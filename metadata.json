@@ -1,0 +1,28 @@
+{
+  "name": "Lib 2026",
+  "short_name": "Libido",
+  "description": "A maior rede social liberal no Brasil. Conexões seguras, discretas e verificadas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#ff1493",
+  "repository": "https://github.com/marcelobarrosorj/libido2026",
+  "icons": [
+    {
+      "src": "https://www.libidoapp.com.br/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://www.libidoapp.com.br/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
