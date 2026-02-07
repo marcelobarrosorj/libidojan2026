@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
-import RadarPage from './radar/RadarPage';
+import Explore from './components/Explore';
 import ChatList from './components/ChatList';
 import Profile from './components/Profile';
 import Subscription from './components/Subscription';
@@ -37,7 +37,6 @@ export default function App() {
     }
 
     const handleVisibility = () => {
-        // EXCEÇÃO DE SEGURANÇA: Não escurece a tela se estivermos em pagamento ou redirecionamento autorizado
         const isSafeZone = document.body.classList.contains('navigating-out') || 
                           document.body.classList.contains('payment-active');
         
@@ -74,6 +73,13 @@ export default function App() {
         document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
+
+  const handleTabChange = (tab: string) => {
+    // Limpa estados de detalhe ao trocar de aba principal
+    setSelectedUser(null);
+    setViewedProfile(null);
+    setActiveTab(tab);
+  };
 
   const handleAcceptTerms = () => {
     recordTermsAcceptance('2026.1', 'app_entry');
@@ -140,23 +146,24 @@ export default function App() {
     );
   }
 
-  const handleViewRadarProfile = (p: any) => {
-    // Adding missing rsvps property to fully satisfy the User interface
+  const handleViewProfile = (p: any) => {
+    // Adding following: p.following || [] to satisfy User type
     const fullUser: User = {
-      id: p.id, nickname: p.name, email: `${p.id}@libido.app`, age: 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
-      type: p.category as any, birthDate: '1995-01-01', biotype: Biotype.PADRAO,
-      gender: Gender.CIS, sexualOrientation: SexualOrientation.BISSEXUAL, vibes: [Vibes.LIBERAL],
-      location: p.city, isOnline: true, verifiedAccount: true, verificationScore: 100, xp: 1200, level: 10,
-      plan: Plan.FREE, matches: [], bookmarks: [], blockedUsers: [], badges: [], boundaries: p.boundaries || [],
-      behaviors: p.behaviors || [], bodyMods: [], bodyHair: 'Aparado', bodyArt: [], bondageExp: 'Iniciante',
-      bucketList: [], bestMoments: [], bestFeature: 'Olhar', beveragePref: 'Gin', bestTime: 'Noite', braveryLevel: p.braveryLevel || 7,
-      busyMode: false, bookingPolicy: 'A combinar', balance: 0, boosts_active: 0, is_premium: false, height: 170,
-      lat: p.lat, lon: p.lon, city: p.city, neighborhood: p.neighborhood, seenBy: [],
+      id: p.id, nickname: p.name || p.nickname, email: p.email || `${p.id}@libido.app`, age: p.age || 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
+      type: p.category || p.type || UserType.HOMEM, birthDate: p.birthDate || '1995-01-01', biotype: p.biotype || Biotype.PADRAO,
+      gender: p.gender || Gender.CIS, sexualOrientation: p.sexualOrientation || SexualOrientation.BISSEXUAL, vibes: p.vibes || [Vibes.LIBERAL],
+      location: p.city || p.location || 'Brasil', isOnline: true, verifiedAccount: p.verifiedAccount || false, verificationScore: p.verificationScore || 50, xp: p.xp || 100, level: p.level || 1,
+      plan: p.plan || Plan.FREE, matches: p.matches || [], bookmarks: p.bookmarks || [], blockedUsers: p.blockedUsers || [], badges: p.badges || [], boundaries: p.boundaries || [],
+      behaviors: p.behaviors || [], bodyMods: p.bodyMods || [], bodyHair: p.bodyHair || 'Aparado', bodyArt: p.bodyArt || [], bondageExp: p.bondageExp || 'Iniciante',
+      bucketList: p.bucketList || [], bestMoments: p.bestMoments || [], bestFeature: p.bestFeature || 'Olhar', beveragePref: p.beveragePref || 'Gin', bestTime: p.bestTime || 'Noite', braveryLevel: p.braveryLevel || 7,
+      busyMode: p.busyMode || false, bookingPolicy: p.bookingPolicy || 'A combinar', balance: p.balance || 0, boosts_active: p.boosts_active || 0, is_premium: p.is_premium || false, height: p.height || 170,
+      lat: p.lat || -23.5505, lon: p.lon || -46.6333, city: p.city || 'São Paulo', neighborhood: p.neighborhood || 'Centro', seenBy: p.seenBy || [],
       gallery: p.gallery || [{ id: `${p.id}-default`, url: p.avatar, timestamp: new Date().toISOString() }],
       trustLevel: p.trustLevel || TrustLevel.BRONZE, isGhostMode: p.isGhostMode || false, hasBlurredGallery: p.hasBlurredGallery || (p.trustLevel === TrustLevel.OURO),
-      vouches: [],
+      vouches: p.vouches || [],
+      following: p.following || [],
       lookingFor: p.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
-      rsvps: []
+      rsvps: p.rsvps || []
     };
     setViewedProfile(fullUser);
     setActiveTab('view_profile');
@@ -172,20 +179,20 @@ export default function App() {
     }
 
     switch (activeTab) {
-      case 'radar': return <RadarPage onProfileClick={handleViewRadarProfile} onUpgrade={() => setActiveTab('assinatura')} />;
+      case 'radar': return <Explore onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
       case 'events': return <EventsPage />;
-      case 'feed': return <Feed />;
+      case 'feed': return <Feed onProfileClick={handleViewProfile} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} />;
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
       case 'assinatura': return <Subscription />;
-      default: return <Feed />; 
+      default: return <Feed onProfileClick={handleViewProfile} />; 
     }
   };
 
   return (
     <AuthContext.Provider value={{ logout, refreshSession, setIsUnlocked, setIsAuthenticated }}>
       <div className="relative w-full h-full flex justify-center">
-        <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+        <Layout activeTab={activeTab} setActiveTab={handleTabChange}>
           {renderContent()}
         </Layout>
       </div>

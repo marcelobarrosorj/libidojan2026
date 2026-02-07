@@ -59,6 +59,8 @@ export function getUserData(): User | null {
           user.is_premium = true;
           user.trustLevel = TrustLevel.OURO;
       }
+      // Garantir que following existe
+      if (!user.following) user.following = [];
       return user;
     } catch (e) { return null; }
   }
@@ -75,10 +77,31 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
         updated.is_premium = true;
     }
 
+    if (!updated.following) updated.following = [];
+
     cache.userData = updated;
     const encoded = safeBtoa(JSON.stringify(updated));
     localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, encoded);
     syncWithCloud(updated);
+};
+
+/**
+ * Alterna o estado de seguir um usuário.
+ */
+export const toggleFollow = async (targetUserId: string): Promise<boolean> => {
+    const user = cache.userData;
+    if (!user) return false;
+
+    const following = user.following || [];
+    const isFollowing = following.includes(targetUserId);
+    
+    const newFollowing = isFollowing 
+        ? following.filter(id => id !== targetUserId)
+        : [...following, targetUserId];
+
+    saveUserData({ ...user, following: newFollowing });
+    log('info', `[FOLLOW] User ${targetUserId} ${isFollowing ? 'unfollowed' : 'followed'}`);
+    return !isFollowing;
 };
 
 export function getAuthFlag(): boolean {
@@ -101,6 +124,7 @@ export const syncCaches = async () => {
                 cloudData.plan = Plan.GOLD;
                 cloudData.is_premium = true;
             }
+            if (!cloudData.following) cloudData.following = [];
             cache.userData = cloudData;
             localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, safeBtoa(JSON.stringify(cloudData)));
         }
@@ -153,7 +177,11 @@ export const validateIntegrity = (): boolean => {
 
 export const sanitizeInput = (i: string) => i.replace(/[<>]/g, '');
 export const postShoutout = async (t: string, type: any, u: any) => ({ success: true });
-export const likeProfile = async (id: string) => ({ isMatch: Math.random() > 0.8 });
+export const likeProfile = async (id: string) => {
+    // Ao dar like, automaticamente segue o usuário conforme solicitação
+    await toggleFollow(id);
+    return { isMatch: Math.random() > 0.8 };
+};
 export const passProfile = async (id: string) => ({});
 
 export const simulateApiCall = async (tag: string, data: any, delay: number = 1000) => {

@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../App';
 import { RegistrationFlow } from './RegistrationFlow';
 import { PinSetup } from './PinSetup';
-import { saveUserData, setAuthFlag } from '../services/authUtils';
+import { PinUnlock } from './PinUnlock';
+import { saveUserData, setAuthFlag, getUserData, showNotification } from '../services/authUtils';
 import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, Vibes } from '../types';
 
 export const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked, refreshSession } = useAuth();
-  const [view, setView] = useState<'landing' | 'register' | 'pin'>('landing');
+  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock'>('landing');
   const [regData, setRegData] = useState<any>(null);
 
   const handleRegistrationComplete = (payload: any) => {
@@ -15,12 +17,21 @@ export const Auth: React.FC = () => {
     setView('pin');
   };
 
+  const handleAccessExisting = () => {
+    const existing = getUserData();
+    if (existing) {
+      setView('unlock');
+    } else {
+      showNotification('Nenhuma conta encontrada neste dispositivo.', 'info');
+    }
+  };
+
   const handlePinDone = () => {
     const data = regData.data;
     const nickname = data.nickname || data.mainNickname || 'Anon';
     const email = data.email || 'contato@libido.app';
 
-    // Construção do objeto de usuário inicial para persistência com campos da Matriz B
+    // Adding following: [] to satisfy User type
     const newUser: User = {
       id: `u-${Date.now()}`,
       nickname,
@@ -61,6 +72,7 @@ export const Auth: React.FC = () => {
       bookmarks: [],
       blockedUsers: [],
       matches: [],
+      following: [],
       seenBy: [],
       bodyMods: [],
       bodyHair: 'Naturais',
@@ -83,15 +95,22 @@ export const Auth: React.FC = () => {
     refreshSession(true);
   };
 
+  const handleUnlocked = () => {
+    setAuthFlag(true);
+    setIsAuthenticated(true);
+    setIsUnlocked(true);
+    refreshSession(true);
+  };
+
   if (view === 'landing') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-700">
         <div className="mb-12 relative group">
-          <div className="absolute inset-0 bg-pink/20 blur-[100px] rounded-full group-hover:bg-pink/30 transition-all duration-1000" />
+          <div className="absolute inset-0 bg-amber-500/20 blur-[100px] rounded-full group-hover:bg-amber-500/30 transition-all duration-1000" />
           <h1 className="text-8xl font-black text-white italic relative tracking-tighter leading-none select-none">
             LIBIDO
           </h1>
-          <p className="text-slate-500 uppercase tracking-[0.5em] text-[10px] mt-4 font-black">Matriz Lifestyle 2026</p>
+          <p className="text-amber-500 uppercase tracking-[0.5em] text-[10px] mt-4 font-black">Matriz Lifestyle 2026</p>
         </div>
         
         <div className="w-full max-w-xs space-y-4 relative z-10">
@@ -102,7 +121,8 @@ export const Auth: React.FC = () => {
             Criar Nova Conta
           </button>
           <button 
-            className="w-full py-5 bg-slate-900 border border-white/5 rounded-[2rem] font-black text-slate-500 uppercase tracking-widest text-[10px] hover:text-white transition-all shadow-xl"
+            onClick={handleAccessExisting}
+            className="w-full py-5 bg-slate-900 border border-amber-500/10 rounded-[2rem] font-black text-slate-400 uppercase tracking-widest text-[10px] hover:text-white transition-all shadow-xl"
           >
             Acessar Existente
           </button>
@@ -119,6 +139,14 @@ export const Auth: React.FC = () => {
     return (
       <div className="h-screen w-full">
         <RegistrationFlow onComplete={handleRegistrationComplete} onCancel={() => setView('landing')} />
+      </div>
+    );
+  }
+
+  if (view === 'unlock') {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 animate-in zoom-in-95 duration-500">
+        <PinUnlock onUnlocked={handleUnlocked} onRequireStrongLogin={() => setView('landing')} />
       </div>
     );
   }

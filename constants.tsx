@@ -1,7 +1,6 @@
 
-import { User, UserType, Vibes, Plan, Post, Biotype, Gender, SexualOrientation, TrustLevel } from './types';
+import { User, UserType, Vibes, Plan, Post, Biotype, Gender, SexualOrientation, TrustLevel, Moment } from './types';
 
-// Adding missing properties (lat, lon, birthDate, rsvps) to match the User interface requirements
 export const MOCK_CURRENT_USER: User = {
   id: 'me',
   nickname: 'User_Libido',
@@ -37,6 +36,7 @@ export const MOCK_CURRENT_USER: User = {
   bookmarks: [],
   blockedUsers: [],
   matches: [],
+  following: [],
   seenBy: [],
   boundaries: ['Sem envolvimento emocional'],
   behaviors: ['Curioso', 'Aberto'],
@@ -67,7 +67,8 @@ export const MOCK_USERS: User[] = [
     age: 26,
     type: UserType.CASAIS,
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    trustLevel: TrustLevel.OURO
+    trustLevel: TrustLevel.OURO,
+    following: []
   },
   {
     ...MOCK_CURRENT_USER,
@@ -77,7 +78,38 @@ export const MOCK_USERS: User[] = [
     age: 27,
     type: UserType.MULHER,
     avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
-    trustLevel: TrustLevel.PRATA
+    trustLevel: TrustLevel.PRATA,
+    following: []
+  }
+];
+
+export const MOCK_MOMENTS: Moment[] = [
+  {
+    id: 'm1',
+    userId: 'user-1',
+    nickname: 'Ana & Bruno',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800',
+    timestamp: '1h atrás',
+    viewed: false
+  },
+  {
+    id: 'm2',
+    userId: 'user-3',
+    nickname: 'Carla',
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
+    imageUrl: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800',
+    timestamp: '4h atrás',
+    viewed: false
+  },
+  {
+    id: 'm3',
+    userId: 'm8',
+    nickname: 'Gabi',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
+    imageUrl: 'https://images.unsplash.com/photo-1514525253361-bee8718a74a2?w=800',
+    timestamp: '30min atrás',
+    viewed: false
   }
 ];
 
@@ -95,5 +127,61 @@ export const MOCK_POSTS: Post[] = [
     shares: 12,
     liked: false,
     timestamp: '2026-01-03T20:00:00Z'
+  },
+  {
+    id: "post-2",
+    userId: 'user-3',
+    user: 'Carla',
+    age: 27,
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800',
+    description: 'Explorando novas conexões no radar hoje. Quem mais por aqui? 😈🖤 #singlewoman #lifestyle',
+    likes: 89,
+    comments: [{ user: 'Matriz', text: 'Vibe absurda!' }],
+    shares: 5,
+    liked: true,
+    timestamp: '2026-01-04T10:30:00Z'
+  },
+  {
+    id: "post-3",
+    userId: 'm4',
+    user: 'Lia & Dan',
+    age: 29,
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
+    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800',
+    description: 'Noite de festa secreta em SP. Simplesmente inesquecível! 🔥🔞 #swingparty #vibe',
+    likes: 210,
+    comments: [{ user: 'Ana', text: 'Estávamos lá! Foi top!' }],
+    shares: 24,
+    liked: false,
+    timestamp: '2026-01-04T02:00:00Z'
+  },
+  {
+    id: "post-4",
+    userId: 'm8',
+    user: 'Gabi',
+    age: 24,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
+    image: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800',
+    description: 'O mistério é o que me move. Pronta para o próximo encontro? 🍷✨ #bdsm #powerplay',
+    likes: 156,
+    comments: [],
+    shares: 8,
+    liked: false,
+    timestamp: '2026-01-04T18:45:00Z'
+  },
+  {
+    id: "post-5",
+    userId: 'm26',
+    user: 'Paola & Gui',
+    age: 31,
+    avatar: 'https://images.unsplash.com/photo-1516575334481-f85287c2c82d?w=400',
+    image: 'https://images.unsplash.com/photo-1516195851888-6f1a981a8a2a?w=800',
+    description: 'Sunset e drinks antes do The Circle. A vida liberal é arte! 🌅🥂 #lifestyle #casalvip',
+    likes: 312,
+    comments: [{ user: 'Admin', text: 'Elegância pura!' }],
+    shares: 45,
+    liked: false,
+    timestamp: '2026-01-04T17:00:00Z'
   }
 ];

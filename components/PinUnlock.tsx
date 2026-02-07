@@ -19,7 +19,6 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
   const pinDigits = useMemo(() => pin.split(''), [pin]);
   const canSubmit = useMemo(() => isValidPinFormat(pin) && !busy, [pin, busy]);
 
-  // Foco inicial garantido com pequeno delay para mobile
   useEffect(() => {
     const t = setTimeout(() => inputRef.current?.focus(), 300);
     return () => clearTimeout(t);
@@ -27,6 +26,14 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
 
   async function handleUnlock() {
     if (pin.length < 4) return;
+    
+    // Explicit numeric check
+    if (!isValidPinFormat(pin)) {
+      setMsg('O PIN deve conter exatamente 4 dígitos numéricos.');
+      setPin('');
+      return;
+    }
+
     setBusy(true);
     setMsg(null);
     try {
@@ -45,7 +52,6 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
           if (res.reason === 'invalid') {
             setMsg('PIN incorreto.');
             setPin('');
-            // Pequeno delay para forçar refoco caso o teclado tenha fechado
             setTimeout(() => inputRef.current?.focus(), 100);
             return;
           }
@@ -59,7 +65,6 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
     }
   }
 
-  // Auto-envio ao completar 4 dígitos
   useEffect(() => {
     if (pin.length === 4 && !busy) {
       handleUnlock();
@@ -72,14 +77,14 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
   }
 
   return (
-    <div className="w-full max-w-sm glass-card rounded-[3rem] p-10 border-white/5 shadow-2xl animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+    <div className="w-full max-w-sm glass-card rounded-[3rem] p-10 border-amber-500/10 shadow-2xl animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
       <div className="text-center space-y-4 mb-8">
-        <div className="w-16 h-16 bg-pink/10 rounded-[1.5rem] flex items-center justify-center mx-auto text-pink shadow-[0_0_20px_rgba(255,20,147,0.15)]">
+        <div className="w-16 h-16 bg-amber-500/10 rounded-[1.5rem] flex items-center justify-center mx-auto text-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
           <Lock size={32} />
         </div>
         <div className="space-y-1">
           <h2 className="text-white font-black text-xs uppercase tracking-[0.3em]">Acesso Bloqueado</h2>
-          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Insira seu PIN para continuar</p>
+          <p className="text-[10px] text-amber-500/70 font-bold uppercase tracking-widest">Insira seu PIN para continuar</p>
         </div>
       </div>
 
@@ -93,12 +98,12 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
               <div 
                 key={i} 
                 className={`flex-1 aspect-square bg-slate-900/60 border rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                  pin.length === i ? 'border-pink ring-2 ring-pink/20 scale-105' : 
-                  pinDigits[i] ? 'border-pink/50 scale-105' : 'border-white/5'
+                  pin.length === i ? 'border-amber-500 ring-2 ring-amber-500/20 scale-105 shadow-lg shadow-amber-500/10' : 
+                  pinDigits[i] ? 'border-amber-500/50 scale-105' : 'border-amber-500/10'
                 }`}
               >
                 {pinDigits[i] ? (
-                  <div className="w-3 h-3 bg-white rounded-full shadow-[0_0_10px_white] animate-in zoom-in" />
+                  <div className="w-3 h-3 bg-amber-500 rounded-full shadow-[0_0_100px_rgba(245,158,11,0.4)] animate-in zoom-in" />
                 ) : null}
               </div>
             ))}
@@ -106,7 +111,10 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
           <input
             ref={inputRef}
             value={pin}
-            onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+              setPin(val);
+            }}
             inputMode="numeric"
             pattern="[0-9]*"
             autoComplete="one-time-code"
@@ -129,12 +137,13 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
             onClick={handleUnlock}
             disabled={!canSubmit}
             loading={busy}
+            variant="amber"
             icon={<Unlock size={20} />}
           />
 
           <button
             onClick={handleForgot}
-            className="w-full py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors flex items-center justify-center gap-2"
+            className="w-full py-4 text-[10px] font-black text-amber-500/60 uppercase tracking-widest hover:text-amber-400 transition-colors flex items-center justify-center gap-2"
           >
             <ShieldAlert size={14} />
             Esqueci meu PIN
@@ -142,7 +151,7 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
         </div>
       </div>
 
-      <p className="text-[9px] text-slate-700 text-center mt-8 font-black uppercase tracking-[0.2em]">
+      <p className="text-[9px] text-slate-800 text-center mt-8 font-black uppercase tracking-[0.2em]">
         Libido Security Layer 2.0
       </p>
     </div>

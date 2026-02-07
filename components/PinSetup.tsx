@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { ShieldCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { isValidPinFormat, isWeakPin } from '../services/pinPolicy';
 import { setUserPin } from '../services/pinService';
@@ -15,16 +16,29 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // O botão agora fica habilitado assim que o formato básico está correto
-  // Permitindo que o usuário clique e receba feedback de validação
+  // Referência para o campo de confirmação para permitir o foco automático
+  const confirmInputRef = useRef<HTMLInputElement>(null);
+
   const canClick = useMemo(() => {
     return pin.length === 4 && confirm.length === 4 && !busy;
   }, [pin, confirm, busy]);
 
-  const handleSubmit = async () => {
-    if (!canClick) return;
+  // Monitora o preenchimento do primeiro PIN para pular para o próximo campo
+  useEffect(() => {
+    if (pin.length === 4) {
+      confirmInputRef.current?.focus();
+    }
+  }, [pin]);
 
-    // Validações internas para feedback claro
+  const handleSubmit = useCallback(async () => {
+    // Validação explícita para 4 dígitos numéricos
+    if (!isValidPinFormat(pin)) {
+      setError('O PIN deve conter exatamente 4 dígitos numéricos.');
+      return;
+    }
+
+    if (pin.length !== 4 || confirm.length !== 4 || busy) return;
+
     if (isWeakPin(pin)) {
       setError('Este PIN é muito comum. Escolha algo menos previsível.');
       return;
@@ -46,7 +60,6 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
         log('info', '[PIN_SETUP] Sucesso. Prosseguindo...');
         onDone();
       } else {
-        // Fix: Explicitly check for message property to satisfy TypeScript compiler
         setError('message' in result ? result.message : 'Erro ao configurar PIN');
       }
     } catch (e: any) {
@@ -55,23 +68,33 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
     } finally {
       setBusy(false);
     }
-  };
+  }, [pin, confirm, busy, onDone]);
+
+  useEffect(() => {
+    if (pin.length === 4 && confirm.length === 4 && !busy) {
+      const timer = setTimeout(() => {
+        handleSubmit();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [pin, confirm, busy, handleSubmit]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 w-full max-w-sm">
       <div className="text-center space-y-2">
-        <div className="w-16 h-16 bg-pink/10 rounded-3xl flex items-center justify-center mx-auto text-pink mb-4">
+        <div className="w-16 h-16 bg-amber-500/10 rounded-3xl flex items-center justify-center mx-auto text-amber-500 mb-4 shadow-lg shadow-amber-500/10">
           <ShieldCheck size={32} />
         </div>
         <h3 className="text-xl font-bold text-white font-outfit uppercase tracking-tight">Segurança Libido</h3>
-        <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Defina sua Chave de 4 dígitos</p>
+        <p className="text-[10px] text-amber-500 font-black uppercase tracking-widest">Defina sua Chave de 4 dígitos</p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-            <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-2">Novo PIN</label>
+            <label className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest ml-2">Novo PIN</label>
             <input
               type="password"
+              autoFocus
               maxLength={4}
               inputMode="numeric"
               placeholder="••••"
@@ -80,13 +103,14 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
                   setError(null);
                   setPin(e.target.value.replace(/\D/g, ''));
               }}
-              className="w-full bg-slate-900 border border-white/5 rounded-2xl py-4 px-6 text-center text-white text-2xl tracking-[1em] focus:border-pink/50 outline-none transition-all"
+              className="w-full bg-slate-900 border-2 border-amber-500/20 rounded-2xl py-5 px-6 text-center text-white text-2xl tracking-[1em] focus:border-amber-500 outline-none transition-all shadow-inner"
             />
         </div>
 
         <div className="space-y-2">
-            <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest ml-2">Confirme o PIN</label>
+            <label className="text-[9px] font-black text-amber-500/60 uppercase tracking-widest ml-2">Confirme o PIN</label>
             <input
+              ref={confirmInputRef}
               type="password"
               maxLength={4}
               inputMode="numeric"
@@ -96,7 +120,7 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
                   setError(null);
                   setConfirm(e.target.value.replace(/\D/g, ''));
               }}
-              className="w-full bg-slate-900 border border-white/5 rounded-2xl py-4 px-6 text-center text-white text-2xl tracking-[1em] focus:border-pink/50 outline-none transition-all"
+              className="w-full bg-slate-900 border-2 border-amber-500/20 rounded-2xl py-5 px-6 text-center text-white text-2xl tracking-[1em] focus:border-amber-500 outline-none transition-all shadow-inner"
             />
         </div>
       </div>
@@ -114,6 +138,7 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
           onClick={handleSubmit}
           disabled={!canClick}
           loading={busy}
+          variant="amber"
           icon={<ArrowRight size={18} />}
         />
         <p className="text-[9px] text-slate-600 text-center mt-4 italic font-medium px-4">

@@ -1,3 +1,4 @@
+
 export enum UserType { HOMEM = 'Homem', MULHER = 'Mulher', CASAIS = 'Casais' }
 export enum TrustLevel { BRONZE = 'Bronze', PRATA = 'Prata', OURO = 'Ouro' }
 export enum Plan { FREE = 'Free', PREMIUM = 'Premium', GOLD = 'Gold' }
@@ -36,6 +37,24 @@ export interface GalleryPhoto {
   url: string; 
   timestamp: string; 
   isBlurred?: boolean; 
+}
+
+export interface Moment {
+  id: string;
+  userId: string;
+  nickname: string;
+  avatar: string;
+  imageUrl: string;
+  timestamp: string;
+  viewed: boolean;
+}
+
+export interface HeatZone {
+  id: string;
+  x: number;
+  y: number;
+  intensity: number; // 0 to 1
+  color: 'amber' | 'pink';
 }
 
 export interface ProfileData {
@@ -102,6 +121,7 @@ export interface User {
   bookmarks: string[];
   blockedUsers: string[];
   matches: string[];
+  following: string[]; // IDs dos usuários que este usuário segue
   seenBy: string[];
   bodyMods: string[];
   bodyHair: string;

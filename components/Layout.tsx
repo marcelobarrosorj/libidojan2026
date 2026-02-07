@@ -69,14 +69,14 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
         </div>
       </main>
 
-      {/* Bottom Navigation Adjusted for Contrast and Visibility */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto main-nav-glass px-2 py-4 pb-6 flex justify-between items-center z-20 rounded-t-[2.5rem]">
-        <NavButton icon={<LayoutGrid size={20} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
-        <NavButton icon={<Radio size={20} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
-        <NavButton icon={<CalendarDays size={20} />} isActive={activeTab === 'events'} onClick={() => setActiveTab('events')} label="Eventos" />
-        <NavButton icon={<CreditCard size={20} />} isActive={activeTab === 'assinatura'} onClick={() => setActiveTab('assinatura')} label="Assinar" />
-        <NavButton icon={<MessageCircle size={20} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
-        <NavButton icon={<UserCircle size={20} />} isActive={activeTab === 'profile'} onClick={() => setActiveTab('profile')} label="Me" />
+      {/* Bottom Navigation: High Visibility 100% Solid Contrast */}
+      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a] border-t-2 border-amber-500 px-2 py-4 pb-10 flex justify-between items-center z-50 rounded-t-[3rem] shadow-[0_-25px_60px_rgba(0,0,0,1)]">
+        <NavButton icon={<LayoutGrid size={24} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
+        <NavButton icon={<Radio size={24} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
+        <NavButton icon={<CalendarDays size={24} />} isActive={activeTab === 'events'} onClick={() => setActiveTab('events')} label="Eventos" />
+        <NavButton icon={<CreditCard size={24} />} isActive={activeTab === 'assinatura'} onClick={() => setActiveTab('assinatura')} label="Assinar" />
+        <NavButton icon={<MessageCircle size={24} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
+        <NavButton icon={<UserCircle size={24} />} isActive={activeTab === 'profile'} onClick={() => setActiveTab('profile')} label="Me" />
       </nav>
     </div>
   );
@@ -85,9 +85,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
 const NavButton: React.FC<{ icon: React.ReactNode, isActive: boolean, onClick: () => void, label: string }> = ({ 
   icon, isActive, onClick, label 
 }) => (
-  <button onClick={onClick} className={`flex flex-col items-center gap-1.5 flex-1 transition-all duration-300 ${isActive ? 'text-amber-500 scale-110' : 'text-slate-500 hover:text-slate-300'}`}>
-    <div className={`p-1.5 rounded-full transition-all ${isActive ? 'bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.3)]' : ''}`}>{icon}</div>
-    <span className={`text-[8px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-60'}`}>{label}</span>
+  <button onClick={onClick} className={`flex flex-col items-center gap-2 flex-1 transition-all duration-300 ${isActive ? 'scale-110' : 'hover:scale-105'}`}>
+    <div className={`p-3.5 rounded-[1.25rem] transition-all shadow-xl border ${isActive ? 'bg-amber-500 text-black border-amber-400 shadow-amber-500/20' : 'bg-slate-900 text-slate-200 border-white/5'}`}>
+      {icon}
+    </div>
+    <span className={`text-[8px] font-black uppercase tracking-[0.15em] transition-colors ${isActive ? 'text-amber-500' : 'text-slate-500'}`}>{label}</span>
   </button>
 );
 
