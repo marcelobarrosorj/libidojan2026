@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    // ... seus dependencies existentes
+    "@supabase/supabase-js": "^2.39.0",
+    "hono": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -18,11 +22,11 @@
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vercel/node": "^3.0.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "typescript": "^5.2.2",
-    "vite": "^6.4.1",
-    "@vercel/node": "^3.0.0"  // ← ADICIONE ESTA LINHA
+    "vite": "^6.4.1"
   }
 }
