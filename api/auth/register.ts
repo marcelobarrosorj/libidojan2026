@@ -4,9 +4,13 @@ import { createHash } from 'node:crypto'
 
 function getSupabase() {
   const url = process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_ANON_KEY
-  if (!url || !key) throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY')
-  return createClient(url, key)
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) {
+    throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
+  }
+  return createClient(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  })
 }
 
 function sha256Hex(input: string) {
@@ -32,15 +36,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const supabase = getSupabase()
-    const password_hash = sha256Hex(pwd)
 
     const { error } = await supabase.from('users').insert({
       email,
-      password_hash,
+      password_hash: sha256Hex(pwd),
       email_verified: true
     })
 
     if (error) {
+      // unique violation (Postgres)
       if ((error as any).code === '23505') {
         return res.status(409).json({ ok: false, error: 'email already exists' })
       }
