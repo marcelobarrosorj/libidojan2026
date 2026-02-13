@@ -2,20 +2,35 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // DEBUG TEMPORÁRIO (vamos remover depois)
+  console.log('DEBUG method:', req.method)
+  console.log('DEBUG headers content-type:', req.headers['content-type'])
+  console.log('DEBUG raw req.body:', req.body)
+  console.log('DEBUG typeof req.body:', typeof req.body)
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ ok: false, error: 'method not allowed' })
   }
 
   let body: any = req.body
+
+  // Se o body vier como string, tenta parsear
   if (typeof body === 'string') {
     try {
       body = JSON.parse(body)
-    } catch {}
+    } catch (e) {
+      console.log('DEBUG JSON.parse failed:', e)
+    }
   }
+
+  console.log('DEBUG parsed body:', body)
 
   const email = body?.email
   const password = body?.password
+
+  console.log('DEBUG extracted email:', email)
+  console.log('DEBUG extracted password type:', typeof password)
 
   if (!email || !password) {
     return res.status(400).json({ ok: false, error: 'missing fields' })
