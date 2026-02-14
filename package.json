@@ -15,7 +15,8 @@
     "@supabase/supabase-js": "^2.38.4",
     "jsonwebtoken": "^9.0.0",
     "@types/jsonwebtoken": "^9.0.0",
-    "stripe": "^16.0.0"
+    "stripe": "^16.0.0",
+    "lucide-react": "^0.294.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
