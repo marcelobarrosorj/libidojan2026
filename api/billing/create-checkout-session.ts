@@ -43,9 +43,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .from('profiles')
     .select('stripe_customer_id')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
-  if (profileErr && profileErr.code !== 'PGRST116') {
+  if (profileErr) {
     return res.status(500).json({ ok: false, error: `supabase profiles read error: ${profileErr.message}` })
   }
 
