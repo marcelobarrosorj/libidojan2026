@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret)
+    event = stripe.webhooks.constructEvent(rawBody, String(sig), webhookSecret)
   } catch (err: any) {
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
