@@ -23,12 +23,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const userId = body?.userId
   const email = body?.email
+  const priceId = body?.priceId || process.env.STRIPE_PRICE_ID_MENSAL // Fallback para mensal se não passar
 
   if (!userId || !email) {
     return res.status(400).json({ ok: false, error: 'missing fields: userId, email' })
   }
 
-  const priceId = process.env.STRIPE_PRICE_ID
   const appUrl = process.env.APP_URL
   const supabaseUrl = process.env.SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
