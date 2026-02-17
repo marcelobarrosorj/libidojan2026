@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
