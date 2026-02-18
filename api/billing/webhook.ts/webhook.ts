@@ -2,89 +2,119 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2024-06-20'
 })
 
-export const config = { api: { bodyParser: false } }
+// Cliente Supabase (use Service Role Key para atualizar dados)
+const supabase = createClient(
+  process.env.SUPABASE_URL as string,
+  process.env.SUPABASE_SERVICE_ROLE_KEY as string
+)
 
-function buffer(readable: any) {
-  return new Promise<Buffer>((resolve, reject) => {
-    const chunks: any[] = []
-    readable.on('data', (chunk: any) => chunks.push(Buffer.from(chunk)))
-    readable.on('end', () => resolve(Buffer.concat(chunks)))
-    readable.on('error', reject)
-  })
+export const config = {
+  api: { bodyParser: false }
+}
+
+async function buffer(readable: any) {
+  const chunks = []
+  for await (const chunk of readable) chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
+  return Buffer.concat(chunks)
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed')
 
-  const sig = req.headers['stripe-signature']
+  const sig = req.headers['stripe-signature'] as string
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-  const supabaseUrl = process.env.SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  if (!sig || !webhookSecret || !supabaseUrl || !serviceRoleKey) {
-    return res.status(400).send('Missing webhook signature/secret or supabase env')
-  }
-
-  const rawBody = await buffer(req)
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(rawBody, String(sig), webhookSecret)
+    const rawBody = await buffer(req)
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret as string)
   } catch (err: any) {
+    console.error(`❌ Webhook Error: ${err.message}`)
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
-  const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
-
-  const updateByCustomer = async (customerId: string, status: string, periodEnd: string | null) => {
-    const { error } = await supabaseAdmin
-      .from('profiles')
-      .update({
-        subscription_status: status,
-        subscription_current_period_end: periodEnd,
-        updated_at: new Date().toISOString()
-      })
-      .eq('stripe_customer_id', customerId)
-
-    if (error) throw new Error(error.message)
-  }
-
   try {
-    if (event.type === 'invoice.paid') {
-      const invoice = event.data.object as Stripe.Invoice
-      const customerId = String(invoice.customer)
-      const subscriptionId = (invoice.subscription as string | null) ?? null
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        const userId = session.metadata?.userId
 
-      if (subscriptionId) {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId)
-        const periodEnd = sub.current_period_end
-          ? new Date(sub.current_period_end * 1000).toISOString()
-          : null
+        if (userId) {
+          console.log(`✅ Checkout concluído para usuário: ${userId}`)
+          
+          // Atualiza o usuário para premium no Supabase
+          const { error } = await supabase
+            .from('users') // ⚠️ AJUSTE: se sua tabela for 'profiles', troque aqui
+            .update({ 
+              plan: 'premium', 
+              is_premium: true,
+              subscriptionStatus: 'active',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId)
 
-        await updateByCustomer(customerId, 'active', periodEnd)
-      } else {
-        await updateByCustomer(customerId, 'active', null)
+          if (error) throw error
+        }
+        break
       }
-    }
 
-    if (event.type === 'invoice.payment_failed') {
-      const invoice = event.data.object as Stripe.Invoice
-      const customerId = String(invoice.customer)
-      await updateByCustomer(customerId, 'past_due', null)
-    }
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        const userId = subscription.metadata?.userId
 
-    if (event.type === 'customer.subscription.deleted') {
-      const sub = event.data.object as Stripe.Subscription
-      const customerId = String(sub.customer)
-      await updateByCustomer(customerId, 'canceled', null)
+        if (userId && subscription.status === 'active') {
+          console.log(`✅ Assinatura ativa para usuário: ${userId}`)
+          
+          const { error } = await supabase
+            .from('users') // ⚠️ AJUSTE: se sua tabela for 'profiles', troque aqui
+            .update({ 
+              plan: 'premium', 
+              is_premium: true,
+              subscriptionStatus: 'active',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId)
+
+          if (error) throw error
+        }
+        break
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription
+        const userId = subscription.metadata?.userId
+
+        if (userId) {
+          console.log(`❌ Assinatura cancelada para usuário: ${userId}`)
+          
+          const { error } = await supabase
+            .from('users') // ⚠️ AJUSTE: se sua tabela for 'profiles', troque aqui
+            .update({ 
+              plan: 'free', 
+              is_premium: false,
+              subscriptionStatus: 'inactive',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId)
+
+          if (error) throw error
+        }
+        break
+      }
+
+      default:
+        break
     }
 
     return res.status(200).json({ received: true })
-  } catch (e: any) {
-    return res.status(500).send(`Webhook handler failed: ${e.message}`)
+  } catch (error: any) {
+    console.error('❌ Erro ao atualizar Supabase:', error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
