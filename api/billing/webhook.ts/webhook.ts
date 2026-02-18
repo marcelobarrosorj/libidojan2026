@@ -2,14 +2,13 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20'
 })
 
-// Cliente Supabase com Service Role (para atualizar dados)
 const supabase = createClient(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_ROLE_KEY as string
+  process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 )
 
 export const config = {
@@ -44,20 +43,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
 
-        if (userId) {
-          console.log(`✅ Checkout concluído para usuário: ${userId}`)
-          
-          // Atualiza para premium na tabela 'profiles'
-          const { error } = await supabase
+        if (userId && session.mode === 'subscription') {
+          await supabase
             .from('profiles')
             .update({ 
               subscription_status: 'active',
-              subscription_current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 dias
+              stripe_subscription_id: session.subscription as string,
               updated_at: new Date().toISOString()
             })
             .eq('id', userId)
-
-          if (error) throw error
         }
         break
       }
@@ -67,19 +61,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const subscription = event.data.object as Stripe.Subscription
         const userId = subscription.metadata?.userId
 
-        if (userId && subscription.status === 'active') {
-          console.log(`✅ Assinatura ativa para usuário: ${userId}`)
-          
-          const { error } = await supabase
+        if (userId) {
+          await supabase
             .from('profiles')
             .update({ 
-              subscription_status: 'active',
+              subscription_status: subscription.status,
               subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              stripe_subscription_id: subscription.id,
               updated_at: new Date().toISOString()
             })
             .eq('id', userId)
-
-          if (error) throw error
         }
         break
       }
@@ -89,9 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const userId = subscription.metadata?.userId
 
         if (userId) {
-          console.log(`❌ Assinatura cancelada para usuário: ${userId}`)
-          
-          const { error } = await supabase
+          await supabase
             .from('profiles')
             .update({ 
               subscription_status: 'inactive',
@@ -99,8 +88,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               updated_at: new Date().toISOString()
             })
             .eq('id', userId)
+        }
+        break
+      }
 
-          if (error) throw error
+      case 'invoice.payment_succeeded': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = invoice.customer as string
+
+        // Encontrar userId pelo customerId
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single()
+
+        if (profile) {
+          await supabase
+            .from('profiles')
+            .update({ subscription_status: 'active' })
+            .eq('id', profile.id)
+        }
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = invoice.customer as string
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single()
+
+        if (profile) {
+          await supabase
+            .from('profiles')
+            .update({ subscription_status: 'past_due' })
+            .eq('id', profile.id)
         }
         break
       }
