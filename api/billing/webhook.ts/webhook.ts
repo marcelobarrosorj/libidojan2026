@@ -6,7 +6,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: '2024-06-20'
 })
 
-// Cliente Supabase (use Service Role Key para atualizar dados)
+// Cliente Supabase com Service Role (para atualizar dados)
 const supabase = createClient(
   process.env.SUPABASE_URL as string,
   process.env.SUPABASE_SERVICE_ROLE_KEY as string
@@ -47,13 +47,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (userId) {
           console.log(`✅ Checkout concluído para usuário: ${userId}`)
           
-          // Atualiza o usuário para premium no Supabase
+          // Atualiza para premium na tabela 'profiles'
           const { error } = await supabase
-            .from('users') // ⚠️ AJUSTE: se sua tabela for 'profiles', troque aqui
+            .from('profiles')
             .update({ 
-              plan: 'premium', 
-              is_premium: true,
-              subscriptionStatus: 'active',
+              subscription_status: 'active',
+              subscription_current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 dias
               updated_at: new Date().toISOString()
             })
             .eq('id', userId)
@@ -72,11 +71,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.log(`✅ Assinatura ativa para usuário: ${userId}`)
           
           const { error } = await supabase
-            .from('users') // ⚠️ AJUSTE: se sua tabela for 'profiles', troque aqui
+            .from('profiles')
             .update({ 
-              plan: 'premium', 
-              is_premium: true,
-              subscriptionStatus: 'active',
+              subscription_status: 'active',
+              subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
               updated_at: new Date().toISOString()
             })
             .eq('id', userId)
@@ -94,11 +92,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.log(`❌ Assinatura cancelada para usuário: ${userId}`)
           
           const { error } = await supabase
-            .from('users') // ⚠️ AJUSTE: se sua tabela for 'profiles', troque aqui
+            .from('profiles')
             .update({ 
-              plan: 'free', 
-              is_premium: false,
-              subscriptionStatus: 'inactive',
+              subscription_status: 'inactive',
+              subscription_current_period_end: null,
               updated_at: new Date().toISOString()
             })
             .eq('id', userId)
