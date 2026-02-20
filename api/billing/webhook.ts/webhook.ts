@@ -19,7 +19,7 @@ async function buffer(readable: any) {
   return Buffer.concat(chunks)
 }
 
-async function updateProfileByUserId(userId: string, patch: Record<string, any>) {
+async function updateProfile(userId: string, patch: Record<string, any>) {
   const { error } = await supabase.from('profiles').update(patch).eq('id', userId)
   if (error) throw new Error(error.message)
 }
@@ -47,10 +47,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
+
+        // Se metadata não veio, não dá pra mapear usuário
         if (!userId) break
 
-        // Marca como active no momento do completion
-        await updateProfileByUserId(userId, {
+        await updateProfile(userId, {
           subscription_status: 'active',
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: session.subscription as string,
@@ -65,8 +66,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const userId = (sub.metadata as any)?.userId
         if (!userId) break
 
-        await updateProfileByUserId(userId, {
-          subscription_status: sub.status,
+        await updateProfile(userId, {
+          subscription_status: sub.status, // active, past_due, canceled...
           subscription_current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
           stripe_subscription_id: sub.id,
           updated_at: new Date().toISOString()
@@ -79,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const userId = (sub.metadata as any)?.userId
         if (!userId) break
 
-        await updateProfileByUserId(userId, {
+        await updateProfile(userId, {
           subscription_status: 'inactive',
           subscription_current_period_end: null,
           stripe_subscription_id: sub.id,
@@ -89,6 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       case 'invoice.payment_failed': {
+        // Marca past_due quando uma cobrança falha
         const invoice = event.data.object as Stripe.Invoice
         const subId = invoice.subscription as string | null
         if (!subId) break
@@ -97,7 +99,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const userId = (sub.metadata as any)?.userId
         if (!userId) break
 
-        await updateProfileByUserId(userId, {
+        await updateProfile(userId, {
           subscription_status: 'past_due',
           updated_at: new Date().toISOString()
         })
@@ -110,6 +112,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ received: true })
   } catch (e: any) {
-    return res.status(500).json({ error: e.message || 'internal_error' })
+    return res.status(500).json({ error: e?.message || 'internal_error' })
   }
 }
