@@ -9,14 +9,36 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 )
 
+type Body = {
+  userId?: string
+  email?: string
+  plan?: 'mensal' | 'semestral' | 'anual'
+  priceId?: string
+}
+
+function getPriceId(body: Body) {
+  if (body.priceId) return body.priceId
+
+  const plan = body.plan || 'mensal'
+  if (plan === 'mensal') return process.env.STRIPE_PRICE_ID_MENSAL
+  if (plan === 'semestral') return process.env.STRIPE_PRICE_ID_SEMESTRAL
+  if (plan === 'anual') return process.env.STRIPE_PRICE_ID_ANUAL
+  return process.env.STRIPE_PRICE_ID_MENSAL
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed')
 
-  const { userId, email, priceId } = req.body
-  if (!userId || !email || !priceId) return res.status(400).json({ error: 'Missing userId, email, priceId' })
+  const body = (req.body || {}) as Body
+  const userId = body.userId
+  const email = body.email
+  const priceId = getPriceId(body)
+
+  if (!userId || !email || !priceId) {
+    return res.status(400).json({ error: 'Missing userId, email, plan/priceId' })
+  }
 
   try {
-    // 1) Customer
     const { data: profile, error: pErr } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
@@ -31,7 +53,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await supabase.from('profiles').update({ stripe_customer_id: customerId }).eq('id', userId)
     }
 
-    // 2) Subscription (incomplete) para gerar PaymentIntent da primeira fatura
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
@@ -42,13 +63,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
     const pi = (subscription.latest_invoice as any).payment_intent as Stripe.PaymentIntent
-
-    return res.status(200).json({
-      subscriptionId: subscription.id,
-      clientSecret: pi.client_secret
-    })
+    return res.status(200).json({ subscriptionId: subscription.id, clientSecret: pi.client_secret })
   } catch (e: any) {
-    console.error(e)
     return res.status(500).json({ error: e.message })
   }
 }
