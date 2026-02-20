@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
+export const config = { api: { bodyParser: false } }
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20'
 })
@@ -11,29 +13,32 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 )
 
-export const config = {
-  api: { bodyParser: false }
-}
-
 async function buffer(readable: any) {
-  const chunks = []
+  const chunks: Buffer[] = []
   for await (const chunk of readable) chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk)
   return Buffer.concat(chunks)
+}
+
+async function updateProfileByUserId(userId: string, patch: Record<string, any>) {
+  const { error } = await supabase.from('profiles').update(patch).eq('id', userId)
+  if (error) throw new Error(error.message)
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed')
 
-  const sig = req.headers['stripe-signature'] as string
+  const sig = req.headers['stripe-signature']
+  if (!sig || typeof sig !== 'string') return res.status(400).send('Missing stripe-signature')
+
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!webhookSecret) return res.status(500).send('Missing STRIPE_WEBHOOK_SECRET')
 
   let event: Stripe.Event
 
   try {
     const rawBody = await buffer(req)
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret as string)
+    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret)
   } catch (err: any) {
-    console.error(`❌ Webhook Error: ${err.message}`)
     return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
@@ -42,92 +47,60 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
+        if (!userId) break
 
-        if (userId && session.mode === 'subscription') {
-          await supabase
-            .from('profiles')
-            .update({ 
-              subscription_status: 'active',
-              stripe_subscription_id: session.subscription as string,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', userId)
-        }
+        // Marca como active no momento do completion
+        await updateProfileByUserId(userId, {
+          subscription_status: 'active',
+          stripe_customer_id: session.customer as string,
+          stripe_subscription_id: session.subscription as string,
+          updated_at: new Date().toISOString()
+        })
         break
       }
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
-        const userId = subscription.metadata?.userId
+        const sub = event.data.object as Stripe.Subscription
+        const userId = (sub.metadata as any)?.userId
+        if (!userId) break
 
-        if (userId) {
-          await supabase
-            .from('profiles')
-            .update({ 
-              subscription_status: subscription.status,
-              subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-              stripe_subscription_id: subscription.id,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', userId)
-        }
+        await updateProfileByUserId(userId, {
+          subscription_status: sub.status,
+          subscription_current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+          stripe_subscription_id: sub.id,
+          updated_at: new Date().toISOString()
+        })
         break
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription
-        const userId = subscription.metadata?.userId
+        const sub = event.data.object as Stripe.Subscription
+        const userId = (sub.metadata as any)?.userId
+        if (!userId) break
 
-        if (userId) {
-          await supabase
-            .from('profiles')
-            .update({ 
-              subscription_status: 'inactive',
-              subscription_current_period_end: null,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', userId)
-        }
-        break
-      }
-
-      case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice
-        const customerId = invoice.customer as string
-
-        // Encontrar userId pelo customerId
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('stripe_customer_id', customerId)
-          .single()
-
-        if (profile) {
-          await supabase
-            .from('profiles')
-            .update({ subscription_status: 'active' })
-            .eq('id', profile.id)
-        }
+        await updateProfileByUserId(userId, {
+          subscription_status: 'inactive',
+          subscription_current_period_end: null,
+          stripe_subscription_id: sub.id,
+          updated_at: new Date().toISOString()
+        })
         break
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        const customerId = invoice.customer as string
+        const subId = invoice.subscription as string | null
+        if (!subId) break
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('stripe_customer_id', customerId)
-          .single()
+        const sub = await stripe.subscriptions.retrieve(subId)
+        const userId = (sub.metadata as any)?.userId
+        if (!userId) break
 
-        if (profile) {
-          await supabase
-            .from('profiles')
-            .update({ subscription_status: 'past_due' })
-            .eq('id', profile.id)
-        }
+        await updateProfileByUserId(userId, {
+          subscription_status: 'past_due',
+          updated_at: new Date().toISOString()
+        })
         break
       }
 
@@ -136,8 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     return res.status(200).json({ received: true })
-  } catch (error: any) {
-    console.error('❌ Erro ao atualizar Supabase:', error.message)
-    return res.status(500).json({ error: error.message })
+  } catch (e: any) {
+    return res.status(500).json({ error: e.message || 'internal_error' })
   }
 }
