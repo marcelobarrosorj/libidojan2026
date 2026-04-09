@@ -14,28 +14,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { email, plan, userId } = req.body;
-    console.log('📧 Email:', email);
-    console.log('📦 Plano:', plan);
+    const { email, plan, userId } = req.body || {};
+    console.log('📧 Email recebido:', email);
+    console.log('📦 Plano recebido:', plan);
+    console.log('🆔 UserId recebido:', userId);
 
     if (!email) {
-      console.log('❌ Email não enviado');
+      console.log('❌ Erro: Email não enviado');
       return res.status(400).json({ error: 'Email é obrigatório' });
     }
 
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.log('❌ STRIPE_SECRET_KEY não está configurada no Vercel');
+      console.log('❌ Erro: STRIPE_SECRET_KEY não está configurada no Vercel');
       return res.status(500).json({ error: 'STRIPE_SECRET_KEY não configurada' });
     }
 
-    // Criar ou usar customer
+    // Criar Customer no Stripe
     const customer = await stripe.customers.create({
       email,
       metadata: { userId: userId || '' }
     });
-    console.log('✅ Customer criado:', customer.id);
+    console.log('✅ Customer criado com sucesso:', customer.id);
 
-    // Price ID
+    // Escolher o Price ID correto
     let priceId = '';
     if (plan === 'mensal') priceId = process.env.STRIPE_PRICE_ID_MENSAL || '';
     else if (plan === 'semestral') priceId = process.env.STRIPE_PRICE_ID_SEMESTRAL || '';
@@ -44,10 +45,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('💰 Price ID usado:', priceId);
 
     if (!priceId) {
-      console.log('❌ Price ID não encontrado para o plano');
-      return res.status(400).json({ error: 'Price ID não encontrado' });
+      console.log('❌ Erro: Price ID não encontrado para o plano:', plan);
+      return res.status(400).json({ error: 'Price ID não encontrado para o plano' });
     }
 
+    // Criar sessão de checkout
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       mode: 'subscription',
@@ -58,15 +60,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       metadata: { userId: userId || '', plan },
     });
 
-    console.log('✅ Session criada com sucesso! URL:', session.url);
+    console.log('✅ Sessão criada com sucesso! URL:', session.url);
 
     return res.status(200).json({ url: session.url });
 
   } catch (error: any) {
-    console.error('❌ ERRO NO CHECKOUT:', error.message);
-    console.error('Stack:', error.stack);
+    console.error('❌ ERRO GRAVE NO CHECKOUT:', error.message);
+    console.error('Stack completo:', error.stack);
     return res.status(500).json({ 
-      error: 'Erro ao criar sessão',
+      error: 'Erro ao criar sessão de pagamento',
       message: error.message 
     });
   }
