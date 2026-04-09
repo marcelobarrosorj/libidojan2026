@@ -18,12 +18,15 @@ export default function SubscribeButtons({ userId, email }: Props) {
     }
 
     setLoading(true)
-    console.log('🚀 Iniciando checkout para plano:', plan)
+    console.log(`🚀 Iniciando checkout - Plano: ${plan} | Email: ${email}`)
 
     try {
       const response = await fetch('/api/billing/create-checkout-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ 
           userId, 
           email, 
@@ -31,32 +34,31 @@ export default function SubscribeButtons({ userId, email }: Props) {
         })
       })
 
-      console.log('Status da resposta:', response.status)
-
       const data = await response.json()
-      console.log('Resposta completa:', data)
+
+      console.log('📥 Resposta do servidor:', data)
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erro desconhecido do servidor')
+        throw new Error(data.error || `Erro HTTP ${response.status}`)
       }
 
       if (data.url) {
-        console.log('Redirecionando para:', data.url)
+        console.log('✅ Redirecionando para Stripe:', data.url)
         window.location.href = data.url
       } else {
-        alert('Não foi possível gerar o link de pagamento')
+        alert('Erro: O Stripe não retornou o link de pagamento')
       }
     } catch (error: any) {
-      console.error('❌ Erro completo:', error)
-      alert(`Erro: ${error.message || 'Falha na conexão com o Stripe'}`)
+      console.error('❌ Erro completo no checkout:', error)
+      alert(`Falha no pagamento: ${error.message || 'Erro de conexão com o Stripe'}`)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-      <h2>Escolha seu Plano</h2>
+    <div style={{ padding: '40px 20px', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
+      <h2>Assinatura Premium</h2>
       
       <div style={{ margin: '30px 0', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
         {(['mensal', 'semestral', 'anual'] as const).map((p) => (
@@ -67,12 +69,13 @@ export default function SubscribeButtons({ userId, email }: Props) {
             style={{
               padding: '12px 24px',
               borderRadius: '8px',
-              backgroundColor: plan === p ? '#000' : '#f0f0f0',
+              backgroundColor: plan === p ? '#000' : '#f1f1f1',
               color: plan === p ? '#fff' : '#000',
-              border: 'none'
+              border: 'none',
+              fontWeight: 'bold'
             }}
           >
-            {p === 'mensal' ? 'Mensal' : p === 'semestral' ? 'Semestral' : 'Anual'}
+            {p.charAt(0).toUpperCase() + p.slice(1)}
           </button>
         ))}
       </div>
@@ -88,11 +91,17 @@ export default function SubscribeButtons({ userId, email }: Props) {
           border: 'none',
           borderRadius: '12px',
           cursor: loading ? 'not-allowed' : 'pointer',
-          marginTop: '20px'
+          marginTop: '20px',
+          width: '100%',
+          maxWidth: '340px'
         }}
       >
-        {loading ? 'Processando...' : `Assinar ${planLabel} agora`}
+        {loading ? 'Processando pagamento...' : `Assinar ${planLabel} agora`}
       </button>
+
+      <p style={{ marginTop: '25px', fontSize: '14px', color: '#666' }}>
+        Pagamento 100% seguro via Stripe • Cancelamento fácil a qualquer momento
+      </p>
     </div>
   )
 }
