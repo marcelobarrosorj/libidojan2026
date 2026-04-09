@@ -2,29 +2,11 @@ import { Plan } from '../types';
 import { log, cache } from './authUtils';
 import { CONFIG } from '../config';
 
-const PRICES_CENTS = {
-  'Assinar Plano Mensal': 4990,
-  'Assinar Plano Semestral': 26946,
-  'Assinar Plano Anual': 47904
-};
-
 /**
- * Cria uma sessão de checkout para assinatura recorrente
+ * Cria sessão de checkout usando o endpoint correto
  */
-export async function createPaymentIntent(plan: Plan | string, method: 'card' | 'pix' = 'card') {
-  log('info', `[GATEWAY] Tentando processar: ${plan} via ${method}`);
-
-  // Se estiver em modo simulador (dev/preview), usa mock
-  if (CONFIG.USE_INTERNAL_SIMULATOR) {
-    log('info', '[GATEWAY] Usando simulador interno');
-    await new Promise(r => setTimeout(r, 800));
-    return {
-      id: `pi_sim_${Date.now()}`,
-      status: 'pending',
-      clientSecret: 'simulated_secret',
-      amount: (PRICES_CENTS[plan as keyof typeof PRICES_CENTS] || 4990) / 100,
-    };
-  }
+export async function createPaymentIntent(plan: Plan | string) {
+  log('info', `[GATEWAY] Iniciando checkout para plano: ${plan}`);
 
   try {
     const response = await fetch('/api/billing/create-checkout-session', {
@@ -33,7 +15,7 @@ export async function createPaymentIntent(plan: Plan | string, method: 'card' | 
       body: JSON.stringify({
         userId: cache.userData?.id,
         email: cache.userData?.nickname + "@libido.app" || "user@libido2026.com",
-        plan: plan.toLowerCase().includes('mensal') ? 'mensal' : 
+        plan: plan.toLowerCase().includes('mensal') ? 'mensal' :
               plan.toLowerCase().includes('semestral') ? 'semestral' : 'anual'
       })
     });
@@ -48,15 +30,7 @@ export async function createPaymentIntent(plan: Plan | string, method: 'card' | 
     return data;
 
   } catch (error: any) {
-    log('warn', '[GATEWAY] Falha na conexão com o servidor. Ativando simulador.', error);
-    await new Promise(r => setTimeout(r, 1000));
-    
-    // Fallback para simulador
-    return {
-      id: `pi_sim_${Date.now()}`,
-      status: 'pending',
-      clientSecret: 'simulated_secret',
-      amount: (PRICES_CENTS[plan as keyof typeof PRICES_CENTS] || 4990) / 100,
-    };
+    log('error', '[GATEWAY] Falha ao criar checkout', error);
+    throw error; // Não faz fallback para simulador aqui - queremos ver o erro real
   }
 }
