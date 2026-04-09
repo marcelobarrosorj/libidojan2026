@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 type Props = {
-  userId: string
+  userId?: string
   email: string
 }
 
@@ -11,77 +11,55 @@ export default function SubscribeButtons({ userId, email }: Props) {
 
   const planLabel = plan === 'mensal' ? 'Mensal' : plan === 'semestral' ? 'Semestral' : 'Anual'
 
-  const createCheckout = async () => {
+  const paymentLinks = {
+    mensal: 'https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403',
+    semestral: 'https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404',
+    anual: 'https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405'
+  }
+
+  const handleSubscribe = () => {
     if (!email) {
       alert("Você precisa estar logado para assinar")
       return
     }
 
     setLoading(true)
-    console.log(`🚀 Iniciando checkout - Plano: ${plan} | Email: ${email}`)
 
-    try {
-      const response = await fetch('/api/billing/create-checkout-session', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ 
-          userId, 
-          email, 
-          plan 
-        })
-      })
-
-      const data = await response.json()
-
-      console.log('📥 Resposta do servidor:', data)
-
-      if (!response.ok) {
-        throw new Error(data.error || `Erro HTTP ${response.status}`)
-      }
-
-      if (data.url) {
-        console.log('✅ Redirecionando para Stripe:', data.url)
-        window.location.href = data.url
-      } else {
-        alert('Erro: O Stripe não retornou o link de pagamento')
-      }
-    } catch (error: any) {
-      console.error('❌ Erro completo no checkout:', error)
-      alert(`Falha no pagamento: ${error.message || 'Erro de conexão com o Stripe'}`)
-    } finally {
-      setLoading(false)
-    }
+    // Redireciona direto para o Payment Link do Stripe
+    const link = paymentLinks[plan]
+    window.location.href = link
   }
 
   return (
     <div style={{ padding: '40px 20px', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
-      <h2>Assinatura Premium</h2>
+      <h2>Escolha seu Plano Premium</h2>
       
       <div style={{ margin: '30px 0', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        {(['mensal', 'semestral', 'anual'] as const).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPlan(p)}
-            disabled={plan === p}
-            style={{
-              padding: '12px 24px',
-              borderRadius: '8px',
-              backgroundColor: plan === p ? '#000' : '#f1f1f1',
-              color: plan === p ? '#fff' : '#000',
-              border: 'none',
-              fontWeight: 'bold'
-            }}
-          >
-            {p.charAt(0).toUpperCase() + p.slice(1)}
-          </button>
-        ))}
+        <button 
+          onClick={() => setPlan('mensal')} 
+          disabled={plan === 'mensal'}
+          style={{ padding: '12px 24px', borderRadius: '8px', backgroundColor: plan === 'mensal' ? '#000' : '#f0f0f0', color: plan === 'mensal' ? '#fff' : '#000' }}
+        >
+          Mensal - R$ 49,90
+        </button>
+        <button 
+          onClick={() => setPlan('semestral')} 
+          disabled={plan === 'semestral'}
+          style={{ padding: '12px 24px', borderRadius: '8px', backgroundColor: plan === 'semestral' ? '#000' : '#f0f0f0', color: plan === 'semestral' ? '#fff' : '#000' }}
+        >
+          Semestral - R$ 269,46
+        </button>
+        <button 
+          onClick={() => setPlan('anual')} 
+          disabled={plan === 'anual'}
+          style={{ padding: '12px 24px', borderRadius: '8px', backgroundColor: plan === 'anual' ? '#000' : '#f0f0f0', color: plan === 'anual' ? '#fff' : '#000' }}
+        >
+          Anual - R$ 479,04
+        </button>
       </div>
 
       <button 
-        onClick={createCheckout}
+        onClick={handleSubscribe}
         disabled={loading}
         style={{
           padding: '18px 50px',
@@ -96,11 +74,11 @@ export default function SubscribeButtons({ userId, email }: Props) {
           maxWidth: '340px'
         }}
       >
-        {loading ? 'Processando pagamento...' : `Assinar ${planLabel} agora`}
+        {loading ? 'Redirecionando...' : `Assinar ${planLabel} agora`}
       </button>
 
       <p style={{ marginTop: '25px', fontSize: '14px', color: '#666' }}>
-        Pagamento 100% seguro via Stripe • Cancelamento fácil a qualquer momento
+        Pagamento seguro via Stripe • Cancelamento fácil a qualquer momento
       </p>
     </div>
   )
