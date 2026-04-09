@@ -18,70 +18,81 @@ export default function SubscribeButtons({ userId, email }: Props) {
     }
 
     setLoading(true)
+    console.log('🚀 Iniciando checkout para plano:', plan)
 
     try {
       const response = await fetch('/api/billing/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, email, plan })
+        body: JSON.stringify({ 
+          userId, 
+          email, 
+          plan 
+        })
       })
 
+      console.log('Status da resposta:', response.status)
+
       const data = await response.json()
+      console.log('Resposta completa:', data)
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erro ao criar o pagamento')
+        throw new Error(data.error || 'Erro desconhecido do servidor')
       }
 
       if (data.url) {
+        console.log('Redirecionando para:', data.url)
         window.location.href = data.url
       } else {
         alert('Não foi possível gerar o link de pagamento')
       }
     } catch (error: any) {
-      console.error('Erro completo:', error)
-      alert('Erro de conexão com o pagamento. Tente novamente em alguns segundos.')
+      console.error('❌ Erro completo:', error)
+      alert(`Erro: ${error.message || 'Falha na conexão com o Stripe'}`)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ padding: '30px', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
-      <h3>Assinatura Premium</h3>
+    <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+      <h2>Escolha seu Plano</h2>
       
-      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', margin: '25px 0', flexWrap: 'wrap' }}>
-        <button onClick={() => setPlan('mensal')} disabled={plan === 'mensal'} style={{ padding: '12px 20px' }}>
-          Mensal
-        </button>
-        <button onClick={() => setPlan('semestral')} disabled={plan === 'semestral'} style={{ padding: '12px 20px' }}>
-          Semestral
-        </button>
-        <button onClick={() => setPlan('anual')} disabled={plan === 'anual'} style={{ padding: '12px 20px' }}>
-          Anual
-        </button>
+      <div style={{ margin: '30px 0', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        {(['mensal', 'semestral', 'anual'] as const).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPlan(p)}
+            disabled={plan === p}
+            style={{
+              padding: '12px 24px',
+              borderRadius: '8px',
+              backgroundColor: plan === p ? '#000' : '#f0f0f0',
+              color: plan === p ? '#fff' : '#000',
+              border: 'none'
+            }}
+          >
+            {p === 'mensal' ? 'Mensal' : p === 'semestral' ? 'Semestral' : 'Anual'}
+          </button>
+        ))}
       </div>
 
       <button 
         onClick={createCheckout}
         disabled={loading}
         style={{
-          padding: '16px 40px',
+          padding: '18px 50px',
           fontSize: '18px',
-          backgroundColor: loading ? '#666' : '#000',
-          color: '#fff',
+          backgroundColor: loading ? '#666' : '#e63939',
+          color: 'white',
           border: 'none',
           borderRadius: '12px',
           cursor: loading ? 'not-allowed' : 'pointer',
-          width: '100%',
-          maxWidth: '320px'
+          marginTop: '20px'
         }}
       >
         {loading ? 'Processando...' : `Assinar ${planLabel} agora`}
       </button>
-
-      <p style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-        Pagamento seguro processado pelo Stripe
-      </p>
     </div>
   )
 }
