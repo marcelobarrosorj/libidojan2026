@@ -33,15 +33,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success_url: 'https://libido2026.vercel.app/sucesso',
       cancel_url: 'https://libido2026.vercel.app/planos',
       customer_email: email,
-      billing_address_collection: 'auto',
     });
 
     return res.status(200).json({ url: session.url });
   } catch (error: any) {
-    console.error('Stripe Error:', error.message);
-    return res.status(500).json({ 
-      error: 'Erro ao criar checkout',
-      message: error.message 
-    });
+    console.error('Erro Stripe:', error.message);
+    return res.status(500).json({ error: error.message });
   }
 }
