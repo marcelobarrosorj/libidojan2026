@@ -33,6 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success_url: 'https://libido2026.vercel.app/sucesso',
       cancel_url: 'https://libido2026.vercel.app/planos',
       customer_email: email,
+      billing_address_collection: 'auto',
     });
 
     return res.status(200).json({ url: session.url });
