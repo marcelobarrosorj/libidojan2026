@@ -7,15 +7,12 @@ type Props = {
 
 export default function SubscribeButtons({ userId, email }: Props) {
   const [plan, setPlan] = useState<'mensal' | 'semestral' | 'anual'>('mensal')
-  const [loading, setLoading] = useState(false)
 
-  const planLabel = plan === 'mensal' ? 'Mensal' : plan === 'semestral' ? 'Semestral' : 'Anual'
-
-  // ←←← Seus Payment Links aqui
+  // Seus Payment Links diretos do Stripe
   const paymentLinks = {
     mensal: "https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403",
     semestral: "https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404",
-    anual: "https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405"   // cole o link do Anual aqui quando tiver
+    anual: "https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405"   // ← Troque pelo seu link real do Anual quando tiver
   }
 
   const handleSubscribe = () => {
@@ -34,16 +31,28 @@ export default function SubscribeButtons({ userId, email }: Props) {
 
   return (
     <div style={{ padding: '40px 20px', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
-      <h2>Escolha seu Plano</h2>
+      <h2>Escolha seu Plano Premium</h2>
       
       <div style={{ margin: '30px 0', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button onClick={() => setPlan('mensal')} disabled={plan === 'mensal'} style={{ padding: '12px 24px', borderRadius: '8px' }}>
-          Mensal - R$ 49,90
+        <button 
+          onClick={() => setPlan('mensal')} 
+          disabled={plan === 'mensal'}
+          style={{ padding: '12px 24px', borderRadius: '8px', backgroundColor: plan === 'mensal' ? '#000' : '#f0f0f0', color: plan === 'mensal' ? '#fff' : '#000' }}
+        >
+          Mensal - R$ 49,90/mês
         </button>
-        <button onClick={() => setPlan('semestral')} disabled={plan === 'semestral'} style={{ padding: '12px 24px', borderRadius: '8px' }}>
+        <button 
+          onClick={() => setPlan('semestral')} 
+          disabled={plan === 'semestral'}
+          style={{ padding: '12px 24px', borderRadius: '8px', backgroundColor: plan === 'semestral' ? '#000' : '#f0f0f0', color: plan === 'semestral' ? '#fff' : '#000' }}
+        >
           Semestral - R$ 269,46
         </button>
-        <button onClick={() => setPlan('anual')} disabled={plan === 'anual'} style={{ padding: '12px 24px', borderRadius: '8px' }}>
+        <button 
+          onClick={() => setPlan('anual')} 
+          disabled={plan === 'anual'}
+          style={{ padding: '12px 24px', borderRadius: '8px', backgroundColor: plan === 'anual' ? '#000' : '#f0f0f0', color: plan === 'anual' ? '#fff' : '#000' }}
+        >
           Anual - R$ 479,04
         </button>
       </div>
@@ -58,14 +67,14 @@ export default function SubscribeButtons({ userId, email }: Props) {
           border: 'none',
           borderRadius: '12px',
           cursor: 'pointer',
-          marginTop: '20px'
+          marginTop: '30px'
         }}
       >
-        Pagar com Stripe - {planLabel}
+        Pagar agora - {planLabel}
       </button>
 
       <p style={{ marginTop: '25px', fontSize: '14px', color: '#666' }}>
-        Pagamento seguro via Stripe • Aceita cartão, boleto e Pix (em breve)
+        Pagamento seguro via Stripe • Aceita cartão, boleto e Pix
       </p>
     </div>
   )
