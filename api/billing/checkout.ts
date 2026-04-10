@@ -10,20 +10,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  const { email, plan } = req.body || {};
+  const { email, plan, userId } = req.body || {};
 
   if (!email || !plan) {
     return res.status(400).json({ error: 'Email e plano são obrigatórios' });
   }
 
   try {
-    const priceMap: Record<string, string> = {
-      mensal: process.env.STRIPE_PRICE_ID_MENSAL || '',
-      semestral: process.env.STRIPE_PRICE_ID_SEMESTRAL || '',
-      anual: process.env.STRIPE_PRICE_ID_ANUAL || '',
-    };
-
-    const priceId = priceMap[plan];
+    let priceId = '';
+    if (plan === 'mensal') priceId = process.env.STRIPE_PRICE_ID_MENSAL || '';
+    else if (plan === 'semestral') priceId = process.env.STRIPE_PRICE_ID_SEMESTRAL || '';
+    else if (plan === 'anual') priceId = process.env.STRIPE_PRICE_ID_ANUAL || '';
 
     if (!priceId) {
       return res.status(400).json({ error: 'Price ID não encontrado para o plano' });
@@ -36,11 +33,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success_url: 'https://libido2026.vercel.app/sucesso',
       cancel_url: 'https://libido2026.vercel.app/planos',
       customer_email: email,
+      metadata: { userId: userId || '', plan },
     });
 
     return res.status(200).json({ url: session.url });
   } catch (error: any) {
-    console.error('Erro Stripe Checkout:', error.message);
+    console.error('Erro ao criar sessão Stripe:', error.message);
     return res.status(500).json({ error: error.message });
   }
 }
