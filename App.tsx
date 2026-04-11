@@ -4,7 +4,6 @@ import Layout from './components/Layout';
 import Explore from './components/Explore';
 import ChatList from './components/ChatList';
 import Profile from './components/Profile';
-import Subscription from './components/Subscription';
 import ChatDetail from './components/ChatDetail';
 import Feed from './components/Feed';
 import EventsPage from './components/EventsPage';
@@ -172,10 +171,10 @@ export default function App() {
       case 'radar': return <Explore onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
-      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('pagamento')} />;
+      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} />;
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
       case 'assinatura':
-      case 'pagamento': 
+      case 'pagamento':
         return <iframe 
           src="/pagamento" 
           style={{ width: '100%', height: '100vh', border: 'none' }} 
