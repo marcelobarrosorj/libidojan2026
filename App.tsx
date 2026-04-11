@@ -21,7 +21,7 @@ export const useAuth = () => useContext(AuthContext);
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(getAuthFlag());
   const [isUnlocked, setIsUnlocked] = useState(isUnlockedWindowValid());
-  const [activeTab, setActiveTab] = useState('feed'); 
+  const [activeTab, setActiveTab] = useState('feed');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [viewedProfile, setViewedProfile] = useState<User | null>(null);
   const [isSyncing, setIsSyncing] = useState(true);
@@ -30,42 +30,35 @@ export default function App() {
 
   useEffect(() => {
     initSecurityLayer();
-
     if (shouldShowTermsGate(new Date(), { version: '2026.1' })) {
       setShowTerms(true);
     }
-
     const handleVisibility = () => {
-        const isSafeZone = document.body.classList.contains('navigating-out') || 
+        const isSafeZone = document.body.classList.contains('navigating-out') ||
                           document.body.classList.contains('payment-active');
-        
+       
         if (isSafeZone) {
             document.body.classList.remove('is-hidden');
             return;
         }
-
         if (document.hidden) {
             document.body.classList.add('is-hidden');
         } else {
             document.body.classList.remove('is-hidden');
         }
     };
-
     const onBlur = () => {
-        const isSafeZone = document.body.classList.contains('navigating-out') || 
+        const isSafeZone = document.body.classList.contains('navigating-out') ||
                           document.body.classList.contains('payment-active');
         if (isSafeZone) return;
         document.body.classList.add('is-hidden');
     };
-
     const onFocus = () => {
         document.body.classList.remove('is-hidden');
     };
-
     window.addEventListener('blur', onBlur);
     window.addEventListener('focus', onFocus);
     document.addEventListener('visibilitychange', handleVisibility);
-
     return () => {
         window.removeEventListener('blur', onBlur);
         window.removeEventListener('focus', onFocus);
@@ -74,7 +67,6 @@ export default function App() {
   }, []);
 
   const handleTabChange = (tab: string) => {
-    // Limpa estados de detalhe ao trocar de aba principal
     setSelectedUser(null);
     setViewedProfile(null);
     setActiveTab(tab);
@@ -108,7 +100,7 @@ export default function App() {
   useEffect(() => {
     const initApp = async () => {
         if (isAuthenticated) {
-            await syncCaches(); 
+            await syncCaches();
             setIsUnlocked(isUnlockedWindowValid());
             setCurrentUser(cache.userData);
         }
@@ -119,11 +111,11 @@ export default function App() {
 
   if (showTerms) {
     return (
-      <TermsGate 
-        privacyUrl="/privacy" 
-        termsUrl="/terms" 
-        onExit={handleExit} 
-        onAccept={handleAcceptTerms} 
+      <TermsGate
+        privacyUrl="/privacy"
+        termsUrl="/terms"
+        onExit={handleExit}
+        onAccept={handleAcceptTerms}
       />
     );
   }
@@ -146,7 +138,6 @@ export default function App() {
   }
 
   const handleViewProfile = (p: any) => {
-    // Adding following: p.following || [] to satisfy User type
     const fullUser: User = {
       id: p.id, nickname: p.name || p.nickname, email: p.email || `${p.id}@libido.app`, age: p.age || 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
       type: p.category || p.type || UserType.HOMEM, birthDate: p.birthDate || '1995-01-01', biotype: p.biotype || Biotype.PADRAO,
@@ -172,7 +163,7 @@ export default function App() {
     if (activeTab === 'chat_detail' && selectedUser) {
       return <ChatDetail user={selectedUser} onBack={() => setActiveTab('chat')} />;
     }
-    
+   
     if (activeTab === 'view_profile' && viewedProfile) {
       return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => setActiveTab('radar')} />;
     }
@@ -181,10 +172,16 @@ export default function App() {
       case 'radar': return <Explore onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
-      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} />;
+      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('pagamento')} />;
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
-      case 'assinatura': return <Subscription />;
-      default: return <Feed onProfileClick={handleViewProfile} />; 
+      case 'assinatura':
+      case 'pagamento': 
+        return <iframe 
+          src="/pagamento" 
+          style={{ width: '100%', height: '100vh', border: 'none' }} 
+          title="Pagamento"
+        />;
+      default: return <Feed onProfileClick={handleViewProfile} />;
     }
   };
 
