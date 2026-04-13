@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 export const IS_PROD = typeof window !== 'undefined' &&
   !window.location.hostname.includes('localhost') &&
   !window.location.hostname.includes('stackblitz');
