@@ -20,21 +20,13 @@ export default function SubscribeButtons({ userId, email }: Props) {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/pagseguro/checkout', {
+      const response = await fetch('/api/billing/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId, 
-          email, 
-          plan 
-        })
+        body: JSON.stringify({ userId, email, plan })
       })
 
       const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao gerar pagamento')
-      }
 
       if (data.url) {
         window.location.href = data.url
@@ -43,36 +35,24 @@ export default function SubscribeButtons({ userId, email }: Props) {
       }
     } catch (error: any) {
       console.error('Erro:', error)
-      alert('Erro de conexão. Tente novamente.')
+      alert('Erro ao conectar com o Stripe. Tente novamente.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ padding: '40px 20px', textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
-      <h2>Assinatura Premium - Libido 2026</h2>
+    <div style={{ padding: '50px 20px', textAlign: 'center' }}>
+      <h2>Assinatura Premium</h2>
       
-      <div style={{ margin: '30px 0', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button 
-          onClick={() => setPlan('mensal')} 
-          disabled={plan === 'mensal'}
-          style={{ padding: '12px 24px', borderRadius: '8px' }}
-        >
+      <div style={{ margin: '30px 0', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button onClick={() => setPlan('mensal')} disabled={plan === 'mensal'} style={{ padding: '15px 25px', borderRadius: '10px' }}>
           Mensal - R$ 49,90
         </button>
-        <button 
-          onClick={() => setPlan('semestral')} 
-          disabled={plan === 'semestral'}
-          style={{ padding: '12px 24px', borderRadius: '8px' }}
-        >
+        <button onClick={() => setPlan('semestral')} disabled={plan === 'semestral'} style={{ padding: '15px 25px', borderRadius: '10px' }}>
           Semestral - R$ 269,46
         </button>
-        <button 
-          onClick={() => setPlan('anual')} 
-          disabled={plan === 'anual'}
-          style={{ padding: '12px 24px', borderRadius: '8px' }}
-        >
+        <button onClick={() => setPlan('anual')} disabled={plan === 'anual'} style={{ padding: '15px 25px', borderRadius: '10px' }}>
           Anual - R$ 479,04
         </button>
       </div>
@@ -81,22 +61,17 @@ export default function SubscribeButtons({ userId, email }: Props) {
         onClick={handleSubscribe}
         disabled={loading}
         style={{
-          padding: '18px 50px',
-          fontSize: '18px',
+          padding: '20px 60px',
+          fontSize: '19px',
           backgroundColor: '#e63939',
           color: 'white',
           border: 'none',
           borderRadius: '12px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          marginTop: '20px'
+          cursor: loading ? 'not-allowed' : 'pointer'
         }}
       >
         {loading ? 'Processando...' : `Assinar ${planLabel} agora`}
       </button>
-
-      <p style={{ marginTop: '25px', fontSize: '14px', color: '#666' }}>
-        Pagamento seguro via PagSeguro • Pix, Boleto e Cartão
-      </p>
     </div>
   )
 }
