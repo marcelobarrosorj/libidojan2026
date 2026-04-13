@@ -167,21 +167,20 @@ export default function App() {
       return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => setActiveTab('radar')} />;
     }
 
-    // Força a página de pagamento isolada para qualquer aba de assinatura
-    if (activeTab === 'assinatura' || activeTab === 'pagamento' || activeTab === 'upgrade') {
-      return <iframe 
-        src="/pagamento" 
-        style={{ width: '100%', height: '100vh', border: 'none' }} 
-        title="Pagamento"
-      />;
-    }
-
     switch (activeTab) {
       case 'radar': return <Explore onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} />;
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
+      case 'assinatura':
+      case 'pagamento':
+        // Página isolada de pagamento - sem conflito com outros componentes
+        return <iframe 
+          src="/pagamento" 
+          style={{ width: '100%', height: '100vh', border: 'none' }} 
+          title="Pagamento"
+        />;
       default: return <Feed onProfileClick={handleViewProfile} />;
     }
   };
