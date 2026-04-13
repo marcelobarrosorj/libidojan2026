@@ -13,7 +13,7 @@ import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, User
 import { getAuthFlag, setAuthFlag, syncCaches, cache } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
-import SubscribeButtons from './components/SubscribeButtons';
+import SubscribeButtons from './components/SubscribeButtons';   // Import correto
 
 const AuthContext = createContext<any>(null);
 export const useAuth = () => useContext(AuthContext);
