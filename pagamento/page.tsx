@@ -16,25 +16,25 @@ export default function PagamentoPage() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: '#000', 
+      backgroundColor: '#000', 
       color: '#fff', 
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center', 
       justifyContent: 'center',
-      padding: '20px',
-      fontFamily: 'Arial, sans-serif'
+      padding: '40px 20px'
     }}>
-      <h1 style={{ fontSize: '36px', marginBottom: '40px' }}>Libido 2026 - Assinatura</h1>
+      <h1 style={{ fontSize: '42px', marginBottom: '40px' }}>Libido 2026</h1>
+      <p style={{ fontSize: '20px', color: '#ccc', marginBottom: '50px' }}>Escolha seu plano</p>
 
       <div style={{ display: 'flex', gap: '20px', marginBottom: '60px', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button onClick={() => setPlan('mensal')} style={{ padding: '20px 30px', fontSize: '18px', background: plan === 'mensal' ? '#e63939' : '#222', border: 'none', borderRadius: '10px' }}>
+        <button onClick={() => setPlan('mensal')} style={{ padding: '20px 30px', fontSize: '18px', background: plan === 'mensal' ? '#e63939' : '#222', border: 'none', borderRadius: '12px', minWidth: '160px' }}>
           Mensal<br />R$ 49,90
         </button>
-        <button onClick={() => setPlan('semestral')} style={{ padding: '20px 30px', fontSize: '18px', background: plan === 'semestral' ? '#e63939' : '#222', border: 'none', borderRadius: '10px' }}>
+        <button onClick={() => setPlan('semestral')} style={{ padding: '20px 30px', fontSize: '18px', background: plan === 'semestral' ? '#e63939' : '#222', border: 'none', borderRadius: '12px', minWidth: '160px' }}>
           Semestral<br />R$ 269,46
         </button>
-        <button onClick={() => setPlan('anual')} style={{ padding: '20px 30px', fontSize: '18px', background: plan === 'anual' ? '#e63939' : '#222', border: 'none', borderRadius: '10px' }}>
+        <button onClick={() => setPlan('anual')} style={{ padding: '20px 30px', fontSize: '18px', background: plan === 'anual' ? '#e63939' : '#222', border: 'none', borderRadius: '12px', minWidth: '160px' }}>
           Anual<br />R$ 479,04
         </button>
       </div>
@@ -42,21 +42,17 @@ export default function PagamentoPage() {
       <button 
         onClick={pagar}
         style={{ 
-          padding: '20px 60px', 
+          padding: '22px 70px', 
           fontSize: '22px', 
-          background: '#e63939', 
+          backgroundColor: '#e63939', 
           color: 'white', 
           border: 'none', 
-          borderRadius: '12px',
+          borderRadius: '16px',
           cursor: 'pointer'
         }}
       >
-        Pagar agora com Stripe
+        Pagar agora - {plan === 'mensal' ? 'Mensal' : plan === 'semestral' ? 'Semestral' : 'Anual'}
       </button>
-
-      <p style={{ marginTop: '40px', color: '#888' }}>
-        Pagamento seguro • Aceita cartão, boleto e Pix
-      </p>
     </div>
   )
 }
