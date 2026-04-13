@@ -1,77 +1,97 @@
 import React, { useState } from 'react'
 
-type Props = {
-  userId?: string
-  email: string
-}
-
-export default function SubscribeButtons({ userId, email }: Props) {
+export default function SubscribeButtons() {
   const [plan, setPlan] = useState<'mensal' | 'semestral' | 'anual'>('mensal')
-  const [loading, setLoading] = useState(false)
 
-  const planLabel = plan === 'mensal' ? 'Mensal' : plan === 'semestral' ? 'Semestral' : 'Anual'
+  const links = {
+    mensal: "https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403",
+    semestral: "https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404",
+    anual: "https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405"
+  }
 
-  const handleSubscribe = async () => {
-    if (!email) {
-      alert("Você precisa estar logado para assinar")
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/billing/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, email, plan })
-      })
-
-      const data = await response.json()
-
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        alert('Não foi possível gerar o link de pagamento')
-      }
-    } catch (error: any) {
-      console.error('Erro:', error)
-      alert('Erro ao conectar com o Stripe. Tente novamente.')
-    } finally {
-      setLoading(false)
-    }
+  const pagarAgora = () => {
+    window.location.href = links[plan]
   }
 
   return (
-    <div style={{ padding: '50px 20px', textAlign: 'center' }}>
-      <h2>Assinatura Premium</h2>
-      
-      <div style={{ margin: '30px 0', display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button onClick={() => setPlan('mensal')} disabled={plan === 'mensal'} style={{ padding: '15px 25px', borderRadius: '10px' }}>
-          Mensal - R$ 49,90
+    <div style={{ 
+      padding: '80px 20px', 
+      textAlign: 'center', 
+      backgroundColor: '#000', 
+      color: '#fff', 
+      minHeight: '100vh' 
+    }}>
+      <h1 style={{ fontSize: '48px', marginBottom: '30px' }}>Libido 2026</h1>
+      <p style={{ fontSize: '22px', color: '#ccc', marginBottom: '60px' }}>Escolha seu plano de assinatura</p>
+
+      <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '70px' }}>
+        <button 
+          onClick={() => setPlan('mensal')} 
+          disabled={plan === 'mensal'}
+          style={{ 
+            padding: '25px 35px', 
+            fontSize: '18px', 
+            backgroundColor: plan === 'mensal' ? '#e63939' : '#222', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '12px',
+            minWidth: '180px'
+          }}
+        >
+          Mensal<br />R$ 49,90
         </button>
-        <button onClick={() => setPlan('semestral')} disabled={plan === 'semestral'} style={{ padding: '15px 25px', borderRadius: '10px' }}>
-          Semestral - R$ 269,46
+
+        <button 
+          onClick={() => setPlan('semestral')} 
+          disabled={plan === 'semestral'}
+          style={{ 
+            padding: '25px 35px', 
+            fontSize: '18px', 
+            backgroundColor: plan === 'semestral' ? '#e63939' : '#222', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '12px',
+            minWidth: '180px'
+          }}
+        >
+          Semestral<br />R$ 269,46
         </button>
-        <button onClick={() => setPlan('anual')} disabled={plan === 'anual'} style={{ padding: '15px 25px', borderRadius: '10px' }}>
-          Anual - R$ 479,04
+
+        <button 
+          onClick={() => setPlan('anual')} 
+          disabled={plan === 'anual'}
+          style={{ 
+            padding: '25px 35px', 
+            fontSize: '18px', 
+            backgroundColor: plan === 'anual' ? '#e63939' : '#222', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '12px',
+            minWidth: '180px'
+          }}
+        >
+          Anual<br />R$ 479,04
         </button>
       </div>
 
       <button 
-        onClick={handleSubscribe}
-        disabled={loading}
+        onClick={pagarAgora}
         style={{
-          padding: '20px 60px',
-          fontSize: '19px',
+          padding: '25px 90px',
+          fontSize: '24px',
           backgroundColor: '#e63939',
           color: 'white',
           border: 'none',
-          borderRadius: '12px',
-          cursor: loading ? 'not-allowed' : 'pointer'
+          borderRadius: '16px',
+          cursor: 'pointer'
         }}
       >
-        {loading ? 'Processando...' : `Assinar ${planLabel} agora`}
+        Pagar agora — {plan === 'mensal' ? 'Mensal' : plan === 'semestral' ? 'Semestral' : 'Anual'}
       </button>
+
+      <p style={{ marginTop: '60px', color: '#888' }}>
+        Pagamento seguro via Stripe • Aceita cartão, boleto e Pix
+      </p>
     </div>
   )
 }
