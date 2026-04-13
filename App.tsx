@@ -175,6 +175,7 @@ export default function App() {
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
       case 'assinatura':
       case 'pagamento':
+        // Página de pagamento isolada - sem conflito com componentes antigos
         return <iframe 
           src="/pagamento" 
           style={{ width: '100%', height: '100vh', border: 'none' }} 
