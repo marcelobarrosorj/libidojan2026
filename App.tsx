@@ -174,12 +174,9 @@ export default function App() {
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} />;
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
-      
-      // Apenas SubscribeButtons - sem duplicação
       case 'assinatura':
       case 'pagamento':
         return <SubscribeButtons />;
-
       default: return <Feed onProfileClick={handleViewProfile} />;
     }
   };
