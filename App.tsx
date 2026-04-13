@@ -13,7 +13,7 @@ import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, User
 import { getAuthFlag, setAuthFlag, syncCaches, cache } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
-import SubscribeButtons from './components/SubscribeButtons';   // Import correto
+import SubscribeButtons from './components/SubscribeButtons';
 
 const AuthContext = createContext<any>(null);
 export const useAuth = () => useContext(AuthContext);
@@ -175,7 +175,7 @@ export default function App() {
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} />;
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
       
-      // Renderização direta e limpa - sem iframe
+      // Apenas SubscribeButtons - sem duplicação
       case 'assinatura':
       case 'pagamento':
         return <SubscribeButtons />;
