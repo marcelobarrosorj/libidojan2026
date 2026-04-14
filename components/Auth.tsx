@@ -18,14 +18,13 @@ export const Auth: React.FC = () => {
   };
 
   const handleAccessExisting = async () => {
-    // Primeiro tenta localStorage
+    showNotification('Buscando conta...', 'info');
+
+    // Tenta localStorage primeiro
     let existing = getUserData();
 
     if (!existing) {
-      // Se não encontrar localmente, tenta buscar no Supabase pelo email ou ID
-      showNotification('Buscando conta na nuvem...', 'info');
-      
-      // Aqui podemos tentar recuperar por email se o usuário informar, mas por enquanto vamos tentar sync
+      // Tenta sincronizar com nuvem
       await syncCaches();
       existing = getUserData();
     }
@@ -33,7 +32,8 @@ export const Auth: React.FC = () => {
     if (existing) {
       setView('unlock');
     } else {
-      showNotification('Nenhuma conta encontrada neste dispositivo ou na nuvem.', 'info');
+      // Se ainda não encontrou, tenta criar um perfil básico com email (se o usuário informar)
+      showNotification('Nenhuma conta encontrada. Crie uma nova conta.', 'info');
     }
   };
 
