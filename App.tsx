@@ -158,99 +158,67 @@ export default function App() {
     setActiveTab('view_profile');
   };
 
-  // Componente SubscribeButtons embutido diretamente (sem import)
-  const SubscribeButtons = () => {
+  // SubscribeButtons embutido diretamente (sem import externo)
+  const SubscribeButtonsComponent = () => {
     const [plan, setPlan] = useState<'mensal' | 'semestral' | 'anual'>('mensal');
+    const [loadingPix, setLoadingPix] = useState(false);
 
-    const links = {
+    const stripeLinks = {
       mensal: "https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403",
       semestral: "https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404",
       anual: "https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405"
     };
 
-    const pagarAgora = () => {
-      window.location.href = links[plan];
+    const pagarComStripe = () => {
+      window.location.href = stripeLinks[plan];
+    };
+
+    const pagarComPix = async () => {
+      setLoadingPix(true);
+      try {
+        const response = await fetch('/api/pagseguro/criar-pix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan })
+        });
+        const data = await response.json();
+        if (data.qrCode) {
+          alert(`✅ QR Code Pix gerado!\n\nCopie e pague:\n\n${data.qrCode}`);
+        } else {
+          alert('Erro ao gerar Pix. Tente novamente.');
+        }
+      } catch (e) {
+        alert('Erro de conexão com PagSeguro.');
+      } finally {
+        setLoadingPix(false);
+      }
     };
 
     return (
-      <div style={{ 
-        padding: '80px 20px', 
-        textAlign: 'center', 
-        backgroundColor: '#000', 
-        color: '#fff', 
-        minHeight: '100vh' 
-      }}>
-        <h1 style={{ fontSize: '48px', marginBottom: '30px' }}>Libido 2026</h1>
-        <p style={{ fontSize: '22px', color: '#ccc', marginBottom: '60px' }}>Escolha seu plano de assinatura</p>
+      <div style={{ padding: '60px 20px', textAlign: 'center', backgroundColor: '#000', color: '#fff', minHeight: '100vh' }}>
+        <h1 style={{ fontSize: '42px', marginBottom: '30px' }}>Libido 2026</h1>
+        <p style={{ fontSize: '20px', color: '#ccc', marginBottom: '50px' }}>Escolha seu plano</p>
 
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '70px' }}>
-          <button 
-            onClick={() => setPlan('mensal')} 
-            disabled={plan === 'mensal'}
-            style={{ 
-              padding: '25px 35px', 
-              fontSize: '18px', 
-              backgroundColor: plan === 'mensal' ? '#e63939' : '#222', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '12px',
-              minWidth: '180px'
-            }}
-          >
+        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '60px' }}>
+          <button onClick={() => setPlan('mensal')} disabled={plan === 'mensal'} style={{ padding: '20px 30px', background: plan === 'mensal' ? '#e63939' : '#333', color: 'white', border: 'none', borderRadius: '10px' }}>
             Mensal<br />R$ 49,90
           </button>
-
-          <button 
-            onClick={() => setPlan('semestral')} 
-            disabled={plan === 'semestral'}
-            style={{ 
-              padding: '25px 35px', 
-              fontSize: '18px', 
-              backgroundColor: plan === 'semestral' ? '#e63939' : '#222', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '12px',
-              minWidth: '180px'
-            }}
-          >
+          <button onClick={() => setPlan('semestral')} disabled={plan === 'semestral'} style={{ padding: '20px 30px', background: plan === 'semestral' ? '#e63939' : '#333', color: 'white', border: 'none', borderRadius: '10px' }}>
             Semestral<br />R$ 269,46
           </button>
-
-          <button 
-            onClick={() => setPlan('anual')} 
-            disabled={plan === 'anual'}
-            style={{ 
-              padding: '25px 35px', 
-              fontSize: '18px', 
-              backgroundColor: plan === 'anual' ? '#e63939' : '#222', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '12px',
-              minWidth: '180px'
-            }}
-          >
+          <button onClick={() => setPlan('anual')} disabled={plan === 'anual'} style={{ padding: '20px 30px', background: plan === 'anual' ? '#e63939' : '#333', color: 'white', border: 'none', borderRadius: '10px' }}>
             Anual<br />R$ 479,04
           </button>
         </div>
 
-        <button 
-          onClick={pagarAgora}
-          style={{
-            padding: '25px 90px',
-            fontSize: '24px',
-            backgroundColor: '#e63939',
-            color: 'white',
-            border: 'none',
-            borderRadius: '16px',
-            cursor: 'pointer'
-          }}
-        >
-          Pagar agora — {plan === 'mensal' ? 'Mensal' : plan === 'semestral' ? 'Semestral' : 'Anual'}
-        </button>
-
-        <p style={{ marginTop: '60px', color: '#888' }}>
-          Pagamento seguro via Stripe
-        </p>
+        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={pagarComStripe} style={{ padding: '20px 60px', fontSize: '19px', background: '#e63939', color: 'white', border: 'none', borderRadius: '12px' }}>
+            Pagar com Cartão
+          </button>
+          <button onClick={pagarComPix} disabled={loadingPix} style={{ padding: '20px 60px', fontSize: '19px', background: '#00b300', color: 'white', border: 'none', borderRadius: '12px' }}>
+            {loadingPix ? 'Gerando Pix...' : 'Pagar com Pix'}
+          </button>
+        </div>
       </div>
     );
   };
@@ -259,7 +227,6 @@ export default function App() {
     if (activeTab === 'chat_detail' && selectedUser) {
       return <ChatDetail user={selectedUser} onBack={() => setActiveTab('chat')} />;
     }
-   
     if (activeTab === 'view_profile' && viewedProfile) {
       return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => setActiveTab('radar')} />;
     }
@@ -272,7 +239,7 @@ export default function App() {
       case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
       case 'assinatura':
       case 'pagamento':
-        return <SubscribeButtons />;
+        return <SubscribeButtonsComponent />;
       default: return <Feed onProfileClick={handleViewProfile} />;
     }
   };
