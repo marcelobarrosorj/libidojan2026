@@ -111,7 +111,7 @@ export const showNotification = (message: string, type: 'info' | 'error' | 'succ
   setTimeout(() => notification.remove(), 4000);
 };
 
-// Funções que estavam faltando (restauradas)
+// Funções restauradas para evitar erros de build
 export const likeProfile = async (id: string) => {
   log('info', `[LIKE] User ${id}`);
   return { isMatch: Math.random() > 0.7 };
@@ -140,4 +140,21 @@ export const toggleFollow = async (targetUserId: string): Promise<boolean> => {
 export const vouchUser = async (targetUserId: string) => {
   log('info', `[VOUCH] User ${targetUserId} vouched`);
   return { success: true };
+};
+
+// Função que estava faltando no ChatDetail.tsx
+export const handleButtonAction = async (action: string, targetId: string) => {
+  log('info', `[BUTTON ACTION] ${action} on user ${targetId}`);
+  
+  if (action === 'like') {
+    return await likeProfile(targetId);
+  }
+  if (action === 'pass') {
+    return await passProfile(targetId);
+  }
+  if (action === 'vouch') {
+    return await vouchUser(targetId);
+  }
+  
+  return { success: false };
 };
