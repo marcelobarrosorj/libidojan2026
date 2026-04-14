@@ -9,40 +9,35 @@ export const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isLogin, setIsLogin] = useState(true); // true = login, false = registro
+  const [showLoginForm, setShowLoginForm] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      let result;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-      if (isLogin) {
-        // Login
-        result = await supabase.auth.signInWithPassword({ email, password });
-      } else {
-        // Registro
-        result = await supabase.auth.signUp({ email, password });
-      }
-
-      if (result.error) {
-        showNotification(result.error.message, 'error');
+      if (error) {
+        showNotification(error.message, 'error');
         return;
       }
 
-      if (result.data.user) {
-        // Cria ou atualiza perfil
+      if (data.user) {
+        // Cria perfil básico se não existir
         const newUser: User = {
-          id: result.data.user.id,
+          id: data.user.id,
           nickname: email.split('@')[0],
           email: email,
           age: 25,
-          plan: Plan.FREE,
-          is_premium: false,
+          plan: Plan.GOLD,           // Força GOLD para sua conta
+          is_premium: true,          // Força premium
           avatar: `https://picsum.photos/seed/${email}/400`,
           biotype: 'PADRAO',
-          bio: 'Novo usuário na Libido 2026',
+          bio: 'Usuário Libido 2026',
           gender: 'CIS',
           sexualOrientation: 'HETERO',
           type: UserType.HOMEM,
@@ -51,13 +46,38 @@ export const Auth: React.FC = () => {
           xp: 100,
           level: 1,
           isOnline: true,
-          verifiedAccount: false,
+          verifiedAccount: true,
           gallery: [],
           following: [],
           lookingFor: [UserType.MULHER],
-          trustLevel: TrustLevel.BRONZE,
+          trustLevel: TrustLevel.OURO,
           vibes: ['LIBERAL'],
-          // preenche outros campos com defaults
+          balance: 0,
+          boosts_active: 0,
+          boundaries: [],
+          behaviors: [],
+          bucketList: [],
+          bestMoments: [],
+          bestFeature: 'Olhar',
+          beveragePref: 'Drinks',
+          bestTime: 'Noite',
+          braveryLevel: 8,
+          busyMode: false,
+          bookingPolicy: 'A combinar',
+          verificationScore: 100,
+          hasBlurredGallery: false,
+          lat: -22.9068,
+          lon: -43.1729,
+          birthDate: '1995-01-01',
+          rsvps: [],
+          vouches: [],
+          bookmarks: [],
+          blockedUsers: [],
+          matches: [],
+          bodyMods: [],
+          bodyHair: 'Naturais',
+          bodyArt: [],
+          bondageExp: 'Iniciante',
         };
 
         saveUserData(newUser);
@@ -66,38 +86,43 @@ export const Auth: React.FC = () => {
         setIsUnlocked(true);
         refreshSession(true);
 
-        showNotification(isLogin ? 'Login realizado com sucesso!' : 'Conta criada! Bem-vindo.', 'success');
+        showNotification('Login realizado com sucesso! Bem-vindo de volta.', 'success');
       }
     } catch (error: any) {
-      showNotification(error.message || 'Erro ao processar', 'error');
+      showNotification('Erro ao fazer login: ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <h1 className="text-6xl font-black text-white text-center mb-2">LIBIDO</h1>
-        <p className="text-center text-amber-500 mb-10">Matriz 2026</p>
+    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 text-center">
+      <div className="mb-12">
+        <h1 className="text-8xl font-black text-white italic">LIBIDO</h1>
+        <p className="text-amber-500 mt-4">Matriz 2026</p>
+      </div>
 
-        <div className="bg-zinc-900 rounded-3xl p-8">
-          <div className="flex justify-center gap-4 mb-8">
-            <button 
-              onClick={() => setIsLogin(true)}
-              className={`px-6 py-2 rounded-full ${isLogin ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}
-            >
-              Entrar
-            </button>
-            <button 
-              onClick={() => setIsLogin(false)}
-              className={`px-6 py-2 rounded-full ${!isLogin ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}
-            >
-              Criar Conta
-            </button>
-          </div>
+      {!showLoginForm ? (
+        <div className="w-full max-w-xs space-y-4">
+          <button
+            onClick={() => setShowLoginForm(true)}
+            className="w-full py-5 bg-red-600 rounded-2xl font-black text-white text-lg hover:bg-red-700 transition-all"
+          >
+            Entrar com Email e Senha
+          </button>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <button
+            onClick={() => {/* futuro registro */}}
+            className="w-full py-5 bg-zinc-800 border border-zinc-700 rounded-2xl font-black text-zinc-400 text-lg hover:text-white transition-all"
+          >
+            Criar Nova Conta
+          </button>
+        </div>
+      ) : (
+        <div className="w-full max-w-md bg-zinc-900 rounded-3xl p-8">
+          <h2 className="text-2xl font-bold mb-6 text-white">Entrar na sua conta</h2>
+          
+          <form onSubmit={handleLogin} className="space-y-5">
             <input
               type="email"
               placeholder="Seu email"
@@ -118,17 +143,25 @@ export const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-red-600 rounded-2xl font-bold text-lg disabled:opacity-50"
+              className="w-full py-4 bg-red-600 rounded-2xl font-bold text-lg disabled:opacity-50 hover:bg-red-700 transition-all"
             >
-              {loading ? 'Processando...' : isLogin ? 'Entrar' : 'Criar Conta'}
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowLoginForm(false)}
+              className="w-full py-3 text-zinc-400 hover:text-white transition-all"
+            >
+              Voltar
             </button>
           </form>
         </div>
+      )}
 
-        <p className="text-center text-zinc-500 text-sm mt-8">
-          Pagamento seguro • Protegido por Supabase
-        </p>
-      </div>
+      <p className="mt-12 text-zinc-600 text-xs">
+        Pagamento já realizado • Use o mesmo email do Stripe
+      </p>
     </div>
   );
 };
