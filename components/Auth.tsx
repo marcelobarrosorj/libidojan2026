@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '../App';
 import { RegistrationFlow } from './RegistrationFlow';
 import { PinSetup } from './PinSetup';
 import { PinUnlock } from './PinUnlock';
-import { saveUserData, setAuthFlag, getUserData, showNotification } from '../services/authUtils';
+import { saveUserData, setAuthFlag, getUserData, showNotification, syncCaches } from '../services/authUtils';
 import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, Vibes } from '../types';
+import { supabase } from '../services/supabase';
 
 export const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked, refreshSession } = useAuth();
@@ -17,12 +17,23 @@ export const Auth: React.FC = () => {
     setView('pin');
   };
 
-  const handleAccessExisting = () => {
-    const existing = getUserData();
+  const handleAccessExisting = async () => {
+    // Primeiro tenta localStorage
+    let existing = getUserData();
+
+    if (!existing) {
+      // Se não encontrar localmente, tenta buscar no Supabase pelo email ou ID
+      showNotification('Buscando conta na nuvem...', 'info');
+      
+      // Aqui podemos tentar recuperar por email se o usuário informar, mas por enquanto vamos tentar sync
+      await syncCaches();
+      existing = getUserData();
+    }
+
     if (existing) {
       setView('unlock');
     } else {
-      showNotification('Nenhuma conta encontrada neste dispositivo.', 'info');
+      showNotification('Nenhuma conta encontrada neste dispositivo ou na nuvem.', 'info');
     }
   };
 
@@ -31,7 +42,6 @@ export const Auth: React.FC = () => {
     const nickname = data.nickname || data.mainNickname || 'Anon';
     const email = data.email || 'contato@libido.app';
 
-    // Adding following: [] to satisfy User type
     const newUser: User = {
       id: `u-${Date.now()}`,
       nickname,
@@ -112,22 +122,21 @@ export const Auth: React.FC = () => {
           </h1>
           <p className="text-amber-500 uppercase tracking-[0.5em] text-[10px] mt-4 font-black">Matriz Lifestyle 2026</p>
         </div>
-        
+       
         <div className="w-full max-w-xs space-y-4 relative z-10">
-          <button 
+          <button
             onClick={() => setView('register')}
             className="w-full py-5 gradient-libido rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl transition-all hover:scale-105 active:scale-95"
           >
             Criar Nova Conta
           </button>
-          <button 
+          <button
             onClick={handleAccessExisting}
             className="w-full py-5 bg-slate-900 border border-amber-500/10 rounded-[2rem] font-black text-slate-400 uppercase tracking-widest text-[10px] hover:text-white transition-all shadow-xl"
           >
             Acessar Existente
           </button>
         </div>
-
         <footer className="mt-24 text-slate-800 text-[8px] uppercase font-black tracking-[0.4em] select-none">
           Ambiente Criptografado & Verificado
         </footer>
