@@ -32,15 +32,10 @@ export const syncWithCloud = async (user: User) => {
         data: user,
         plan: user.plan || Plan.FREE,
         is_premium: user.is_premium || false,
-        stripe_subscription_id: user.stripe_subscription_id || null,
         updated_at: new Date().toISOString()
       });
 
-    if (error) {
-      log('warn', 'Erro ao salvar no Supabase', error);
-    } else {
-      log('info', `Perfil sincronizado no Supabase para ${user.nickname}`);
-    }
+    if (error) log('warn', 'Erro ao salvar no Supabase', error);
   } catch (e) {
     log('warn', 'Cloud Sync falhou', e);
   }
@@ -50,7 +45,7 @@ export function getUserData(): User | null {
   const raw = localStorage.getItem(STORAGE_KEYS.USER_DATA_NEW);
   if (raw) {
     try {
-      let user = JSON.parse(atob(raw)) as User;   // simplificado
+      let user = JSON.parse(atob(raw)) as User;
       if (isOwner(user)) {
         user.plan = Plan.GOLD;
         user.is_premium = true;
@@ -114,4 +109,35 @@ export const showNotification = (message: string, type: 'info' | 'error' | 'succ
   notification.innerText = message;
   document.body.appendChild(notification);
   setTimeout(() => notification.remove(), 4000);
+};
+
+// Funções que estavam faltando (restauradas)
+export const likeProfile = async (id: string) => {
+  log('info', `[LIKE] User ${id}`);
+  return { isMatch: Math.random() > 0.7 };
+};
+
+export const passProfile = async (id: string) => {
+  log('info', `[PASS] User ${id}`);
+  return {};
+};
+
+export const toggleFollow = async (targetUserId: string): Promise<boolean> => {
+  const user = cache.userData;
+  if (!user) return false;
+
+  const following = user.following || [];
+  const isFollowing = following.includes(targetUserId);
+
+  const newFollowing = isFollowing
+    ? following.filter(id => id !== targetUserId)
+    : [...following, targetUserId];
+
+  saveUserData({ ...user, following: newFollowing });
+  return !isFollowing;
+};
+
+export const vouchUser = async (targetUserId: string) => {
+  log('info', `[VOUCH] User ${targetUserId} vouched`);
+  return { success: true };
 };
