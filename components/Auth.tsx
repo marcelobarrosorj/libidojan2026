@@ -1,168 +1,134 @@
 import React, { useState } from 'react';
 import { useAuth } from '../App';
-import { RegistrationFlow } from './RegistrationFlow';
-import { PinSetup } from './PinSetup';
-import { PinUnlock } from './PinUnlock';
-import { saveUserData, setAuthFlag, getUserData, showNotification, syncCaches } from '../services/authUtils';
-import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, Vibes } from '../types';
 import { supabase } from '../services/supabase';
+import { saveUserData, setAuthFlag, showNotification } from '../services/authUtils';
+import { User, Plan, TrustLevel, UserType } from '../types';
 
 export const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked, refreshSession } = useAuth();
-  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock'>('landing');
-  const [regData, setRegData] = useState<any>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(true); // true = login, false = registro
 
-  const handleRegistrationComplete = (payload: any) => {
-    setRegData(payload);
-    setView('pin');
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const handleAccessExisting = async () => {
-    showNotification('Buscando conta...', 'info');
+    try {
+      let result;
 
-    // Tenta localStorage primeiro
-    let existing = getUserData();
+      if (isLogin) {
+        // Login
+        result = await supabase.auth.signInWithPassword({ email, password });
+      } else {
+        // Registro
+        result = await supabase.auth.signUp({ email, password });
+      }
 
-    if (!existing) {
-      // Tenta sincronizar com nuvem
-      await syncCaches();
-      existing = getUserData();
+      if (result.error) {
+        showNotification(result.error.message, 'error');
+        return;
+      }
+
+      if (result.data.user) {
+        // Cria ou atualiza perfil
+        const newUser: User = {
+          id: result.data.user.id,
+          nickname: email.split('@')[0],
+          email: email,
+          age: 25,
+          plan: Plan.FREE,
+          is_premium: false,
+          avatar: `https://picsum.photos/seed/${email}/400`,
+          biotype: 'PADRAO',
+          bio: 'Novo usuário na Libido 2026',
+          gender: 'CIS',
+          sexualOrientation: 'HETERO',
+          type: UserType.HOMEM,
+          height: 170,
+          location: 'Brasil',
+          xp: 100,
+          level: 1,
+          isOnline: true,
+          verifiedAccount: false,
+          gallery: [],
+          following: [],
+          lookingFor: [UserType.MULHER],
+          trustLevel: TrustLevel.BRONZE,
+          vibes: ['LIBERAL'],
+          // preenche outros campos com defaults
+        };
+
+        saveUserData(newUser);
+        setAuthFlag(true);
+        setIsAuthenticated(true);
+        setIsUnlocked(true);
+        refreshSession(true);
+
+        showNotification(isLogin ? 'Login realizado com sucesso!' : 'Conta criada! Bem-vindo.', 'success');
+      }
+    } catch (error: any) {
+      showNotification(error.message || 'Erro ao processar', 'error');
+    } finally {
+      setLoading(false);
     }
-
-    if (existing) {
-      setView('unlock');
-    } else {
-      // Se ainda não encontrou, tenta criar um perfil básico com email (se o usuário informar)
-      showNotification('Nenhuma conta encontrada. Crie uma nova conta.', 'info');
-    }
   };
-
-  const handlePinDone = () => {
-    const data = regData.data;
-    const nickname = data.nickname || data.mainNickname || 'Anon';
-    const email = data.email || 'contato@libido.app';
-
-    const newUser: User = {
-      id: `u-${Date.now()}`,
-      nickname,
-      email,
-      age: data.age || 18,
-      plan: Plan.FREE,
-      balance: 0,
-      boosts_active: 0,
-      trustLevel: TrustLevel.BRONZE,
-      is_premium: false,
-      avatar: `https://picsum.photos/seed/${nickname}/400`,
-      biotype: data.biotype || Biotype.PADRAO,
-      bio: 'Novo explorador na Matriz Libido 2026.',
-      gender: data.gender || Gender.CIS,
-      sexualOrientation: data.sexualPreference || SexualOrientation.HETERO,
-      type: UserType.HOMEM,
-      lookingFor: data.lookingFor || [UserType.MULHER],
-      height: data.height || 170,
-      location: 'São Paulo, SP',
-      xp: 100,
-      level: 1,
-      isOnline: true,
-      verifiedAccount: false,
-      isGhostMode: false,
-      gallery: [],
-      badges: ['Iniciante'],
-      boundaries: [],
-      behaviors: [],
-      braveryLevel: 5,
-      updatedAt: new Date().toISOString(),
-      vibes: [Vibes.LIBERAL],
-      bucketList: [],
-      lat: -23.5505,
-      lon: -46.6333,
-      birthDate: '2000-01-01',
-      rsvps: [],
-      vouches: [],
-      bookmarks: [],
-      blockedUsers: [],
-      matches: [],
-      following: [],
-      seenBy: [],
-      bodyMods: [],
-      bodyHair: 'Naturais',
-      bodyArt: [],
-      bondageExp: 'Nenhuma',
-      bestMoments: [],
-      bestFeature: 'Olhar',
-      beveragePref: 'Drinks',
-      bestTime: 'Noite',
-      busyMode: false,
-      bookingPolicy: 'A combinar',
-      verificationScore: 0,
-      hasBlurredGallery: false
-    };
-
-    saveUserData(newUser);
-    setAuthFlag(true);
-    setIsAuthenticated(true);
-    setIsUnlocked(true);
-    refreshSession(true);
-  };
-
-  const handleUnlocked = () => {
-    setAuthFlag(true);
-    setIsAuthenticated(true);
-    setIsUnlocked(true);
-    refreshSession(true);
-  };
-
-  if (view === 'landing') {
-    return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-700">
-        <div className="mb-12 relative group">
-          <div className="absolute inset-0 bg-amber-500/20 blur-[100px] rounded-full group-hover:bg-amber-500/30 transition-all duration-1000" />
-          <h1 className="text-8xl font-black text-white italic relative tracking-tighter leading-none select-none">
-            LIBIDO
-          </h1>
-          <p className="text-amber-500 uppercase tracking-[0.5em] text-[10px] mt-4 font-black">Matriz Lifestyle 2026</p>
-        </div>
-       
-        <div className="w-full max-w-xs space-y-4 relative z-10">
-          <button
-            onClick={() => setView('register')}
-            className="w-full py-5 gradient-libido rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl transition-all hover:scale-105 active:scale-95"
-          >
-            Criar Nova Conta
-          </button>
-          <button
-            onClick={handleAccessExisting}
-            className="w-full py-5 bg-slate-900 border border-amber-500/10 rounded-[2rem] font-black text-slate-400 uppercase tracking-widest text-[10px] hover:text-white transition-all shadow-xl"
-          >
-            Acessar Existente
-          </button>
-        </div>
-        <footer className="mt-24 text-slate-800 text-[8px] uppercase font-black tracking-[0.4em] select-none">
-          Ambiente Criptografado & Verificado
-        </footer>
-      </div>
-    );
-  }
-
-  if (view === 'register') {
-    return (
-      <div className="h-screen w-full">
-        <RegistrationFlow onComplete={handleRegistrationComplete} onCancel={() => setView('landing')} />
-      </div>
-    );
-  }
-
-  if (view === 'unlock') {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 animate-in zoom-in-95 duration-500">
-        <PinUnlock onUnlocked={handleUnlocked} onRequireStrongLogin={() => setView('landing')} />
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 animate-in zoom-in-95 duration-500">
-      <PinSetup onDone={handlePinDone} />
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <h1 className="text-6xl font-black text-white text-center mb-2">LIBIDO</h1>
+        <p className="text-center text-amber-500 mb-10">Matriz 2026</p>
+
+        <div className="bg-zinc-900 rounded-3xl p-8">
+          <div className="flex justify-center gap-4 mb-8">
+            <button 
+              onClick={() => setIsLogin(true)}
+              className={`px-6 py-2 rounded-full ${isLogin ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}
+            >
+              Entrar
+            </button>
+            <button 
+              onClick={() => setIsLogin(false)}
+              className={`px-6 py-2 rounded-full ${!isLogin ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}
+            >
+              Criar Conta
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <input
+              type="email"
+              placeholder="Seu email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-red-600"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-red-600"
+              required
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-red-600 rounded-2xl font-bold text-lg disabled:opacity-50"
+            >
+              {loading ? 'Processando...' : isLogin ? 'Entrar' : 'Criar Conta'}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-zinc-500 text-sm mt-8">
+          Pagamento seguro • Protegido por Supabase
+        </p>
+      </div>
     </div>
   );
 };
