@@ -6,7 +6,7 @@ import { PinUnlock } from './PinUnlock';
 import { saveUserData, setAuthFlag, getUserData, showNotification } from '../services/authUtils';
 import { User, Plan, TrustLevel } from '../types';
 
-export const Auth: React.FC = () => {
+const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked } = useAuth();
   const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock' | 'emailLogin'>('landing');
   const [regData, setRegData] = useState<any>(null);
@@ -34,7 +34,7 @@ export const Auth: React.FC = () => {
       nickname: data.nickname || 'Usuário',
       email: data.email || '',
       age: data.age || 18,
-      plan: Plan.GOLD,           // Força premium para teste
+      plan: Plan.GOLD,
       is_premium: true,
       balance: 0,
       boosts_active: 0,
@@ -51,8 +51,6 @@ export const Auth: React.FC = () => {
   };
 
   const handleLoginWithEmail = () => {
-    // Aqui você pode expandir depois com Supabase auth real
-    // Por enquanto, força acesso com email do pagamento
     const fakePremiumUser: User = {
       id: `u-${Date.now()}`,
       nickname: 'Usuário Premium',
@@ -111,3 +109,5 @@ export const Auth: React.FC = () => {
     </div>
   );
 };
+
+export default Auth;
