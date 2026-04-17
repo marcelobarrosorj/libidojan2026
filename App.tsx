@@ -13,7 +13,7 @@ import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, User
 import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
-import SubscribeButtons from './SubscribeButtons';   // ← Import corrigido (da raiz)
+import SubscribeButtons from './SubscribeButtons';  // ← Import correto da raiz
 
 const AuthContext = createContext<any>(null);
 export const useAuth = () => useContext(AuthContext);
@@ -52,7 +52,7 @@ export default function App() {
     cache.userData = user;
     localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(user)));
     
-    // Força premium para o seu email
+    // Força premium para seu email
     if (user.email && (user.email.includes('marcelobarrosorj') || user.email.includes('libidoapp'))) {
       user.plan = Plan.GOLD;
       user.is_premium = true;
