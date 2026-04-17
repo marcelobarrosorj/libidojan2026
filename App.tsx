@@ -36,11 +36,11 @@ export default function App() {
     localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(premiumUser)));
   };
 
-  // Tela de pagamento VISÍVEL e FORTE (sem Layout)
+  // Tela de pagamento VISÍVEL E FORTE (sem Layout nenhum)
   const PaymentScreen = () => (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1a0033, #4b0082)',
+      background: 'linear-gradient(135deg, #4b0082, #1a0033)',
       color: '#fff',
       display: 'flex',
       flexDirection: 'column',
@@ -50,7 +50,7 @@ export default function App() {
       textAlign: 'center'
     }}>
       <h1 style={{ fontSize: '42px', marginBottom: '60px', fontWeight: 'bold' }}>
-        ASSINATURA PREMIUM
+        ASSINATURA PREMIUM LIBIDO 2026
       </h1>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '25px', width: '100%', maxWidth: '420px' }}>
