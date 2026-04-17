@@ -1,169 +1,113 @@
 import React, { useState } from 'react';
 import { useAuth } from '../App';
-import { supabase } from '../services/supabase';
-import { saveUserData, setAuthFlag, showNotification } from '../services/authUtils';
-import { User, Plan, TrustLevel, UserType } from '../types';
+import { RegistrationFlow } from './RegistrationFlow';
+import { PinSetup } from './PinSetup';
+import { PinUnlock } from './PinUnlock';
+import { saveUserData, setAuthFlag, getUserData, showNotification } from '../services/authUtils';
+import { User, Plan, TrustLevel } from '../types';
 
 export const Auth: React.FC = () => {
-  const { setIsAuthenticated, setIsUnlocked, refreshSession } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(false);
+  const { setIsAuthenticated, setIsUnlocked } = useAuth();
+  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock' | 'emailLogin'>('landing');
+  const [regData, setRegData] = useState<any>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleRegistrationComplete = (payload: any) => {
+    setRegData(payload);
+    setView('pin');
+  };
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        showNotification(error.message, 'error');
-        return;
-      }
-
-      if (data.user) {
-        // Cria perfil básico se não existir
-        const newUser: User = {
-          id: data.user.id,
-          nickname: email.split('@')[0],
-          email: email,
-          age: 25,
-          plan: Plan.GOLD,           // Força GOLD para sua conta
-          is_premium: true,          // Força premium
-          avatar: `https://picsum.photos/seed/${email}/400`,
-          biotype: 'PADRAO',
-          bio: 'Usuário Libido 2026',
-          gender: 'CIS',
-          sexualOrientation: 'HETERO',
-          type: UserType.HOMEM,
-          height: 170,
-          location: 'Brasil',
-          xp: 100,
-          level: 1,
-          isOnline: true,
-          verifiedAccount: true,
-          gallery: [],
-          following: [],
-          lookingFor: [UserType.MULHER],
-          trustLevel: TrustLevel.OURO,
-          vibes: ['LIBERAL'],
-          balance: 0,
-          boosts_active: 0,
-          boundaries: [],
-          behaviors: [],
-          bucketList: [],
-          bestMoments: [],
-          bestFeature: 'Olhar',
-          beveragePref: 'Drinks',
-          bestTime: 'Noite',
-          braveryLevel: 8,
-          busyMode: false,
-          bookingPolicy: 'A combinar',
-          verificationScore: 100,
-          hasBlurredGallery: false,
-          lat: -22.9068,
-          lon: -43.1729,
-          birthDate: '1995-01-01',
-          rsvps: [],
-          vouches: [],
-          bookmarks: [],
-          blockedUsers: [],
-          matches: [],
-          bodyMods: [],
-          bodyHair: 'Naturais',
-          bodyArt: [],
-          bondageExp: 'Iniciante',
-        };
-
-        saveUserData(newUser);
-        setAuthFlag(true);
-        setIsAuthenticated(true);
-        setIsUnlocked(true);
-        refreshSession(true);
-
-        showNotification('Login realizado com sucesso! Bem-vindo de volta.', 'success');
-      }
-    } catch (error: any) {
-      showNotification('Erro ao fazer login: ' + error.message, 'error');
-    } finally {
-      setLoading(false);
+  const handleAccessWithPin = () => {
+    const existing = getUserData();
+    if (existing) {
+      setView('unlock');
+    } else {
+      showNotification('Nenhuma conta encontrada neste dispositivo. Crie uma nova conta.', 'info');
     }
   };
 
+  const handlePinDone = () => {
+    const data = regData?.data || getUserData();
+    if (!data) return;
+
+    const newUser: User = {
+      id: data.id || `u-${Date.now()}`,
+      nickname: data.nickname || 'Usuário',
+      email: data.email || '',
+      age: data.age || 18,
+      plan: Plan.GOLD,           // Força premium para teste
+      is_premium: true,
+      balance: 0,
+      boosts_active: 0,
+      trustLevel: TrustLevel.OURO,
+      avatar: data.avatar || 'https://picsum.photos/id/64/300/300',
+      following: [],
+    };
+
+    saveUserData(newUser);
+    setIsAuthenticated(true);
+    setIsUnlocked(true);
+    setAuthFlag(true);
+    showNotification('Acesso liberado com PIN!', 'success');
+  };
+
+  const handleLoginWithEmail = () => {
+    // Aqui você pode expandir depois com Supabase auth real
+    // Por enquanto, força acesso com email do pagamento
+    const fakePremiumUser: User = {
+      id: `u-${Date.now()}`,
+      nickname: 'Usuário Premium',
+      email: 'marcelobarrosorj@gmail.com',
+      age: 30,
+      plan: Plan.GOLD,
+      is_premium: true,
+      balance: 0,
+      boosts_active: 0,
+      trustLevel: TrustLevel.OURO,
+      avatar: 'https://picsum.photos/id/64/300/300',
+      following: [],
+    };
+
+    saveUserData(fakePremiumUser);
+    setIsAuthenticated(true);
+    setIsUnlocked(true);
+    setAuthFlag(true);
+    showNotification('Acesso liberado como Premium!', 'success');
+  };
+
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 text-center">
-      <div className="mb-12">
-        <h1 className="text-8xl font-black text-white italic">LIBIDO</h1>
-        <p className="text-amber-500 mt-4">Matriz 2026</p>
-      </div>
-
-      {!showLoginForm ? (
-        <div className="w-full max-w-xs space-y-4">
-          <button
-            onClick={() => setShowLoginForm(true)}
-            className="w-full py-5 bg-red-600 rounded-2xl font-black text-white text-lg hover:bg-red-700 transition-all"
-          >
-            Entrar com Email e Senha
-          </button>
-
-          <button
-            onClick={() => {/* futuro registro */}}
-            className="w-full py-5 bg-zinc-800 border border-zinc-700 rounded-2xl font-black text-zinc-400 text-lg hover:text-white transition-all"
-          >
-            Criar Nova Conta
-          </button>
-        </div>
-      ) : (
-        <div className="w-full max-w-md bg-zinc-900 rounded-3xl p-8">
-          <h2 className="text-2xl font-bold mb-6 text-white">Entrar na sua conta</h2>
+    <div style={{ padding: '40px 20px', textAlign: 'center', minHeight: '100vh', backgroundColor: '#000', color: '#fff' }}>
+      {view === 'landing' && (
+        <>
+          <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Bem-vindo ao Libido 2026</h1>
           
-          <form onSubmit={handleLogin} className="space-y-5">
-            <input
-              type="email"
-              placeholder="Seu email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-red-600"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Sua senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-red-600"
-              required
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-red-600 rounded-2xl font-bold text-lg disabled:opacity-50 hover:bg-red-700 transition-all"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px', margin: '0 auto' }}>
+            <button 
+              onClick={() => setView('register')}
+              style={{ padding: '16px', fontSize: '18px', background: '#ff00aa', color: '#fff', border: 'none', borderRadius: '12px' }}
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              Criar Nova Conta
             </button>
 
-            <button
-              type="button"
-              onClick={() => setShowLoginForm(false)}
-              className="w-full py-3 text-zinc-400 hover:text-white transition-all"
+            <button 
+              onClick={handleAccessWithPin}
+              style={{ padding: '16px', fontSize: '18px', background: '#333', color: '#fff', border: 'none', borderRadius: '12px' }}
             >
-              Voltar
+              Acessar com PIN
             </button>
-          </form>
-        </div>
+
+            <button 
+              onClick={handleLoginWithEmail}
+              style={{ padding: '16px', fontSize: '18px', background: '#00aa00', color: '#fff', border: 'none', borderRadius: '12px' }}
+            >
+              Entrar com Email (Acesso Rápido)
+            </button>
+          </div>
+        </>
       )}
 
-      <p className="mt-12 text-zinc-600 text-xs">
-        Pagamento já realizado • Use o mesmo email do Stripe
-      </p>
+      {view === 'register' && <RegistrationFlow onComplete={handleRegistrationComplete} />}
+      {view === 'pin' && <PinSetup onComplete={handlePinDone} />}
+      {view === 'unlock' && <PinUnlock onSuccess={handlePinDone} />}
     </div>
   );
 };
-
-export default Auth;
