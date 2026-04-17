@@ -8,11 +8,6 @@ const Auth: React.FC = () => {
   const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock'>('landing');
   const [regData, setRegData] = useState<any>(null);
 
-  const handleRegistrationComplete = (payload: any) => {
-    setRegData(payload);
-    setView('pin');
-  };
-
   const handleAccessWithPin = () => {
     const existing = getUserData();
     if (existing) {
@@ -100,7 +95,7 @@ const Auth: React.FC = () => {
         </>
       )}
 
-      {view === 'register' && <RegistrationFlow onComplete={handleRegistrationComplete} />}
+      {view === 'register' && <RegistrationFlow onComplete={(data) => { setRegData(data); setView('pin'); }} />}
       {view === 'pin' && <PinSetup onComplete={handlePinDone} />}
       {view === 'unlock' && <PinUnlock onSuccess={handlePinDone} />}
     </div>
