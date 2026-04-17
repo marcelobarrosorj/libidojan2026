@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import { User, Plan } from './types';
-import { setAuthFlag, cache } from './services/authUtils';
+import { setAuthFlag, cache, getUserData } from './services/authUtils';
+
+const AuthContext = createContext<any>(null);
+export const useAuth = () => useContext(AuthContext);
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const savedUser = getUserData();
+    if (savedUser) {
+      setIsAuthenticated(true);
+      setCurrentUser(savedUser);
+    }
+  }, []);
 
   const handleLoginSuccess = (user: User) => {
     const premiumUser = { ...user };
@@ -20,7 +31,7 @@ export default function App() {
     localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(premiumUser)));
   };
 
-  // Tela de assinatura VISÍVEL (sem Layout, sem complicação)
+  // Tela de assinatura VISÍVEL e FORTE (sem Layout)
   const PaymentScreen = () => (
     <div style={{
       minHeight: '100vh',
