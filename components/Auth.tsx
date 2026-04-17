@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from '../App';
-import { saveUserData, setAuthFlag, showNotification } from '../services/authUtils';
+import { saveUserData, setAuthFlag } from '../services/authUtils';
 import { User, Plan, TrustLevel } from '../types';
 
-const Auth = () => {
+const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked } = useAuth();
 
   const handleLoginWithEmail = () => {
@@ -25,18 +25,12 @@ const Auth = () => {
     setIsAuthenticated(true);
     setIsUnlocked(true);
     setAuthFlag(true);
-    showNotification('Acesso liberado como Premium!', 'success');
+    alert('✅ Acesso liberado como Premium!');
   };
 
   return (
-    <div style={{ 
-      padding: '60px 20px', 
-      textAlign: 'center', 
-      minHeight: '100vh', 
-      backgroundColor: '#000', 
-      color: '#fff' 
-    }}>
-      <h1 style={{ fontSize: '36px', marginBottom: '60px' }}>Libido 2026</h1>
+    <div style={{ padding: '40px 20px', textAlign: 'center', minHeight: '100vh', backgroundColor: '#000', color: '#fff' }}>
+      <h1 style={{ fontSize: '32px', marginBottom: '60px' }}>Bem-vindo ao Libido 2026</h1>
       
       <button 
         onClick={handleLoginWithEmail}
@@ -46,18 +40,13 @@ const Auth = () => {
           background: '#00aa00', 
           color: '#fff', 
           border: 'none', 
-          borderRadius: '12px',
+          borderRadius: '12px', 
           fontWeight: 'bold',
-          width: '100%',
-          maxWidth: '320px'
+          cursor: 'pointer'
         }}
       >
         Entrar com Email (Acesso Rápido)
       </button>
-
-      <p style={{ marginTop: '40px', color: '#888' }}>
-        Clique acima para acessar como Premium imediatamente
-      </p>
     </div>
   );
 };
