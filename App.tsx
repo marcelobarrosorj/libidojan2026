@@ -13,7 +13,7 @@ import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, User
 import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
-import SubscribeButtons from './components/SubscribeButtons';
+import SubscribeButtons from './SubscribeButtons';   // ← Import corrigido (da raiz)
 
 const AuthContext = createContext<any>(null);
 export const useAuth = () => useContext(AuthContext);
@@ -27,7 +27,6 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showTerms, setShowTerms] = useState(false);
 
-  // Inicialização mais robusta
   useEffect(() => {
     initSecurityLayer();
     
@@ -38,7 +37,7 @@ export default function App() {
       setIsAuthenticated(true);
       setCurrentUser(savedUser);
       setIsUnlocked(true);
-      syncCaches(); // tenta sincronizar com nuvem
+      syncCaches();
     }
 
     const shouldShow = shouldShowTermsGate();
@@ -53,8 +52,8 @@ export default function App() {
     cache.userData = user;
     localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(user)));
     
-    // Força premium no login se for o email pago
-    if (user.email?.includes('marcelobarrosorj') || user.email?.includes('libidoapp')) {
+    // Força premium para o seu email
+    if (user.email && (user.email.includes('marcelobarrosorj') || user.email.includes('libidoapp'))) {
       user.plan = Plan.GOLD;
       user.is_premium = true;
     }
