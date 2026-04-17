@@ -8,7 +8,7 @@ import { User, Plan, TrustLevel } from '../types';
 
 const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked } = useAuth();
-  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock' | 'emailLogin'>('landing');
+  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock'>('landing');
   const [regData, setRegData] = useState<any>(null);
 
   const handleRegistrationComplete = (payload: any) => {
