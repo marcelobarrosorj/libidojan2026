@@ -8,21 +8,21 @@ export default function App() {
       left: 0,
       width: '100vw',
       height: '100vh',
-      backgroundColor: '#00ff00',
-      color: '#000',
+      backgroundColor: '#ff00ff',
+      color: '#fff',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: '60px',
+      fontSize: '50px',
       fontWeight: 'bold',
       textAlign: 'center',
       zIndex: 999999,
       padding: '20px'
     }}>
       TESTE FINAL<br /><br />
-      SE VOCÊ VÊ ESTE TEXTO VERDE GRANDE<br />
-      O APP ESTÁ FUNCIONANDO
+      FUNDO ROSA FORTE<br /><br />
+      SE VOCÊ VÊ ESTE TEXTO, O APP RENDERIZOU
     </div>
   );
 }
