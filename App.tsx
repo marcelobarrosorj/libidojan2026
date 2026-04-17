@@ -28,24 +28,25 @@ export default function App() {
     localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(premiumUser)));
   };
 
-  // Tela de assinatura FORÇADA e VISÍVEL
+  // Tela de assinatura FORÇADA (máxima visibilidade)
   const PaymentScreen = () => (
     <div style={{
       position: 'fixed',
       top: 0,
       left: 0,
-      width: '100%',
-      height: '100%',
+      width: '100vw',
+      height: '100vh',
       background: '#4b0082',
       color: '#fff',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 9999,
-      padding: '20px'
+      zIndex: 99999,
+      padding: '20px',
+      boxSizing: 'border-box'
     }}>
-      <h1 style={{ fontSize: '48px', marginBottom: '40px', textAlign: 'center' }}>
+      <h1 style={{ fontSize: '48px', marginBottom: '50px', textAlign: 'center' }}>
         LIBIDO 2026<br />PREMIUM
       </h1>
       
@@ -70,8 +71,8 @@ export default function App() {
         </button>
       </div>
 
-      <p style={{ marginTop: '50px', fontSize: '18px', opacity: 0.8 }}>
-        Pagamento abre em nova aba • Seguro via Stripe
+      <p style={{ marginTop: '60px', fontSize: '18px' }}>
+        Clique em um botão para assinar
       </p>
     </div>
   );
