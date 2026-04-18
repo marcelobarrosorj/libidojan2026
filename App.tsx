@@ -41,35 +41,39 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {/* Conteúdo com altura total para vencer o fundo preto do Layout */}
+      {/* FORÇA BRUTA DE VISIBILIDADE - nunca mais tela preta */}
       <div style={{ 
         flex: 1, 
-        minHeight: '100%', 
+        minHeight: '100vh', 
+        width: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        padding: '40px 20px', 
+        padding: '80px 20px 100px', 
         backgroundColor: '#1a0033', 
-        color: '#fff' 
+        color: '#fff',
+        overflow: 'visible'
       }}>
-        <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Assinatura Premium Libido 2026</h1>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px', width: '100%' }}>
+        <h1 style={{ fontSize: '38px', marginBottom: '60px', fontWeight: '900', letterSpacing: '-1px' }}>
+          Assinatura Premium Libido 2026
+        </h1>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '440px', width: '100%' }}>
           <button 
             onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')}
-            style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
+            style={{ padding: '24px', fontSize: '24px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '20px', fontWeight: '900', boxShadow: '0 10px 30px rgba(0,255,136,0.4)' }}
           >
             Mensal — R$ 49,90
           </button>
           <button 
             onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404', '_blank')}
-            style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
+            style={{ padding: '24px', fontSize: '24px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '20px', fontWeight: '900', boxShadow: '0 10px 30px rgba(0,255,136,0.4)' }}
           >
             Semestral — R$ 269,46
           </button>
           <button 
             onClick={() => window.open('https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405', '_blank')}
-            style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
+            style={{ padding: '24px', fontSize: '24px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '20px', fontWeight: '900', boxShadow: '0 10px 30px rgba(0,255,136,0.4)' }}
           >
             Anual — R$ 479,04
           </button>
