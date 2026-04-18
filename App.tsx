@@ -1,28 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Auth from './components/Auth';
+import Layout from './components/Layout';
+import { User, Plan } from './types';
+import { getAuthFlag, setAuthFlag, cache, getUserData } from './services/authUtils';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const savedUser = getUserData();
+    if (savedUser) {
+      setIsAuthenticated(true);
+      setCurrentUser(savedUser);
+    }
+  }, []);
+
+  const handleLoginSuccess = (user: User) => {
+    const premiumUser = { ...user };
+    if (user.email && (user.email.includes('marcelobarrosorj') || user.email.includes('libidoapp'))) {
+      premiumUser.plan = Plan.GOLD;
+      premiumUser.is_premium = true;
+    }
+    setCurrentUser(premiumUser);
+    setIsAuthenticated(true);
+    setAuthFlag(true);
+    cache.userData = premiumUser;
+    localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(premiumUser)));
+  };
+
+  if (!isAuthenticated) {
+    return <Auth onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: '#00ff00',
-      color: '#000',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '60px',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      zIndex: 999999,
-      padding: '20px'
-    }}>
-      TESTE FINAL<br /><br />
-      SE VOCÊ VÊ ESTE TEXTO VERDE GRANDE<br />
-      O REACT ESTÁ FUNCIONANDO
-    </div>
+    <Layout activeTab="assinatura" setActiveTab={() => {}}>
+      <div style={{ 
+        padding: '60px 20px', 
+        textAlign: 'center', 
+        backgroundColor: '#1a0033', 
+        color: '#fff', 
+        minHeight: '80vh' 
+      }}>
+        <h1 style={{ fontSize: '36px', marginBottom: '50px' }}>Assinatura Premium Libido 2026</h1>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px', maxWidth: '420px', margin: '0 auto' }}>
+          <button 
+            onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')}
+            style={{ padding: '22px', fontSize: '22px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '16px', fontWeight: 'bold' }}
+          >
+            Mensal — R$ 49,90
+          </button>
+          <button 
+            onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404', '_blank')}
+            style={{ padding: '22px', fontSize: '22px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '16px', fontWeight: 'bold' }}
+          >
+            Semestral — R$ 269,46
+          </button>
+          <button 
+            onClick={() => window.open('https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405', '_blank')}
+            style={{ padding: '22px', fontSize: '22px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '16px', fontWeight: 'bold' }}
+          >
+            Anual — R$ 479,04
+          </button>
+        </div>
+      </div>
+    </Layout>
   );
 }
