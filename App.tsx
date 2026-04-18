@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
 import { User, Plan } from './types';
 import { getAuthFlag, setAuthFlag, cache, getUserData } from './services/authUtils';
 
+const AuthContext = createContext<any>(null);
+export const useAuth = () => useContext(AuthContext);
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [activeTab, setActiveTab] = useState<'assinatura'>('assinatura');
 
   useEffect(() => {
     const savedUser = getUserData();
@@ -34,33 +38,17 @@ export default function App() {
   }
 
   return (
-    <Layout activeTab="assinatura" setActiveTab={() => {}}>
-      <div style={{ 
-        padding: '60px 20px', 
-        textAlign: 'center', 
-        backgroundColor: '#1a0033', 
-        color: '#fff', 
-        minHeight: '80vh' 
-      }}>
-        <h1 style={{ fontSize: '36px', marginBottom: '50px' }}>Assinatura Premium Libido 2026</h1>
-        
+    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+      <div style={{ padding: '40px 20px', textAlign: 'center', backgroundColor: '#1a0033', color: '#fff', minHeight: '80vh' }}>
+        <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Assinatura Premium Libido 2026</h1>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px', margin: '0 auto' }}>
-          <button 
-            onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')}
-            style={{ padding: '20px', fontSize: '22px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
-          >
+          <button onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')} style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>
             Mensal — R$ 49,90
           </button>
-          <button 
-            onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404', '_blank')}
-            style={{ padding: '20px', fontSize: '22px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
-          >
+          <button onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404', '_blank')} style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>
             Semestral — R$ 269,46
           </button>
-          <button 
-            onClick={() => window.open('https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405', '_blank')}
-            style={{ padding: '20px', fontSize: '22px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
-          >
+          <button onClick={() => window.open('https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405', '_blank')} style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>
             Anual — R$ 479,04
           </button>
         </div>
