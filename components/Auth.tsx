@@ -5,42 +5,7 @@ import { User, Plan, TrustLevel } from '../types';
 
 const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked } = useAuth();
-  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock'>('landing');
-  const [regData, setRegData] = useState<any>(null);
-
-  const handleAccessWithPin = () => {
-    const existing = getUserData();
-    if (existing) {
-      setView('unlock');
-    } else {
-      showNotification('Nenhuma conta encontrada neste dispositivo.', 'info');
-    }
-  };
-
-  const handlePinDone = () => {
-    const data = regData?.data || getUserData();
-    if (!data) return;
-
-    const newUser: User = {
-      id: data.id || `u-${Date.now()}`,
-      nickname: data.nickname || 'Usuário Premium',
-      email: data.email || 'marcelobarrosorj@gmail.com',
-      age: data.age || 30,
-      plan: Plan.GOLD,
-      is_premium: true,
-      balance: 0,
-      boosts_active: 0,
-      trustLevel: TrustLevel.OURO,
-      avatar: data.avatar || 'https://picsum.photos/id/64/300/300',
-      following: [],
-    };
-
-    saveUserData(newUser);
-    setIsAuthenticated(true);
-    setIsUnlocked(true);
-    setAuthFlag(true);
-    showNotification('Acesso liberado com PIN!', 'success');
-  };
+  const [view, setView] = useState<'landing'>('landing');
 
   const handleLoginWithEmail = () => {
     const premiumUser: User = {
@@ -66,38 +31,30 @@ const Auth: React.FC = () => {
 
   return (
     <div style={{ padding: '40px 20px', textAlign: 'center', minHeight: '100vh', backgroundColor: '#000', color: '#fff' }}>
-      {view === 'landing' && (
-        <>
-          <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Bem-vindo ao Libido 2026</h1>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px', margin: '0 auto' }}>
-            <button 
-              onClick={() => setView('register')}
-              style={{ padding: '16px', fontSize: '18px', background: '#ff00aa', color: '#fff', border: 'none', borderRadius: '12px' }}
-            >
-              Criar Nova Conta
-            </button>
+      <h1 style={{ fontSize: '32px', marginBottom: '60px' }}>Bem-vindo ao Libido 2026</h1>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '320px', margin: '0 auto' }}>
+        <button 
+          onClick={() => alert('Funcionalidade em desenvolvimento')}
+          style={{ padding: '16px', fontSize: '18px', background: '#ff00aa', color: '#fff', border: 'none', borderRadius: '12px' }}
+        >
+          Criar Nova Conta
+        </button>
 
-            <button 
-              onClick={handleAccessWithPin}
-              style={{ padding: '16px', fontSize: '18px', background: '#333', color: '#fff', border: 'none', borderRadius: '12px' }}
-            >
-              Acessar com PIN
-            </button>
+        <button 
+          onClick={() => alert('Funcionalidade em desenvolvimento')}
+          style={{ padding: '16px', fontSize: '18px', background: '#333', color: '#fff', border: 'none', borderRadius: '12px' }}
+        >
+          Acessar com PIN
+        </button>
 
-            <button 
-              onClick={handleLoginWithEmail}
-              style={{ padding: '16px', fontSize: '18px', background: '#00aa00', color: '#fff', border: 'none', borderRadius: '12px' }}
-            >
-              Entrar com Email (Acesso Rápido)
-            </button>
-          </div>
-        </>
-      )}
-
-      {view === 'register' && <RegistrationFlow onComplete={(data) => { setRegData(data); setView('pin'); }} />}
-      {view === 'pin' && <PinSetup onComplete={handlePinDone} />}
-      {view === 'unlock' && <PinUnlock onSuccess={handlePinDone} />}
+        <button 
+          onClick={handleLoginWithEmail}
+          style={{ padding: '16px', fontSize: '18px', background: '#00aa00', color: '#fff', border: 'none', borderRadius: '12px' }}
+        >
+          Entrar com Email (Acesso Rápido)
+        </button>
+      </div>
     </div>
   );
 };
