@@ -41,17 +41,17 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {/* Tela de assinatura com fundo forte para garantir visibilidade dentro do Layout */}
+      {/* Ajuste de tamanho para preencher o Layout e evitar tela preta */}
       <div style={{ 
-        minHeight: '100vh', 
-        backgroundColor: '#1a0033', 
-        color: '#fff', 
+        flex: 1, 
+        minHeight: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
         padding: '40px 20px', 
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
+        backgroundColor: '#1a0033', 
+        color: '#fff' 
       }}>
         <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Assinatura Premium Libido 2026</h1>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px', width: '100%' }}>
