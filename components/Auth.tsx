@@ -3,9 +3,13 @@ import { useAuth } from '../App';
 import { saveUserData, setAuthFlag, getUserData, showNotification } from '../services/authUtils';
 import { User, Plan, TrustLevel } from '../types';
 
-const Auth: React.FC = () => {
+interface AuthProps {
+  onLoginSuccess: (user: User) => void;
+}
+
+const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
   const { setIsAuthenticated, setIsUnlocked } = useAuth();
-  const [view, setView] = useState<'landing'>('landing');
+  const [view] = useState<'landing'>('landing');
 
   const handleLoginWithEmail = () => {
     const premiumUser: User = {
@@ -27,6 +31,7 @@ const Auth: React.FC = () => {
     setIsUnlocked(true);
     setAuthFlag(true);
     showNotification('✅ Acesso liberado como Premium!', 'success');
+    onLoginSuccess(premiumUser);
   };
 
   return (
