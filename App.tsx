@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
 import { User, Plan } from './types';
 import { getAuthFlag, setAuthFlag, cache, getUserData } from './services/authUtils';
 
+const AuthContext = createContext<any>(null);
+export const useAuth = () => useContext(AuthContext);
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState('assinatura');
+  const [activeTab, setActiveTab] = useState<'assinatura'>('assinatura');
 
   useEffect(() => {
     const savedUser = getUserData();
@@ -28,7 +31,6 @@ export default function App() {
     setAuthFlag(true);
     cache.userData = premiumUser;
     localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(premiumUser)));
-    setActiveTab('assinatura');
   };
 
   if (!isAuthenticated) {
