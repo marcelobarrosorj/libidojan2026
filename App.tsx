@@ -41,9 +41,20 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      <div style={{ padding: '40px 20px', textAlign: 'center', backgroundColor: '#1a0033', color: '#fff', minHeight: '80vh' }}>
+      {/* Tela de assinatura com fundo forte para garantir visibilidade dentro do Layout */}
+      <div style={{ 
+        minHeight: '100vh', 
+        backgroundColor: '#1a0033', 
+        color: '#fff', 
+        padding: '40px 20px', 
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
         <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Assinatura Premium Libido 2026</h1>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px', width: '100%' }}>
           <button onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')} style={{ padding: '18px', fontSize: '20px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>
             Mensal — R$ 49,90
           </button>
