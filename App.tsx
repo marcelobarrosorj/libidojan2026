@@ -41,18 +41,18 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {/* CONTEÚDO QUE PREENCHE 100% DO LAYOUT - sem absolute, sem conflito */}
+      {/* CORREÇÃO FINAL DE TAMANHO - preenche o main do Layout sem conflito */}
       <div style={{ 
         flex: 1, 
-        minHeight: '100%', 
         width: '100%', 
+        minHeight: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        padding: '80px 20px 120px', 
+        padding: '80px 20px 140px', 
         backgroundColor: '#1a0033', 
-        color: '#fff' 
+        color: '#fff'
       }}>
         <h1 style={{ fontSize: '38px', marginBottom: '60px', fontWeight: '900', letterSpacing: '-1px' }}>
           Assinatura Premium Libido 2026
