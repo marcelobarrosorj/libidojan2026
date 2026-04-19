@@ -41,22 +41,18 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {/* FORÇA BRUTA MÁXIMA - resolve tela preta para sempre */}
+      {/* CONTEÚDO QUE PREENCHE 100% DO LAYOUT - sem absolute, sem conflito */}
       <div style={{ 
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '80px 20px 120px',
-        backgroundColor: '#1a0033',
-        color: '#fff',
-        zIndex: 9999,
-        overflow: 'visible'
+        flex: 1, 
+        minHeight: '100%', 
+        width: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '80px 20px 120px', 
+        backgroundColor: '#1a0033', 
+        color: '#fff' 
       }}>
         <h1 style={{ fontSize: '38px', marginBottom: '60px', fontWeight: '900', letterSpacing: '-1px' }}>
           Assinatura Premium Libido 2026
