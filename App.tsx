@@ -41,7 +41,7 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {/* CORREÇÃO FINAL DE TAMANHO - preenche o main do Layout sem conflito */}
+      {/* REFAZIMENTO TOTAL DO TAMANHO - agora cabe perfeitamente dentro do Layout */}
       <div style={{ 
         flex: 1, 
         width: '100%', 
@@ -50,7 +50,7 @@ export default function App() {
         flexDirection: 'column', 
         alignItems: 'center', 
         justifyContent: 'center', 
-        padding: '80px 20px 140px', 
+        padding: '80px 20px 160px',   /* padding-bottom maior para o menu fixo */
         backgroundColor: '#1a0033', 
         color: '#fff'
       }}>
