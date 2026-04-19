@@ -1,54 +1,72 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20',
-});
-
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06-20' });
 const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const sig = req.headers['stripe-signature'] as string;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).send('Method Not Allowed');
+  }
 
+  const sig = req.headers['stripe-signature'] as string;
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
   } catch (err: any) {
-    console.error('❌ Webhook signature verification failed:', err.message);
+    console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  console.log('✅ Webhook recebido:', event.type);
+  try {
+    switch (event.type) {
+      case 'invoice.paid':
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+        const subscription = event.data.object as Stripe.Subscription;
+        const userId = subscription.metadata?.user_id;
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const userId = session.metadata?.userId;
-    const plan = session.metadata?.plan || 'mensal';
+        if (userId) {
+          await supabase
+            .from('users')
+            .update({
+              is_premium: true,
+              plan: 'GOLD',
+              subscription_active: true,
+              subscription_id: subscription.id,
+            })
+            .eq('id', userId);
+        }
+        break;
 
-    if (userId) {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          plan: plan,
-          is_premium: true,
-          stripe_subscription_id: session.subscription as string,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) {
-        console.error('❌ Erro ao atualizar perfil:', error);
-      } else {
-        console.log(`✅ Usuário ${userId} atualizado para premium (${plan})`);
-      }
+      case 'customer.subscription.deleted':
+        const deletedSub = event.data.object as Stripe.Subscription;
+        const deletedUserId = deletedSub.metadata?.user_id;
+        if (deletedUserId) {
+          await supabase
+            .from('users')
+            .update({ is_premium: false, subscription_active: false })
+            .eq('id', deletedUserId);
+        }
+        break;
     }
-  }
 
-  return res.status(200).json({ received: true });
+    res.status(200).send('Webhook received and processed successfully');
+  } catch (error) {
+    console.error('Erro ao processar webhook:', error);
+    res.status(200).send('Webhook received'); // sempre retorna 200 para o Stripe não desativar novamente
+  }
 }
+
+export const config = {
+  api: { bodyParser: false },
+};
