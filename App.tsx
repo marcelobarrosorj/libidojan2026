@@ -3,4 +3,7 @@ import Auth from './Auth';
 import Layout from './components/Layout';
 import { User, Plan } from './types';
 import { getAuthFlag, setAuthFlag, cache, getUserData } from './services/authUtils';
-import { initSecurityLayer } from './services/security
+import { initSecurityLayer } from './services/securityService';
+
+const AuthContext = createContext<any>(null);
+export const useAuth
