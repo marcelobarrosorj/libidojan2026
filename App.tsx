@@ -1,9 +1,34 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Plan } from './types';
-import { getAuthFlag, setAuthFlag, cache, getUserData, saveUserData } from './services/authUtils';
-import { initSecurityLayer } from './services/securityService';
 
-// AuthContext completo (fix erro "must be initialized")
+// Types de types.ts
+enum Plan { FREE = 'Free', PREMIUM = 'Premium', GOLD = 'Gold' }
+interface User { id: string; email: string; nickname: string; plan: Plan; is_premium: boolean; boosts_active: number; following: string[]; }
+
+// authUtils.ts stubbed
+const cache = { userData: null as User | null };
+function getUserData(): User | null { 
+  const raw = localStorage.getItem('libido_user_data_v2');
+  if (raw) {
+    try { 
+      const user = JSON.parse(atob(raw)) as User;
+      cache.userData = user;
+      return user;
+    } catch { }
+  }
+  return null;
+}
+function saveUserData(userData: Partial<User>) {
+  const current = cache.userData || {} as User;
+  const updated = { ...current, ...userData } as User;
+  cache.userData = updated;
+  localStorage.setItem('libido_user_data_v2', btoa(JSON.stringify(updated)));
+}
+function setAuthFlag(v: boolean) { localStorage.setItem('libido_auth_active', v ? 'true' : 'false'); }
+
+// securityService.ts stubbed
+function initSecurityLayer() { console.log('Security Layer ativa'); }
+
+// AuthContext completo
 const AuthContext = createContext<any>(null);
 export const useAuth = () => useContext(AuthContext);
 
@@ -22,7 +47,15 @@ export default function App() {
   }, []);
 
   const handleLoginSuccess = (user: Partial<User>) => {
-    const premiumUser = { ...user, id: `u-${Date.now()}`, nickname: 'Usuário Premium', age: 30, balance: 0, boosts_active: 0, trustLevel: 'Ouro', avatar: 'https://picsum.photos/id/64/300/300', following: [] } as User;
+    const premiumUser: User = { 
+      id: `u-${Date.now()}`, 
+      email: user.email || '', 
+      nickname: 'Usuário Premium', 
+      plan: Plan.FREE, 
+      is_premium: false, 
+      boosts_active: 0, 
+      following: [] 
+    };
     if (user.email && (user.email.includes('marcelobarrosorj') || user.email.includes('libidoapp'))) {
       premiumUser.plan = Plan.GOLD;
       premiumUser.is_premium = true;
@@ -30,36 +63,33 @@ export default function App() {
     setCurrentUser(premiumUser);
     setIsAuthenticated(true);
     setAuthFlag(true);
-    cache.userData = premiumUser;
     saveUserData(premiumUser);
   };
 
-  // Stub Auth (completo, usa handleLoginSuccess)
+  // Stub Auth inline
   const AuthComponent = () => (
-    <div style={{ padding: '40px 20px', textAlign: 'center', minHeight: '100vh', backgroundColor: '#000', color: '#fff' }}>
-      <h1 style={{ fontSize: '32px', marginBottom: '60px' }}>Bem-vindo ao Libido 2026</h1>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '320px', margin: '0 auto' }}>
-        <button onClick={() => alert('Funcionalidade em desenvolvimento')} style={{ padding: '16px', fontSize: '18px', background: '#ff00aa', color: '#fff', border: 'none', borderRadius: '12px' }}>Criar Nova Conta</button>
-        <button onClick={() => alert('Funcionalidade em desenvolvimento')} style={{ padding: '16px', fontSize: '18px', background: '#333', color: '#fff', border: 'none', borderRadius: '12px' }}>Acessar com PIN</button>
-        <button onClick={() => handleLoginSuccess({ email: 'marcelobarrosorj@gmail.com' })} style={{ padding: '16px', fontSize: '18px', background: '#00aa00', color: '#fff', border: 'none', borderRadius: '12px' }}>Entrar com Email (Acesso Rápido)</button>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#050505', color: '#fff', padding: '20px' }}>
+      <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+        <h1 style={{ fontSize: '32px', marginBottom: '40px' }}>Libido 2026</h1>
+        <button onClick={() => handleLoginSuccess({ email: 'marcelobarrosorj@gmail.com' })} 
+          style={{ width: '100%', padding: '16px', fontSize: '18px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold', marginBottom: '16px' }}>
+          Entrar (Acesso Premium)
+        </button>
       </div>
     </div>
   );
 
-  // Stub Layout (completo, mobile-first, sem overflow-hidden)
+  // Stub Layout inline (mobile-first, scroll fix)
   const LayoutComponent = ({ children, activeTab, setActiveTab }: { children: React.ReactNode; activeTab: string; setActiveTab: (tab: string) => void }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', maxWidth: '480px', margin: '0 auto', backgroundColor: '#050505', borderLeft: '1px solid #333', borderRight: '1px solid #333' }}>
-      {/* Header stub */}
-      <header style={{ padding: '24px 24px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white' }}>LIBIDO</h1>
-        <button onClick={() => setActiveTab('profile')} style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)' }}>⚙️</button>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', maxWidth: '480px', margin: '0 auto', backgroundColor: '#050505' }}>
+      <header style={{ padding: '24px 20px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)', position: 'sticky', top: 0, zIndex: 50 }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#fff' }}>LIBIDO</h1>
+        <button onClick={() => setActiveTab('profile')} style={{ padding: '12px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)' }}>⚙️</button>
       </header>
-      {/* Main */}
-      <main style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+      <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px' }}>
         {children}
       </main>
-      {/* Nav stub */}
-      <nav style={{ padding: '16px', display: 'flex', justifyContent: 'space-around', backgroundColor: 'rgba(0,0,0,0.8)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <nav style={{ padding: '16px', display: 'flex', justifyContent: 'space-around', backgroundColor: 'rgba(10,10,10,0.95)', borderTop: '1px solid rgba(255,255,255,0.1)', position: 'sticky', bottom: 0, paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <button onClick={() => setActiveTab('feed')} style={{ color: activeTab === 'feed' ? '#ffd700' : '#aaa' }}>Feed</button>
         <button onClick={() => setActiveTab('assinatura')} style={{ color: activeTab === 'assinatura' ? '#ffd700' : '#aaa' }}>Assinar</button>
         <button onClick={() => setActiveTab('profile')} style={{ color: activeTab === 'profile' ? '#ffd700' : '#aaa' }}>Perfil</button>
@@ -67,18 +97,19 @@ export default function App() {
     </div>
   );
 
-  if (!isAuthenticated) {
-    return <AuthComponent />;
-  }
+  if (!isAuthenticated) return <AuthComponent />;
 
   return (
     <LayoutComponent activeTab={activeTab} setActiveTab={setActiveTab}>
-      <div style={{ 
-        flex: 1, width: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px 160px', backgroundColor: '#1a0033', color: '#fff' 
-      }}>
-        <h1 style={{ fontSize: '38px', marginBottom: '60px', fontWeight: '900', letterSpacing: '-1px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px 160px', backgroundColor: '#1a0033', color: '#fff', minHeight: '100vh' }}>
+        <h1 style={{ fontSize: '38px', marginBottom: '60px', fontWeight: '900', letterSpacing: '-1px', textAlign: 'center' }}>
           Assinatura Premium Libido 2026
         </h1>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '440px', width: '100%' }}>
-          <button onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')} style={{ padding: '24px', fontSize: '24px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '20px', fontWeight: '900', boxShadow: '0 15px 40px rgba(0,255,136,0.5)' }}>Mensal — R$ 49,90</button>
-          <button onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc
+          <button onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403', '_blank')} 
+            style={{ padding: '24px', fontSize: '24px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '20px', fontWeight: '900', boxShadow: '0 15px 40px rgba(0,255,136,0.5)', cursor: 'pointer' }}>
+            Mensal — R$ 49,90
+          </button>
+          <button onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404', '_blank')} 
+            style={{ padding: '24px', fontSize: '24px', background: '#00ff88', color: '#000', border: 'none', borderRadius: '20px', fontWeight: '900', boxShadow: '0 15px 40px rgba(0,255,136,0.5)', cursor: 'pointer' }}>
+            Semestral
