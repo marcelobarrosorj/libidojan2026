@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 export default function App() {
-  const [showSubs, setShowSubs] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
 
-  if (!showSubs) {
+  if (!authenticated) {
     return (
       <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#050505',color:'#fff',padding:'20px'}}>
         <div style={{textAlign:'center'}}>
           <h1 style={{fontSize:'32px',marginBottom:'40px'}}>Libido 2026</h1>
-          <button onClick={() => setShowSubs(true)} style={{width:'100%',padding:'16px',fontSize:'18px',background:'#00ff88',color:'#000',border:'none',borderRadius:'12px',fontWeight:'bold'}}>
+          <button onClick={() => setAuthenticated(true)} style={{width:'100%',padding:'16px',fontSize:'18px',background:'#00ff88',color:'#000',border:'none',borderRadius:'12px',fontWeight:'bold'}}>
             Entrar Premium
           </button>
         </div>
@@ -27,4 +27,14 @@ export default function App() {
           <button onClick={() => window.open('https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403','_blank')} style={{padding:'24px',fontSize:'24px',background:'#00ff88',color:'#000',border:'none',borderRadius:'20px',fontWeight:'900',boxShadow:'0 15px 40px rgba(0,255,136,0.5)'}}>
             Mensal — R$ 49,90
           </button>
-          <button onClick={() => window.open('https://buy.stripe.com
+          <button onClick={() => window.open('https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404','_blank')} style={{padding:'24px',fontSize:'24px',background:'#00ff88',color:'#000',border:'none',borderRadius:'20px',fontWeight:'900',boxShadow:'0 15px 40px rgba(0,255,136,0.5)'}}>
+            Semestral — R$ 269,46
+          </button>
+          <button onClick={() => window.open('https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405','_blank')} style={{padding:'24px',fontSize:'24px',background:'#00ff88',color:'#000',border:'none',borderRadius:'20px',fontWeight:'900',boxShadow:'0 15px 40px rgba(0,255,136,0.5)'}}>
+            Anual — R$ 479,04
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+}
