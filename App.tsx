@@ -5,5 +5,4 @@ import { User, Plan } from './types';
 import { getAuthFlag, setAuthFlag, cache, getUserData } from './services/authUtils';
 import { initSecurityLayer } from './services/securityService';
 
-const AuthContext = createContext<any>(null);
-export const use
+const AuthContext
