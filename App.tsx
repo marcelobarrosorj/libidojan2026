@@ -1,40 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function App() {
-  const [authenticated, setAuthenticated] = useState(false);
-
-  // Tela de login
-  if (!authenticated) {
-    return (
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        fontFamily: 'Arial, sans-serif',
-      }}>
-        <h1 style={{ color: 'white', marginBottom: '20px' }}>Login</h1>
-        <button
-          onClick={() => setAuthenticated(true)}
-          style={{
-            padding: '12px 24px',
-            margin: '10px',
-            fontSize: '18px',
-            background: 'linear-gradient(135deg, #00ff88 0%, #ff00aa 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            cursor: 'pointer',
-          }}
-        >
-          Login Email/PIN
-        </button>
-        <button
-          onClick={() => alert('Cadastro em desenvolvimento')}
-          style={{
+const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+           style={{
             padding: '12px 24px',
             margin: '10px',
             fontSize: '18px',
