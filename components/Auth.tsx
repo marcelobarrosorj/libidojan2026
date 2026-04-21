@@ -9,8 +9,12 @@ import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, V
 
 export const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked, refreshSession } = useAuth();
-  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock'>('landing');
+  const [view, setView] = useState<'landing' | 'register' | 'pin' | 'unlock' | 'login' | 'forgot_password'>('landing');
   const [regData, setRegData] = useState<any>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleRegistrationComplete = (payload: any) => {
     setRegData(payload);
@@ -18,11 +22,70 @@ export const Auth: React.FC = () => {
   };
 
   const handleAccessExisting = () => {
-    const existing = getUserData();
-    if (existing) {
-      setView('unlock');
-    } else {
-      showNotification('Nenhuma conta encontrada neste dispositivo.', 'info');
+    setView('login');
+  };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Preencha todos os campos.');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: authError } = await import('../services/supabase').then(m => m.supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password
+      }));
+
+      if (authError) throw authError;
+
+      if (data.user) {
+        // Busca perfil completo no banco
+        const { data: profile, error: profileError } = await import('../services/supabase').then(m => m.supabase
+          .from('profiles')
+          .select('data')
+          .eq('id', data.user.id)
+          .single());
+
+        if (profileError) throw new Error('Perfil não encontrado no servidor.');
+
+        const userData = profile.data as User;
+        saveUserData(userData);
+        setView('unlock');
+      }
+    } catch (e: any) {
+      console.error('[AUTH_ERROR]', e);
+      setError(e.message || 'Erro ao realizar login.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Informe seu e-mail para recuperação.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error: resetError } = await import('../services/supabase').then(m => m.supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: window.location.origin
+      }));
+
+      if (resetError) throw resetError;
+
+      showNotification('Link de recuperação enviado para seu e-mail.', 'success');
+      setView('login');
+    } catch (e: any) {
+      setError(e.message || 'Erro ao solicitar recuperação.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,6 +165,104 @@ export const Auth: React.FC = () => {
     refreshSession(true);
   };
 
+  if (view === 'login') {
+    return (
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
+        <header className="mb-12 text-center">
+            <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">Acessar Matriz</h2>
+            <p className="text-amber-500 uppercase tracking-widest text-[10px] mt-2 font-black">Identificação Requerida</p>
+        </header>
+
+        <div className="w-full max-w-xs space-y-6">
+            <div className="space-y-4">
+                <input 
+                    type="email" 
+                    placeholder="E-MAIL" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-slate-900 border-2 border-white/5 rounded-2xl p-5 text-white font-black tracking-widest text-xs focus:border-amber-500 transition-all outline-none"
+                />
+                <input 
+                    type="password" 
+                    placeholder="SENHA" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-slate-900 border-2 border-white/5 rounded-2xl p-5 text-white font-black tracking-widest text-xs focus:border-amber-500 transition-all outline-none"
+                />
+            </div>
+
+            {error && (
+                <p className="text-rose-500 text-[10px] uppercase font-black tracking-widest text-center animate-bounce">{error}</p>
+            )}
+
+            <button 
+                onClick={handleLogin}
+                disabled={loading}
+                className="w-full py-5 gradient-libido rounded-[2rem] font-black text-white uppercase tracking-widest shadow-2xl disabled:opacity-50"
+            >
+                {loading ? 'Sincronizando...' : 'Entrar'}
+            </button>
+
+            <div className="flex flex-col gap-4 text-center mt-6">
+                <button 
+                    onClick={() => { setError(null); setView('forgot_password'); }}
+                    className="text-[10px] text-amber-500/60 uppercase font-black tracking-widest hover:text-amber-500 transition-colors"
+                >
+                    Esqueci minha senha
+                </button>
+                <button 
+                    onClick={() => { setError(null); setView('landing'); }}
+                    className="text-[10px] text-slate-500 uppercase font-black tracking-widest hover:text-white transition-colors"
+                >
+                    Voltar
+                </button>
+            </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'forgot_password') {
+    return (
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
+        <header className="mb-12 text-center">
+            <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">Recuperar Acesso</h2>
+            <p className="text-amber-500 uppercase tracking-widest text-[10px] mt-2 font-black">Fluxo de Segurança</p>
+        </header>
+
+        <div className="w-full max-w-xs space-y-6">
+            <div className="space-y-4">
+                <input 
+                    type="email" 
+                    placeholder="SEU E-MAIL CADASTRADO" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-slate-900 border-2 border-white/5 rounded-2xl p-5 text-white font-black tracking-widest text-xs focus:border-amber-500 transition-all outline-none"
+                />
+            </div>
+
+            {error && (
+                <p className="text-rose-500 text-[10px] uppercase font-black tracking-widest text-center animate-bounce">{error}</p>
+            )}
+
+            <button 
+                onClick={handleForgotPassword}
+                disabled={loading}
+                className="w-full py-5 bg-amber-500 rounded-[2rem] font-black text-black uppercase tracking-widest shadow-2xl disabled:opacity-50"
+            >
+                {loading ? 'Enviando...' : 'Solicitar Link'}
+            </button>
+
+            <button 
+                onClick={() => { setError(null); setView('login'); }}
+                className="w-full text-center text-[10px] text-slate-500 uppercase font-black tracking-widest hover:text-white transition-colors mt-4"
+            >
+                Cancelar
+            </button>
+        </div>
+      </div>
+    );
+  }
   if (view === 'landing') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-700">
