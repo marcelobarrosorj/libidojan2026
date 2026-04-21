@@ -1,313 +1,509 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-type User = {
-  id: string;
-  email: string;
-  password: string;
-  profile?: 'casal' | 'homem' | 'mulher' | 'outro';
+type Screen = 'login' | 'signup' | 'forgot' | 'profile' | 'feed' | 'radar' | 'chat' | 'assinatura' | 'settings';
+
+type UserType = 'casal' | 'homem' | 'mulher' | 'outro';
+
+type PaymentPlan = {
+  label: string;
+  price: string;
+  href: string;
 };
 
-type AuthState = {
-  isAuthenticated: boolean;
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-};
+const AUTH_KEY = 'libido_auth_v2';
 
-enum Screen {
-  Login = 'login',
-  Signup = 'signup',
-  ForgotPassword = 'forgotPassword',
-  Main = 'main',
-  ProfileSelection = 'profileSelection',
-}
+export default function App() {
+  const [screen, setScreen] = useState<Screen>('login');
+  const [authenticated, setAuthenticated] = useState(false);
+  const [panicMode, setPanicMode] = useState(false);
 
-const mockUsers: User[] = [
-  { id: '1', email: 'user@example.com', password: 'password123', profile: 'homem' },
-];
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
-const PAYMENT_URL = 'https://pagamento.simulado.com';
-const PAYMENT_BUTTON_URL = 'https://botao.pagamento.simulado.com';
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirm, setSignupConfirm] = useState('');
 
-function logAudit(action: string, details: string) {
-  console.log(`[AUDITORIA] ${new Date().toISOString()} - ${action}: ${details}`);
-}
+  const [selectedUserType, setSelectedUserType] = useState<UserType>('casal');
 
-const App: React.FC = () => {
-  const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    user: null,
-    loading: false,
-    error: null,
-  });
-  const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.Login);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [selectedProfile, setSelectedProfile] = useState<User['profile']>('casal');
+  const paymentPlans: PaymentPlan[] = useMemo(
+    () => [
+      {
+        label: 'Mensal',
+        price: 'R$ 49,90',
+        href: 'https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403',
+      },
+      {
+        label: 'Semestral',
+        price: 'R$ 269,46',
+        href: 'https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404',
+      },
+      {
+        label: 'Anual',
+        price: 'R$ 479,04',
+        href: 'https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405',
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
-    const storedAuth = localStorage.getItem('auth');
-    if (storedAuth) {
-      const parsedAuth: AuthState = JSON.parse(storedAuth);
-      setAuthState(parsedAuth);
-      if (parsedAuth.isAuthenticated) {
-        setCurrentScreen(Screen.Main);
-      }
+    const saved = localStorage.getItem(AUTH_KEY);
+    if (saved === 'true') {
+      setAuthenticated(true);
+      setScreen('feed');
     }
+
+    const handleBlur = () => setPanicMode(true);
+    const handleFocus = () => setPanicMode(false);
+    const handleVisibility = () => setPanicMode(document.hidden);
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
-  const saveSession = (state: AuthState) => {
-    localStorage.setItem('auth', JSON.stringify(state));
-    setAuthState(state);
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthState((prev) => ({ ...prev, loading: true, error: null }));
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const user = mockUsers.find((u) => u.email === email && u.password === password);
-    if (user) {
-      const newState = { isAuthenticated: true, user, loading: false, error: null };
-      saveSession(newState);
-      setCurrentScreen(Screen.Main);
-      logAudit('LOGIN_SUCCESS', `Usuário ${user.email} logado com sucesso`);
+  useEffect(() => {
+    if (panicMode) {
+      document.body.classList.add('is-hidden');
     } else {
-      setAuthState((prev) => ({
-        ...prev,
-        loading: false,
-        error: 'Credenciais inválidas. Verifique seu email e senha.',
-      }));
-      logAudit('LOGIN_FAILURE', `Tentativa de login falhada para ${email}`);
+      document.body.classList.remove('is-hidden');
     }
+  }, [panicMode]);
+
+  const login = () => {
+    if (!loginEmail.trim() || !loginPassword.trim()) return;
+    localStorage.setItem(AUTH_KEY, 'true');
+    setAuthenticated(true);
+    setScreen('feed');
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      setAuthState((prev) => ({ ...prev, error: 'As senhas não coincidem.' }));
-      return;
-    }
-    setAuthState((prev) => ({ ...prev, loading: true, error: null }));
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const newUser: User = { id: Date.now().toString(), email, password, profile: undefined };
-    mockUsers.push(newUser);
-    setAuthState((prev) => ({ ...prev, loading: false }));
-    setCurrentScreen(Screen.ProfileSelection);
-    logAudit('SIGNUP_SUCCESS', `Usuário ${email} cadastrado com sucesso`);
+  const signup = () => {
+    if (!signupEmail.trim() || !signupPassword.trim() || signupPassword !== signupConfirm) return;
+    localStorage.setItem(AUTH_KEY, 'true');
+    setAuthenticated(true);
+    setScreen('profile');
   };
 
-  const handleProfileSelection = () => {
-    if (authState.user) {
-      authState.user.profile = selectedProfile;
-      saveSession(authState);
-      setCurrentScreen(Screen.Main);
-      logAudit('PROFILE_SELECTED', `Perfil ${selectedProfile} selecionado para ${authState.user.email}`);
-    }
+  const logout = () => {
+    localStorage.removeItem(AUTH_KEY);
+    setAuthenticated(false);
+    setScreen('login');
+    setLoginEmail('');
+    setLoginPassword('');
+    setSignupEmail('');
+    setSignupPassword('');
+    setSignupConfirm('');
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthState((prev) => ({ ...prev, loading: true, error: null }));
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setAuthState((prev) => ({
-      ...prev,
-      loading: false,
-      error: 'Instruções enviadas para seu email.',
-    }));
-    logAudit('FORGOT_PASSWORD', `Solicitação de redefinição para ${email}`);
-  };
-
-  const handleLogout = () => {
-    saveSession({ isAuthenticated: false, user: null, loading: false, error: null });
-    setCurrentScreen(Screen.Login);
-    logAudit('LOGOUT', 'Usuário deslogado');
-  };
-
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case Screen.Login:
-        return (
-          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-              />
-              {authState.error && <p style={{ color: 'red' }}>{authState.error}</p>}
-              <button
-                type="submit"
-                disabled={authState.loading}
-                style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}
-              >
-                {authState.loading ? 'Carregando...' : 'Entrar'}
-              </button>
-            </form>
-            <button onClick={() => setCurrentScreen(Screen.Signup)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
-              Cadastrar-se
-            </button>
-            <button onClick={() => setCurrentScreen(Screen.ForgotPassword)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
-              Esqueci a senha
-            </button>
+  const Shell = ({ children }: { children: React.ReactNode }) => (
+    <div className="libido-shell">
+      <header className="libido-header">
+        <div className="libido-brand">
+          <div className="libido-mark">L</div>
+          <div>
+            <div className="libido-title">LIBIDO</div>
+            <div className="libido-subtitle">Midnight & Gold</div>
           </div>
-        );
+        </div>
 
-      case Screen.Signup:
-        return (
-          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
-            <h2>Cadastro</h2>
-            <form onSubmit={handleSignup}>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-              />
-              <input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-              />
-              <input
-                type="password"
-                placeholder="Confirmar Senha"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-              />
-              {authState.error && <p style={{ color: 'red' }}>{authState.error}</p>}
-              <button
-                type="submit"
-                disabled={authState.loading}
-                style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}
-              >
-                {authState.loading ? 'Carregando...' : 'Cadastrar'}
-              </button>
-            </form>
-            <button onClick={() => setCurrentScreen(Screen.Login)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
-              Voltar ao Login
-            </button>
+        <div className="libido-header-actions">
+          <button className="libido-upgrade" onClick={() => setScreen('assinatura')}>
+            UPGRADE
+          </button>
+          <button className="libido-icon-btn" onClick={() => setScreen('settings')}>
+            ⚙
+          </button>
+        </div>
+      </header>
+
+      <main className="libido-content">{children}</main>
+
+      <nav className="libido-bottom-nav">
+        <NavItem active={screen === 'feed'} label="Feed" onClick={() => setScreen('feed')} />
+        <NavItem active={screen === 'radar'} label="Radar" onClick={() => setScreen('radar')} />
+        <NavItem active={screen === 'chat'} label="Chats" onClick={() => setScreen('chat')} />
+        <NavItem active={screen === 'profile'} label="Perfil" onClick={() => setScreen('profile')} />
+      </nav>
+    </div>
+  );
+
+  const NavItem = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
+    <button className={`libido-nav-item ${active ? 'active' : ''}`} onClick={onClick}>
+      <span className="libido-nav-dot" />
+      <span>{label}</span>
+    </button>
+  );
+
+  if (!authenticated && screen !== 'login' && screen !== 'signup' && screen !== 'forgot') {
+    setScreen('login');
+  }
+
+  return (
+    <>
+      <style>{`
+        :root {
+          --pink: #ff1493;
+          --amber: #f59e0b;
+          --dark: #050505;
+          --card: rgba(255,255,255,0.05);
+          --text: #ffffff;
+          --muted: #9ca3af;
+          --line: rgba(255,255,255,0.08);
+        }
+
+        * {
+          box-sizing: border-box;
+          -webkit-user-select: none;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+
+        body {
+          margin: 0;
+          background: var(--dark);
+          color: var(--text);
+          font-family: Inter, sans-serif;
+          overflow-x: hidden;
+        }
+
+        body.is-hidden {
+          filter: blur(40px) grayscale(1) brightness(0.1);
+        }
+
+        .libido-shell {
+          min-height: 100dvh;
+          max-width: 420px;
+          margin: 0 auto;
+          background: var(--dark);
+          border-left: 1px solid rgba(255,255,255,0.06);
+          border-right: 1px solid rgba(255,255,255,0.06);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .libido-header {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 18px 20px;
+          background: rgba(0,0,0,0.55);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid var(--line);
+        }
+
+        .libido-brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .libido-mark {
+          width: 36px;
+          height: 36px;
+          border-radius: 14px;
+          display: grid;
+          place-items: center;
+          background: linear-gradient(135deg, var(--amber), #b45309);
+          color: #000;
+          font-weight: 900;
+        }
+
+        .libido-title {
+          font-family: Outfit, sans-serif;
+          font-size: 24px;
+          font-weight: 700;
+          letter-spacing: -0.03em;
+        }
+
+        .libido-subtitle {
+          font-size: 12px;
+          color: var(--muted);
+        }
+
+        .libido-header-actions {
+          display: flex;
+          gap: 10px;
+        }
+
+        .libido-upgrade {
+          border: 0;
+          border-radius: 999px;
+          padding: 10px 14px;
+          background: linear-gradient(135deg, var(--amber), #b45309);
+          color: #000;
+          font-weight: 900;
+          font-size: 11px;
+        }
+
+        .libido-icon-btn {
+          width: 38px;
+          height: 38px;
+          border-radius: 999px;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.05);
+          color: var(--text);
+        }
+
+        .libido-content {
+          padding: 20px;
+          padding-bottom: 110px;
+          min-height: calc(100dvh - 84px);
+        }
+
+        .libido-card {
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 24px;
+          padding: 20px;
+          backdrop-filter: blur(16px);
+          box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+        }
+
+        .libido-h1 {
+          font-family: Outfit, sans-serif;
+          font-size: 30px;
+          margin: 0 0 10px;
+          letter-spacing: -0.03em;
+        }
+
+        .libido-p {
+          margin: 0 0 16px;
+          color: var(--muted);
+          line-height: 1.5;
+          font-size: 14px;
+        }
+
+        .libido-input {
+          width: 100%;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.04);
+          color: var(--text);
+          padding: 14px 16px;
+          border-radius: 16px;
+          outline: none;
+          margin-bottom: 12px;
+          font-size: 15px;
+        }
+
+        .libido-btn-primary,
+        .libido-btn-secondary {
+          width: 100%;
+          border: 0;
+          border-radius: 16px;
+          padding: 14px 16px;
+          font-weight: 800;
+          font-size: 15px;
+        }
+
+        .libido-btn-primary {
+          background: linear-gradient(135deg, var(--pink), #b91c1c);
+          color: white;
+        }
+
+        .libido-btn-secondary {
+          margin-top: 12px;
+          background: linear-gradient(135deg, var(--amber), #b45309);
+          color: #000;
+        }
+
+        .libido-link {
+          display: block;
+          text-align: center;
+          color: var(--muted);
+          margin-top: 12px;
+          font-size: 13px;
+        }
+
+        .libido-bottom-nav {
+          position: fixed;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 100%;
+          max-width: 420px;
+          display: flex;
+          justify-content: space-around;
+          gap: 8px;
+          padding: 14px 10px 22px;
+          background: rgba(10,10,10,0.95);
+          border-top: 1px solid var(--line);
+          backdrop-filter: blur(16px);
+          z-index: 40;
+        }
+
+        .libido-nav-item {
+          flex: 1;
+          border: 0;
+          background: transparent;
+          color: var(--muted);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          font-size: 10px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+        }
+
+        .libido-nav-item.active {
+          color: var(--amber);
+        }
+
+        .libido-nav-dot {
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          background: rgba(255,255,255,0.06);
+          border: 1px solid var(--line);
+        }
+
+        .libido-nav-item.active .libido-nav-dot {
+          background: var(--amber);
+          box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.16);
+        }
+
+        .libido-payment-list {
+          display: grid;
+          gap: 12px;
+        }
+
+        .libido-payment {
+          border: 1px solid var(--line);
+          border-radius: 20px;
+          padding: 16px;
+          background: rgba(255,255,255,0.04);
+          color: var(--text);
+          text-align: left;
+        }
+
+        .libido-profile-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .libido-chip {
+          padding: 12px;
+          border-radius: 14px;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.04);
+          color: var(--text);
+        }
+      `}</style>
+
+      {!authenticated ? (
+        <div className="libido-shell" style={{ minHeight: '100dvh' }}>
+          <div style={{ padding: 20 }}>
+            <div className="libido-card">
+              <h1 className="libido-h1">Libido</h1>
+              <p className="libido-p">Acesse sua conta ou crie uma nova.</p>
+
+              {screen === 'login' && (
+                <>
+                  <input className="libido-input" placeholder="E-mail" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                  <input className="libido-input" placeholder="Senha" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                  <button className="libido-btn-primary" onClick={login}>Entrar</button>
+                  <button className="libido-btn-secondary" onClick={() => setScreen('signup')}>Cadastro</button>
+                  <button className="libido-link" onClick={() => setScreen('forgot')}>Esqueci a senha</button>
+                </>
+              )}
+
+              {screen === 'signup' && (
+                <>
+                  <input className="libido-input" placeholder="E-mail" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} />
+                  <input className="libido-input" placeholder="Senha" type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} />
+                  <input className="libido-input" placeholder="Confirmar senha" type="password" value={signupConfirm} onChange={(e) => setSignupConfirm(e.target.value)} />
+                  <button className="libido-btn-primary" onClick={signup}>Criar conta</button>
+                  <button className="libido-btn-secondary" onClick={() => setScreen('login')}>Voltar</button>
+                </>
+              )}
+
+              {screen === 'forgot' && (
+                <>
+                  <p className="libido-p">Digite seu e-mail para receber instruções de redefinição.</p>
+                  <input className="libido-input" placeholder="E-mail" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                  <button className="libido-btn-primary" onClick={() => setScreen('login')}>Enviar link</button>
+                  <button className="libido-btn-secondary" onClick={() => setScreen('login')}>Voltar</button>
+                </>
+              )}
+            </div>
           </div>
-        );
+        </div>
+      ) : (
+        <Shell>
+          {screen === 'feed' && (
+            <div className="libido-card">
+              <h1 className="libido-h1">Feed</h1>
+              <p className="libido-p">Aqui entra o conteúdo principal do app.</p>
+            </div>
+          )}
 
-      case Screen.ForgotPassword:
-        return (
-          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
-            <h2>Esqueci a Senha</h2>
-            <form onSubmit={handleForgotPassword}>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-              />
-              {authState.error && <p style={{ color: 'green' }}>{authState.error}</p>}
-              <button
-                type="submit"
-                disabled={authState.loading}
-                style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}
-              >
-                {authState.loading ? 'Carregando...' : 'Enviar'}
-              </button>
-            </form>
-            <button onClick={() => setCurrentScreen(Screen.Login)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
-              Voltar ao Login
-            </button>
-          </div>
-        );
+          {screen === 'radar' && (
+            <div className="libido-card">
+              <h1 className="libido-h1">Radar</h1>
+              <p className="libido-p">Busca e descoberta com visual premium.</p>
+            </div>
+          )}
 
-      case Screen.ProfileSelection:
-        return (
-          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
-            <h2>Escolha seu Perfil</h2>
-            <select
-              value={selectedProfile}
-              onChange={(e) => setSelectedProfile(e.target.value as User['profile'])}
-              style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
-            >
-              <option value="casal">Casal</option>
-              <option value="homem">Homem</option>
-              <option value="mulher">Mulher</option>
-              <option value="outro">Outro</option>
-            </select>
-            <button onClick={handleProfileSelection} style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}>
-              Confirmar
-            </button>
-          </div>
-        );
+          {screen === 'chat' && (
+            <div className="libido-card">
+              <h1 className="libido-h1">Chats</h1>
+              <p className="libido-p">Mensagens e conexões.</p>
+            </div>
+          )}
 
-      case Screen.Main:
-        return (
-          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
-            <h2>Bem-vindo, {authState.user?.email}!</h2>
-            <p>Perfil: {authState.user?.profile}</p>
-            {authState.isAuthenticated && (
-              <div>
-                <button
-                  onClick={() => window.open(PAYMENT_URL, '_blank')}
-                  style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', margin: '10px 0' }}
-                >
-                  Ir para Pagamento
-                </button>
-                <button
-                  onClick={() => window.open(PAYMENT_BUTTON_URL, '_blank')}
-                  style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none' }}
-                >
-                  Botão de Pagamento
-                </button>
+          {screen === 'profile' && (
+            <div className="libido-card">
+              <h1 className="libido-h1">Perfil</h1>
+              <p className="libido-p">Selecione seu tipo de perfil.</p>
+              <div className="libido-profile-grid">
+                {(['casal', 'homem', 'mulher', 'outro'] as UserType[]).map((item) => (
+                  <button key={item} className="libido-chip" onClick={() => setSelectedUserType(item)}>
+                    {item}
+                  </button>
+                ))}
               </div>
-            )}
-            <button onClick={handleLogout} style={{ padding: '10px', backgroundColor: '#666', color: 'white', border: 'none', marginTop: '20px' }}>
-              Sair
-            </button>
-          </div>
-        );
+              <button className="libido-btn-secondary" onClick={logout}>Sair</button>
+            </div>
+          )}
 
-      default:
-        return <div>Tela não encontrada</div>;
-    }
-  };
+          {screen === 'assinatura' && (
+            <div className="libido-card">
+              <h1 className="libido-h1">Assinatura Premium</h1>
+              <p className="libido-p">Os planos só ficam acionáveis após login.</p>
+              <div className="libido-payment-list">
+                {paymentPlans.map((plan) => (
+                  <button key={plan.label} className="libido-payment" onClick={() => window.open(plan.href, '_blank', 'noopener,noreferrer')}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong>{plan.label}</strong>
+                      <span style={{ color: 'var(--amber)', fontWeight: 900 }}>{plan.price}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-  return <div>{renderScreen()}</div>;
-};
-
-// Comentário sobre causa raiz:
-// A causa raiz do bug era um vínculo indevido entre os handlers de autenticação (login/cadastro) e as URLs de pagamento.
-// Anteriormente, após login ou cadastro, o código redirecionava diretamente para telas de pagamento, o que violava a segurança e UX.
-// Agora, corrigimos isso garantindo que login/cadastro redirecionem apenas para telas de autenticação ou dashboard principal,
-// e o acesso a pagamento é condicional apenas se authenticated=true, nunca como fallback.
-
-// Mudanças implementadas:
-// - Separação clara de responsabilidades: handlers de auth não tocam em URLs de pagamento.
-// - Validação real simulada para credenciais.
-// - Mensagens de erro em português.
-// - Estado de carregamento.
-// - Redirecionamentos corretos: login -> main, cadastro -> profile selection -> main.
-// - Acesso a pagamento apenas na tela main se autenticado.
-// - Logs de auditoria para todas as ações.
-// - UX elegante com paleta sóbria (tons de cinza).
-// - Tipagens e enums para robustez.
-// - Estado de sessão persistido em localStorage.
-
-export default App;
+          {screen === 'settings' && (
+            <div className="libido-card">
+              <h1 className="libido-h1">Configurações</h1>
+              <p className="libido-p">Ajustes gerais do aplicativo.</p>
+              <button className="libido-btn-secondary" onClick={logout}>Sair</button>
+            </div>
+          )}
+        </Shell>
+      )}
+    </>
+  );
+}
