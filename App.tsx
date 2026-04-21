@@ -1,509 +1,201 @@
-import React, { useEffect, useMemo, useState } from 'react';
 
-type Screen = 'login' | 'signup' | 'forgot' | 'profile' | 'feed' | 'radar' | 'chat' | 'assinatura' | 'settings';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import Auth from './components/Auth';
+import Layout from './components/Layout';
+import Explore from './components/Explore';
+import ChatList from './components/ChatList';
+import Profile from './components/Profile';
+import Subscription from './components/Subscription';
+import ChatDetail from './components/ChatDetail';
+import Feed from './components/Feed';
+import EventsPage from './components/EventsPage';
+import { TermsGate } from './components/TermsGate';
+import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
+import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
+import { getAuthFlag, setAuthFlag, syncCaches, cache } from './services/authUtils';
+import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
+import { initSecurityLayer } from './services/securityService';
 
-type UserType = 'casal' | 'homem' | 'mulher' | 'outro';
-
-type PaymentPlan = {
-  label: string;
-  price: string;
-  href: string;
-};
-
-const AUTH_KEY = 'libido_auth_v2';
+const AuthContext = createContext<any>(null);
+export const useAuth = () => useContext(AuthContext);
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('login');
-  const [authenticated, setAuthenticated] = useState(false);
-  const [panicMode, setPanicMode] = useState(false);
-
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupConfirm, setSignupConfirm] = useState('');
-
-  const [selectedUserType, setSelectedUserType] = useState<UserType>('casal');
-
-  const paymentPlans: PaymentPlan[] = useMemo(
-    () => [
-      {
-        label: 'Mensal',
-        price: 'R$ 49,90',
-        href: 'https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403',
-      },
-      {
-        label: 'Semestral',
-        price: 'R$ 269,46',
-        href: 'https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404',
-      },
-      {
-        label: 'Anual',
-        price: 'R$ 479,04',
-        href: 'https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405',
-      },
-    ],
-    []
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(getAuthFlag());
+  const [isUnlocked, setIsUnlocked] = useState(isUnlockedWindowValid());
+  const [activeTab, setActiveTab] = useState('feed'); 
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [viewedProfile, setViewedProfile] = useState<User | null>(null);
+  const [isSyncing, setIsSyncing] = useState(true);
+  const [currentUser, setCurrentUser] = useState<User | null>(cache.userData);
+  const [showTerms, setShowTerms] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(AUTH_KEY);
-    if (saved === 'true') {
-      setAuthenticated(true);
-      setScreen('feed');
+    initSecurityLayer();
+
+    if (shouldShowTermsGate(new Date(), { version: '2026.1' })) {
+      setShowTerms(true);
     }
 
-    const handleBlur = () => setPanicMode(true);
-    const handleFocus = () => setPanicMode(false);
-    const handleVisibility = () => setPanicMode(document.hidden);
+    const handleVisibility = () => {
+        const isSafeZone = document.body.classList.contains('navigating-out') || 
+                          document.body.classList.contains('payment-active');
+        
+        if (isSafeZone) {
+            document.body.classList.remove('is-hidden');
+            return;
+        }
 
-    window.addEventListener('blur', handleBlur);
-    window.addEventListener('focus', handleFocus);
+        if (document.hidden) {
+            document.body.classList.add('is-hidden');
+        } else {
+            document.body.classList.remove('is-hidden');
+        }
+    };
+
+    const onBlur = () => {
+        const isSafeZone = document.body.classList.contains('navigating-out') || 
+                          document.body.classList.contains('payment-active');
+        if (isSafeZone) return;
+        document.body.classList.add('is-hidden');
+    };
+
+    const onFocus = () => {
+        document.body.classList.remove('is-hidden');
+    };
+
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibility);
+        window.removeEventListener('blur', onBlur);
+        window.removeEventListener('focus', onFocus);
+        document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
-  useEffect(() => {
-    if (panicMode) {
-      document.body.classList.add('is-hidden');
-    } else {
-      document.body.classList.remove('is-hidden');
-    }
-  }, [panicMode]);
-
-  const login = () => {
-    if (!loginEmail.trim() || !loginPassword.trim()) return;
-    localStorage.setItem(AUTH_KEY, 'true');
-    setAuthenticated(true);
-    setScreen('feed');
+  const handleTabChange = (tab: string) => {
+    // Limpa estados de detalhe ao trocar de aba principal
+    setSelectedUser(null);
+    setViewedProfile(null);
+    setActiveTab(tab);
   };
 
-  const signup = () => {
-    if (!signupEmail.trim() || !signupPassword.trim() || signupPassword !== signupConfirm) return;
-    localStorage.setItem(AUTH_KEY, 'true');
-    setAuthenticated(true);
-    setScreen('profile');
+  const handleAcceptTerms = () => {
+    recordTermsAcceptance('2026.1', 'app_entry');
+    setShowTerms(false);
+  };
+
+  const handleExit = () => {
+    window.location.href = 'https://www.google.com';
   };
 
   const logout = () => {
-    localStorage.removeItem(AUTH_KEY);
-    setAuthenticated(false);
-    setScreen('login');
-    setLoginEmail('');
-    setLoginPassword('');
-    setSignupEmail('');
-    setSignupPassword('');
-    setSignupConfirm('');
+    setAuthFlag(false);
+    clearUnlockedWindow();
+    setIsAuthenticated(false);
+    setIsUnlocked(false);
+    setCurrentUser(null);
+    localStorage.clear();
   };
 
-  const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div className="libido-shell">
-      <header className="libido-header">
-        <div className="libido-brand">
-          <div className="libido-mark">L</div>
-          <div>
-            <div className="libido-title">LIBIDO</div>
-            <div className="libido-subtitle">Midnight & Gold</div>
-          </div>
-        </div>
+  const refreshSession = async (immediate = false) => {
+    await syncCaches();
+    setIsAuthenticated(getAuthFlag());
+    setIsUnlocked(isUnlockedWindowValid());
+    setCurrentUser(cache.userData);
+  };
 
-        <div className="libido-header-actions">
-          <button className="libido-upgrade" onClick={() => setScreen('assinatura')}>
-            UPGRADE
-          </button>
-          <button className="libido-icon-btn" onClick={() => setScreen('settings')}>
-            ⚙
-          </button>
-        </div>
-      </header>
+  useEffect(() => {
+    const initApp = async () => {
+        if (isAuthenticated) {
+            await syncCaches(); 
+            setIsUnlocked(isUnlockedWindowValid());
+            setCurrentUser(cache.userData);
+        }
+        setIsSyncing(false);
+    };
+    initApp();
+  }, [isAuthenticated]);
 
-      <main className="libido-content">{children}</main>
-
-      <nav className="libido-bottom-nav">
-        <NavItem active={screen === 'feed'} label="Feed" onClick={() => setScreen('feed')} />
-        <NavItem active={screen === 'radar'} label="Radar" onClick={() => setScreen('radar')} />
-        <NavItem active={screen === 'chat'} label="Chats" onClick={() => setScreen('chat')} />
-        <NavItem active={screen === 'profile'} label="Perfil" onClick={() => setScreen('profile')} />
-      </nav>
-    </div>
-  );
-
-  const NavItem = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button className={`libido-nav-item ${active ? 'active' : ''}`} onClick={onClick}>
-      <span className="libido-nav-dot" />
-      <span>{label}</span>
-    </button>
-  );
-
-  if (!authenticated && screen !== 'login' && screen !== 'signup' && screen !== 'forgot') {
-    setScreen('login');
+  if (showTerms) {
+    return (
+      <TermsGate 
+        privacyUrl="/privacy" 
+        termsUrl="/terms" 
+        onExit={handleExit} 
+        onAccept={handleAcceptTerms} 
+      />
+    );
   }
 
-  return (
-    <>
-      <style>{`
-        :root {
-          --pink: #ff1493;
-          --amber: #f59e0b;
-          --dark: #050505;
-          --card: rgba(255,255,255,0.05);
-          --text: #ffffff;
-          --muted: #9ca3af;
-          --line: rgba(255,255,255,0.08);
-        }
-
-        * {
-          box-sizing: border-box;
-          -webkit-user-select: none;
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        body {
-          margin: 0;
-          background: var(--dark);
-          color: var(--text);
-          font-family: Inter, sans-serif;
-          overflow-x: hidden;
-        }
-
-        body.is-hidden {
-          filter: blur(40px) grayscale(1) brightness(0.1);
-        }
-
-        .libido-shell {
-          min-height: 100dvh;
-          max-width: 420px;
-          margin: 0 auto;
-          background: var(--dark);
-          border-left: 1px solid rgba(255,255,255,0.06);
-          border-right: 1px solid rgba(255,255,255,0.06);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .libido-header {
-          position: sticky;
-          top: 0;
-          z-index: 20;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px 20px;
-          background: rgba(0,0,0,0.55);
-          backdrop-filter: blur(16px);
-          border-bottom: 1px solid var(--line);
-        }
-
-        .libido-brand {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .libido-mark {
-          width: 36px;
-          height: 36px;
-          border-radius: 14px;
-          display: grid;
-          place-items: center;
-          background: linear-gradient(135deg, var(--amber), #b45309);
-          color: #000;
-          font-weight: 900;
-        }
-
-        .libido-title {
-          font-family: Outfit, sans-serif;
-          font-size: 24px;
-          font-weight: 700;
-          letter-spacing: -0.03em;
-        }
-
-        .libido-subtitle {
-          font-size: 12px;
-          color: var(--muted);
-        }
-
-        .libido-header-actions {
-          display: flex;
-          gap: 10px;
-        }
-
-        .libido-upgrade {
-          border: 0;
-          border-radius: 999px;
-          padding: 10px 14px;
-          background: linear-gradient(135deg, var(--amber), #b45309);
-          color: #000;
-          font-weight: 900;
-          font-size: 11px;
-        }
-
-        .libido-icon-btn {
-          width: 38px;
-          height: 38px;
-          border-radius: 999px;
-          border: 1px solid var(--line);
-          background: rgba(255,255,255,0.05);
-          color: var(--text);
-        }
-
-        .libido-content {
-          padding: 20px;
-          padding-bottom: 110px;
-          min-height: calc(100dvh - 84px);
-        }
-
-        .libido-card {
-          background: var(--card);
-          border: 1px solid var(--line);
-          border-radius: 24px;
-          padding: 20px;
-          backdrop-filter: blur(16px);
-          box-shadow: 0 18px 50px rgba(0,0,0,0.35);
-        }
-
-        .libido-h1 {
-          font-family: Outfit, sans-serif;
-          font-size: 30px;
-          margin: 0 0 10px;
-          letter-spacing: -0.03em;
-        }
-
-        .libido-p {
-          margin: 0 0 16px;
-          color: var(--muted);
-          line-height: 1.5;
-          font-size: 14px;
-        }
-
-        .libido-input {
-          width: 100%;
-          border: 1px solid var(--line);
-          background: rgba(255,255,255,0.04);
-          color: var(--text);
-          padding: 14px 16px;
-          border-radius: 16px;
-          outline: none;
-          margin-bottom: 12px;
-          font-size: 15px;
-        }
-
-        .libido-btn-primary,
-        .libido-btn-secondary {
-          width: 100%;
-          border: 0;
-          border-radius: 16px;
-          padding: 14px 16px;
-          font-weight: 800;
-          font-size: 15px;
-        }
-
-        .libido-btn-primary {
-          background: linear-gradient(135deg, var(--pink), #b91c1c);
-          color: white;
-        }
-
-        .libido-btn-secondary {
-          margin-top: 12px;
-          background: linear-gradient(135deg, var(--amber), #b45309);
-          color: #000;
-        }
-
-        .libido-link {
-          display: block;
-          text-align: center;
-          color: var(--muted);
-          margin-top: 12px;
-          font-size: 13px;
-        }
-
-        .libido-bottom-nav {
-          position: fixed;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 100%;
-          max-width: 420px;
-          display: flex;
-          justify-content: space-around;
-          gap: 8px;
-          padding: 14px 10px 22px;
-          background: rgba(10,10,10,0.95);
-          border-top: 1px solid var(--line);
-          backdrop-filter: blur(16px);
-          z-index: 40;
-        }
-
-        .libido-nav-item {
-          flex: 1;
-          border: 0;
-          background: transparent;
-          color: var(--muted);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-          font-size: 10px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-        }
-
-        .libido-nav-item.active {
-          color: var(--amber);
-        }
-
-        .libido-nav-dot {
-          width: 22px;
-          height: 22px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.06);
-          border: 1px solid var(--line);
-        }
-
-        .libido-nav-item.active .libido-nav-dot {
-          background: var(--amber);
-          box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.16);
-        }
-
-        .libido-payment-list {
-          display: grid;
-          gap: 12px;
-        }
-
-        .libido-payment {
-          border: 1px solid var(--line);
-          border-radius: 20px;
-          padding: 16px;
-          background: rgba(255,255,255,0.04);
-          color: var(--text);
-          text-align: left;
-        }
-
-        .libido-profile-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
-
-        .libido-chip {
-          padding: 12px;
-          border-radius: 14px;
-          border: 1px solid var(--line);
-          background: rgba(255,255,255,0.04);
-          color: var(--text);
-        }
-      `}</style>
-
-      {!authenticated ? (
-        <div className="libido-shell" style={{ minHeight: '100dvh' }}>
-          <div style={{ padding: 20 }}>
-            <div className="libido-card">
-              <h1 className="libido-h1">Libido</h1>
-              <p className="libido-p">Acesse sua conta ou crie uma nova.</p>
-
-              {screen === 'login' && (
-                <>
-                  <input className="libido-input" placeholder="E-mail" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
-                  <input className="libido-input" placeholder="Senha" type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
-                  <button className="libido-btn-primary" onClick={login}>Entrar</button>
-                  <button className="libido-btn-secondary" onClick={() => setScreen('signup')}>Cadastro</button>
-                  <button className="libido-link" onClick={() => setScreen('forgot')}>Esqueci a senha</button>
-                </>
-              )}
-
-              {screen === 'signup' && (
-                <>
-                  <input className="libido-input" placeholder="E-mail" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} />
-                  <input className="libido-input" placeholder="Senha" type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} />
-                  <input className="libido-input" placeholder="Confirmar senha" type="password" value={signupConfirm} onChange={(e) => setSignupConfirm(e.target.value)} />
-                  <button className="libido-btn-primary" onClick={signup}>Criar conta</button>
-                  <button className="libido-btn-secondary" onClick={() => setScreen('login')}>Voltar</button>
-                </>
-              )}
-
-              {screen === 'forgot' && (
-                <>
-                  <p className="libido-p">Digite seu e-mail para receber instruções de redefinição.</p>
-                  <input className="libido-input" placeholder="E-mail" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
-                  <button className="libido-btn-primary" onClick={() => setScreen('login')}>Enviar link</button>
-                  <button className="libido-btn-secondary" onClick={() => setScreen('login')}>Voltar</button>
-                </>
-              )}
-            </div>
+  if (isSyncing) {
+      return (
+          <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
+              <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
+              <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.5em] animate-pulse">Sincronizando Matriz</p>
           </div>
-        </div>
-      ) : (
-        <Shell>
-          {screen === 'feed' && (
-            <div className="libido-card">
-              <h1 className="libido-h1">Feed</h1>
-              <p className="libido-p">Aqui entra o conteúdo principal do app.</p>
-            </div>
-          )}
+      );
+  }
 
-          {screen === 'radar' && (
-            <div className="libido-card">
-              <h1 className="libido-h1">Radar</h1>
-              <p className="libido-p">Busca e descoberta com visual premium.</p>
-            </div>
-          )}
+  if (!isAuthenticated || !isUnlocked) {
+    return (
+      <AuthContext.Provider value={{ logout, refreshSession, setIsUnlocked, setIsAuthenticated }}>
+        <Auth />
+      </AuthContext.Provider>
+    );
+  }
 
-          {screen === 'chat' && (
-            <div className="libido-card">
-              <h1 className="libido-h1">Chats</h1>
-              <p className="libido-p">Mensagens e conexões.</p>
-            </div>
-          )}
+  const handleViewProfile = (p: any) => {
+    // Adding following: p.following || [] to satisfy User type
+    const fullUser: User = {
+      id: p.id, nickname: p.name || p.nickname, email: p.email || `${p.id}@libido.app`, age: p.age || 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
+      type: p.category || p.type || UserType.HOMEM, birthDate: p.birthDate || '1995-01-01', biotype: p.biotype || Biotype.PADRAO,
+      gender: p.gender || Gender.CIS, sexualOrientation: p.sexualOrientation || SexualOrientation.BISSEXUAL, vibes: p.vibes || [Vibes.LIBERAL],
+      location: p.city || p.location || 'Brasil', isOnline: true, verifiedAccount: p.verifiedAccount || false, verificationScore: p.verificationScore || 50, xp: p.xp || 100, level: p.level || 1,
+      plan: p.plan || Plan.FREE, matches: p.matches || [], bookmarks: p.bookmarks || [], blockedUsers: p.blockedUsers || [], badges: p.badges || [], boundaries: p.boundaries || [],
+      behaviors: p.behaviors || [], bodyMods: p.bodyMods || [], bodyHair: p.bodyHair || 'Aparado', bodyArt: p.bodyArt || [], bondageExp: p.bondageExp || 'Iniciante',
+      bucketList: p.bucketList || [], bestMoments: p.bestMoments || [], bestFeature: p.bestFeature || 'Olhar', beveragePref: p.beveragePref || 'Gin', bestTime: p.bestTime || 'Noite', braveryLevel: p.braveryLevel || 7,
+      busyMode: p.busyMode || false, bookingPolicy: p.bookingPolicy || 'A combinar', balance: p.balance || 0, boosts_active: p.boosts_active || 0, is_premium: p.is_premium || false, height: p.height || 170,
+      lat: p.lat || -23.5505, lon: p.lon || -46.6333, city: p.city || 'São Paulo', neighborhood: p.neighborhood || 'Centro', seenBy: p.seenBy || [],
+      gallery: p.gallery || [{ id: `${p.id}-default`, url: p.avatar, timestamp: new Date().toISOString() }],
+      trustLevel: p.trustLevel || TrustLevel.BRONZE, isGhostMode: p.isGhostMode || false, hasBlurredGallery: p.hasBlurredGallery || (p.trustLevel === TrustLevel.OURO),
+      vouches: p.vouches || [],
+      following: p.following || [],
+      lookingFor: p.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
+      rsvps: p.rsvps || []
+    };
+    setViewedProfile(fullUser);
+    setActiveTab('view_profile');
+  };
 
-          {screen === 'profile' && (
-            <div className="libido-card">
-              <h1 className="libido-h1">Perfil</h1>
-              <p className="libido-p">Selecione seu tipo de perfil.</p>
-              <div className="libido-profile-grid">
-                {(['casal', 'homem', 'mulher', 'outro'] as UserType[]).map((item) => (
-                  <button key={item} className="libido-chip" onClick={() => setSelectedUserType(item)}>
-                    {item}
-                  </button>
-                ))}
-              </div>
-              <button className="libido-btn-secondary" onClick={logout}>Sair</button>
-            </div>
-          )}
+  const renderContent = () => {
+    if (activeTab === 'chat_detail' && selectedUser) {
+      return <ChatDetail user={selectedUser} onBack={() => setActiveTab('chat')} />;
+    }
+    
+    if (activeTab === 'view_profile' && viewedProfile) {
+      return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => setActiveTab('radar')} />;
+    }
 
-          {screen === 'assinatura' && (
-            <div className="libido-card">
-              <h1 className="libido-h1">Assinatura Premium</h1>
-              <p className="libido-p">Os planos só ficam acionáveis após login.</p>
-              <div className="libido-payment-list">
-                {paymentPlans.map((plan) => (
-                  <button key={plan.label} className="libido-payment" onClick={() => window.open(plan.href, '_blank', 'noopener,noreferrer')}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <strong>{plan.label}</strong>
-                      <span style={{ color: 'var(--amber)', fontWeight: 900 }}>{plan.price}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+    switch (activeTab) {
+      case 'radar': return <Explore onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
+      case 'events': return <EventsPage />;
+      case 'feed': return <Feed onProfileClick={handleViewProfile} />;
+      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} />;
+      case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
+      case 'assinatura': return <Subscription />;
+      default: return <Feed onProfileClick={handleViewProfile} />; 
+    }
+  };
 
-          {screen === 'settings' && (
-            <div className="libido-card">
-              <h1 className="libido-h1">Configurações</h1>
-              <p className="libido-p">Ajustes gerais do aplicativo.</p>
-              <button className="libido-btn-secondary" onClick={logout}>Sair</button>
-            </div>
-          )}
-        </Shell>
-      )}
-    </>
+  return (
+    <AuthContext.Provider value={{ logout, refreshSession, setIsUnlocked, setIsAuthenticated }}>
+      <div className="relative w-full h-full flex justify-center">
+        <Layout activeTab={activeTab} setActiveTab={handleTabChange}>
+          {renderContent()}
+        </Layout>
+      </div>
+    </AuthContext.Provider>
   );
 }
