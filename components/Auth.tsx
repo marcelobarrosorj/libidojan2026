@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { RegistrationFlow } from './RegistrationFlow';
 import { PinSetup } from './PinSetup';
 import { PinUnlock } from './PinUnlock';
+import { supabase } from '../services/supabase';
 import { saveUserData, setAuthFlag, getUserData, showNotification } from '../services/authUtils';
 import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, Vibes } from '../types';
 
@@ -35,20 +36,20 @@ export const Auth: React.FC = () => {
     setError(null);
     
     try {
-      const { data, error: authError } = await import('../services/supabase').then(m => m.supabase.auth.signInWithPassword({
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password
-      }));
+      });
 
       if (authError) throw authError;
 
       if (data.user) {
         // Busca perfil completo no banco
-        const { data: profile, error: profileError } = await import('../services/supabase').then(m => m.supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('data')
           .eq('id', data.user.id)
-          .single());
+          .single();
 
         if (profileError) throw new Error('Perfil não encontrado no servidor.');
 
@@ -74,9 +75,9 @@ export const Auth: React.FC = () => {
     setError(null);
 
     try {
-      const { error: resetError } = await import('../services/supabase').then(m => m.supabase.auth.resetPasswordForEmail(email.trim(), {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: window.location.origin
-      }));
+      });
 
       if (resetError) throw resetError;
 
