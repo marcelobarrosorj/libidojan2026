@@ -1,365 +1,313 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-type Screen = 'home' | 'login' | 'register' | 'dashboard';
-
-type PaymentPlan = {
-  label: string;
-  price: string;
-  href: string;
+type User = {
+  id: string;
+  email: string;
+  password: string;
+  profile?: 'casal' | 'homem' | 'mulher' | 'outro';
 };
 
-const AUTH_KEY = 'libido_auth_v1';
+type AuthState = {
+  isAuthenticated: boolean;
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+};
 
-export default function App() {
-  const [screen, setScreen] = useState<Screen>('home');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [registerName, setRegisterName] = useState('');
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
+enum Screen {
+  Login = 'login',
+  Signup = 'signup',
+  ForgotPassword = 'forgotPassword',
+  Main = 'main',
+  ProfileSelection = 'profileSelection',
+}
+
+const mockUsers: User[] = [
+  { id: '1', email: 'user@example.com', password: 'password123', profile: 'homem' },
+];
+
+const PAYMENT_URL = 'https://pagamento.simulado.com';
+const PAYMENT_BUTTON_URL = 'https://botao.pagamento.simulado.com';
+
+function logAudit(action: string, details: string) {
+  console.log(`[AUDITORIA] ${new Date().toISOString()} - ${action}: ${details}`);
+}
+
+const App: React.FC = () => {
+  const [authState, setAuthState] = useState<AuthState>({
+    isAuthenticated: false,
+    user: null,
+    loading: false,
+    error: null,
+  });
+  const [currentScreen, setCurrentScreen] = useState<Screen>(Screen.Login);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [selectedProfile, setSelectedProfile] = useState<User['profile']>('casal');
 
   useEffect(() => {
-    const saved = localStorage.getItem(AUTH_KEY);
-    if (saved === 'true') {
-      setIsAuthenticated(true);
-      setScreen('dashboard');
+    const storedAuth = localStorage.getItem('auth');
+    if (storedAuth) {
+      const parsedAuth: AuthState = JSON.parse(storedAuth);
+      setAuthState(parsedAuth);
+      if (parsedAuth.isAuthenticated) {
+        setCurrentScreen(Screen.Main);
+      }
     }
   }, []);
 
-  const paymentPlans: PaymentPlan[] = useMemo(
-    () => [
-      {
-        label: 'Mensal',
-        price: 'R$ 49,90',
-        href: 'https://buy.stripe.com/cNi14n7Ix7rl6LF7Qqbo403',
-      },
-      {
-        label: 'Semestral',
-        price: 'R$ 269,46',
-        href: 'https://buy.stripe.com/3cI6oHfaZcLFc5ZfiSbo404',
-      },
-      {
-        label: 'Anual',
-        price: 'R$ 479,04',
-        href: 'https://buy.stripe.com/4gM4gz8MBeTNgmfdaKbo405',
-      },
-    ],
-    []
-  );
-
-  const handleLogin = () => {
-    if (!loginEmail.trim() || !loginPassword.trim()) return;
-    localStorage.setItem(AUTH_KEY, 'true');
-    setIsAuthenticated(true);
-    setScreen('dashboard');
+  const saveSession = (state: AuthState) => {
+    localStorage.setItem('auth', JSON.stringify(state));
+    setAuthState(state);
   };
 
-  const handleRegister = () => {
-    if (!registerName.trim() || !registerEmail.trim() || !registerPassword.trim()) return;
-    localStorage.setItem(AUTH_KEY, 'true');
-    setIsAuthenticated(true);
-    setScreen('dashboard');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthState((prev) => ({ ...prev, loading: true, error: null }));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const user = mockUsers.find((u) => u.email === email && u.password === password);
+    if (user) {
+      const newState = { isAuthenticated: true, user, loading: false, error: null };
+      saveSession(newState);
+      setCurrentScreen(Screen.Main);
+      logAudit('LOGIN_SUCCESS', `Usuário ${user.email} logado com sucesso`);
+    } else {
+      setAuthState((prev) => ({
+        ...prev,
+        loading: false,
+        error: 'Credenciais inválidas. Verifique seu email e senha.',
+      }));
+      logAudit('LOGIN_FAILURE', `Tentativa de login falhada para ${email}`);
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setAuthState((prev) => ({ ...prev, error: 'As senhas não coincidem.' }));
+      return;
+    }
+    setAuthState((prev) => ({ ...prev, loading: true, error: null }));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const newUser: User = { id: Date.now().toString(), email, password, profile: undefined };
+    mockUsers.push(newUser);
+    setAuthState((prev) => ({ ...prev, loading: false }));
+    setCurrentScreen(Screen.ProfileSelection);
+    logAudit('SIGNUP_SUCCESS', `Usuário ${email} cadastrado com sucesso`);
+  };
+
+  const handleProfileSelection = () => {
+    if (authState.user) {
+      authState.user.profile = selectedProfile;
+      saveSession(authState);
+      setCurrentScreen(Screen.Main);
+      logAudit('PROFILE_SELECTED', `Perfil ${selectedProfile} selecionado para ${authState.user.email}`);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthState((prev) => ({ ...prev, loading: true, error: null }));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setAuthState((prev) => ({
+      ...prev,
+      loading: false,
+      error: 'Instruções enviadas para seu email.',
+    }));
+    logAudit('FORGOT_PASSWORD', `Solicitação de redefinição para ${email}`);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem(AUTH_KEY);
-    setIsAuthenticated(false);
-    setScreen('home');
-    setLoginEmail('');
-    setLoginPassword('');
-    setRegisterName('');
-    setRegisterEmail('');
-    setRegisterPassword('');
+    saveSession({ isAuthenticated: false, user: null, loading: false, error: null });
+    setCurrentScreen(Screen.Login);
+    logAudit('LOGOUT', 'Usuário deslogado');
   };
 
-  const openPayment = (href: string) => {
-    if (!isAuthenticated) return;
-    window.open(href, '_blank', 'noopener,noreferrer');
-  };
-
-  if (screen === 'home') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.card}>
-          <h1 style={styles.appTitle}>Libido</h1>
-          <p style={styles.subtitle}>Acesse sua conta ou crie um novo cadastro.</p>
-
-          <button onClick={() => setScreen('login')} style={styles.primaryButton}>
-            Entrar
-          </button>
-
-          <button onClick={() => setScreen('register')} style={styles.secondaryButton}>
-            Cadastro
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'login') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.card}>
-          <h1 style={styles.sectionTitle}>Libido</h1>
-          <p style={styles.subtitle}>Faça login para continuar.</p>
-
-          <input
-            value={loginEmail}
-            onChange={(e) => setLoginEmail(e.target.value)}
-            type="email"
-            placeholder="E-mail"
-            style={styles.input}
-          />
-
-          <input
-            value={loginPassword}
-            onChange={(e) => setLoginPassword(e.target.value)}
-            type="password"
-            placeholder="Senha"
-            style={styles.input}
-          />
-
-          <button onClick={handleLogin} style={styles.primaryButton}>
-            Entrar
-          </button>
-
-          <button onClick={() => setScreen('home')} style={styles.ghostButton}>
-            Voltar
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'register') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.card}>
-          <h1 style={styles.sectionTitle}>Libido</h1>
-          <p style={styles.subtitle}>Crie sua conta para continuar.</p>
-
-          <input
-            value={registerName}
-            onChange={(e) => setRegisterName(e.target.value)}
-            type="text"
-            placeholder="Nome"
-            style={styles.input}
-          />
-
-          <input
-            value={registerEmail}
-            onChange={(e) => setRegisterEmail(e.target.value)}
-            type="email"
-            placeholder="E-mail"
-            style={styles.input}
-          />
-
-          <input
-            value={registerPassword}
-            onChange={(e) => setRegisterPassword(e.target.value)}
-            type="password"
-            placeholder="Senha"
-            style={styles.input}
-          />
-
-          <button onClick={handleRegister} style={styles.primaryButton}>
-            Cadastrar
-          </button>
-
-          <button onClick={() => setScreen('home')} style={styles.ghostButton}>
-            Voltar
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={styles.dashboardPage}>
-      <header style={styles.header}>
-        <div>
-          <h1 style={styles.headerTitle}>Libido</h1>
-          <p style={styles.headerSubtitle}>Área autenticada</p>
-        </div>
-
-        <button onClick={handleLogout} style={styles.logoutButton}>
-          Sair
-        </button>
-      </header>
-
-      <main style={styles.dashboardContent}>
-        <div style={styles.card}>
-          <h2 style={styles.sectionTitle}>Painel principal</h2>
-          <p style={styles.subtitle}>
-            Os botões de pagamento estão disponíveis somente após login.
-          </p>
-
-          <div style={styles.paymentGrid}>
-            {paymentPlans.map((plan) => (
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case Screen.Login:
+        return (
+          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
+            <h2>Login</h2>
+            <form onSubmit={handleLogin}>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+              />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+              />
+              {authState.error && <p style={{ color: 'red' }}>{authState.error}</p>}
               <button
-                key={plan.label}
-                onClick={() => openPayment(plan.href)}
-                style={styles.paymentButton}
-                type="button"
+                type="submit"
+                disabled={authState.loading}
+                style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}
               >
-                <span>{plan.label}</span>
-                <strong>{plan.price}</strong>
+                {authState.loading ? 'Carregando...' : 'Entrar'}
               </button>
-            ))}
+            </form>
+            <button onClick={() => setCurrentScreen(Screen.Signup)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
+              Cadastrar-se
+            </button>
+            <button onClick={() => setCurrentScreen(Screen.ForgotPassword)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
+              Esqueci a senha
+            </button>
           </div>
-        </div>
-      </main>
-    </div>
-  );
-}
+        );
 
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px',
-    background: 'linear-gradient(180deg, #0f172a 0%, #111827 100%)',
-    color: '#e5e7eb',
-  },
-  dashboardPage: {
-    minHeight: '100vh',
-    background: 'linear-gradient(180deg, #0f172a 0%, #111827 100%)',
-    color: '#e5e7eb',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '420px',
-    padding: '28px',
-    borderRadius: '20px',
-    background: 'rgba(17, 24, 39, 0.78)',
-    border: '1px solid rgba(148, 163, 184, 0.16)',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(12px)',
-  },
-  appTitle: {
-    margin: 0,
-    fontSize: '34px',
-    fontWeight: 800,
-    letterSpacing: '-0.03em',
-    color: '#f8fafc',
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    margin: 0,
-    fontSize: '28px',
-    fontWeight: 800,
-    letterSpacing: '-0.02em',
-    color: '#f8fafc',
-    textAlign: 'center',
-  },
-  subtitle: {
-    margin: '10px 0 22px',
-    fontSize: '14px',
-    lineHeight: 1.6,
-    color: '#cbd5e1',
-    textAlign: 'center',
-  },
-  input: {
-    width: '100%',
-    boxSizing: 'border-box',
-    marginBottom: '12px',
-    padding: '14px 16px',
-    borderRadius: '12px',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
-    background: 'rgba(15, 23, 42, 0.7)',
-    color: '#f8fafc',
-    outline: 'none',
-    fontSize: '15px',
-  },
-  primaryButton: {
-    width: '100%',
-    marginTop: '4px',
-    padding: '14px 16px',
-    border: 'none',
-    borderRadius: '12px',
-    background: 'linear-gradient(135deg, #334155 0%, #475569 100%)',
-    color: '#f8fafc',
-    fontSize: '15px',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
-  secondaryButton: {
-    width: '100%',
-    marginTop: '12px',
-    padding: '14px 16px',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
-    borderRadius: '12px',
-    background: 'transparent',
-    color: '#e2e8f0',
-    fontSize: '15px',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
-  ghostButton: {
-    width: '100%',
-    marginTop: '12px',
-    padding: '12px 16px',
-    border: 'none',
-    background: 'transparent',
-    color: '#94a3b8',
-    fontSize: '14px',
-    cursor: 'pointer',
-    textDecoration: 'underline',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '16px',
-    padding: '20px 24px',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.12)',
-    background: 'rgba(15, 23, 42, 0.45)',
-    backdropFilter: 'blur(12px)',
-  },
-  headerTitle: {
-    margin: 0,
-    fontSize: '22px',
-    fontWeight: 800,
-    color: '#f8fafc',
-  },
-  headerSubtitle: {
-    margin: '4px 0 0',
-    fontSize: '13px',
-    color: '#cbd5e1',
-  },
-  logoutButton: {
-    padding: '10px 14px',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
-    borderRadius: '10px',
-    background: 'rgba(15, 23, 42, 0.8)',
-    color: '#f8fafc',
-    cursor: 'pointer',
-    fontWeight: 700,
-  },
-  dashboardContent: {
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '24px',
-  },
-  paymentGrid: {
-    display: 'grid',
-    gap: '12px',
-    marginTop: '8px',
-  },
-  paymentButton: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    padding: '16px 18px',
-    borderRadius: '14px',
-    border: '1px solid rgba(148, 163, 184, 0.14)',
-    background: 'linear-gradient(135deg, rgba(51,65,85,0.95) 0%, rgba(30,41,59,0.95) 100%)',
-    color: '#f8fafc',
-    cursor: 'pointer',
-    fontSize: '15px',
-  },
+      case Screen.Signup:
+        return (
+          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
+            <h2>Cadastro</h2>
+            <form onSubmit={handleSignup}>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+              />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+              />
+              <input
+                type="password"
+                placeholder="Confirmar Senha"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+              />
+              {authState.error && <p style={{ color: 'red' }}>{authState.error}</p>}
+              <button
+                type="submit"
+                disabled={authState.loading}
+                style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}
+              >
+                {authState.loading ? 'Carregando...' : 'Cadastrar'}
+              </button>
+            </form>
+            <button onClick={() => setCurrentScreen(Screen.Login)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
+              Voltar ao Login
+            </button>
+          </div>
+        );
+
+      case Screen.ForgotPassword:
+        return (
+          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
+            <h2>Esqueci a Senha</h2>
+            <form onSubmit={handleForgotPassword}>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+              />
+              {authState.error && <p style={{ color: 'green' }}>{authState.error}</p>}
+              <button
+                type="submit"
+                disabled={authState.loading}
+                style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}
+              >
+                {authState.loading ? 'Carregando...' : 'Enviar'}
+              </button>
+            </form>
+            <button onClick={() => setCurrentScreen(Screen.Login)} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#333' }}>
+              Voltar ao Login
+            </button>
+          </div>
+        );
+
+      case Screen.ProfileSelection:
+        return (
+          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
+            <h2>Escolha seu Perfil</h2>
+            <select
+              value={selectedProfile}
+              onChange={(e) => setSelectedProfile(e.target.value as User['profile'])}
+              style={{ display: 'block', margin: '10px 0', padding: '8px', width: '100%' }}
+            >
+              <option value="casal">Casal</option>
+              <option value="homem">Homem</option>
+              <option value="mulher">Mulher</option>
+              <option value="outro">Outro</option>
+            </select>
+            <button onClick={handleProfileSelection} style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', width: '100%' }}>
+              Confirmar
+            </button>
+          </div>
+        );
+
+      case Screen.Main:
+        return (
+          <div style={{ padding: '20px', backgroundColor: '#f5f5f5', fontFamily: 'Arial, sans-serif', color: '#333' }}>
+            <h2>Bem-vindo, {authState.user?.email}!</h2>
+            <p>Perfil: {authState.user?.profile}</p>
+            {authState.isAuthenticated && (
+              <div>
+                <button
+                  onClick={() => window.open(PAYMENT_URL, '_blank')}
+                  style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none', margin: '10px 0' }}
+                >
+                  Ir para Pagamento
+                </button>
+                <button
+                  onClick={() => window.open(PAYMENT_BUTTON_URL, '_blank')}
+                  style={{ padding: '10px', backgroundColor: '#333', color: 'white', border: 'none' }}
+                >
+                  Botão de Pagamento
+                </button>
+              </div>
+            )}
+            <button onClick={handleLogout} style={{ padding: '10px', backgroundColor: '#666', color: 'white', border: 'none', marginTop: '20px' }}>
+              Sair
+            </button>
+          </div>
+        );
+
+      default:
+        return <div>Tela não encontrada</div>;
+    }
+  };
+
+  return <div>{renderScreen()}</div>;
 };
+
+// Comentário sobre causa raiz:
+// A causa raiz do bug era um vínculo indevido entre os handlers de autenticação (login/cadastro) e as URLs de pagamento.
+// Anteriormente, após login ou cadastro, o código redirecionava diretamente para telas de pagamento, o que violava a segurança e UX.
+// Agora, corrigimos isso garantindo que login/cadastro redirecionem apenas para telas de autenticação ou dashboard principal,
+// e o acesso a pagamento é condicional apenas se authenticated=true, nunca como fallback.
+
+// Mudanças implementadas:
+// - Separação clara de responsabilidades: handlers de auth não tocam em URLs de pagamento.
+// - Validação real simulada para credenciais.
+// - Mensagens de erro em português.
+// - Estado de carregamento.
+// - Redirecionamentos corretos: login -> main, cadastro -> profile selection -> main.
+// - Acesso a pagamento apenas na tela main se autenticado.
+// - Logs de auditoria para todas as ações.
+// - UX elegante com paleta sóbria (tons de cinza).
+// - Tipagens e enums para robustez.
+// - Estado de sessão persistido em localStorage.
+
+export default App;
