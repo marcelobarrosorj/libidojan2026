@@ -25,6 +25,7 @@ export default function App() {
   const [viewedProfile, setViewedProfile] = useState<User | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [loadStep, setLoadStep] = useState('Iniciando Matriz...');
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const local = getUserData();
     if (local) cache.userData = local;
@@ -33,8 +34,9 @@ export default function App() {
   const [showTerms, setShowTerms] = useState(false);
   const syncLock = React.useRef(false);
   const hasInitialSynced = React.useRef(false);
-
+  
   useEffect(() => {
+    setLoadStep('Verificando Camada de Segurança...');
     initSecurityLayer();
 
     let mounted = true;
@@ -42,11 +44,13 @@ export default function App() {
         const hasAuth = getAuthFlag();
         if (hasAuth && !hasInitialSynced.current) {
             try {
+                setLoadStep('Sincronizando Identidade com Cloud...');
                 await refreshSession();
             } catch (e) {
                 log('error', 'Critical Init Failure', e);
             }
         }
+        setLoadStep('Matriz pronta. Descriptografando interface...');
         if (mounted) setIsInitialLoading(false);
     };
     
@@ -176,7 +180,10 @@ export default function App() {
       return (
           <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
               <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
-              <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.5em] animate-pulse">Sincronizando Matriz</p>
+              <div className="text-center">
+                  <p className="text-[14px] font-black text-amber-500 uppercase tracking-[0.5em] animate-pulse">LIBIDO 2026</p>
+                  <p className="text-[8px] text-slate-500 uppercase mt-4 tracking-widest">{loadStep}</p>
+              </div>
           </div>
       );
   }

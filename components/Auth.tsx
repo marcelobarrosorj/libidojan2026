@@ -181,52 +181,66 @@ export const Auth: React.FC = () => {
       }
 
       if (data.user) {
-        // Busca perfil completo no banco
+        // Busca perfil completo no banco - Tenta buscar colunas diretas se 'data' falhar
         let { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('data')
+          .select('*')
           .eq('id', data.user.id)
           .single();
 
         if (profileError || !profile) {
-          log('info', 'Perfil não encontrado, criando perfil padrão para usuário existente');
-          
-          // Se o perfil não existir, cria um perfil padrão para não travar o login
-          const defaultUser: User = {
+          log('info', 'Perfil não encontrado ou erro na busca, verificando fallback...');
+          // Tenta buscar apenas e-mail se o select * falhou (tabela pode estar vazia)
+          if (!profile) {
+              const { data: retryProfile } = await supabase.from('profiles').select('id').eq('id', data.user.id).single();
+              if (retryProfile) profile = retryProfile as any;
+          }
+        }
+
+        // Se ainda não temos um perfil, construímos o usuário a partir do que temos
+        const userData = (profile && profile.data) ? (profile.data as User) : {
             id: data.user.id,
-            nickname: email.split('@')[0],
+            nickname: profile?.nickname || email.split('@')[0],
             email: email.trim(),
-            age: 18,
-            plan: Plan.FREE,
+            age: profile?.age || 18,
+            plan: profile?.plan || Plan.FREE,
+            is_premium: profile?.is_premium || false,
             balance: 0,
             boosts_active: 0,
             trustLevel: TrustLevel.BRONZE,
-            is_premium: false,
             avatar: `https://picsum.photos/seed/${data.user.id}/400`,
             biotype: Biotype.PADRAO,
-            bio: 'Explorador Libido.',
             gender: Gender.CIS,
             sexualOrientation: SexualOrientation.HETERO,
             type: UserType.HOMEM,
             lookingFor: [UserType.MULHER],
-            height: 170,
-            location: 'São Paulo, SP',
             xp: 500,
             level: 1,
             isOnline: true,
-            verifiedAccount: false,
-            isGhostMode: false,
-            gallery: [],
-            badges: ['Verificado'],
-            boundaries: [],
-            behaviors: [],
-            braveryLevel: 5,
             updatedAt: new Date().toISOString(),
             vibes: [Vibes.LIBERAL],
-            bucketList: [],
             lat: -23.5505,
             lon: -46.6333,
             birthDate: '2000-01-01',
+            verifiedAccount: false,
+            isGhostMode: false,
+            gallery: [],
+            badges: [],
+            boundaries: [],
+            behaviors: [],
+            braveryLevel: 5,
+            bio: 'Explorador Libido.',
+            height: 170,
+            location: 'São Paulo, SP',
+            bucketList: [],
+            bestMoments: [],
+            bestFeature: 'Personalidade',
+            beveragePref: 'Gelo',
+            bestTime: 'Noite',
+            busyMode: false,
+            bookingPolicy: 'Livre',
+            verificationScore: 50,
+            hasBlurredGallery: false,
             rsvps: [],
             vouches: [],
             bookmarks: [],
@@ -238,28 +252,9 @@ export const Auth: React.FC = () => {
             bodyHair: 'Naturais',
             bodyArt: [],
             bondageExp: 'Nenhuma',
-            bestMoments: [],
-            bestFeature: 'Personalidade',
-            beveragePref: 'Gelo',
-            bestTime: 'Noite',
-            busyMode: false,
-            bookingPolicy: 'Livre',
-            verificationScore: 50,
-            hasBlurredGallery: false
-          };
+            neighborhood: 'Centro'
+        } as User;
 
-          await supabase.from('profiles').upsert({
-            id: data.user.id,
-            nickname: defaultUser.nickname,
-            data: defaultUser,
-            plan: defaultUser.plan,
-            updated_at: new Date().toISOString()
-          });
-
-          profile = { data: defaultUser };
-        }
-
-        const userData = profile.data as User;
         saveUserData(userData);
         setView('unlock');
       }

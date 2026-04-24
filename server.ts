@@ -2,6 +2,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
@@ -26,6 +27,13 @@ async function startServer() {
    * WEBHOOK STRIPE (Deve vir antes do express.json)
    */
   app.post('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
+  // Logger de requisições verboso
+  app.use((req, res, next) => {
+    if (req.path === '/health') return next();
+    console.log(`[REQ] ${new Date().toLocaleTimeString()} - ${req.method} ${req.path}`);
+    next();
+  });
 
   app.use(express.json());
 
@@ -117,20 +125,48 @@ async function startServer() {
     }
   });
 
-  // Health check para o ambiente AI Studio
+  // Health check simples
   app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
   // Integração com Vite (Desenvolvimento vs Produção)
   if (process.env.NODE_ENV !== 'production') {
+    console.log('[BOOT] Inicializando Vite Middleware...');
     const vite = await createViteServer({
       server: { 
         middlewareMode: true,
-        hmr: false
+        host: '0.0.0.0',
+        hmr: false 
       },
       appType: 'spa',
     });
+    
+    // Middleware do Vite deve vir antes de rotas genéricas
     app.use(vite.middlewares);
-    console.log('  🛠️  Vite Middleware Ativo (Modo Dev)');
+
+    // Handler para index.html em modo dev
+    app.get('*', async (req, res, next) => {
+      // Ignora chamadas de API e arquivos com extensão (estáticos)
+      if (req.url.startsWith('/api') || req.url.includes('.')) return next();
+      
+      try {
+        const url = req.originalUrl;
+        const templatePath = path.resolve(__dirname, 'index.html');
+        
+        if (!fs.existsSync(templatePath)) {
+            console.error('[VITE_ERR] index.html não localizado em:', templatePath);
+            return res.status(500).send('Erro: index.html não encontrado no servidor.');
+        }
+
+        let template = fs.readFileSync(templatePath, 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).send(template);
+      } catch (e: any) {
+        console.error('[VITE_TRANSFORM_ERR]', e.message);
+        next(e);
+      }
+    });
+
+    console.log('  ✅ Vite Middleware e Roteador SPA prontos.');
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
@@ -139,11 +175,14 @@ async function startServer() {
     });
   }
 
+  // AGORA sim iniciamos o listen, após TUDO estar configurado
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 LIBIDO 2026: Servidor Ativo na porta ${PORT}`);
+    console.log(`\n🚀 LIBIDO 2026: MATRIZ ONLINE EM http://localhost:${PORT}`);
+    console.log(`[ENV] Modo: ${process.env.NODE_ENV || 'development'}`);
   });
 }
 
 startServer().catch(err => {
-    console.error('Falha ao iniciar o servidor:', err);
+    console.error('CRITICAL ERROR during server startup:', err);
+    process.exit(1);
 });
