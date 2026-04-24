@@ -111,7 +111,7 @@ const VibeVoice: React.FC<VibeVoiceProps> = ({ onClose }) => {
       streamRef.current = stream;
 
       setVibeStatus("Abrindo túnel neural...");
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
       
       // 2. Inicializar contextos de áudio
       const inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });

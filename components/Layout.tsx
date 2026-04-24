@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { motion } from 'motion/react';
 import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert } from 'lucide-react';
 import { cache } from '../services/authUtils';
 import { Plan } from '../types';
@@ -69,14 +70,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
         </div>
       </main>
 
-      {/* Bottom Navigation: High Visibility 100% Solid Contrast */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a] border-t-2 border-amber-500 px-2 py-4 pb-10 flex justify-between items-center z-50 rounded-t-[3rem] shadow-[0_-25px_60px_rgba(0,0,0,1)]">
-        <NavButton icon={<LayoutGrid size={24} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
-        <NavButton icon={<Radio size={24} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
-        <NavButton icon={<CalendarDays size={24} />} isActive={activeTab === 'events'} onClick={() => setActiveTab('events')} label="Eventos" />
-        <NavButton icon={<CreditCard size={24} />} isActive={activeTab === 'assinatura'} onClick={() => setActiveTab('assinatura')} label="Assinar" />
-        <NavButton icon={<MessageCircle size={24} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
-        <NavButton icon={<UserCircle size={24} />} isActive={activeTab === 'profile'} onClick={() => setActiveTab('profile')} label="Me" />
+      {/* Bottom Navigation: Reorganized for 2026 Experience */}
+      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/5 px-2 pt-4 pb-10 flex justify-between items-center z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
+        <NavButton icon={<LayoutGrid size={22} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
+        <NavButton icon={<Radio size={22} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
+        <NavButton icon={<CalendarDays size={22} />} isActive={activeTab === 'events'} onClick={() => setActiveTab('events')} label="Círculo" />
+        <NavButton icon={<MessageCircle size={22} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
+        <NavButton icon={<UserCircle size={22} />} isActive={activeTab === 'profile'} onClick={() => setActiveTab('profile')} label="Perfil" />
       </nav>
     </div>
   );
@@ -85,11 +85,22 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
 const NavButton: React.FC<{ icon: React.ReactNode, isActive: boolean, onClick: () => void, label: string }> = ({ 
   icon, isActive, onClick, label 
 }) => (
-  <button onClick={onClick} className={`flex flex-col items-center gap-2 flex-1 transition-all duration-300 ${isActive ? 'scale-110' : 'hover:scale-105'}`}>
-    <div className={`p-3.5 rounded-[1.25rem] transition-all shadow-xl border ${isActive ? 'bg-amber-500 text-black border-amber-400 shadow-amber-500/20' : 'bg-slate-900 text-slate-200 border-white/5'}`}>
-      {icon}
+  <button onClick={onClick} className="flex flex-col items-center gap-1.5 flex-1 relative transition-all active:scale-95">
+    <div className={`relative p-2.5 rounded-2xl transition-all duration-500 ${isActive ? 'text-amber-500' : 'text-slate-500 hover:text-slate-300'}`}>
+      {isActive && (
+        <motion.div 
+          layoutId="nav-glow"
+          className="absolute inset-0 bg-amber-500/10 rounded-2xl border border-amber-500/20 blur-[1px]"
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+        />
+      )}
+      <div className="relative z-10 transition-transform duration-300" style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }}>
+        {icon}
+      </div>
     </div>
-    <span className={`text-[8px] font-black uppercase tracking-[0.15em] transition-colors ${isActive ? 'text-amber-500' : 'text-slate-500'}`}>{label}</span>
+    <span className={`text-[8px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${isActive ? 'text-amber-500 opacity-100' : 'text-slate-600 opacity-60'}`}>
+      {label}
+    </span>
   </button>
 );
 

@@ -13,32 +13,57 @@ export type VerifyResult =
 const UNLOCK_UNTIL_KEY = 'crs_unlock_until_ms';
 const DEFAULT_UNLOCK_WINDOW_MS = 30 * 60 * 1000; // 30 minutos
 
+const isBrowser = typeof window !== 'undefined';
+
+// Fallback em memória para evitar loops em navegadores com sessionStorage restrito
+let memoryUnlockUntil = 0;
+
 /**
  * Define que o app está desbloqueado para a sessão atual.
  */
 export function setUnlockedWindow(ms: number = DEFAULT_UNLOCK_WINDOW_MS): void {
-  sessionStorage.setItem(UNLOCK_UNTIL_KEY, String(Date.now() + ms));
+  const until = Date.now() + ms;
+  memoryUnlockUntil = until;
+  if (!isBrowser) return;
+  try {
+    sessionStorage.setItem(UNLOCK_UNTIL_KEY, String(until));
+  } catch (e) {}
 }
 
 /**
  * Verifica se o app ainda está dentro da janela de desbloqueio da sessão.
  */
 export function isUnlockedWindowValid(): boolean {
-  const raw = sessionStorage.getItem(UNLOCK_UNTIL_KEY);
-  if (!raw) return false;
-  const until = Number(raw);
-  if (!Number.isFinite(until)) return false;
-  return Date.now() < until;
+  // 1. Tenta memória primeiro (mais rápido e seguro contra restrições de storage)
+  if (memoryUnlockUntil > Date.now()) return true;
+
+  if (!isBrowser) return false;
+
+  // 2. Tenta sessionStorage
+  try {
+    const raw = sessionStorage.getItem(UNLOCK_UNTIL_KEY);
+    if (!raw) return false;
+    const until = Number(raw);
+    if (!Number.isFinite(until)) return false;
+    const isValid = Date.now() < until;
+    if (isValid) memoryUnlockUntil = until; // Sincroniza memória
+    return isValid;
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
  * Remove a confiança da sessão (ex: no logout).
  */
 export function clearUnlockedWindow(): void {
+  if (!isBrowser) return;
   sessionStorage.removeItem(UNLOCK_UNTIL_KEY);
 }
 
 export async function setUserPin(pin: string): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!isBrowser) return { ok: false, message: 'Browser only' };
+  
   // Check for crypto availability
   if (!window.crypto || !window.crypto.subtle) {
     return { ok: false, message: 'Criptografia indisponível no navegador atual.' };

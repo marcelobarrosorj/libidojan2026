@@ -2,16 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MOCK_CURRENT_USER } from '../constants';
 import { User, Biotype, UserType, Gender, SexualOrientation, PartnerData, TrustLevel, GalleryPhoto, Plan } from '../types';
-import { useAuth } from '../App';
+import { useAuth } from '../hooks/useAuthContext';
 import ActionButton from './common/ActionButton';
 import { Select, Input } from './common/RegistrationUI';
 import ImageEditor from './ImageEditor';
 import VerificationPortal from './VerificationPortal';
+import { SegmentedControl } from './common/SegmentedControl';
 import { 
   BadgeCheck, Settings, LogOut, ShieldCheck, 
   ChevronLeft, Ruler, Eye, Palette, Crown, 
   Fingerprint, Wind, X, Heart, 
-  ImageIcon, Plus, Trash2, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users
+  ImageIcon, Plus, Trash2, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
+  Zap
 } from 'lucide-react';
 import { 
     saveUserData, sanitizeInput, simulateApiCall,
@@ -22,10 +24,11 @@ import { soundService } from '../services/soundService';
 interface ProfileProps {
   user?: User;
   onBack?: () => void;
+  onNavigate?: (tab: string) => void;
   isOwnProfile?: boolean;
 }
 
-const Profile: React.FC<ProfileProps> = ({ user: propUser, onBack, isOwnProfile = true }) => {
+const Profile: React.FC<ProfileProps> = ({ user: propUser, onBack, onNavigate, isOwnProfile = true }) => {
   const { logout, refreshSession } = useAuth();
   
   const [user, setUser] = useState<User>(propUser || cache.userData || MOCK_CURRENT_USER);
@@ -132,11 +135,37 @@ const Profile: React.FC<ProfileProps> = ({ user: propUser, onBack, isOwnProfile 
         </div>
       </div>
 
-      <div className="flex bg-slate-900/40 p-1 rounded-2xl border border-amber-500/10 mx-auto max-w-[320px]">
-          <button onClick={() => setActiveTab('info')} className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'info' ? 'bg-amber-500/10 text-white' : 'text-slate-500'}`}>Infos</button>
-          <button onClick={() => setActiveTab('gallery')} className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'gallery' ? 'bg-amber-500/10 text-white' : 'text-slate-500'}`}>Galeria</button>
-          <button onClick={() => setActiveTab('trust')} className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === 'trust' ? 'bg-amber-500/10 text-white' : 'text-slate-500'}`}>Matriz</button>
+      <div className="mx-auto w-full max-w-[340px]">
+          <SegmentedControl 
+            activeId={activeTab}
+            onChange={(id) => setActiveTab(id as 'info' | 'gallery' | 'trust')}
+            tabs={[
+              { id: 'info', label: 'Infos', icon: <Fingerprint /> },
+              { id: 'gallery', label: 'Galeria', icon: <ImageIcon /> },
+              { id: 'trust', label: 'Matriz', icon: <ShieldCheck /> }
+            ]}
+          />
       </div>
+
+      {isOwnProfile && user.plan === Plan.FREE && (
+         <div className="px-2">
+            <button 
+              onClick={() => onNavigate?.('assinatura')} 
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 p-4 rounded-3xl flex items-center justify-between group active:scale-95 transition-all shadow-xl shadow-amber-500/20"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-black/20 rounded-xl">
+                  <Zap size={20} className="text-white animate-pulse" />
+                </div>
+                <div className="text-left">
+                  <p className="text-[10px] font-black text-black/60 uppercase tracking-widest leading-none">Upgrade Premium</p>
+                  <p className="text-sm font-black text-white uppercase italic tracking-tighter">Ativar Plano Gold</p>
+                </div>
+              </div>
+              <ChevronLeft size={20} className="text-white rotate-180 group-hover:translate-x-1 transition-transform" />
+            </button>
+         </div>
+      )}
 
       {activeTab === 'info' && (
         <div className="space-y-10 animate-in slide-in-from-left-5">

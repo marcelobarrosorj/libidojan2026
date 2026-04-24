@@ -60,6 +60,7 @@ export interface HeatZone {
 export interface ProfileData {
   nickname: string;
   email?: string;
+  password?: string;
   age?: number;
   biotype: Biotype;
   height?: number;
@@ -143,6 +144,7 @@ export type ProfileType = 'man' | 'woman' | 'couple_fxm' | 'couple_mxm' | 'coupl
 export interface CoupleProfileData { 
   mainNickname: string; 
   email: string; 
+  password?: string;
   partner1: ProfileData; 
   partner2: ProfileData; 
   lookingFor: UserType[]; 

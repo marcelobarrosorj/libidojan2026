@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
+import { SegmentedControl } from './common/SegmentedControl';
 import { 
   CalendarDays, MapPin, Zap, Users, Plus, Star, ShieldCheck, 
   Sparkles, Clock, ChevronRight, X, Info, Building2, Send, 
-  Ticket, QrCode, UserCheck, CheckCircle2, Crown, Loader2
+  Ticket, QrCode, UserCheck, CheckCircle2, Crown, Loader2,
+  Trophy
 } from 'lucide-react';
 import ActionButton from './common/ActionButton';
 import { showNotification, cache, saveUserData, syncCaches, handleButtonAction } from '../services/authUtils';
@@ -168,9 +170,16 @@ export default function EventsPage() {
         </div>
       </div>
 
-      <div className="flex bg-slate-900/40 p-1 rounded-2xl border border-white/5">
-        <button onClick={() => setActiveTab('events')} className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'events' ? 'bg-pink text-white shadow-lg shadow-pink/30' : 'text-slate-500'}`}>Eventos</button>
-        <button onClick={() => setActiveTab('partners')} className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'partners' ? 'bg-pink text-white shadow-lg shadow-pink/30' : 'text-slate-500'}`}>Locais Verificados</button>
+      <div className="w-full">
+        <SegmentedControl 
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as 'events' | 'partners')}
+          tabs={[
+            { id: 'events', label: 'Eventos', icon: <CalendarDays /> },
+            { id: 'partners', label: 'Locais Verificados', icon: <ShieldCheck /> }
+          ]}
+          variant="amber"
+        />
       </div>
 
       <div className="space-y-6">

@@ -33,6 +33,7 @@ export const isOwner = (user: User | null): boolean => {
 
 export const syncWithCloud = async (user: User) => {
     try {
+        if (!user || !user.id) return;
         const { error } = await supabase
             .from('profiles')
             .upsert({ 
@@ -42,13 +43,16 @@ export const syncWithCloud = async (user: User) => {
                 plan: user.plan,
                 updated_at: new Date().toISOString()
             });
-        if (error) throw error;
+        if (error) log('warn', 'Cloud Sync Error', error);
     } catch (e) {
-        log('warn', 'Cloud Sync Offline ou Erro de Permissão', e);
+        log('warn', 'Cloud Sync Offline ou Erro de Rede', e);
     }
 };
 
+const isBrowser = typeof window !== 'undefined';
+
 export function getUserData(): User | null {
+  if (!isBrowser) return null;
   const rawNew = localStorage.getItem(STORAGE_KEYS.USER_DATA_NEW);
   if (rawNew) {
     try {
@@ -80,8 +84,10 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
     if (!updated.following) updated.following = [];
 
     cache.userData = updated;
-    const encoded = safeBtoa(JSON.stringify(updated));
-    localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, encoded);
+    if (isBrowser) {
+        const encoded = safeBtoa(JSON.stringify(updated));
+        localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, encoded);
+    }
     syncWithCloud(updated);
 };
 
@@ -105,33 +111,61 @@ export const toggleFollow = async (targetUserId: string): Promise<boolean> => {
 };
 
 export function getAuthFlag(): boolean {
+  if (!isBrowser) return false;
   return localStorage.getItem(STORAGE_KEYS.AUTH_FLAG_NEW) === 'true';
 }
 
 export function setAuthFlag(v: boolean): void {
+  if (!isBrowser) return;
   localStorage.setItem(STORAGE_KEYS.AUTH_FLAG_NEW, v ? 'true' : 'false');
 }
 
 export const syncCaches = async () => {
-    const local = getUserData();
-    if (local) {
-        cache.userData = local;
-        const { data } = await supabase.from('profiles').select('data').eq('id', local.id).single();
+    try {
+        const local = getUserData();
+        if (!local || !local.id) return;
+
+        log('info', 'Sincronizando cache com Supabase...');
+        const { data, error } = await supabase.from('profiles').select('data').eq('id', local.id).single();
+        
+        if (error) {
+            log('warn', 'Falha ao sincronizar com servidor, operando em modo local');
+            return;
+        }
+
         if (data) {
-            let cloudData = data.data as User;
-            // Validação de proprietário no retorno da nuvem
+            const cloudData = data.data as User;
             if (isOwner(cloudData)) {
                 cloudData.plan = Plan.GOLD;
                 cloudData.is_premium = true;
             }
             if (!cloudData.following) cloudData.following = [];
-            cache.userData = cloudData;
-            localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, safeBtoa(JSON.stringify(cloudData)));
+
+            // Só atualiza se houver mudança real ou se for a primeira vez
+            const cloudStr = JSON.stringify(cloudData);
+            const localStr = JSON.stringify(local);
+
+            if (cloudStr !== localStr) {
+                log('info', 'Dados novos detectados na nuvem. Atualizando cache local.');
+                cache.userData = cloudData;
+                if (isBrowser) {
+                    localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, safeBtoa(cloudStr));
+                }
+            } else {
+                log('info', 'Cache local já está sincronizado.');
+                cache.userData = local;
+            }
         }
+    } catch (e) {
+        log('warn', 'Erro crítico durante sincronização de cache', e);
     }
 };
 
 export const showNotification = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
+    if (!isBrowser) {
+        log('info', `[NOTIFICATION] ${message}`);
+        return;
+    }
     const notification = document.createElement('div');
     notification.className = `notification ${type === 'error' ? 'bg-rose-600' : type === 'success' ? 'bg-green-600' : 'bg-slate-800'} text-white animate-in slide-in-from-top duration-300 shadow-2xl`;
     notification.innerText = message;
@@ -167,6 +201,7 @@ export const retryWithBackoff = async <T>(operation: () => Promise<T>): Promise<
 };
 
 export const validateIntegrity = (): boolean => {
+    if (!isBrowser) return true;
     // Added null check for CONFIG.APP_URL which might be missing in some environments
     if (CONFIG.APP_URL && !window.location.origin.includes(new URL(CONFIG.APP_URL).hostname)) {
         log('error', 'Integridade de origem violada.');

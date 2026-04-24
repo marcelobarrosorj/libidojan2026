@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { RadarProfile } from "./types";
 import { log } from "../services/authUtils";
 
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAI = () => new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export async function generateRadarSummary(profiles: RadarProfile[]) {
   const ai = getAI();
@@ -18,11 +18,10 @@ export async function generateRadarSummary(profiles: RadarProfile[]) {
   Perfis: ${JSON.stringify(summaryData)}`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    return response.text?.trim() || "Conexões interessantes detectadas no seu radar agora.";
+    const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await genModel.generateContent(prompt);
+    const response = await result.response;
+    return response.text()?.trim() || "Conexões interessantes detectadas no seu radar agora.";
   } catch (error: any) {
     log('error', 'Radar AI Summary failed', { error: error.message });
     return "O radar está agitado! Explore as conexões lifestyle ao seu redor.";
@@ -39,11 +38,10 @@ export async function generateVibeCheck(profile: RadarProfile) {
   Exemplos: "Energia Magnética", "Mistério Total", "Vibe Sofisticada", "Pura Ousadia".`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    return response.text?.trim().replace(/[".]/g, '') || "Conexão Ativa";
+    const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await genModel.generateContent(prompt);
+    const response = await result.response;
+    return response.text()?.trim().replace(/[".]/g, '') || "Conexão Ativa";
   } catch (error) {
     return "High Compatibility";
   }

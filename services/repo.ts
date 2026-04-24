@@ -10,23 +10,6 @@ export type Viewer = {
 };
 
 /**
- * Base de perfis indexada para o radar.
- * Converte MOCK_USERS para o formato UserProfile.
- */
-const profiles: UserProfile[] = MOCK_USERS.map(u => ({
-    id: u.id,
-    name: u.nickname,
-    lat: u.lat || 0,
-    lon: u.lon || 0,
-    city: u.city || '',
-    neighborhood: u.neighborhood || '',
-    category: u.type,
-    categories: [],
-    avatar: u.avatar,
-    bio: u.bio
-}));
-
-/**
  * Mock de perfis para testes rápidos de UI do radar.
  * Pegamos uma fatia dos mocks completos para o fallback rápido.
  */
@@ -47,8 +30,56 @@ export function loadViewer(viewerId: string): Viewer | null {
   return viewers[viewerId] || viewers['me'];
 }
 
-export function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: number; minLon: number; maxLon: number }): UserProfile[] {
-  return profiles.filter(
-    (p) => p.lat >= box.minLat && p.lat <= box.maxLat && p.lon >= box.minLon && p.lon <= box.maxLon
-  );
+import { supabase } from './supabase';
+
+/**
+ * Busca perfis reais no banco de dados usando o retângulo envolvente (Bounding Box).
+ */
+export async function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: number; minLon: number; maxLon: number }): Promise<UserProfile[]> {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, nickname, data')
+      .gte('data->>lat', box.minLat.toString())
+      .lte('data->>lat', box.maxLat.toString())
+      // Nota: Filtragem de lon e outros critérios seriam feitos aqui em um app escala real.
+      // Simplificando para retorno de todos os perfis ativos para o radar.
+      .limit(50);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return data.map(item => {
+        const u = item.data as any;
+        return {
+            id: item.id,
+            name: item.nickname || u.nickname,
+            lat: u.lat || 0,
+            lon: u.lon || 0,
+            city: u.city || '',
+            neighborhood: u.neighborhood || '',
+            category: u.type || 'Explorador',
+            categories: [],
+            avatar: u.avatar || `https://picsum.photos/seed/${item.id}/400`,
+            bio: u.bio || ''
+        };
+      });
+    }
+  } catch (e) {
+    console.warn('Falha ao buscar perfis reais, retornando mocks:', e);
+  }
+
+  // Fallback para mocks se o banco estiver vazio ou falhar
+  return MOCK_USERS.map(u => ({
+      id: u.id,
+      name: u.nickname,
+      lat: u.lat || 0,
+      lon: u.lon || 0,
+      city: u.city || '',
+      neighborhood: u.neighborhood || '',
+      category: u.type,
+      categories: [],
+      avatar: u.avatar,
+      bio: u.bio
+  }));
 }

@@ -32,12 +32,12 @@ export const RegistrationFlow: React.FC<{
   const [profileType, setProfileType] = useState<ProfileType>('couple_fxm');
   const [error, setError] = useState<string | null>(null);
 
-  const [singleData, setSingleData] = useState<ProfileData>({ 
-    nickname: '', email: '', biotype: Biotype.PADRAO, lookingFor: [] 
+  const [singleData, setSingleData] = useState<ProfileData & { password?: string }>({ 
+    nickname: '', email: '', biotype: Biotype.PADRAO, lookingFor: [], password: ''
   });
 
-  const [coupleData, setCoupleData] = useState<CoupleProfileData>({
-    mainNickname: '', email: '', 
+  const [coupleData, setCoupleData] = useState<CoupleProfileData & { password?: string }>({
+    mainNickname: '', email: '', password: '',
     partner1: { nickname: '', biotype: Biotype.PADRAO }, 
     partner2: { nickname: '', biotype: Biotype.PADRAO },
     lookingFor: [UserType.CASAIS]
@@ -56,6 +56,7 @@ export const RegistrationFlow: React.FC<{
     if (step === 'details') {
       const email = isCouple ? coupleData.email : (singleData.email || '');
       const nickname = isCouple ? coupleData.mainNickname : singleData.nickname;
+      const password = isCouple ? coupleData.password : singleData.password;
 
       if (!nickname || nickname.trim().length < 3) {
         setError('Nickname é obrigatório (mín. 3 caracteres).');
@@ -64,6 +65,11 @@ export const RegistrationFlow: React.FC<{
 
       if (!email || !EMAIL_REGEX.test(email)) {
         setError('Por favor, insira um e-mail de cadastro válido.');
+        return;
+      }
+
+      if (!password || password.length < 6) {
+        setError('A senha deve ter pelo menos 6 caracteres para sua segurança.');
         return;
       }
 
@@ -150,6 +156,17 @@ export const RegistrationFlow: React.FC<{
                   value={isCouple ? coupleData.email : (singleData.email || '')} 
                   onChange={(v) => isCouple ? setCoupleData({...coupleData, email: v}) : setSingleData({...singleData, email: v})} 
                   placeholder="NOME@DOMINIO.COM" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-amber-500/60 uppercase ml-4 flex items-center gap-2">
+                  <Lock size={12} /> Senha de Acesso
+                </label>
+                <Input 
+                  type="password"
+                  value={isCouple ? (coupleData.password || '') : (singleData.password || '')} 
+                  onChange={(v) => isCouple ? setCoupleData({...coupleData, password: v}) : setSingleData({...singleData, password: v})} 
+                  placeholder="MÍNIMO 6 CARACTERES" 
                 />
               </div>
               <div className="bg-amber-500/5 p-4 rounded-3xl border border-amber-500/10">

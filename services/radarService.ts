@@ -18,7 +18,7 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
   const activeMaxKm = isPremium ? MAX_KM_PREMIUM : MAX_KM_FREE;
 
   const box = boundingBox(viewerLat, viewerLon, activeMaxKm);
-  const candidates = fetchProfilesByBoundingBox(box);
+  const candidates = await fetchProfilesByBoundingBox(box);
 
   let out: RadarResultItem[] = [];
 

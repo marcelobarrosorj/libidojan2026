@@ -3,6 +3,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { MOCK_POSTS, MOCK_USERS } from '../constants';
 import { Post, User, GalleryPhoto } from '../types';
 import { Heart, MessageCircle, MoreHorizontal, X, Maximize2, ChevronLeft, ChevronRight, Send, Flag, UserX, Link as LinkIcon, EyeOff, Users, Sparkles } from 'lucide-react';
+import { SegmentedControl } from './common/SegmentedControl';
 import { log, handleButtonAction, showNotification, cache } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import ProtectedImage from './common/ProtectedImage';
@@ -103,20 +104,15 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
     <div className="flex flex-col gap-6 p-4 pb-28 animate-in fade-in duration-500">
       <VibeMoments />
 
-      {/* NOVO: Seletor de Aba do Feed */}
-      <div className="flex bg-slate-900/40 p-1 rounded-2xl border border-amber-500/10 mx-auto w-full max-w-xs mb-2">
-        <button 
-          onClick={() => setFeedMode('all')} 
-          className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${feedMode === 'all' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'text-slate-500'}`}
-        >
-          <Sparkles size={14} /> Explorar
-        </button>
-        <button 
-          onClick={() => setFeedMode('following')} 
-          className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${feedMode === 'following' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'text-slate-500'}`}
-        >
-          <Users size={14} /> Seguindo
-        </button>
+      <div className="mx-auto w-full max-w-[280px] mb-2">
+        <SegmentedControl 
+          activeId={feedMode}
+          onChange={(id) => setFeedMode(id as 'all' | 'following')}
+          tabs={[
+            { id: 'all', label: 'Explorar', icon: <Sparkles /> },
+            { id: 'following', label: 'Seguindo', icon: <Users /> }
+          ]}
+        />
       </div>
 
       {filteredPosts.length === 0 ? (

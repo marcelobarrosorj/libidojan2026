@@ -7,6 +7,9 @@ import { log } from './authUtils';
  */
 
 export const initSecurityLayer = () => {
+    const isBrowser = typeof window !== 'undefined';
+    if (!isBrowser) return;
+
     log('info', 'Libido Security: Protocolo de Blindagem Ativo.');
     
     // Bloqueia menu de contexto em todo o app

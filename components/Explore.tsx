@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
 import { User, RadarProfile } from '../types';
 import { X, Heart, Zap, Radio as RadioIcon, Target } from 'lucide-react';
+import { SegmentedControl } from './common/SegmentedControl';
 import { log, likeProfile, passProfile, showNotification } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { getCurrentPosition } from '../services/geoService';
@@ -87,10 +88,16 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick }) => {
 
   return (
     <div className="p-4 flex flex-col items-center gap-6 animate-in fade-in duration-500 pb-28">
-      <div className="flex bg-slate-900/50 p-1.5 rounded-3xl border border-amber-500/10 w-full shrink-0 shadow-2xl">
-        <button onClick={() => setViewMode('sonar')} className={`flex-1 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${viewMode === 'sonar' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-slate-500 hover:text-slate-300'}`}><Target size={14} /> Sonar</button>
-        <button onClick={() => setViewMode('radar')} className={`flex-1 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${viewMode === 'radar' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-slate-500 hover:text-slate-300'}`}><RadioIcon size={14} /> Radar</button>
-        <button onClick={() => setViewMode('swipe')} className={`flex-1 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${viewMode === 'swipe' ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/30' : 'text-slate-500 hover:text-slate-300'}`}><Zap size={14} /> Swipe</button>
+      <div className="w-full shrink-0">
+        <SegmentedControl 
+          activeId={viewMode}
+          onChange={(id) => setViewMode(id as 'sonar' | 'radar' | 'swipe')}
+          tabs={[
+            { id: 'sonar', label: 'Sonar', icon: <Target /> },
+            { id: 'radar', label: 'Radar', icon: <RadioIcon /> },
+            { id: 'swipe', label: 'Swipe', icon: <Zap /> }
+          ]}
+        />
       </div>
 
       <div className="w-full flex-1">

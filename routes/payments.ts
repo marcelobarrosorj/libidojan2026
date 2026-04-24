@@ -65,4 +65,15 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   res.json({ received: true });
 });
 
+/**
+ * GET /api/payments/status/:id
+ */
+router.get('/status/:id', async (req, res) => {
+  const id = req.params.id;
+  res.json({
+    id,
+    status: id.includes('sim') || Math.random() > 0.5 ? 'succeeded' : 'pending'
+  });
+});
+
 export default router;

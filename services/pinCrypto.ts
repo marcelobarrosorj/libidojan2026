@@ -47,7 +47,7 @@ async function derivePinHashB64(
   const derivedBits = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt: b64ToBytes(saltB64),
+      salt: b64ToBytes(saltB64) as BufferSource,
       iterations,
       hash: 'SHA-256',
     },

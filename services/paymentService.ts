@@ -45,7 +45,7 @@ export async function createPaymentIntent(plan: Plan | string, method: 'card' | 
   }
 
   try {
-    const response = await fetch(`${CONFIG.API_BASE_URL}/api/payments/create-intent`, {
+    const response = await fetch('/api/payments/create-intent', {
       method: 'POST',
       headers: { 
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export async function verifyPaymentStatus(paymentIntentId: string): Promise<bool
     }
 
     try {
-        const response = await fetch(`${CONFIG.API_BASE_URL}/api/payments/status/${paymentIntentId}`, {
+        const response = await fetch(`/api/payments/status/${paymentIntentId}`, {
             method: 'GET'
         });
         if (!response.ok) return false;

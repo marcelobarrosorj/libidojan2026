@@ -3,7 +3,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { User } from "../types";
 import { log, retryWithBackoff } from "./authUtils";
 
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAI = () => new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 /**
  * Analiza a compatibilidade profunda baseada na Matriz B (Lifestyle, Behaviors, Boundaries, Bravery).

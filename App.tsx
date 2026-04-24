@@ -11,13 +11,11 @@ import Feed from './components/Feed';
 import EventsPage from './components/EventsPage';
 import { TermsGate } from './components/TermsGate';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
+import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
-import { getAuthFlag, setAuthFlag, syncCaches, cache } from './services/authUtils';
+import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
-
-const AuthContext = createContext<any>(null);
-export const useAuth = () => useContext(AuthContext);
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(getAuthFlag());
@@ -25,12 +23,39 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('feed'); 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [viewedProfile, setViewedProfile] = useState<User | null>(null);
-  const [isSyncing, setIsSyncing] = useState(true);
-  const [currentUser, setCurrentUser] = useState<User | null>(cache.userData);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const local = getUserData();
+    if (local) cache.userData = local;
+    return local;
+  });
   const [showTerms, setShowTerms] = useState(false);
+  const syncLock = React.useRef(false);
+  const hasInitialSynced = React.useRef(false);
 
   useEffect(() => {
     initSecurityLayer();
+
+    let mounted = true;
+    const initApp = async () => {
+        const hasAuth = getAuthFlag();
+        if (hasAuth && !hasInitialSynced.current) {
+            try {
+                await refreshSession();
+            } catch (e) {
+                log('error', 'Critical Init Failure', e);
+            }
+        }
+        if (mounted) setIsInitialLoading(false);
+    };
+    
+    // Failsafe: Remove loading screen after 8 seconds no matter what
+    const timer = setTimeout(() => {
+        if (mounted) setIsInitialLoading(false);
+    }, 8000);
+
+    initApp();
 
     if (shouldShowTermsGate(new Date(), { version: '2026.1' })) {
       setShowTerms(true);
@@ -68,6 +93,8 @@ export default function App() {
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
+        mounted = false;
+        clearTimeout(timer);
         window.removeEventListener('blur', onBlur);
         window.removeEventListener('focus', onFocus);
         document.removeEventListener('visibilitychange', handleVisibility);
@@ -90,33 +117,49 @@ export default function App() {
     window.location.href = 'https://www.google.com';
   };
 
-  const logout = () => {
+  const logout = React.useCallback(() => {
     setAuthFlag(false);
     clearUnlockedWindow();
     setIsAuthenticated(false);
     setIsUnlocked(false);
     setCurrentUser(null);
     localStorage.clear();
-  };
+  }, []);
 
-  const refreshSession = async (immediate = false) => {
-    await syncCaches();
-    setIsAuthenticated(getAuthFlag());
-    setIsUnlocked(isUnlockedWindowValid());
-    setCurrentUser(cache.userData);
-  };
+  const refreshSession = React.useCallback(async (immediate = false) => {
+    if (syncLock.current && !immediate) return;
+    syncLock.current = true;
+    
+    // Só mostra loading visual se for o sync inicial ou imediato
+    if (!hasInitialSynced.current || immediate) {
+        setIsSyncing(true);
+    }
+
+    try {
+        await syncCaches();
+        const auth = getAuthFlag();
+        const unlocked = isUnlockedWindowValid();
+        
+        setIsAuthenticated(auth);
+        setIsUnlocked(unlocked);
+        setCurrentUser(cache.userData);
+        hasInitialSynced.current = true;
+    } finally {
+        setIsSyncing(false);
+        syncLock.current = false;
+    }
+  }, []);
+
+  const authContextValue = React.useMemo(() => ({
+    logout,
+    refreshSession,
+    setIsUnlocked,
+    setIsAuthenticated
+  }), [logout, refreshSession]);
 
   useEffect(() => {
-    const initApp = async () => {
-        if (isAuthenticated) {
-            await syncCaches(); 
-            setIsUnlocked(isUnlockedWindowValid());
-            setCurrentUser(cache.userData);
-        }
-        setIsSyncing(false);
-    };
-    initApp();
-  }, [isAuthenticated]);
+    // Escuta mudanças de aba e outras lógicas se necessário
+  }, []);
 
   if (showTerms) {
     return (
@@ -129,7 +172,7 @@ export default function App() {
     );
   }
 
-  if (isSyncing) {
+  if (isInitialLoading) {
       return (
           <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
               <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
@@ -140,7 +183,7 @@ export default function App() {
 
   if (!isAuthenticated || !isUnlocked) {
     return (
-      <AuthContext.Provider value={{ logout, refreshSession, setIsUnlocked, setIsAuthenticated }}>
+      <AuthContext.Provider value={authContextValue}>
         <Auth />
       </AuthContext.Provider>
     );
@@ -183,14 +226,14 @@ export default function App() {
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} />;
-      case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} />;
+      case 'profile': return <Profile user={currentUser || undefined} isOwnProfile={true} onBack={() => setActiveTab('feed')} onNavigate={setActiveTab} />;
       case 'assinatura': return <Subscription />;
       default: return <Feed onProfileClick={handleViewProfile} />; 
     }
   };
 
   return (
-    <AuthContext.Provider value={{ logout, refreshSession, setIsUnlocked, setIsAuthenticated }}>
+    <AuthContext.Provider value={authContextValue}>
       <div className="relative w-full h-full flex justify-center">
         <Layout activeTab={activeTab} setActiveTab={handleTabChange}>
           {renderContent()}

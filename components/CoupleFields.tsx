@@ -191,7 +191,7 @@ export const CoupleFields: React.FC<CoupleFieldsProps> = ({ profileType, data, o
         </div>
 
         <Checkbox 
-          checked={data.customizeNicknames} 
+          checked={!!data.customizeNicknames} 
           onChange={(c) => onChange('customizeNicknames', c)} 
           label="Personalizar nicknames individuais" 
         />

@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pink: #ff1493;
+  --color-amber: #F59E0B;
+}
+
+:root {
+    --pink: #ff1493;
+    --amber: #F59E0B;
+    --dark: #050505;
+    --white: #ffffff;
+    --danger: #ef4444;
+}
+
+body {
+    background-color: var(--dark);
+    color: var(--white);
+}
