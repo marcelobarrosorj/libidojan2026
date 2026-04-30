@@ -24,7 +24,15 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
 
   for (const p of candidates) {
     if (p.id === viewerId) continue;
+    
+    // Filtro por categorias/interesses
     if (!matchesPreferences(p, viewer.preferredCategories)) continue;
+    
+    // Filtro por Preferência 'lookingFor' (tipo do perfil deve estar na lista do visualizador)
+    // No mapping do repo.ts, p.category recebe o UserType (Homem, Mulher, Casais)
+    if (viewer.lookingFor && viewer.lookingFor.length > 0) {
+      if (!viewer.lookingFor.includes(p.category as any)) continue;
+    }
 
     const rawDistanceKm = haversineKm(viewerLat, viewerLon, p.lat, p.lon);
     if (rawDistanceKm > activeMaxKm) continue;

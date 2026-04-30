@@ -23,159 +23,112 @@ async function startServer() {
   // Configurações Globais
   app.use(cors({ origin: true, credentials: true }));
 
-  /**
-   * WEBHOOK STRIPE (Deve vir antes do express.json)
-   */
-  app.post('/api/payments/webhook', express.raw({ type: 'application/json' }));
+    /**
+     * WEBHOOK STRIPE
+     */
+    app.post('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
-  // Logger de requisições verboso
-  app.use((req, res, next) => {
-    if (req.path === '/health') return next();
-    console.log(`[REQ] ${new Date().toLocaleTimeString()} - ${req.method} ${req.path}`);
-    next();
-  });
+    // Health check simples
+    app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-  app.use(express.json());
+    app.use(express.json());
 
-  // Logger de requisições simplificado
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/api') && process.env.NODE_ENV !== 'production') {
-      // Log leve apenas em desenvolvimento
-    }
-    next();
-  });
+    // Rotas da API...
+    app.use('/api', radarRoutes);
+    app.use('/api/payments', paymentRoutes);
 
-  // Rotas da API...
-  app.use('/api', radarRoutes);
-  app.use('/api/payments', paymentRoutes);
-
-  // PROXY SUPABASE - Fix para "Failed to fetch" (CORS/Network bypass)
-  app.all('/api/sb-api*', async (req, res) => {
-    const supabaseUrl = 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
-    
-    // Extrai o caminho após /api/sb-api
-    let pathAfterProxy = req.originalUrl.split('/api/sb-api')[1] || '/';
-    if (!pathAfterProxy.startsWith('/')) pathAfterProxy = '/' + pathAfterProxy;
-    
-    const url = `${supabaseUrl}${pathAfterProxy}`;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => {
-        controller.abort();
-    }, 25000); // 25s timeout
-
-    try {
-      const headers: Record<string, string> = {
-          'host': 'hkuwlazwtxwfffnpgfdd.supabase.co'
-      };
-
-      for (const [key, value] of Object.entries(req.headers)) {
-        const lowerKey = key.toLowerCase();
-        const skipHeaders = [
-            'host', 'origin', 'referer', 'content-length', 
-            'connection', 'keep-alive', 'accept-encoding', 'cookie'
-        ];
-        if (value && typeof value === 'string' && !skipHeaders.includes(lowerKey)) {
-          headers[key] = value;
-        }
-      }
-
-      let body: any = undefined;
-      if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
-         if (req.body && Object.keys(req.body).length > 0) {
-             body = JSON.stringify(req.body);
-             headers['content-type'] = 'application/json';
-         }
-      }
-
-      console.log(`[SB_PROXY] ${req.method} ${url}`);
-
-      const response = await fetch(url, {
-        method: req.method,
-        headers: headers,
-        body,
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeout);
-
-      const responseHeaders: Record<string, string> = {};
-      response.headers.forEach((value, key) => {
-          const lowerKey = key.toLowerCase();
-          const skipResponseHeaders = [
-              'content-encoding', 'transfer-encoding', 'content-length', 
-              'connection', 'access-control-allow-origin', 'set-cookie'
-          ];
-          if (!skipResponseHeaders.includes(lowerKey)) {
-              responseHeaders[key] = value;
-          }
-      });
-
-      const buffer = await response.arrayBuffer();
-      res.status(response.status).set(responseHeaders).send(Buffer.from(buffer));
-
-    } catch (e: any) {
-      clearTimeout(timeout);
-      const isTimeout = e.name === 'AbortError';
-      console.error('[SB_PROXY_ERR]', isTimeout ? 'Timeout' : e.message, '->', url);
-      res.status(isTimeout ? 504 : 502).json({ 
-        error: isTimeout ? 'Timeout Supabase' : `Proxy Error`,
-        details: e.message 
-      });
-    }
-  });
-
-  // Health check simples
-  app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
-
-  // Integração com Vite (Desenvolvimento vs Produção)
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('[BOOT] Inicializando Vite Middleware...');
-    const vite = await createViteServer({
-      server: { 
-        middlewareMode: true,
-        host: '0.0.0.0',
-        hmr: false 
-      },
-      appType: 'spa',
-    });
-    
-    // Middleware do Vite deve vir antes de rotas genéricas
-    app.use(vite.middlewares);
-
-    // Handler para index.html em modo dev
-    app.get('*', async (req, res, next) => {
-      // Ignora chamadas de API e arquivos com extensão (estáticos)
-      if (req.url.startsWith('/api') || req.url.includes('.')) return next();
-      
-      try {
-        const url = req.originalUrl;
-        const templatePath = path.resolve(__dirname, 'index.html');
+    // PROXY SUPABASE - Fix para "Failed to fetch" (CORS/Network bypass)
+    app.all('/api/sb-api*', async (req, res) => {
+        const supabaseUrl = process.env.SUPABASE_URL || 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
+        const fullUrl = req.originalUrl || '';
+        const pathAfterProxy = fullUrl.replace('/api/sb-api', '') || '/';
         
-        if (!fs.existsSync(templatePath)) {
-            console.error('[VITE_ERR] index.html não localizado em:', templatePath);
-            return res.status(500).send('Erro: index.html não encontrado no servidor.');
+        const targetUrl = new URL(pathAfterProxy, supabaseUrl);
+        
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000); 
+
+        try {
+            const headers: Record<string, string> = {
+                'host': new URL(supabaseUrl).hostname,
+                'apikey': req.headers['apikey'] as string || '',
+                'authorization': req.headers['authorization'] as string || '',
+                'content-type': req.headers['content-type'] as string || 'application/json',
+                'prefer': req.headers['prefer'] as string || '',
+                'x-client-info': 'libido-applet-proxy'
+            };
+
+            const fetchOptions: any = {
+                method: req.method,
+                headers: headers,
+                signal: controller.signal
+            };
+
+            if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+                fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+            }
+
+            const response = await fetch(targetUrl.toString(), fetchOptions);
+            
+            const data = await response.arrayBuffer();
+            
+            // Repassa headers importantes (ex: range para paginação)
+            const responseHeaders = ['content-type', 'content-range', 'preference-applied'];
+            responseHeaders.forEach(h => {
+                const val = response.headers.get(h);
+                if (val) res.setHeader(h, val);
+            });
+
+            res.status(response.status).send(Buffer.from(data));
+        } catch (e: any) {
+            if (!res.headersSent) {
+                res.status(502).json({ error: 'Supabase Proxy Error', details: e.message });
+            }
+        } finally {
+            clearTimeout(timeout);
         }
-
-        let template = fs.readFileSync(templatePath, 'utf-8');
-        template = await vite.transformIndexHtml(url, template);
-        res.status(200).set({ 'Content-Type': 'text/html' }).send(template);
-      } catch (e: any) {
-        console.error('[VITE_TRANSFORM_ERR]', e.message);
-        next(e);
-      }
     });
 
-    console.log('  ✅ Vite Middleware e Roteador SPA prontos.');
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
+    // SPA Fallback Logic
+    if (process.env.NODE_ENV !== 'production') {
+        const vite = await createViteServer({
+            server: { 
+                middlewareMode: true, 
+                hmr: false,
+                host: '0.0.0.0'
+            },
+            appType: 'spa',
+        });
+        
+        app.use(vite.middlewares);
 
-  // AGORA sim iniciamos o listen, após TUDO estar configurado
+        app.get('*', async (req, res, next) => {
+            if (req.path.startsWith('/api/') || req.path === '/health' || req.path.includes('.')) {
+                return next();
+            }
+
+            try {
+                const templatePath = path.resolve(process.cwd(), 'index.html');
+                if (!fs.existsSync(templatePath)) return next();
+
+                let template = fs.readFileSync(templatePath, 'utf8');
+                template = await vite.transformIndexHtml(req.originalUrl || '/', template);
+                
+                res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+            } catch (e: any) {
+                vite.ssrFixStacktrace(e);
+                next(e);
+            }
+        });
+    } else {
+        const distPath = path.resolve(process.cwd(), 'dist');
+        app.use(express.static(distPath));
+        app.get('*', (req, res) => {
+            res.sendFile(path.resolve(distPath, 'index.html'));
+        });
+    }
+
+  // Iniciamos a escuta ao final para garantir que tudo está pronto
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n🚀 LIBIDO 2026: MATRIZ ONLINE EM http://localhost:${PORT}`);
     console.log(`[ENV] Modo: ${process.env.NODE_ENV || 'development'}`);

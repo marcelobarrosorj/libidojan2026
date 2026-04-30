@@ -31,12 +31,19 @@ function getViewerCity(): string {
   return 'São Paulo';
 }
 
+import { MOCK_CURRENT_USER } from '../constants';
+
 function enrichAndFilterByRadius(base: RadarProfile[], viewer: ViewerLocation, radiusKm: number): RadarProfile[] {
   const radius = normalizeRadiusKm(radiusKm);
   const out: RadarProfile[] = [];
 
   for (const p of base) {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon)) continue;
+
+    // Filtro por 'lookingFor'
+    if (MOCK_CURRENT_USER.lookingFor && MOCK_CURRENT_USER.lookingFor.length > 0) {
+      if (!MOCK_CURRENT_USER.lookingFor.includes(p.category as any)) continue;
+    }
 
     const rawKm = haversineKm(viewer.lat, viewer.lon, p.lat, p.lon);
     if (rawKm > MAX_KM_ALLOWED) continue;

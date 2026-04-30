@@ -45,9 +45,14 @@ export default function App() {
         if (hasAuth && !hasInitialSynced.current) {
             try {
                 setLoadStep('Sincronizando Identidade com Cloud...');
-                await refreshSession();
+                // Timeout de 5s para o refresh
+                await Promise.race([
+                    refreshSession(),
+                    new Promise((_, r) => setTimeout(() => r(new Error('Sync Timeout')), 5000))
+                ]);
             } catch (e) {
-                log('error', 'Critical Init Failure', e);
+                log('error', 'Init Sync Failure', e);
+                // Mesmo se falhar o sync, libera o loading para usar dados locais
             }
         }
         setLoadStep('Matriz pronta. Descriptografando interface...');
@@ -65,43 +70,9 @@ export default function App() {
       setShowTerms(true);
     }
 
-    const handleVisibility = () => {
-        const isSafeZone = document.body.classList.contains('navigating-out') || 
-                          document.body.classList.contains('payment-active');
-        
-        if (isSafeZone) {
-            document.body.classList.remove('is-hidden');
-            return;
-        }
-
-        if (document.hidden) {
-            document.body.classList.add('is-hidden');
-        } else {
-            document.body.classList.remove('is-hidden');
-        }
-    };
-
-    const onBlur = () => {
-        const isSafeZone = document.body.classList.contains('navigating-out') || 
-                          document.body.classList.contains('payment-active');
-        if (isSafeZone) return;
-        document.body.classList.add('is-hidden');
-    };
-
-    const onFocus = () => {
-        document.body.classList.remove('is-hidden');
-    };
-
-    window.addEventListener('blur', onBlur);
-    window.addEventListener('focus', onFocus);
-    document.addEventListener('visibilitychange', handleVisibility);
-
     return () => {
         mounted = false;
         clearTimeout(timer);
-        window.removeEventListener('blur', onBlur);
-        window.removeEventListener('focus', onFocus);
-        document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 

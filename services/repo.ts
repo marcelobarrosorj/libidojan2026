@@ -1,11 +1,13 @@
 
 import type { UserProfile, RadarProfile } from '../types';
-import { MOCK_USERS } from '../constants';
+import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
 import { mockRadarProfiles as fullMocks } from '../radar/mockData';
+import { UserType } from '../types';
 
 export type Viewer = {
   id: string;
   preferredCategories: string[];
+  lookingFor: UserType[];
   city: string;
 };
 
@@ -22,8 +24,18 @@ export const mockRadarProfiles: RadarProfile[] = fullMocks.slice(0, 10).map(p =>
  * Mock de visualizadores com preferências pré-configuradas.
  */
 const viewers: Record<string, Viewer> = {
-  viewer1: { id: 'viewer1', preferredCategories: ['casais', 'mulher', 'mulheres', 'trisal', 'homem'], city: 'São Paulo' },
-  me: { id: 'me', preferredCategories: ['casais', 'mulher', 'mulheres', 'trisal', 'homem', 'homem trans', 'mulher trans'], city: 'São Paulo' },
+  viewer1: { 
+    id: 'viewer1', 
+    preferredCategories: ['casais', 'mulher', 'mulheres', 'trisal', 'homem'], 
+    lookingFor: [UserType.MULHER, UserType.CASAIS],
+    city: 'São Paulo' 
+  },
+  me: { 
+    id: 'me', 
+    preferredCategories: ['casais', 'mulher', 'mulheres', 'trisal', 'homem', 'homem trans', 'mulher trans'], 
+    lookingFor: MOCK_CURRENT_USER.lookingFor,
+    city: 'São Paulo' 
+  },
 };
 
 export function loadViewer(viewerId: string): Viewer | null {
