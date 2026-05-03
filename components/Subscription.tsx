@@ -1,43 +1,49 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Plan } from '../types';
+import { Plan, User } from '../types';
 import { 
-  CreditCard, Check, Star, ArrowRight, 
-  AlertTriangle, ShieldCheck, X, Loader2, Sparkles, Crown, Zap, ShieldAlert
+  Check, Star, 
+  AlertTriangle, X, Loader2, Sparkles, Crown, Zap, ShieldAlert
 } from 'lucide-react';
-import { cache, saveUserData, showNotification } from '../services/authUtils';
+import { cache, saveUserData, showNotification, syncCaches, isPremiumUser } from '../services/authUtils';
 import ActionButton from './common/ActionButton';
-import { createPaymentIntent } from '../services/paymentService';
+import LibidoIcon from './common/LibidoIcon';
 
-// Chave pública fornecida
-const STRIPE_PUBLIC_KEY = 'pk_live_51RsspgEqSklIuetZT3UOXocxXkYCTYKTznCnN6ciw1r6sghZmfkZD8gEzZ0tIUXwjdUDVaGIRxr9ZkCN5d5LeX7H00ZRa4BkE6';
-
-const Subscription: React.FC = () => {
+const Subscription: React.FC<{ currentUser?: User | null }> = ({ currentUser }) => {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStep, setPaymentStep] = useState<'idle' | 'card_input' | 'success' | 'error'>('idle');
+  const [paymentStep, setPaymentStep] = useState<'idle' | 'pix_display' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   
-  const stripeRef = useRef<any>(null);
-  const elementsRef = useRef<any>(null);
-  const cardRef = useRef<any>(null);
-
+  // Chave Pix oficial da Matriz Libido
+  const PIX_KEY = 'libidoapp@gmail.com'; 
+  const PIX_RECIPIENT = 'Libido App - Matriz 2026';
   const PLANS = [
     { 
+      id: 'diario',
+      name: 'Acesso 24h', 
+      price: 'R$ 9,90', 
+      cents: 990,
+      period: 'por dia',
+      desc: 'Perfil completo por 24 horas.', 
+      features: ['Acesso total por 24h', 'Sem renovação automática'],
+      color: 'border-emerald-500/20 bg-emerald-500/[0.02]'
+    },
+    { 
       id: 'mensal',
-      name: 'Assinar Plano Mensal', 
-      price: 'R$ 49,90/mês', 
+      name: 'Mensal', 
+      price: 'R$ 49,90', 
       cents: 4990,
+      period: 'por mês',
       desc: 'Flexibilidade total na rede.', 
       features: ['Alcance 15km', 'Mensagens limitadas'],
       color: 'border-white/5'
     },
     { 
       id: 'semestral',
-      name: 'Assinar Plano Semestral', 
+      name: 'Semestral', 
       price: 'R$ 269,46', 
       cents: 26946,
-      period: '6 meses',
+      period: 'por semestre',
       desc: 'Economia de 10% (R$ 44,91/mês)', 
       features: ['Alcance 250km', 'Mensagens ilimitadas', 'Selo Silver'],
       recommended: true,
@@ -45,10 +51,10 @@ const Subscription: React.FC = () => {
     },
     { 
       id: 'anual',
-      name: 'Assinar Plano Anual', 
+      name: 'Anual', 
       price: 'R$ 479,04', 
       cents: 47904,
-      period: '12 meses',
+      period: 'por ano',
       desc: 'O melhor valor (R$ 39,92/mês)', 
       features: ['Tudo do semestral', 'Modo Ghost', 'Vibe Concierge'],
       color: 'border-amber-500/30 bg-amber-500/[0.02]'
@@ -69,84 +75,11 @@ const Subscription: React.FC = () => {
     };
   }, [paymentStep]);
 
-  useEffect(() => {
-    if (paymentStep === 'card_input' && !cardRef.current) {
-        // @ts-ignore
-        stripeRef.current = window.Stripe(STRIPE_PUBLIC_KEY);
-        elementsRef.current = stripeRef.current.elements();
-        
-        const style = {
-            base: {
-                color: '#ffffff',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '16px',
-                '::placeholder': { color: '#475569' },
-                iconColor: '#ff1493'
-            },
-            invalid: {
-                color: '#ef4444',
-                iconColor: '#ef4444'
-            }
-        };
-
-        cardRef.current = elementsRef.current.create('card', { style, hidePostalCode: true });
-        cardRef.current.mount('#stripe-card-element');
-        
-        cardRef.current.on('change', (event: any) => {
-            if (event.error) setErrorMessage(event.error.message);
-            else setErrorMessage('');
-        });
-    }
-  }, [paymentStep]);
-
   const handleSelectPlan = (plan: any) => {
     setSelectedPlan(plan);
-    setPaymentStep('card_input');
+    setPaymentStep('pix_display');
     document.body.classList.add('payment-active');
     document.body.classList.remove('is-hidden');
-  };
-
-  const processStripePayment = async () => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    setErrorMessage('');
-
-    try {
-        const intent = await createPaymentIntent(selectedPlan.name, 'card');
-        const result = await stripeRef.current.confirmCardPayment(intent.clientSecret, {
-            payment_method: {
-                card: cardRef.current,
-                billing_details: {
-                    name: cache.userData?.nickname || 'Membro Libido',
-                    email: `${cache.userData?.nickname}@libido.app`
-                }
-            }
-        });
-
-        if (result.error) {
-            setErrorMessage(result.error.message);
-            setPaymentStep('error');
-        } else {
-            if (result.paymentIntent.status === 'succeeded') {
-                finalizeSubscription();
-            }
-        }
-    } catch (err: any) {
-        setErrorMessage('Erro de conectividade com o gateway.');
-        setPaymentStep('error');
-    } finally {
-        setIsProcessing(false);
-    }
-  };
-
-  const finalizeSubscription = () => {
-    const userData = cache.userData;
-    if (userData) {
-        const newPlan = selectedPlan.id === 'mensal' ? Plan.PREMIUM : Plan.GOLD;
-        saveUserData({ ...userData, plan: newPlan, is_premium: true });
-        setPaymentStep('success');
-        showNotification('Sua Matriz foi elevada com sucesso!', 'success');
-    }
   };
 
   const closeCheckout = () => {
@@ -155,6 +88,48 @@ const Subscription: React.FC = () => {
     document.body.classList.remove('payment-success');
     document.body.classList.remove('is-hidden');
   };
+
+  const user = currentUser || cache.userData;
+  const isPremium = isPremiumUser(user);
+
+  // Sincroniza ao abrir para garantir status atualizado
+  useEffect(() => {
+    syncCaches();
+  }, []);
+
+  if (isPremium) {
+    return (
+      <div className="p-6 space-y-12 pb-32 animate-in fade-in bg-[#050505] min-h-screen flex flex-col items-center justify-center text-center">
+        <div className="relative">
+          <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-[0_0_50px_rgba(245,158,11,0.2)] animate-pulse">
+            <Crown size={48} />
+          </div>
+          <div className="absolute -bottom-2 -right-2 bg-pink p-1.5 rounded-full border border-black animate-bounce">
+            <Sparkles size={16} className="text-white" />
+          </div>
+        </div>
+        
+        <div className="space-y-4 max-w-sm">
+          <h2 className="text-4xl font-black italic uppercase text-white tracking-tighter leading-none">MATRIZ LIBERADA</h2>
+          <p className="text-[12px] text-amber-500 font-extrabold uppercase tracking-[0.3em] font-outfit">Sua assinatura está ativa</p>
+          
+          <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-6 mt-6">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
+              <span className="text-[10px] text-slate-500 font-black uppercase">Plano Atual</span>
+              <span className="text-[12px] text-white font-black uppercase italic">{user?.plan}</span>
+            </div>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
+              Você já usufrui de todos os privilégios VIP, incluindo alcance estendido, mensagens ilimitadas e visibilidade prioritária.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 opacity-20">
+           <LibidoIcon size={50} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-8 pb-32 animate-in fade-in bg-[#050505] min-h-screen relative">
@@ -206,40 +181,61 @@ const Subscription: React.FC = () => {
         ))}
       </div>
 
-      {/* OVERLAY DE CHECKOUT STRIPE */}
+      {/* OVERLAY DE CHECKOUT */}
       {paymentStep !== 'idle' && (
         <div className="fixed inset-0 z-[1500] flex items-center justify-center p-6 animate-in fade-in duration-300">
-            <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => !isProcessing && closeCheckout()} />
+            <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={closeCheckout} />
             
             <div className="relative w-full max-w-sm glass-card rounded-[3.5rem] p-8 border-white/10 shadow-[0_0_100px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300">
-                <button onClick={closeCheckout} className="absolute top-6 right-6 p-2 text-slate-500 hover:text-white" disabled={isProcessing}>
+                <button onClick={closeCheckout} className="absolute top-6 right-6 p-2 text-slate-500 hover:text-white">
                     <X size={24} />
                 </button>
 
-                {paymentStep === 'card_input' && (
+                {paymentStep === 'pix_display' && (
                     <div className="space-y-8 py-4">
-                        <div className="text-center space-y-1">
-                            <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Checkout Seguro</h3>
-                            <p className="text-[10px] text-pink font-black uppercase tracking-widest">{selectedPlan?.name}</p>
+                        <div className="text-center space-y-2">
+                             <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto text-emerald-500 border border-emerald-500/20">
+                                <LibidoIcon size={32} />
+                             </div>
+                            <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Pagamento via Pix</h3>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
+                                Transfira o valor de <span className="text-white">{selectedPlan?.price}</span> para a chave abaixo e envie o comprovante.
+                            </p>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className="bg-slate-900/60 p-6 rounded-3xl border border-white/5 shadow-inner">
-                                <div id="stripe-card-element" className="p-2" />
+                        <div className="space-y-4">
+                            <div className="bg-slate-900/60 p-6 rounded-3xl border border-white/5 text-center relative group">
+                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Destinatário</p>
+                                <p className="text-white font-bold text-sm mb-4">{PIX_RECIPIENT}</p>
+
+                                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-2">Chave Pix (E-mail)</p>
+                                <p className="text-amber-500 font-mono font-bold text-lg break-all select-all">{PIX_KEY}</p>
+                                
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(PIX_KEY);
+                                        showNotification('Chave Pix copiada!', 'success');
+                                    }}
+                                    className="mt-4 w-full py-2 bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase rounded-xl border border-amber-500/20 hover:bg-amber-500 hover:text-black transition-all"
+                                >
+                                    Copiar Chave Pix
+                                </button>
                             </div>
 
-                            {errorMessage && (
-                                <div className="bg-rose-500/10 p-4 rounded-2xl border border-rose-500/20 flex items-center gap-3">
-                                    <AlertTriangle size={18} className="text-rose-500 shrink-0" />
-                                    <p className="text-[10px] text-rose-500 font-bold uppercase">{errorMessage}</p>
-                                </div>
-                            )}
+                            <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 flex items-center gap-3">
+                                <ShieldAlert size={18} className="text-amber-500 shrink-0" />
+                                <p className="text-[9px] text-amber-500 font-bold uppercase leading-tight">
+                                    Após o pagamento, sua Matriz será atualizada em até 1 hora útil após a confirmação.
+                                </p>
+                            </div>
 
                             <ActionButton 
-                                label={`Assinar Agora - ${selectedPlan?.price}`} 
-                                onClick={processStripePayment} 
-                                loading={isProcessing} 
-                                icon={<ShieldCheck size={18} />} 
+                                label="Já realizei o pagamento" 
+                                onClick={() => {
+                                    showNotification('Notificação enviada! Aguarde a liberação.', 'info');
+                                    setPaymentStep('idle');
+                                }} 
+                                className="bg-emerald-500 text-black border-none"
                             />
                         </div>
                     </div>
@@ -260,7 +256,7 @@ const Subscription: React.FC = () => {
                     <AlertTriangle size={48} className="text-rose-500 mx-auto" />
                     <h3 className="text-white font-black uppercase italic tracking-tighter">Falha no Pagamento</h3>
                     <p className="text-[10px] text-slate-500 uppercase">{errorMessage}</p>
-                    <ActionButton label="Tentar Novamente" onClick={() => setPaymentStep('card_input')} />
+                    <ActionButton label="Tentar Novamente" onClick={() => setPaymentStep('idle')} />
                   </div>
                 )}
             </div>

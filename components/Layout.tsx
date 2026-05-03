@@ -3,18 +3,18 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert } from 'lucide-react';
 import { cache } from '../services/authUtils';
-import { Plan } from '../types';
+import { Plan, User } from '../types';
 import LibidoIcon from './common/LibidoIcon';
 
 interface LayoutProps {
   children: React.ReactNode;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  user: User | null;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) => {
-  const user = cache.userData;
-  const isGold = user?.plan === Plan.GOLD;
+const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user }) => {
+  const isPremium = user?.is_premium || user?.plan === Plan.GOLD || user?.plan === Plan.PREMIUM;
 
   return (
     <div className="flex flex-col min-h-[100dvh] h-[100dvh] max-w-md mx-auto relative bg-[#050505] border-x border-slate-900/50 overflow-hidden">
@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          {user?.plan === Plan.FREE && (
+          {!isPremium && (
              <button 
                 onClick={() => setActiveTab('assinatura')}
                 className="bg-amber-500 text-black text-[8px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-amber-500/30 animate-bounce uppercase tracking-widest"
@@ -48,8 +48,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
           </button>
 
           <button 
-            onClick={() => setActiveTab('profile')}
-            className={`p-2 rounded-full transition-colors ${activeTab === 'profile' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-800 text-slate-400'}`}
+            onClick={() => setActiveTab('profile_settings')}
+            className={`p-2 rounded-full transition-colors ${activeTab === 'profile' || activeTab === 'profile_settings' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-800 text-slate-400'}`}
           >
             <Settings size={20} />
           </button>
@@ -76,7 +76,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
         <NavButton icon={<Radio size={22} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
         <NavButton icon={<CalendarDays size={22} />} isActive={activeTab === 'events'} onClick={() => setActiveTab('events')} label="Círculo" />
         <NavButton icon={<MessageCircle size={22} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
-        <NavButton icon={<UserCircle size={22} />} isActive={activeTab === 'profile'} onClick={() => setActiveTab('profile')} label="Perfil" />
+        <NavButton icon={<UserCircle size={22} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
       </nav>
     </div>
   );

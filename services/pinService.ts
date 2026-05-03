@@ -101,6 +101,11 @@ export async function verifyUserPin(pinAttempt: string): Promise<VerifyResult> {
   if (!isValidPinFormat(pinAttempt)) return { ok: false, reason: 'invalid' };
 
   try {
+    // Check for crypto availability
+    if (typeof window !== 'undefined' && (!window.crypto || !window.crypto.subtle)) {
+      throw new Error('Criptografia indisponível no navegador atual.');
+    }
+
     const ok = await verifyPin(pinAttempt, rec.pinHash);
     if (ok) {
       rec.failedAttempts = 0;

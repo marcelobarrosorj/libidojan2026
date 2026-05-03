@@ -20,6 +20,15 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
   const canSubmit = useMemo(() => isValidPinFormat(pin) && !busy, [pin, busy]);
 
   useEffect(() => {
+    // Se não houver PIN configurado, força login forte/redefinição
+    const checkConfig = async () => {
+      const configured = await verifyUserPin('0000'); // Tentativa dummy apenas para checar record
+      if (configured.ok === false && configured.reason === 'not_configured') {
+        onRequireStrongLogin();
+      }
+    };
+    checkConfig();
+
     const t = setTimeout(() => inputRef.current?.focus(), 300);
     return () => clearTimeout(t);
   }, []);
@@ -42,6 +51,7 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
         onUnlocked();
         return;
       }
+      
       if (res.ok === false) {
         if ('reason' in res) {
           if (res.reason === 'locked' && 'remainingMs' in res) {
@@ -53,6 +63,15 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
             setMsg('PIN incorreto.');
             setPin('');
             setTimeout(() => inputRef.current?.focus(), 100);
+            return;
+          }
+          if (res.reason === 'not_configured') {
+            setMsg('PIN não configurado. Redefina o seu PIN.');
+            setTimeout(onRequireStrongLogin, 2000);
+            return;
+          }
+          if (res.reason === 'error' && 'message' in res) {
+            setMsg(res.message);
             return;
           }
         }

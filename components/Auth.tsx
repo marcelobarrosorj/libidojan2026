@@ -6,15 +6,22 @@ import { PinSetup } from './PinSetup';
 import { PinUnlock } from './PinUnlock';
 import { supabase } from '../services/supabase';
 import { saveUserData, setAuthFlag, getUserData, showNotification, log } from '../services/authUtils';
+import { isPinConfigured } from '../services/pinService';
 import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, Vibes } from '../types';
 
 export const Auth: React.FC = () => {
   const { setIsAuthenticated, setIsUnlocked, refreshSession } = useAuth();
   
-  // Decide a visão inicial baseada no status de autenticação
+  // Decide a visão inicial baseada no status de autenticação e PIN
   const getInitialView = () => {
     const authFlag = localStorage.getItem('libido_auth_active') === 'true';
-    if (authFlag) return 'unlock';
+    if (authFlag) {
+      // Se autenticado mas sem PIN (ex: limparam record local), vai para setup se já logado
+      if (!isPinConfigured()) {
+        return 'pin';
+      }
+      return 'unlock';
+    }
     return 'landing';
   };
 
@@ -210,10 +217,10 @@ export const Auth: React.FC = () => {
             trustLevel: TrustLevel.BRONZE,
             avatar: `https://picsum.photos/seed/${data.user.id}/400`,
             biotype: Biotype.PADRAO,
-            gender: Gender.CIS,
-            sexualOrientation: SexualOrientation.HETERO,
-            type: UserType.HOMEM,
-            lookingFor: [UserType.MULHER],
+            gender: profile?.gender || Gender.MASCULINO,
+            sexualOrientation: profile?.sexualOrientation || SexualOrientation.HETERO,
+            type: profile?.type || UserType.HOMEM,
+            lookingFor: profile?.lookingFor || [UserType.MULHER],
             xp: 500,
             level: 1,
             isOnline: true,
@@ -256,7 +263,11 @@ export const Auth: React.FC = () => {
         } as User;
 
         saveUserData(userData);
-        setView('unlock');
+        if (isPinConfigured()) {
+           setView('unlock');
+        } else {
+           setView('pin');
+        }
       }
     } catch (e: any) {
       console.error('[AUTH_ERROR]', e);
@@ -292,6 +303,16 @@ export const Auth: React.FC = () => {
   };
 
   const handlePinDone = async () => {
+    // Se não temos regData, significa que é um usuário existente redefinindo PIN
+    if (!regData) {
+        setAuthFlag(true);
+        setIsAuthenticated(true);
+        setIsUnlocked(true);
+        refreshSession(true);
+        showNotification('Segurança atualizada com sucesso!', 'success');
+        return;
+    }
+
     const data = regData.data;
     const nickname = data.nickname || data.mainNickname || 'Anon';
     const email = data.email || 'contato@libido.app';
@@ -334,7 +355,7 @@ export const Auth: React.FC = () => {
           avatar: `https://picsum.photos/seed/${nickname}/400`,
           biotype: data.biotype || Biotype.PADRAO,
           bio: 'Novo explorador na Matriz Libido 2026.',
-          gender: data.gender || Gender.CIS,
+          gender: data.gender || Gender.MASCULINO,
           sexualOrientation: data.sexualPreference || SexualOrientation.HETERO,
           type: UserType.HOMEM,
           lookingFor: data.lookingFor || [UserType.MULHER],
@@ -593,7 +614,13 @@ export const Auth: React.FC = () => {
   if (view === 'unlock') {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 animate-in zoom-in-95 duration-500">
-        <PinUnlock onUnlocked={handleUnlocked} onRequireStrongLogin={() => setView('landing')} />
+        <PinUnlock 
+          onUnlocked={handleUnlocked} 
+          onRequireStrongLogin={() => {
+            setAuthFlag(false);
+            setView('login');
+          }} 
+        />
       </div>
     );
   }

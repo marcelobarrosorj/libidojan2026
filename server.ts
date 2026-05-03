@@ -27,7 +27,55 @@ async function startServer() {
     // 1. Health Check (Crítico: deve estar disponível imediatamente)
     app.get('/health', (_req, res) => res.status(200).send('OK'));
 
-    // 2. Registro de Rotas de API
+    // 2. Proxy para Supabase (sb-api)
+    app.use('/api/sb-api', async (req, res) => {
+        try {
+            const supabaseUrl = process.env.SUPABASE_URL || 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
+            const url = `${supabaseUrl}${req.url}`;
+            
+            const fetchOptions: any = {
+                method: req.method,
+                headers: {
+                    'apikey': (req.headers['apikey'] as string) || (process.env.SUPABASE_ANON_KEY as string),
+                    'Authorization': req.headers['authorization'] as string,
+                    'Content-Type': 'application/json',
+                    'Prefer': req.headers['prefer'] as string,
+                    'X-Client-Info': req.headers['x-client-info'] as string
+                }
+            };
+
+            // Remove headers vazios
+            Object.keys(fetchOptions.headers).forEach(key => {
+                if (!fetchOptions.headers[key]) delete fetchOptions.headers[key];
+            });
+
+            // Somente envia body se houver conteúdo e não for GET/HEAD
+            if (!['GET', 'HEAD'].includes(req.method) && req.body && Object.keys(req.body).length > 0) {
+                fetchOptions.body = JSON.stringify(req.body);
+            }
+
+            const response = await fetch(url, fetchOptions);
+            
+            res.status(response.status);
+            
+            const contentType = response.headers.get('content-type');
+            if (contentType) res.setHeader('Content-Type', contentType);
+
+            // Se for 204 ou corpo vazio, encerra sem tentar ler texto
+            if (response.status === 204) {
+                return res.end();
+            }
+
+            const data = await response.text();
+            res.send(data);
+        } catch (error: any) {
+            console.error('[SB_PROXY_ERROR]', error.message);
+            // Retorna um JSON válido mesmo no erro para evitar quebras no frontend
+            res.status(500).json({ error: 'Erro de comunicação', message: error.message });
+        }
+    });
+
+    // 3. Registro de Rotas de API Internas
     app.use('/api', radarRoutes);
     app.use('/api/payments', paymentRoutes);
 

@@ -37,12 +37,19 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
             }`}
           >
             <div className="relative shrink-0">
-                <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-slate-800 transition-all duration-700 ${isLocked ? 'blur-xl grayscale opacity-50' : ''}`}>
+                <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-slate-800 transition-all duration-700 relative ${isLocked ? 'blur-xl grayscale opacity-50' : ''}`}>
                     <img 
                         src={p.avatar} 
                         className="w-full h-full object-cover" 
                         alt={isLocked ? 'Bloqueado' : p.name} 
                     />
+                    {!isLocked && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-md py-0.5 flex items-center justify-center">
+                            <span className="text-[6px] font-black text-white uppercase tracking-tighter">
+                                {formatDistanceLabel(p.distanceKm || 0)}
+                            </span>
+                        </div>
+                    )}
                 </div>
                 {isLocked && (
                     <div className="absolute inset-0 flex items-center justify-center text-pink">
@@ -66,6 +73,14 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
                   }
                 </span>
               </div>
+              
+              {/* Conecte Style: Presence Indicator */}
+              {!isLocked && Math.random() > 0.7 && (
+                <div className="flex items-center gap-1.5 mt-1.5">
+                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_5px_#10b981]" />
+                   <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest leading-none">Presente na Vibe</span>
+                </div>
+              )}
             </div>
 
             {isLocked ? (

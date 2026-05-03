@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
 
 // ID do Proprietário para acesso irrestrito
 const OWNER_ID = 'me';
+const OWNER_EMAIL = 'marcelobarrosorj@gmail.com';
 
 export const cache: { userData: User | null } = {
     userData: null
@@ -28,7 +29,18 @@ export const log = (level: 'info' | 'warn' | 'error', message: string, data?: an
  * Verifica se o usuário logado é o proprietário para liberar acesso total
  */
 export const isOwner = (user: User | null): boolean => {
-    return user?.id === OWNER_ID || user?.nickname === 'User_Libido';
+    if (!user) return false;
+    return user.id === OWNER_ID || 
+           user.nickname === 'User_Libido' || 
+           user.email === OWNER_EMAIL;
+};
+
+/**
+ * Verifica se um usuário possui status premium de forma consolidada
+ */
+export const isPremiumUser = (user: User | null): boolean => {
+    if (!user) return false;
+    return isOwner(user) || user.is_premium || user.plan === Plan.GOLD || user.plan === Plan.PREMIUM;
 };
 
 export const syncWithCloud = async (user: User) => {
@@ -71,6 +83,20 @@ export function getUserData(): User | null {
   return null;
 }
 
+// Gerenciamento de eventos de atualização de cache
+type CacheListener = (user: User | null) => void;
+const listeners = new Set<CacheListener>();
+
+export const authEvents = {
+    subscribe: (listener: CacheListener) => {
+        listeners.add(listener);
+        return () => listeners.delete(listener);
+    },
+    notify: (user: User | null) => {
+        listeners.forEach(l => l(user));
+    }
+};
+
 export const saveUserData = (userData: Partial<User> | UserData) => {
     const current = cache.userData || {} as User;
     let updated = { ...current, ...userData } as User;
@@ -81,6 +107,14 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
         updated.is_premium = true;
     }
 
+    // Proteção Anti-Downgrade: Se o cache diz que é PREMIUM e o novo dado diz que é FREE,
+    // mantém o status PREMIUM a menos que seja uma redefinição total.
+    if (cache.userData?.is_premium && !updated.is_premium && Object.keys(userData).length < 10) {
+        log('warn', '[AUTH] Bloqueado downgrade acidental de plano detectado em salvamento parcial.');
+        updated.is_premium = true;
+        updated.plan = cache.userData.plan;
+    }
+
     if (!updated.following) updated.following = [];
 
     cache.userData = updated;
@@ -88,6 +122,7 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
         const encoded = safeBtoa(JSON.stringify(updated));
         localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, encoded);
     }
+    authEvents.notify(updated);
     syncWithCloud(updated);
 };
 
@@ -126,7 +161,11 @@ export const syncCaches = async () => {
         if (!local || !local.id) return;
 
         log('info', 'Sincronizando cache com Supabase...');
-        const { data, error } = await supabase.from('profiles').select('data').eq('id', local.id).single();
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('data, plan, is_premium, trust_level, xp, level')
+            .eq('id', local.id)
+            .single();
         
         if (error) {
             log('warn', 'Falha ao sincronizar com servidor, operando em modo local');
@@ -134,7 +173,16 @@ export const syncCaches = async () => {
         }
 
         if (data) {
-            const cloudData = data.data as User;
+            const cloudData = (data.data || {}) as User;
+            
+            // Prioriza colunas individuais do banco de dados sobre o JSON 'data'
+            // Isso garante que mudanças feitas por sistemas externos (Stripe/Webhooks) sejam respeitadas
+            if (data.plan) cloudData.plan = data.plan as Plan;
+            if (data.is_premium !== undefined) cloudData.is_premium = !!data.is_premium;
+            if (data.trust_level) cloudData.trustLevel = data.trust_level as TrustLevel;
+            if (data.xp !== undefined) cloudData.xp = data.xp;
+            if (data.level !== undefined) cloudData.level = data.level;
+
             if (isOwner(cloudData)) {
                 cloudData.plan = Plan.GOLD;
                 cloudData.is_premium = true;
@@ -151,6 +199,7 @@ export const syncCaches = async () => {
                 if (isBrowser) {
                     localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, safeBtoa(cloudStr));
                 }
+                authEvents.notify(cloudData);
             } else {
                 log('info', 'Cache local já está sincronizado.');
                 cache.userData = local;
@@ -220,11 +269,28 @@ export const likeProfile = async (id: string) => {
 export const passProfile = async (id: string) => ({});
 
 export const simulateApiCall = async (tag: string, data: any, delay: number = 1000) => {
-    log('info', `[PRODUCTION_READY][${tag}]`, data);
+    log('info', `[AUDIT][API_REQUEST][${tag}]`, data);
+    // Simula uma falha em 5% das vezes para auditoria de tratamento de erro
+    if (Math.random() < 0.05) {
+        throw new Error('Falha simulada na comunicação com o servidor.');
+    }
     return new Promise(resolve => setTimeout(resolve, delay));
 };
 
 export const vouchUser = async (targetUserId: string) => {
     log('info', `[VOUCH] User ${targetUserId} vouched`);
     return { success: true };
+};
+
+/**
+ * Alterna o Modo Ghost (navegação invisível)
+ */
+export const toggleGhostMode = async (): Promise<boolean> => {
+    const user = cache.userData;
+    if (!user) return false;
+
+    const newGhostMode = !user.isGhostMode;
+    saveUserData({ ...user, isGhostMode: newGhostMode });
+    log('info', `[PRIVACY] Ghost Mode ${newGhostMode ? 'enabled' : 'disabled'}`);
+    return newGhostMode;
 };

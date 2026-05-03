@@ -14,7 +14,7 @@ export const MOCK_CURRENT_USER: User = {
   avatar: 'https://picsum.photos/seed/me/400/400',
   biotype: Biotype.ATLETICO,
   bio: 'Proprietário da Matriz Libido. Explorando conexões seguras.',
-  gender: Gender.CIS,
+  gender: Gender.MASCULINO,
   sexualOrientation: SexualOrientation.HETERO,
   type: UserType.HOMEM,
   lookingFor: [UserType.MULHER, UserType.CASAIS],

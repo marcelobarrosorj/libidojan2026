@@ -11,7 +11,7 @@ export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: numb
   if (lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined) return 9999;
   
   // Se forem exatamente o mesmo ponto
-  if (lat1 === lat2 && lon1 === lon2) return 0.05;
+  if (lat1 === lat2 && lon1 === lon2) return 0.1;
 
   const R = 6371; // Raio da Terra em km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -33,10 +33,14 @@ export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: numb
  * - Maior ou igual a 1km: exibe em quilômetros (km)
  */
 export function formatDistanceLabel(km: number): string {
-  if (km < 1) {
-    const meters = Math.round(km * 1000);
-    // Garante um valor mínimo visual para não parecer 0m
-    return `${Math.max(meters, 1)} m`;
+  // Garante que a distância mínima seja 0.1km (100m)
+  const effectiveKm = Math.max(km, 0.1);
+  
+  if (effectiveKm < 1) {
+    const meters = Math.round(effectiveKm * 1000);
+    // Arredonda para a centena mais próxima para manter o padrão de 100m, 200m...
+    const roundedMeters = Math.ceil(meters / 100) * 100;
+    return `${roundedMeters} m`;
   }
   
   if (km > 1000) return "+999 km";

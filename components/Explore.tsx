@@ -8,26 +8,35 @@ import { log, likeProfile, passProfile, showNotification } from '../services/aut
 import { soundService } from '../services/soundService';
 import { getCurrentPosition } from '../services/geoService';
 import RadarPage from '../radar/RadarPage';
-import SonarPage from '../sonar/SonarPage';
 
 interface ExploreProps {
   onMatch?: (user: User) => void;
   onProfileClick?: (p: RadarProfile) => void;
+  currentUser: User | null;
 }
 
-const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick }) => {
-  const [viewMode, setViewMode] = useState<'sonar' | 'radar' | 'swipe'>('radar');
+const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser }) => {
+  const [viewMode, setViewMode] = useState<'radar' | 'swipe'>('radar');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [isSwiping, setIsSwiping] = useState<'left' | 'right' | 'up' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number, lon: number } | null>(null);
   
+  const effectiveUser = useMemo(() => {
+    const base = currentUser || MOCK_CURRENT_USER;
+    return {
+      ...base,
+      lat: userLocation?.lat ?? base.lat,
+      lon: userLocation?.lon ?? base.lon
+    };
+  }, [currentUser, userLocation]);
+
   const filteredUsers = useMemo(() => {
     return MOCK_USERS.filter(user => 
-      MOCK_CURRENT_USER.lookingFor.includes(user.type)
+      effectiveUser.lookingFor.includes(user.type)
     );
-  }, [MOCK_CURRENT_USER.lookingFor]);
+  }, [effectiveUser.lookingFor]);
 
   const currentSwipeUser = useMemo(() => {
     if (filteredUsers.length === 0) return null;
@@ -39,12 +48,6 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick }) => {
       .then(pos => setUserLocation(pos))
       .catch(err => log('warn', 'Geolocation failed', err));
   }, []);
-
-  const effectiveUser = useMemo(() => ({
-    ...MOCK_CURRENT_USER,
-    lat: userLocation?.lat ?? MOCK_CURRENT_USER.lat,
-    lon: userLocation?.lon ?? MOCK_CURRENT_USER.lon
-  }), [userLocation]);
 
   const handleLike = async () => {
     if (isProcessing || !currentSwipeUser) return;
@@ -102,9 +105,8 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick }) => {
       <div className="w-full shrink-0">
         <SegmentedControl 
           activeId={viewMode}
-          onChange={(id) => setViewMode(id as 'sonar' | 'radar' | 'swipe')}
+          onChange={(id) => setViewMode(id as 'radar' | 'swipe')}
           tabs={[
-            { id: 'sonar', label: 'Sonar', icon: <Target /> },
             { id: 'radar', label: 'Radar', icon: <RadioIcon /> },
             { id: 'swipe', label: 'Swipe', icon: <Zap /> }
           ]}
@@ -112,7 +114,6 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick }) => {
       </div>
 
       <div className="w-full flex-1">
-        {viewMode === 'sonar' && <SonarPage />}
         {viewMode === 'radar' && <RadarPage onProfileClick={onProfileClick} />}
         
         {viewMode === 'swipe' && (

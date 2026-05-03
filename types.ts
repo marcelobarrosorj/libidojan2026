@@ -14,9 +14,8 @@ export enum Biotype {
 }
 
 export enum Gender { 
-  CIS = 'Cisgênero', 
-  TRANS = 'Transgênero', 
-  NB = 'Não-Binário' 
+  MASCULINO = 'Masculino', 
+  FEMININO = 'Feminino' 
 }
 
 export enum SexualOrientation { 
@@ -270,4 +269,22 @@ export interface EventItem {
   dressCode?: string;
   audience: string;
   isVerifiedPartner?: boolean;
+}
+
+export interface Venue {
+  id: string;
+  name: string;
+  address: string;
+  category: string;
+  image: string;
+  checkInCount: number;
+  lat: number;
+  lon: number;
+}
+
+export interface CheckIn {
+  userId: string;
+  venueId: string;
+  timestamp: string;
+  status?: string;
 }

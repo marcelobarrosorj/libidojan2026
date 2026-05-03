@@ -3,18 +3,18 @@ import React, { useState } from 'react';
 import { MOCK_USERS } from '../constants';
 import { User, Plan } from '../types';
 import { MessageCircle, Heart, Search, Filter, Sparkles, ChevronRight, X, Check, Lock } from 'lucide-react';
-import { showNotification, cache } from '../services/authUtils';
+import { showNotification, cache, isPremiumUser } from '../services/authUtils';
 
 interface ChatListProps {
   onSelectUser: (user: User) => void;
   onNavigateToSubscription?: () => void;
+  currentUser: User | null;
 }
 
-const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscription }) => {
+const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscription, currentUser }) => {
   const [searchTerm, setSearchTerm] = useState('');
   
-  const userPlan = cache.userData?.plan || Plan.FREE;
-  const isPremium = userPlan !== Plan.FREE;
+  const isPremium = isPremiumUser(currentUser);
 
   const matches = MOCK_USERS.filter(u => {
     return u.id !== 'me' && u.nickname.toLowerCase().includes(searchTerm.toLowerCase());

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "post-1",
+    "userId": "user-1",
+    "user": "Ana & Bruno",
+    "age": 26,
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+    "image": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
+    "description": "Vibes de sábado à noite 🥂✨ #casalliberal #lifestyle",
+    "likes": 124,
+    "comments": [{ "user": "Bruno", "text": "Incrível!" }],
+    "shares": 12,
+    "liked": false,
+    "timestamp": "2026-01-03T20:00:00Z"
+  },
+  {
+    "id": "post-2",
+    "userId": "user-3",
+    "user": "Carla",
+    "age": 27,
+    "avatar": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400",
+    "image": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800",
+    "description": "Explorando novas conexões no radar hoje. Quem mais por aqui? 😈🖤 #singlewoman #lifestyle",
+    "likes": 89,
+    "comments": [{ "user": "Matriz", "text": "Vibe absurda!" }],
+    "shares": 5,
+    "liked": true,
+    "timestamp": "2026-01-04T10:30:00Z"
+  }
+]
