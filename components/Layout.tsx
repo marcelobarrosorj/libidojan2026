@@ -81,6 +81,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
         <NavButton icon={<Trophy size={22} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
         <NavButton icon={<MessageCircle size={22} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
         <NavButton icon={<UserCircle size={22} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
+        {isOwner(user) && (
+          <NavButton icon={<ShieldAlert size={22} />} isActive={activeTab === 'admin_moderation'} onClick={() => setActiveTab('admin_moderation')} label="Governo" />
+        )}
       </nav>
     </div>
   );

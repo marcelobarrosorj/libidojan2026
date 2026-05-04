@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User } from '../types';
 import VerificationGate from './VerificationGate';
+import { ReportModal } from './ReportModal';
 import { 
   ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert,
   Clock, Image as ImageIcon, EyeOff, Timer
@@ -33,6 +34,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
   const [isTyping, setIsTyping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
   };
 
   const handleReport = () => {
-    showNotification(`Denúncia registrada.`, 'info');
+    setShowReport(true);
     setShowMenu(false);
   };
 
@@ -177,6 +179,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
           </div>
         </VerificationGate>
       </div>
+      <ReportModal 
+        isOpen={showReport} 
+        onClose={() => setShowReport(false)} 
+        reportedUserId={user.id} 
+        reportedUserName={user.nickname}
+        chatContextId={`chat_${user.id}`}
+      />
     </div>
   );
 };

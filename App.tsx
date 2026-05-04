@@ -12,6 +12,7 @@ import EventsPage from './components/EventsPage';
 import Ranking from './components/Ranking';
 import { TermsGate } from './components/TermsGate';
 import VerificationBanner from './components/VerificationBanner';
+import AdminReports from './components/AdminReports';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
@@ -235,6 +236,7 @@ export default function App() {
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} currentUser={currentUser} />;
+      case 'admin_moderation': return <AdminReports />;
       case 'profile': 
       case 'profile_settings':
         return <Profile 

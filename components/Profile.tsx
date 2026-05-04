@@ -29,6 +29,7 @@ import StealthModeToggle from './StealthModeToggle';
 import BlurredImage from './BlurredImage';
 import PhotoGridModal from './PhotoGridModal';
 import VerificationGate from './VerificationGate';
+import { ReportModal } from './ReportModal';
 import { useMemo } from 'react';
 
 interface ProfileProps {
@@ -58,6 +59,7 @@ const Profile: React.FC<ProfileProps> = ({
   const [soundEnabled, setSoundEnabled] = useState(soundService.isEnabled());
   const [showVerification, setShowVerification] = useState(false);
   const [showNoFakeModal, setShowNoFakeModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
@@ -335,6 +337,13 @@ const Profile: React.FC<ProfileProps> = ({
                     title="Dar Vouch (Endosso)"
                     >
                         <ShieldCheck size={20} />
+                    </button>
+                    <button 
+                      onClick={() => setShowReportModal(true)}
+                      className="p-3 rounded-2xl border bg-rose-500/10 text-rose-500 border-rose-500/20 transition-all active:scale-90 shadow-xl"
+                      title="Denunciar Perfil"
+                    >
+                        <ShieldAlert size={20} />
                     </button>
                 </div>
             </VerificationGate>
@@ -698,6 +707,15 @@ const Profile: React.FC<ProfileProps> = ({
         {isOwnProfile && <ActionButton label="Configuração" onClick={() => setIsEditing(true)} variant="amber" icon={<Settings size={20} />} />}
         {isOwnProfile && <ActionButton label="Encerrar Sessão" onClick={() => logout()} variant="danger" icon={<LogOut size={20} />} />}
       </div>
+      
+      {!isOwnProfile && (
+        <ReportModal 
+          isOpen={showReportModal} 
+          onClose={() => setShowReportModal(false)}
+          reportedUserId={user.id}
+          reportedUserName={user.nickname}
+        />
+      )}
      </>
     )}
   </div>
