@@ -16,11 +16,13 @@ import AdminReports from './components/AdminReports';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
+import { useAntiPrint } from './hooks/useAntiPrint';
 import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log, authEvents } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
 
 export default function App() {
+  const isProtected = useAntiPrint();
   const [isAuthenticated, setIsAuthenticated] = useState(getAuthFlag());
   const [isUnlocked, setIsUnlocked] = useState(isUnlockedWindowValid());
   const [activeTab, setActiveTab] = useState('feed'); 
@@ -159,18 +161,20 @@ export default function App() {
 
   if (showTerms) {
     return (
-      <TermsGate 
-        privacyUrl="/privacy" 
-        termsUrl="/terms" 
-        onExit={handleExit} 
-        onAccept={handleAcceptTerms} 
-      />
+      <div className={isProtected ? 'blurred pointer-events-none' : ''}>
+        <TermsGate 
+          privacyUrl="/privacy" 
+          termsUrl="/terms" 
+          onExit={handleExit} 
+          onAccept={handleAcceptTerms} 
+        />
+      </div>
     );
   }
 
   if (isInitialLoading) {
       return (
-          <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
+          <div className={`min-h-screen bg-black flex flex-col items-center justify-center gap-6 transition-all ${isProtected ? 'blurred pointer-events-none' : ''}`}>
               <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
               <div className="text-center">
                   <p className="text-[14px] font-black text-amber-500 uppercase tracking-[0.5em] animate-pulse">LIBIDO 2026</p>
@@ -183,7 +187,9 @@ export default function App() {
   if (!isAuthenticated || !isUnlocked) {
     return (
       <AuthContext.Provider value={authContextValue}>
-        <Auth />
+        <div className={isProtected ? 'blurred pointer-events-none' : ''}>
+          <Auth />
+        </div>
       </AuthContext.Provider>
     );
   }
@@ -253,10 +259,29 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContextValue}>
-      <div className="relative w-full h-full flex justify-center">
-        <Layout activeTab={activeTab} setActiveTab={handleTabChange} user={currentUser}>
-          {renderContent()}
-        </Layout>
+      <div className="relative w-full h-[100dvh] flex justify-center bg-black overflow-hidden">
+        <div className={`w-full h-full flex flex-col blur-on-focus-loss transition-all duration-500 ${isProtected ? 'blurred' : ''}`}>
+          <Layout activeTab={activeTab} setActiveTab={handleTabChange} user={currentUser}>
+            {renderContent()}
+          </Layout>
+        </div>
+        
+        {isProtected && (
+          <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-500">
+             <div className="p-8 rounded-[3.5rem] bg-slate-900/80 border border-amber-500/30 flex flex-col items-center text-center space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
+               <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
+                 <Lock size={40} />
+               </div>
+               <div>
+                  <h2 className="text-xl font-black text-white uppercase italic tracking-tighter leading-none">Matriz Blindada</h2>
+                  <p className="text-[10px] text-amber-500 font-black uppercase tracking-[0.3em] mt-2">Protocolo Antiprint</p>
+               </div>
+               <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-[200px]">
+                 Privacidade é nosso ativo mais valioso. Capturas de tela e gravação são proibidas.
+               </p>
+             </div>
+          </div>
+        )}
       </div>
     </AuthContext.Provider>
   );

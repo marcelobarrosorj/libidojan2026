@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/* Antiprint & Content Protection */
+@media print {
+    body {
+        display: none !important;
+    }
+}
+
+.antiprint-active {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
+
+.blur-on-focus-loss {
+    transition: filter 0.3s ease;
+}
+
+.blurred {
+    filter: blur(25px) grayscale(1) brightness(0.5);
+    pointer-events: none;
+}
+
 @theme {
   --color-pink: #ff1493;
   --color-amber: #F59E0B;
