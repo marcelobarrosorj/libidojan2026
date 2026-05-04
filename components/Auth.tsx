@@ -337,6 +337,9 @@ export const Auth: React.FC = () => {
     setError(null);
 
     try {
+        const data = regData.data;
+        const isCouple = regData.profileType.startsWith('couple');
+        
         // 1. Criar usuário real no Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: email.trim(),
@@ -356,20 +359,22 @@ export const Auth: React.FC = () => {
           id: userId,
           nickname,
           email,
-          age: data.age || 18,
+          age: isCouple ? data.partner1?.age || 18 : data.age || 18,
           plan: Plan.FREE,
           balance: 0,
           boosts_active: 0,
           trustLevel: TrustLevel.BRONZE,
           is_premium: false,
           avatar: `https://picsum.photos/seed/${nickname}/400`,
-          biotype: data.biotype || Biotype.PADRAO,
+          biotype: isCouple ? data.partner1?.biotype || Biotype.PADRAO : data.biotype || Biotype.PADRAO,
           bio: 'Novo explorador na Matriz Libido 2026.',
-          gender: data.gender || Gender.MASCULINO,
-          sexualOrientation: data.sexualPreference || SexualOrientation.HETERO,
-          type: UserType.HOMEM,
+          gender: isCouple ? data.partner1?.gender || Gender.MASCULINO : data.gender || Gender.MASCULINO,
+          sexualOrientation: isCouple ? data.partner1?.sexualPreference || SexualOrientation.HETERO : data.sexualPreference || SexualOrientation.HETERO,
+          type: isCouple ? UserType.CASAIS : (data.gender === Gender.FEMININO ? UserType.MULHER : UserType.HOMEM),
           lookingFor: data.lookingFor || [UserType.MULHER],
-          height: data.height || 170,
+          height: isCouple ? data.partner1?.height || 170 : data.height || 170,
+          partner1: isCouple ? data.partner1 : undefined,
+          partner2: isCouple ? data.partner2 : undefined,
           location: 'São Paulo, SP',
           xp: 100,
           level: 1,

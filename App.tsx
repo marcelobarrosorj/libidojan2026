@@ -10,6 +10,7 @@ import ChatDetail from './components/ChatDetail';
 import Feed from './components/Feed';
 import EventsPage from './components/EventsPage';
 import Ranking from './components/Ranking';
+import { soundService } from './services/soundService';
 import { TermsGate } from './components/TermsGate';
 import VerificationBanner from './components/VerificationBanner';
 import AdminReports from './components/AdminReports';
@@ -17,6 +18,7 @@ import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
 import { useAntiPrint } from './hooks/useAntiPrint';
+import { Lock } from 'lucide-react';
 import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log, authEvents } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
@@ -132,8 +134,18 @@ export default function App() {
     };
   }, [refreshSession]);
 
+  const [radarResetKey, setRadarResetKey] = useState(0);
+
   const handleTabChange = (tab: string) => {
-    // Limpa estados de detalhe ao trocar de aba principal
+    // Limpa estados de detalhe de forma robusta ao trocar de aba principal
+    if (typeof soundService?.play === 'function') soundService.play('TAP');
+    
+    // Se clicar na aba que já está ativa, forçamos um reset visual (efeito Refresh)
+    if (tab === activeTab) {
+        if (tab === 'radar') setRadarResetKey(prev => prev + 1);
+        return;
+    }
+
     setSelectedUser(null);
     setViewedProfile(null);
     setActiveTab(tab);
@@ -155,9 +167,77 @@ export default function App() {
     setIsAuthenticated
   }), [logout, refreshSession]);
 
-  useEffect(() => {
-    // Escuta mudanças de aba e outras lógicas se necessário
-  }, []);
+  const handleViewProfile = (p: any) => {
+    const fullUser: User = {
+      id: p.id, nickname: p.name || p.nickname, email: p.email || `${p.id}@libido.app`, age: p.age || 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
+      type: p.category || p.type || UserType.HOMEM, birthDate: p.birthDate || '1995-01-01', biotype: p.biotype || Biotype.PADRAO,
+      gender: p.gender || Gender.MASCULINO, sexualOrientation: p.sexualOrientation || SexualOrientation.BISSEXUAL, vibes: p.vibes || [Vibes.LIBERAL],
+      location: p.city || p.location || 'Brasil', isOnline: true, verifiedAccount: p.verifiedAccount || false, verificationScore: p.verificationScore || 50, xp: p.xp || 100, level: p.level || 1,
+      plan: p.plan || Plan.FREE, matches: p.matches || [], bookmarks: p.bookmarks || [], blockedUsers: p.blockedUsers || [], badges: p.badges || [], boundaries: p.boundaries || [],
+      behaviors: p.behaviors || [], bodyMods: p.bodyMods || [], bodyHair: p.bodyHair || 'Aparado', bodyArt: p.bodyArt || [], bondageExp: p.bondageExp || 'Iniciante',
+      bucketList: p.bucketList || [], bestMoments: p.bestMoments || [], bestFeature: p.bestFeature || 'Olhar', beveragePref: p.beveragePref || 'Gin', bestTime: p.bestTime || 'Noite', braveryLevel: p.braveryLevel || 7,
+      busyMode: p.busyMode || false, bookingPolicy: p.bookingPolicy || 'A combinar', balance: p.balance || 0, boosts_active: p.boosts_active || 0, is_premium: p.is_premium || false, height: p.height || 170,
+      lat: p.lat || -23.5505, lon: p.lon || -46.6333, city: p.city || 'São Paulo', neighborhood: p.neighborhood || 'Centro', seenBy: p.seenBy || [],
+      gallery: p.gallery || [{ id: `${p.id}-default`, url: p.avatar, timestamp: new Date().toISOString() }],
+      trustLevel: p.trustLevel || TrustLevel.BRONZE, isGhostMode: p.isGhostMode || false, hasBlurredGallery: p.hasBlurredGallery || (p.trustLevel === TrustLevel.OURO),
+      vouches: p.vouches || [],
+      following: p.following || [],
+      lookingFor: p.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
+      rsvps: p.rsvps || [],
+      isSubscriber: p.isSubscriber || false,
+      dailyProfileViews: p.dailyProfileViews || 0,
+      consentMatrix: p.consentMatrix || [
+        { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
+        { id: 'total', label: 'Troca Total', value: 'nao' as any },
+        { id: 'menage', label: 'Ménage', value: 'sim' as any }
+      ],
+      vouchScore: p.vouchScore || 70,
+      isStealthMode: p.isStealthMode || false,
+      prefersBlurredPhotos: p.prefersBlurredPhotos || false
+    };
+    setViewedProfile(fullUser);
+    setActiveTab('view_profile');
+  };
+
+  const renderContent = () => {
+    // Rotas de detalhe que sobrepõem abas principais
+    if (activeTab === 'chat_detail' && selectedUser) {
+      return <ChatDetail user={selectedUser} currentUser={currentUser} onBack={() => handleTabChange('chat')} />;
+    }
+
+    if (activeTab === 'view_profile' && viewedProfile) {
+      return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => handleTabChange('radar')} />;
+    }
+
+    // Abas principais
+    switch (activeTab) {
+      case 'radar': 
+      case 'view_profile': // Fallback se view_profile for atingido sem perfil selecionado
+        return <Explore 
+          key={`explore-radar-${radarResetKey}`} 
+          currentUser={currentUser} 
+          setCurrentUser={setCurrentUser} 
+          onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} 
+          onProfileClick={handleViewProfile} 
+        />;
+      case 'ranking': return <Ranking onSelectUser={handleViewProfile} />;
+      case 'events': return <EventsPage />;
+      case 'feed': return <Feed onProfileClick={handleViewProfile} />;
+      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => handleTabChange('assinatura')} currentUser={currentUser} />;
+      case 'admin_moderation': return <AdminReports />;
+      case 'profile': 
+      case 'profile_settings':
+        return <Profile 
+          user={currentUser || undefined} 
+          isOwnProfile={true} 
+          startEditing={activeTab === 'profile_settings'}
+          onBack={() => handleTabChange('feed')} 
+          onNavigate={handleTabChange} 
+        />;
+      case 'assinatura': return <Subscription currentUser={currentUser} />;
+      default: return <Feed onProfileClick={handleViewProfile} />; 
+    }
+  };
 
   if (showTerms) {
     return (
@@ -193,69 +273,6 @@ export default function App() {
       </AuthContext.Provider>
     );
   }
-
-  const handleViewProfile = (p: any) => {
-    // Adding following: p.following || [] to satisfy User type
-    const fullUser: User = {
-      id: p.id, nickname: p.name || p.nickname, email: p.email || `${p.id}@libido.app`, age: p.age || 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
-      type: p.category || p.type || UserType.HOMEM, birthDate: p.birthDate || '1995-01-01', biotype: p.biotype || Biotype.PADRAO,
-      gender: p.gender || Gender.MASCULINO, sexualOrientation: p.sexualOrientation || SexualOrientation.BISSEXUAL, vibes: p.vibes || [Vibes.LIBERAL],
-      location: p.city || p.location || 'Brasil', isOnline: true, verifiedAccount: p.verifiedAccount || false, verificationScore: p.verificationScore || 50, xp: p.xp || 100, level: p.level || 1,
-      plan: p.plan || Plan.FREE, matches: p.matches || [], bookmarks: p.bookmarks || [], blockedUsers: p.blockedUsers || [], badges: p.badges || [], boundaries: p.boundaries || [],
-      behaviors: p.behaviors || [], bodyMods: p.bodyMods || [], bodyHair: p.bodyHair || 'Aparado', bodyArt: p.bodyArt || [], bondageExp: p.bondageExp || 'Iniciante',
-      bucketList: p.bucketList || [], bestMoments: p.bestMoments || [], bestFeature: p.bestFeature || 'Olhar', beveragePref: p.beveragePref || 'Gin', bestTime: p.bestTime || 'Noite', braveryLevel: p.braveryLevel || 7,
-      busyMode: p.busyMode || false, bookingPolicy: p.bookingPolicy || 'A combinar', balance: p.balance || 0, boosts_active: p.boosts_active || 0, is_premium: p.is_premium || false, height: p.height || 170,
-      lat: p.lat || -23.5505, lon: p.lon || -46.6333, city: p.city || 'São Paulo', neighborhood: p.neighborhood || 'Centro', seenBy: p.seenBy || [],
-      gallery: p.gallery || [{ id: `${p.id}-default`, url: p.avatar, timestamp: new Date().toISOString() }],
-      trustLevel: p.trustLevel || TrustLevel.BRONZE, isGhostMode: p.isGhostMode || false, hasBlurredGallery: p.hasBlurredGallery || (p.trustLevel === TrustLevel.OURO),
-      vouches: p.vouches || [],
-      following: p.following || [],
-      lookingFor: p.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
-      rsvps: p.rsvps || [],
-      isSubscriber: p.isSubscriber || false,
-      dailyProfileViews: p.dailyProfileViews || 0,
-      consentMatrix: p.consentMatrix || [
-        { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
-        { id: 'total', label: 'Troca Total', value: 'nao' as any },
-        { id: 'menage', label: 'Ménage', value: 'sim' as any }
-      ],
-      vouchScore: p.vouchScore || 70,
-      isStealthMode: p.isStealthMode || false,
-      prefersBlurredPhotos: p.prefersBlurredPhotos || false
-    };
-    setViewedProfile(fullUser);
-    setActiveTab('view_profile');
-  };
-
-  const renderContent = () => {
-    if (activeTab === 'chat_detail' && selectedUser) {
-      return <ChatDetail user={selectedUser} currentUser={currentUser} onBack={() => setActiveTab('chat')} />;
-    }
-    
-    if (activeTab === 'view_profile' && viewedProfile) {
-      return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => setActiveTab('radar')} />;
-    }
-
-    switch (activeTab) {
-      case 'radar': return <Explore currentUser={currentUser} setCurrentUser={setCurrentUser} onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
-      case 'ranking': return <Ranking onSelectUser={handleViewProfile} />;
-      case 'events': return <EventsPage />;
-      case 'feed': return <Feed onProfileClick={handleViewProfile} />;
-      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} currentUser={currentUser} />;
-      case 'admin_moderation': return <AdminReports />;
-      case 'profile': 
-      case 'profile_settings':
-        return <Profile 
-          user={currentUser || undefined} 
-          isOwnProfile={true} 
-          startEditing={activeTab === 'profile_settings'}
-          onBack={() => setActiveTab('feed')} 
-          onNavigate={setActiveTab} 
-        />;
-      case 'assinatura': return <Subscription currentUser={currentUser} />;
-      default: return <Feed onProfileClick={handleViewProfile} />; 
-    }
-  };
 
   return (
     <AuthContext.Provider value={authContextValue}>

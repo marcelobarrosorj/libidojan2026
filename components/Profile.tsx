@@ -150,7 +150,32 @@ const Profile: React.FC<ProfileProps> = ({
     soundService.play('MATCH');
     
     setTimeout(() => {
-        const updatedUser = { ...user, type: nextType };
+        let updatedUser = { ...user, type: nextType };
+        
+        // Se mudou para casal e não tem dados de parceiros, inicializa
+        if (nextType === UserType.CASAIS) {
+          if (!updatedUser.partner1) {
+            updatedUser.partner1 = { 
+              nickname: `${user.nickname} (P1)`, 
+              age: user.age, 
+              gender: user.gender,
+              biotype: user.biotype,
+              height: user.height,
+              sexualPreference: user.sexualOrientation
+            };
+          }
+          if (!updatedUser.partner2) {
+            updatedUser.partner2 = { 
+              nickname: `${user.nickname} (P2)`, 
+              age: user.age, 
+              gender: user.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
+              biotype: Biotype.PADRAO,
+              height: 165,
+              sexualPreference: SexualOrientation.BISSEXUAL
+            };
+          }
+        }
+        
         setUser(updatedUser);
         saveUserData(updatedUser);
         setIsSaving(false);
@@ -209,13 +234,35 @@ const Profile: React.FC<ProfileProps> = ({
             </div>
             
             <div className="space-y-6">
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Apelido / Nickname</label>
-                    <Input 
-                        value={user.nickname}
-                        onChange={(val) => setUser({...user, nickname: val})}
-                        placeholder="Como quer ser chamado?"
-                    />
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Status / Tipo</label>
+                        <Select 
+                            value={user.type || ''}
+                            onChange={(val) => {
+                                const nextType = val as UserType;
+                                let updatedUser = { ...user, type: nextType };
+                                if (nextType === UserType.CASAIS) {
+                                  if (!updatedUser.partner1) updatedUser.partner1 = { nickname: `${user.nickname} (P1)`, age: user.age, gender: user.gender, biotype: user.biotype, height: user.height };
+                                  if (!updatedUser.partner2) updatedUser.partner2 = { nickname: `${user.nickname} (P2)`, age: user.age, gender: Gender.FEMININO, biotype: Biotype.PADRAO, height: 165 };
+                                }
+                                setUser(updatedUser);
+                            }}
+                            options={[
+                                { value: UserType.HOMEM, label: 'Homem (Solteiro)' },
+                                { value: UserType.MULHER, label: 'Mulher (Solteira)' },
+                                { value: UserType.CASAIS, label: 'Casal' },
+                            ]}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Nickname</label>
+                        <Input 
+                            value={user.nickname}
+                            onChange={(val) => setUser({...user, nickname: val})}
+                            placeholder="Nome de Exibição"
+                        />
+                    </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -267,6 +314,115 @@ const Profile: React.FC<ProfileProps> = ({
                         placeholder="Uma breve frase sobre você..."
                     />
                 </div>
+
+                {/* Seção Casal Dinâmica - Refatorada para Visibilidade Máxima */}
+                {(user.type === UserType.CASAIS || (user.type as any) === 'Casal') && (
+                    <div className="space-y-8 pt-8 border-t border-white/10 animate-in fade-in slide-in-from-bottom-4">
+                        <div className="flex items-center gap-3 px-2">
+                            <div className="w-10 h-10 rounded-xl bg-pink/10 flex items-center justify-center text-pink">
+                                <Users size={20} />
+                            </div>
+                            <div className="text-left">
+                                <h3 className="text-[12px] font-black text-white uppercase tracking-widest italic">Protocolo Dual: Integrantes</h3>
+                                <p className="text-[8px] text-slate-500 uppercase font-black tracking-widest mt-0.5">Sincronize os dados de ambos os perfis</p>
+                            </div>
+                        </div>
+ 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Integrante 1 */}
+                            <div className="bg-slate-900/60 p-6 rounded-[2.5rem] border border-white/5 space-y-5 shadow-2xl relative overflow-hidden group">
+                                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-pink shadow-[0_0_8px_#ff1493]" />
+                                        <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Integrante 1</span>
+                                    </div>
+                                    <Heart size={14} className="text-pink group-hover:scale-125 transition-transform" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Idade</label>
+                                        <Input 
+                                            type="number"
+                                            value={user.partner1?.age ? user.partner1.age.toString() : user.age.toString()}
+                                            onChange={(val) => {
+                                                const age = parseInt(val) || 0;
+                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), age }});
+                                            }}
+                                            placeholder="Ex: 25"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Altura</label>
+                                        <Input 
+                                            type="number"
+                                            value={user.partner1?.height ? user.partner1.height.toString() : user.height.toString()}
+                                            onChange={(val) => {
+                                                const height = parseInt(val) || 0;
+                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), height }});
+                                            }}
+                                            placeholder="Ex: 170"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
+                                    <Select 
+                                        value={user.partner1?.biotype || user.biotype}
+                                        onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), biotype: val as Biotype }})}
+                                        options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
+                                    />
+                                </div>
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-pink/5 blur-3xl rounded-full -z-10 group-hover:bg-pink/10 transition-colors" />
+                            </div>
+ 
+                            {/* Integrante 2 */}
+                            <div className="bg-slate-900/60 p-6 rounded-[2.5rem] border border-white/5 space-y-5 shadow-2xl relative overflow-hidden group">
+                                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]" />
+                                        <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Integrante 2</span>
+                                    </div>
+                                    <Heart size={14} className="text-purple-500 group-hover:scale-125 transition-transform" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Idade</label>
+                                        <Input 
+                                            type="number"
+                                            value={user.partner2?.age ? user.partner2.age.toString() : ''}
+                                            onChange={(val) => {
+                                                const age = parseInt(val) || 0;
+                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), age }});
+                                            }}
+                                            placeholder="Ex: 24"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Altura</label>
+                                        <Input 
+                                            type="number"
+                                            value={user.partner2?.height ? user.partner2.height.toString() : ''}
+                                            onChange={(val) => {
+                                                const height = parseInt(val) || 0;
+                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), height }});
+                                            }}
+                                            placeholder="Ex: 165"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
+                                    <Select 
+                                        value={user.partner2?.biotype || ''}
+                                        onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), biotype: val as Biotype }})}
+                                        options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
+                                    />
+                                </div>
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 blur-3xl rounded-full -z-10 group-hover:bg-purple-500/10 transition-colors" />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
 

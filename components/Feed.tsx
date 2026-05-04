@@ -17,9 +17,11 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
   const [feedMode, setFeedMode] = useState<'all' | 'following'>('all');
   
   // Highlighted Top Users
-  const topUsers = useMemo(() => MOCK_USERS.slice(0, 8), []);
+  const topUsers = useMemo(() => {
+    return [...MOCK_USERS].sort(() => Math.random() - 0.5).slice(0, 8);
+  }, []);
   
-  const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
+  const [posts, setPosts] = useState<Post[]>(() => [...MOCK_POSTS].sort(() => Math.random() - 0.5));
   const [activeModal, setActiveModal] = useState<{ type: 'comment' | 'share' | 'gallery' | 'menu'; postId?: string | number; userId?: string } | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<{ url: string; index: number; photos: GalleryPhoto[]; ownerNickname: string } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);

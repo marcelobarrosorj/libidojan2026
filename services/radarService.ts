@@ -57,10 +57,11 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
     });
   }
 
-  // Se o radar estiver vazio, usamos os mocks
+  // Se o radar estiver vazio, usamos os mocks formatados e embaralhados
   if (out.length === 0) {
-    out = mockRadarProfiles.map((m, idx) => {
-      const angle = (idx / mockRadarProfiles.length) * Math.PI * 2;
+    const shuffledMocks = [...mockRadarProfiles].sort(() => Math.random() - 0.5);
+    out = shuffledMocks.map((m, idx) => {
+      const angle = (idx / shuffledMocks.length) * Math.PI * 2;
       const randomDist = 2 + Math.random() * (activeMaxKm - 2); 
       
       const offsetLat = (randomDist / 111) * Math.cos(angle);
@@ -72,7 +73,7 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
         lon: viewerLon + offsetLon,
         distanceKm: randomDist,
         distanceLabel: formatDistanceLabel(randomDist),
-        locationLabel: 'Descoberta VIP',
+        locationLabel: 'Sinal Matriz',
         isMock: true
       };
     }) as any;
@@ -82,17 +83,21 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
 
   // APLICAÇÃO DA RESTRIÇÃO FREE
   if (!isPremium) {
+    // Definimos um índice de desbloqueio determinístico baseado no ID do usuário ou aleatório para a sessão
+    // Aqui usaremos aleatório para dar dinamismo conforme solicitado para "expert fix"
+    const unlockIndex = Math.floor(Math.random() * out.length);
+
     return out.map((profile, index) => {
-      if (index === 0) return profile; // Primeiro perfil é liberado
+      if (index === unlockIndex) return profile; // Um perfil aleatório é liberado para dar dinamismo
 
       // Perfis subsequentes são ofuscados
       return {
         ...profile,
         id: `locked-${profile.id}`,
-        name: 'Perfil Oculto',
-        avatar: 'https://www.libidoapp.com.br/placeholder-locked.png', // URL de mock distorcido
-        bio: 'Assine para visualizar esta biografia.',
-        isLocked: true, // Flag para o frontend
+        name: 'Sinal Oculto',
+        avatar: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400', // Arte abstrata
+        bio: 'Assine para sincronizar esta biografia.',
+        isLocked: true, 
         trustLevel: TrustLevel.BRONZE
       } as any;
     });

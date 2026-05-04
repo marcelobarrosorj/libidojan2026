@@ -113,46 +113,6 @@ export default function RadarPage({
         </div>
       </div>
 
-      {/* Check-in Section (Conecte Style) */}
-      <div className="space-y-4">
-        {!currentCheckIn ? (
-          <button 
-            onClick={() => setShowVenueSelector(true)}
-            className="w-full relative overflow-hidden group p-5 bg-gradient-to-r from-pink/5 to-purple-500/5 rounded-[2rem] border border-pink/10 hover:border-pink/30 transition-all flex items-center justify-between"
-          >
-             <div className="flex items-center gap-4">
-               <div className="w-12 h-12 bg-pink/10 rounded-2xl flex items-center justify-center text-pink group-hover:scale-110 transition-transform">
-                 <MapPin size={24} />
-               </div>
-               <div className="text-left">
-                 <h3 className="text-white font-bold text-sm">Fazer Check-in</h3>
-                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Encontre pessoas no mesmo local</p>
-               </div>
-             </div>
-             <ChevronRight className="text-slate-700 group-hover:text-pink transition-colors" />
-             <div className="absolute top-0 right-0 w-24 h-24 bg-pink/5 blur-3xl rounded-full" />
-          </button>
-        ) : (
-          <div className="p-5 bg-emerald-500/[0.03] rounded-[2rem] border border-emerald-500/10 flex items-center justify-between">
-             <div className="flex items-center gap-4">
-               <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
-                 <CheckCircle2 size={24} />
-               </div>
-               <div className="text-left">
-                 <h3 className="text-white font-bold text-sm tracking-tight">Presente em: <span className="text-emerald-500">{checkedVenue?.name}</span></h3>
-                 <p className="text-[10px] text-emerald-500/60 uppercase font-black tracking-widest">Visível na lista de convidados</p>
-               </div>
-             </div>
-             <button 
-              onClick={handleCheckOut}
-              className="p-2 bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors"
-             >
-               <X size={16} />
-             </button>
-          </div>
-        )}
-      </div>
-
       {/* Profile Discovery Logic */}
       <div className="glass-card p-6 rounded-[2.5rem] border-white/5 space-y-4 shadow-inner relative overflow-hidden group">
         <div className="flex justify-between items-center z-10 relative">
@@ -211,6 +171,46 @@ export default function RadarPage({
                 onUpgrade={onUpgrade}
             />
           )}
+      </div>
+
+      {/* Check-in Section (Conecte Style) - Moved to bottom */}
+      <div className="space-y-4 pt-4 border-t border-white/5">
+        {!currentCheckIn ? (
+          <button 
+            onClick={() => setShowVenueSelector(true)}
+            className="w-full relative overflow-hidden group p-5 bg-gradient-to-r from-pink/5 to-purple-500/5 rounded-[2rem] border border-pink/10 hover:border-pink/30 transition-all flex items-center justify-between"
+          >
+             <div className="flex items-center gap-4">
+               <div className="w-12 h-12 bg-pink/10 rounded-2xl flex items-center justify-center text-pink group-hover:scale-110 transition-transform">
+                 <MapPin size={24} />
+               </div>
+               <div className="text-left">
+                 <h3 className="text-white font-bold text-sm">Fazer Check-in</h3>
+                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Encontre pessoas no mesmo local</p>
+               </div>
+             </div>
+             <ChevronRight className="text-slate-700 group-hover:text-pink transition-colors" />
+             <div className="absolute top-0 right-0 w-24 h-24 bg-pink/5 blur-3xl rounded-full" />
+          </button>
+        ) : (
+          <div className="p-5 bg-emerald-500/[0.03] rounded-[2rem] border border-emerald-500/10 flex items-center justify-between">
+             <div className="flex items-center gap-4">
+               <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
+                 <CheckCircle2 size={24} />
+               </div>
+               <div className="text-left">
+                 <h3 className="text-white font-bold text-sm tracking-tight">Presente em: <span className="text-emerald-500">{checkedVenue?.name}</span></h3>
+                 <p className="text-[10px] text-emerald-500/60 uppercase font-black tracking-widest">Visível na lista de convidados</p>
+               </div>
+             </div>
+             <button 
+              onClick={handleCheckOut}
+              className="p-2 bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors"
+             >
+               <X size={16} />
+             </button>
+          </div>
+        )}
       </div>
       
       {/* Venue Selector Modal */}

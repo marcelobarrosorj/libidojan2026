@@ -7,7 +7,8 @@ const SOUND_STORAGE_KEY = 'libido_settings_sound';
 const SOUNDS = {
   MESSAGE: 'https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3', // Ping discreto
   LIKE: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',    // Pop sutil
-  MATCH: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'   // Brilho/Sucesso
+  MATCH: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',   // Brilho/Sucesso
+  TAP: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',     // Clique seco (novo)
 };
 
 class SoundService {

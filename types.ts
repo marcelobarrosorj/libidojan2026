@@ -165,6 +165,8 @@ export interface User {
   vouchScore: number; // 0-100 refletindo respeito e presença
   isStealthMode: boolean;
   prefersBlurredPhotos: boolean;
+  partner1?: ProfileData;
+  partner2?: ProfileData;
 }
 
 export type Step = 'type' | 'details' | 'physical' | 'confirm';
