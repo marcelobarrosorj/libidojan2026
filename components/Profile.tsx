@@ -137,6 +137,37 @@ const Profile: React.FC<ProfileProps> = ({
     showNotification('Foto removida da galeria.', 'info');
   };
 
+  // Efeito para sincronizar parceiros quando muda para tipo CASAL
+  useEffect(() => {
+    const isCouple = user.type === UserType.CASAIS || 
+                    String(user.type).toLowerCase() === 'casais' || 
+                    String(user.type).toLowerCase() === 'casal';
+
+    if (isCouple) {
+      if (!user.partner1 || !user.partner2) {
+        log('info', '[PROFILE] Inicializando parceiros reativamente para tipo:', user.type);
+        const updatedUser = {
+          ...user,
+          partner1: user.partner1 || { 
+            nickname: `${user.nickname} (P1)`, 
+            age: user.age > 18 ? user.age : 30, 
+            gender: Gender.MASCULINO,
+            biotype: Biotype.PADRAO,
+            height: 175
+          },
+          partner2: user.partner2 || { 
+            nickname: `${user.nickname} (P2)`, 
+            age: user.age > 18 ? user.age - 2 : 28, 
+            gender: Gender.FEMININO,
+            biotype: Biotype.CURVILINEO,
+            height: 165
+          }
+        };
+        setUser(updatedUser);
+      }
+    }
+  }, [user.type, user.nickname, user.age]);
+
   /**
    * Alterna dinamicamente entre status de Solteiro e Casal
    */
@@ -241,12 +272,8 @@ const Profile: React.FC<ProfileProps> = ({
                             value={user.type || ''}
                             onChange={(val) => {
                                 const nextType = val as UserType;
-                                let updatedUser = { ...user, type: nextType };
-                                if (nextType === UserType.CASAIS) {
-                                  if (!updatedUser.partner1) updatedUser.partner1 = { nickname: `${user.nickname} (P1)`, age: user.age, gender: user.gender, biotype: user.biotype, height: user.height };
-                                  if (!updatedUser.partner2) updatedUser.partner2 = { nickname: `${user.nickname} (P2)`, age: user.age, gender: Gender.FEMININO, biotype: Biotype.PADRAO, height: 165 };
-                                }
-                                setUser(updatedUser);
+                                log('info', `[PROFILE_EDIT] Alterando tipo para: ${nextType}`);
+                                setUser({ ...user, type: nextType });
                             }}
                             options={[
                                 { value: UserType.HOMEM, label: 'Homem (Solteiro)' },
@@ -264,48 +291,8 @@ const Profile: React.FC<ProfileProps> = ({
                         />
                     </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Idade</label>
-                        <Input 
-                            type="number"
-                            value={user.age === 0 ? '' : user.age.toString()}
-                            onChange={(val) => {
-                                const parsed = parseInt(val);
-                                setUser({...user, age: isNaN(parsed) ? 0 : parsed});
-                            }}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Gênero</label>
-                        <Select 
-                            value={user.gender || ''}
-                            onChange={(val) => setUser({...user, gender: val as Gender})}
-                            options={Object.values(Gender).map(g => ({ value: g, label: g }))}
-                        />
-                    </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Orientação</label>
-                        <Select 
-                            value={user.sexualOrientation || ''}
-                            onChange={(val) => setUser({...user, sexualOrientation: val as SexualOrientation})}
-                            options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Biotipo</label>
-                        <Select 
-                            value={user.biotype || ''}
-                            onChange={(val) => setUser({...user, biotype: val as Biotype})}
-                            options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
-                        />
-                    </div>
-                </div>
-
+                {/* Bio sempre visível */}
                 <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Bio / Recado</label>
                     <Input 
@@ -315,8 +302,58 @@ const Profile: React.FC<ProfileProps> = ({
                     />
                 </div>
 
+                {/* Campos Individuais - Só aparecem se NÃO for casal */}
+                {!(user.type === UserType.CASAIS || 
+                  String(user.type).toLowerCase() === 'casais' || 
+                  String(user.type).toLowerCase() === 'casal') && (
+                  <div className="space-y-6 animate-in slide-in-from-top-2">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Idade</label>
+                            <Input 
+                                type="number"
+                                value={user.age === 0 ? '' : user.age.toString()}
+                                onChange={(val) => {
+                                    const parsed = parseInt(val);
+                                    setUser({...user, age: isNaN(parsed) ? 0 : parsed});
+                                }}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Gênero</label>
+                            <Select 
+                                value={user.gender || ''}
+                                onChange={(val) => setUser({...user, gender: val as Gender})}
+                                options={Object.values(Gender).map(g => ({ value: g, label: g }))}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Orientação</label>
+                            <Select 
+                                value={user.sexualOrientation || ''}
+                                onChange={(val) => setUser({...user, sexualOrientation: val as SexualOrientation})}
+                                options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Biotipo</label>
+                            <Select 
+                                value={user.biotype || ''}
+                                onChange={(val) => setUser({...user, biotype: val as Biotype})}
+                                options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
+                            />
+                        </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Seção Casal Dinâmica - Refatorada para Visibilidade Máxima */}
-                {(user.type === UserType.CASAIS || (user.type as any) === 'Casal') && (
+                {(user.type === UserType.CASAIS || 
+                  String(user.type).toLowerCase() === 'casais' || 
+                  String(user.type).toLowerCase() === 'casal') && (
                     <div className="space-y-8 pt-8 border-t border-white/10 animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex items-center gap-3 px-2">
                             <div className="w-10 h-10 rounded-xl bg-pink/10 flex items-center justify-center text-pink">
@@ -324,19 +361,19 @@ const Profile: React.FC<ProfileProps> = ({
                             </div>
                             <div className="text-left">
                                 <h3 className="text-[12px] font-black text-white uppercase tracking-widest italic">Protocolo Dual: Integrantes</h3>
-                                <p className="text-[8px] text-slate-500 uppercase font-black tracking-widest mt-0.5">Sincronize os dados de ambos os perfis</p>
+                                <p className="text-[8px] text-slate-500 uppercase font-black tracking-widest mt-0.5">Sincronize os dados de ambos (Homem & Mulher)</p>
                             </div>
                         </div>
  
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Integrante 1 */}
+                        <div className="flex flex-col gap-6">
+                            {/* Homem */}
                             <div className="bg-slate-900/60 p-6 rounded-[2.5rem] border border-white/5 space-y-5 shadow-2xl relative overflow-hidden group">
                                 <div className="flex items-center justify-between border-b border-white/5 pb-3">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-pink shadow-[0_0_8px_#ff1493]" />
-                                        <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Integrante 1</span>
+                                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]" />
+                                        <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Homem</span>
                                     </div>
-                                    <Heart size={14} className="text-pink group-hover:scale-125 transition-transform" />
+                                    <Heart size={14} className="text-blue-500 group-hover:scale-125 transition-transform" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
@@ -348,7 +385,7 @@ const Profile: React.FC<ProfileProps> = ({
                                                 const age = parseInt(val) || 0;
                                                 setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), age }});
                                             }}
-                                            placeholder="Ex: 25"
+                                            placeholder="Ex: 53"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
@@ -360,29 +397,39 @@ const Profile: React.FC<ProfileProps> = ({
                                                 const height = parseInt(val) || 0;
                                                 setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), height }});
                                             }}
-                                            placeholder="Ex: 170"
+                                            placeholder="Ex: 180"
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
-                                    <Select 
-                                        value={user.partner1?.biotype || user.biotype}
-                                        onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), biotype: val as Biotype }})}
-                                        options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
-                                    />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
+                                        <Select 
+                                            value={user.partner1?.biotype || user.biotype}
+                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), biotype: val as Biotype }})}
+                                            options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Orientação</label>
+                                        <Select 
+                                            value={user.partner1?.sexualPreference || user.sexualOrientation}
+                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), sexualPreference: val as SexualOrientation }})}
+                                            options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-pink/5 blur-3xl rounded-full -z-10 group-hover:bg-pink/10 transition-colors" />
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-3xl rounded-full -z-10 group-hover:bg-blue-500/10 transition-colors" />
                             </div>
  
-                            {/* Integrante 2 */}
-                            <div className="bg-slate-900/60 p-6 rounded-[2.5rem] border border-white/5 space-y-5 shadow-2xl relative overflow-hidden group">
+                            {/* Mulher */}
+                            <div className="bg-slate-900/60 p-6 rounded-[2.5rem] border border-pink-500/20 space-y-5 shadow-2xl relative overflow-hidden group">
                                 <div className="flex items-center justify-between border-b border-white/5 pb-3">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]" />
-                                        <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Integrante 2</span>
+                                        <div className="w-2 h-2 rounded-full bg-pink shadow-[0_0_8px_#ff1493]" />
+                                        <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Mulher</span>
                                     </div>
-                                    <Heart size={14} className="text-purple-500 group-hover:scale-125 transition-transform" />
+                                    <Heart size={14} className="text-pink group-hover:scale-125 transition-transform" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
@@ -394,7 +441,7 @@ const Profile: React.FC<ProfileProps> = ({
                                                 const age = parseInt(val) || 0;
                                                 setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), age }});
                                             }}
-                                            placeholder="Ex: 24"
+                                            placeholder="Ex: 45"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
@@ -410,15 +457,25 @@ const Profile: React.FC<ProfileProps> = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
-                                    <Select 
-                                        value={user.partner2?.biotype || ''}
-                                        onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), biotype: val as Biotype }})}
-                                        options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
-                                    />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
+                                        <Select 
+                                            value={user.partner2?.biotype || ''}
+                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), biotype: val as Biotype }})}
+                                            options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Orientação</label>
+                                        <Select 
+                                            value={user.partner2?.sexualPreference || ''}
+                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), sexualPreference: val as SexualOrientation }})}
+                                            options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 blur-3xl rounded-full -z-10 group-hover:bg-purple-500/10 transition-colors" />
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-pink/5 blur-3xl rounded-full -z-10 group-hover:bg-pink/10 transition-colors" />
                             </div>
                         </div>
                     </div>
@@ -534,7 +591,23 @@ const Profile: React.FC<ProfileProps> = ({
         </div>
         
         <div>
-          <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>{user.nickname}, {user.age}</h2>
+          <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>
+            {user.nickname}
+            {!(user.type === UserType.CASAIS || 
+              String(user.type).toLowerCase() === 'casais' || 
+              String(user.type).toLowerCase() === 'casal') && `, ${user.age}`}
+          </h2>
+          
+          {(user.type === UserType.CASAIS || 
+            String(user.type).toLowerCase() === 'casais' || 
+            String(user.type).toLowerCase() === 'casal') && (
+            <div className="flex items-center justify-center gap-2 mt-1">
+              <span className="text-[10px] font-black text-blue-500 uppercase italic tracking-widest leading-none">H: {user.partner1?.age || user.age}</span>
+              <span className="text-slate-700">•</span>
+              <span className="text-[10px] font-black text-pink uppercase italic tracking-widest leading-none">M: {user.partner2?.age || 'N/A'}</span>
+            </div>
+          )}
+
           <div className="flex flex-col items-center gap-2 mt-2">
             
             {/* Toggle de Status Estilizado */}
@@ -664,12 +737,47 @@ const Profile: React.FC<ProfileProps> = ({
                     <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Identidade</h3>
                 </div>
                 {user.bio && <div className="px-2"><p className="text-[10px] text-slate-300 italic leading-relaxed">"{user.bio}"</p></div>}
-                <div className="grid grid-cols-2 gap-3">
-                    <MatrixCard icon={<Wind size={14}/>} label="Gênero" value={user.gender || 'N/A'} />
-                    <MatrixCard icon={<Heart size={14}/>} label="Orientação" value={user.sexualOrientation || 'N/A'} />
-                    <MatrixCard icon={<Ruler size={14}/>} label="Altura" value={user.height ? `${user.height}cm` : 'N/A'} />
-                    <MatrixCard icon={<Palette size={14}/>} label="Biotipo" value={user.biotype || 'N/A'} />
-                </div>
+                
+                {(user.type === UserType.CASAIS || 
+                  String(user.type).toLowerCase() === 'casais' || 
+                  String(user.type).toLowerCase() === 'casal') ? (
+                  <div className="space-y-6">
+                    {/* Homem Display */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 px-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <span className="text-[9px] font-black text-white uppercase italic tracking-widest">Homem</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                          <MatrixCard icon={<Wind size={14}/>} label="Idade" value={user.partner1?.age || 'N/A'} />
+                          <MatrixCard icon={<Heart size={14}/>} label="Orientação" value={user.partner1?.sexualPreference || user.sexualOrientation || 'N/A'} />
+                          <MatrixCard icon={<Ruler size={14}/>} label="Altura" value={user.partner1?.height ? `${user.partner1.height}cm` : 'N/A'} />
+                          <MatrixCard icon={<Palette size={14}/>} label="Biotipo" value={user.partner1?.biotype || 'N/A'} />
+                      </div>
+                    </div>
+
+                    {/* Mulher Display */}
+                    <div className="space-y-3 pt-4 border-t border-white/5">
+                      <div className="flex items-center gap-2 px-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-pink" />
+                        <span className="text-[9px] font-black text-white uppercase italic tracking-widest">Mulher</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                          <MatrixCard icon={<Wind size={14}/>} label="Idade" value={user.partner2?.age || 'N/A'} />
+                          <MatrixCard icon={<Heart size={14}/>} label="Orientação" value={user.partner2?.sexualPreference || 'N/A'} />
+                          <MatrixCard icon={<Ruler size={14}/>} label="Altura" value={user.partner2?.height ? `${user.partner2.height}cm` : 'N/A'} />
+                          <MatrixCard icon={<Palette size={14}/>} label="Biotipo" value={user.partner2?.biotype || 'N/A'} />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                      <MatrixCard icon={<Wind size={14}/>} label="Gênero" value={user.gender || 'N/A'} />
+                      <MatrixCard icon={<Heart size={14}/>} label="Orientação" value={user.sexualOrientation || 'N/A'} />
+                      <MatrixCard icon={<Ruler size={14}/>} label="Altura" value={user.height ? `${user.height}cm` : 'N/A'} />
+                      <MatrixCard icon={<Palette size={14}/>} label="Biotipo" value={user.biotype || 'N/A'} />
+                  </div>
+                )}
                 
                 {isOwnProfile && (
                     <div className="pt-4 px-2">

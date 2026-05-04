@@ -57,8 +57,12 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
   }, [currentUser, userLocation]);
 
   const filteredUsers = useMemo(() => {
-    // Embaralhamos a lista base para evitar que os mesmos perfis (ex: Ana e Bruno) apareçam sempre primeiro
-    const baseList = [...MOCK_USERS].sort(() => Math.random() - 0.5);
+    // Fisher-Yates Shuffle para aleatorização estatisticamente superior
+    const baseList = [...MOCK_USERS];
+    for (let i = baseList.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [baseList[i], baseList[j]] = [baseList[j], baseList[i]];
+    }
 
     return baseList.filter(user => {
       // Basic type check

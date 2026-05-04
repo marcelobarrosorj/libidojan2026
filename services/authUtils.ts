@@ -114,6 +114,8 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
         updated.is_premium = true;
         updated.emailVerified = true;
         updated.isSubscriber = true;
+        // Se mudou a idade manualmente, não deixa resetar
+        if (userData.age) updated.age = userData.age;
     }
 
     // Proteção Anti-Downgrade: Se o cache diz que é PREMIUM e o novo dado diz que é FREE,
@@ -197,6 +199,22 @@ export const syncCaches = async () => {
             if (data.trust_level) cloudData.trustLevel = data.trust_level as TrustLevel;
             if (data.xp !== undefined) cloudData.xp = data.xp;
             if (data.level !== undefined) cloudData.level = data.level;
+            
+            // PROTEÇÃO DE INTEGRIDADE DE DADOS (IDADE)
+            // Se o usuário local tem uma idade definida (diferente de 18 default) e a nuvem retorna 18,
+            // ou se o cloudData não tem idade, preservamos o local.
+            const localAge = Number(local.age);
+            const cloudAge = Number(cloudData.age || 0);
+
+            // Se o local é um valor de "adulto" real e a nuvem está no default de reset ou vazia
+            if (localAge > 18 && (cloudAge <= 18)) {
+                log('info', `[AUTH] Integrity Gate: Protegendo idade local (${localAge}) contra reset da nuvem (${cloudAge})`);
+                cloudData.age = localAge;
+                // Força um novo push para a nuvem para corrigir o valor lá
+                syncWithCloud(cloudData);
+            } else if (localAge > 0 && cloudAge > 18 && cloudAge !== localAge) {
+                log('info', `[AUTH] Sincronizando idade da nuvem: ${cloudAge}`);
+            }
 
             if (isOwner(cloudData)) {
                 cloudData.plan = Plan.GOLD;
