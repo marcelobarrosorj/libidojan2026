@@ -77,6 +77,11 @@ export function getUserData(): User | null {
       }
       // Garantir que following existe
       if (!user.following) user.following = [];
+      if (!user.verificationLevels) {
+          user.verificationLevels = { identity: false, photo: false, social: false, trust: false };
+      }
+      if (user.totalLikes === undefined) user.totalLikes = 0;
+      if (user.totalViews === undefined) user.totalViews = 0;
       return user;
     } catch (e) { return null; }
   }

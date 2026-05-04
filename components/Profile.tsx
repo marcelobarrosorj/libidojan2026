@@ -7,12 +7,14 @@ import ActionButton from './common/ActionButton';
 import { Select, Input } from './common/RegistrationUI';
 import ImageEditor from './ImageEditor';
 import VerificationPortal from './VerificationPortal';
+import VerificationModal from './VerificationModal';
 import { SegmentedControl } from './common/SegmentedControl';
 import { 
   BadgeCheck, Settings, LogOut, ShieldCheck, 
   ChevronLeft, Ruler, Eye, Palette, Crown, 
   Fingerprint, Wind, X, Heart, Ghost,
   ImageIcon, Plus, Trash2, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
+  UserCheck, Globe,
   Zap
 } from 'lucide-react';
 import { 
@@ -22,6 +24,9 @@ import {
 } from '../services/authUtils';
 import { haversineKm, formatDistanceLabel } from '../services/geoService';
 import { soundService } from '../services/soundService';
+import ConsentMatrix from './ConsentMatrix';
+import StealthModeToggle from './StealthModeToggle';
+import BlurredImage from './BlurredImage';
 import PhotoGridModal from './PhotoGridModal';
 import { useMemo } from 'react';
 
@@ -51,6 +56,7 @@ const Profile: React.FC<ProfileProps> = ({
   const [isEditingGallery, setIsEditingGallery] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(soundService.isEnabled());
   const [showVerification, setShowVerification] = useState(false);
+  const [showNoFakeModal, setShowNoFakeModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
@@ -214,8 +220,11 @@ const Profile: React.FC<ProfileProps> = ({
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Idade</label>
                         <Input 
                             type="number"
-                            value={user.age.toString()}
-                            onChange={(val) => setUser({...user, age: parseInt(val) || 18})}
+                            value={user.age === 0 ? '' : user.age.toString()}
+                            onChange={(val) => {
+                                const parsed = parseInt(val);
+                                setUser({...user, age: isNaN(parsed) ? 0 : parsed});
+                            }}
                         />
                     </div>
                     <div className="space-y-2">
@@ -282,6 +291,7 @@ const Profile: React.FC<ProfileProps> = ({
     <div className={`p-6 space-y-8 animate-in fade-in pb-32 min-h-full ${isOuro ? 'bg-[#050505] bg-gradient-to-b from-amber-500/5 to-transparent' : 'bg-[#050505]'}`}>
       {editingImageUrl && <ImageEditor imageUrl={editingImageUrl} onSave={handlePhotoSave} onCancel={() => setEditingImageUrl(null)} />}
       {showVerification && <VerificationPortal onClose={() => setShowVerification(false)} onSuccess={() => refreshSession()} />}
+      {showNoFakeModal && <VerificationModal isOpen={showNoFakeModal} onClose={() => setShowNoFakeModal(false)} user={user} />}
       
       <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
 
@@ -301,9 +311,30 @@ const Profile: React.FC<ProfileProps> = ({
              {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} className="text-slate-500" />}
            </button>
         ) : (
-            <button onClick={handleFollow} className={`p-3 rounded-2xl border transition-all active:scale-90 shadow-xl ${isFollowing ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 text-amber-500 border-amber-500/20'}`}>
-                {isFollowing ? <UserMinus size={20} /> : <UserPlus size={20} />}
-            </button>
+            <div className="flex items-center gap-2">
+                <button 
+                  onClick={async () => {
+                    const newValue = !isFollowing;
+                    const result = await toggleFollow(user.id);
+                    setIsFollowing(result);
+                    soundService.play('LIKE');
+                    showNotification(result ? `Você agora segue ${user.nickname}` : `Você deixou de seguir ${user.nickname}`, 'success');
+                  }} 
+                  className={`p-3 rounded-2xl border transition-all active:scale-90 shadow-xl ${isFollowing ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 text-amber-500 border-amber-500/20'}`}
+                >
+                    {isFollowing ? <UserMinus size={20} /> : <UserPlus size={20} />}
+                </button>
+                <button 
+                  onClick={() => {
+                    showNotification(`Você deu um Vouch de respeito para ${user.nickname}!`, 'success');
+                    soundService.play('MATCH');
+                  }}
+                  className="p-3 rounded-2xl border bg-emerald-500/10 text-emerald-500 border-emerald-500/20 transition-all active:scale-90 shadow-xl"
+                  title="Dar Vouch (Endosso)"
+                >
+                    <ShieldCheck size={20} />
+                </button>
+            </div>
         )}
       </div>
 
@@ -313,7 +344,13 @@ const Profile: React.FC<ProfileProps> = ({
             onClick={() => setShowPhotoGrid(true)}
             className={`w-32 h-32 rounded-[2.5rem] p-1 shadow-2xl transition-transform active:scale-95 cursor-pointer relative overflow-hidden ${isOuro ? 'bg-gradient-to-tr from-amber-400 to-amber-700 shadow-amber-500/30' : 'bg-slate-800'}`}
           >
-            <img src={user.avatar} className="w-full h-full rounded-[2.2rem] object-cover border-4 border-[#050505]" alt={user.nickname} />
+            <BlurredImage 
+              src={user.avatar} 
+              alt={user.nickname}
+              isInitiallyBlurred={!isOwnProfile && user.prefersBlurredPhotos}
+              canUnlock={!isOwnProfile}
+              className="w-full h-full rounded-[2.2rem] border-4 border-[#050505]"
+            />
             
             {!isOwnProfile && cache.userData?.lat && cache.userData?.lon && user.lat && user.lon && (
               <div className="absolute bottom-2 left-0 right-0 py-1 bg-black/40 backdrop-blur-md flex items-center justify-center">
@@ -367,7 +404,33 @@ const Profile: React.FC<ProfileProps> = ({
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[340px]">
+          <div className={`p-6 rounded-3xl bg-slate-900/60 border border-white/5 flex justify-between items-center mt-6`}>
+              <div className="text-center group flex-1">
+                 <div className="flex items-center justify-center gap-1.5 text-pink">
+                    <Heart size={14} fill="currentColor" className="group-hover:scale-125 transition-transform" />
+                    <span className="font-black text-lg italic tracking-tighter">{user.totalLikes || 0}</span>
+                 </div>
+                 <p className="text-[7px] text-slate-500 uppercase font-bold tracking-widest mt-1">Crushes</p>
+              </div>
+              <div className="w-[1px] h-8 bg-white/10" />
+              <div className="text-center group flex-1">
+                 <div className="flex items-center justify-center gap-1.5 text-amber-500">
+                    <Eye size={14} className="group-hover:scale-125 transition-transform" />
+                    <span className="font-black text-lg italic tracking-tighter">{user.totalViews || 0}</span>
+                 </div>
+                 <p className="text-[7px] text-slate-500 uppercase font-bold tracking-widest mt-1">Visitas</p>
+              </div>
+              <div className="w-[1px] h-8 bg-white/10" />
+              <div className="text-center group flex-1">
+                 <div className="flex items-center justify-center gap-1.5 text-blue-400">
+                    <ShieldCheck size={14} className="group-hover:scale-125 transition-transform" />
+                    <span className="font-black text-lg italic tracking-tighter">{user.vouchScore || 0}%</span>
+                 </div>
+                 <p className="text-[7px] text-slate-500 uppercase font-bold tracking-widest mt-1">Vouch Score</p>
+              </div>
+          </div>
+
+          <div className="mx-auto w-full max-w-[340px] pt-4">
           {!isEditing && (
               <SegmentedControl 
                 activeId={activeTab}
@@ -387,6 +450,46 @@ const Profile: React.FC<ProfileProps> = ({
         <>
           {activeTab === 'info' && (
         <div className="space-y-10 animate-in slide-in-from-left-5">
+            {isOwnProfile && (
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 px-2 border-b border-white/5 pb-2">
+                    <ShieldCheck size={16} className="text-amber-500" />
+                    <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Segurança Estratégica</h3>
+                </div>
+                <StealthModeToggle 
+                  isActive={user.isStealthMode} 
+                  onToggle={() => {
+                    const newValue = !user.isStealthMode;
+                    setUser(prev => ({ ...prev, isStealthMode: newValue }));
+                    saveUserData({ ...user, isStealthMode: newValue });
+                    showNotification(newValue ? 'Modo Stealth Ativado' : 'Modo Stealth Desativado', 'success');
+                  }} 
+                />
+                
+                <button 
+                  onClick={() => {
+                    const newValue = !user.prefersBlurredPhotos;
+                    setUser(prev => ({ ...prev, prefersBlurredPhotos: newValue }));
+                    saveUserData({ ...user, prefersBlurredPhotos: newValue });
+                  }}
+                  className={`w-full p-4 rounded-3xl border flex items-center justify-between transition-all ${user.prefersBlurredPhotos ? 'bg-amber-500/10 border-amber-500/30' : 'bg-slate-900/40 border-white/5'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.prefersBlurredPhotos ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-500'}`}>
+                      <Palette size={20} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-white uppercase italic">Blur Automático</h4>
+                      <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">Suas fotos ficam borradas para estranhos</p>
+                    </div>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full relative transition-colors ${user.prefersBlurredPhotos ? 'bg-amber-500' : 'bg-slate-800'}`}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${user.prefersBlurredPhotos ? 'right-1' : 'left-1'}`} />
+                  </div>
+                </button>
+              </section>
+            )}
+
             <section className="space-y-6">
                 <div className="flex items-center gap-2 px-2 border-b border-white/5 pb-2">
                     <Fingerprint size={16} className="text-amber-500" />
@@ -494,14 +597,49 @@ const Profile: React.FC<ProfileProps> = ({
       {activeTab === 'trust' && (
         <div className="space-y-8 animate-in zoom-in-95 duration-500 text-center py-4">
              <div className="relative inline-block">
-                <div className="w-24 h-24 rounded-full bg-slate-900 border border-amber-500/10 flex items-center justify-center text-amber-500 shadow-2xl">
-                    <ShieldCheck size={48} />
+                <div className="w-24 h-24 rounded-full bg-slate-900 border border-amber-500/10 flex items-center justify-center text-amber-500 shadow-2xl overflow-hidden relative">
+                    <ShieldCheck size={48} className={user.vouchScore && user.vouchScore > 70 ? 'text-green-500' : 'text-amber-500'} />
+                    {user.vouchScore && (
+                        <div className="absolute inset-x-0 bottom-0 h-1 bg-slate-800">
+                             <div className="h-full bg-amber-500" style={{ width: `${user.vouchScore}%` }} />
+                        </div>
+                    )}
                 </div>
-                <div className="absolute -top-2 -right-2 bg-amber-500 text-black px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg">TRUST LVL</div>
+                <div className="absolute -top-2 -right-2 bg-amber-500 text-black px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg">Vouch Score</div>
              </div>
+             
+             <div className="space-y-4">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left px-2">Matriz de Consentimento</h3>
+                <ConsentMatrix items={user.consentMatrix || []} />
+             </div>
+
              <div>
-                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Nível {user.trustLevel}</h3>
-                <p className="text-slate-500 text-xs font-medium max-w-[240px] mx-auto leading-relaxed">Sua reputação na Matriz Libido determina seu acesso a eventos exclusivos e galerias privadas.</p>
+                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">
+                    {user.vouchScore ? `Vouch Social: ${user.vouchScore}%` : `Nível ${user.trustLevel}`}
+                </h3>
+                <p className="text-slate-500 text-xs font-medium max-w-[240px] mx-auto leading-relaxed">
+                    Sua reputação é validada pelo sistema **NoFake**. Membros verificados têm acesso à Matriz Gold e eventos exclusivos.
+                </p>
+                
+                {isOwnProfile && (
+                    <button 
+                        onClick={() => setShowNoFakeModal(true)}
+                        className="mt-6 px-8 py-3 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-transform shadow-xl"
+                    >
+                        Aumentar Score
+                    </button>
+                )}
+             </div>
+
+             <div className="grid grid-cols-4 gap-2 px-2 mt-4">
+                {['identity', 'photo', 'social', 'trust'].map((lvl) => (
+                    <div key={lvl} className={`p-3 rounded-2xl border ${user.verificationLevels?.[lvl as keyof typeof user.verificationLevels] ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-slate-900 border-white/5 text-slate-700'}`}>
+                        {lvl === 'identity' && <UserCheck size={18} />}
+                        {lvl === 'photo' && <Camera size={18} />}
+                        {lvl === 'social' && <Globe size={18} />}
+                        {lvl === 'trust' && <ShieldCheck size={18} />}
+                    </div>
+                ))}
              </div>
         </div>
       )}

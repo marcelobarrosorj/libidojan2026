@@ -54,8 +54,18 @@ export const MOCK_CURRENT_USER: User = {
   bookingPolicy: 'A combinar',
   lat: -23.5505,
   lon: -46.6333,
+  isSubscriber: false,
+  dailyProfileViews: 0,
   birthDate: '1995-01-01',
-  rsvps: []
+  rsvps: [],
+  consentMatrix: [
+    { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
+    { id: 'total', label: 'Troca Total', value: 'talvez' as any },
+    { id: 'menage', label: 'Ménage', value: 'sim' as any }
+  ],
+  vouchScore: 98,
+  isStealthMode: false,
+  prefersBlurredPhotos: true
 };
 
 export const MOCK_USERS: User[] = [
@@ -68,7 +78,13 @@ export const MOCK_USERS: User[] = [
     type: UserType.CASAIS,
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     trustLevel: TrustLevel.OURO,
-    following: []
+    following: [],
+    consentMatrix: [
+      { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
+      { id: 'total', label: 'Troca Total', value: 'sim' as any },
+      { id: 'menage', label: 'Ménage', value: 'sim' as any }
+    ],
+    vouchScore: 95
   },
   {
     ...MOCK_CURRENT_USER,
@@ -79,7 +95,45 @@ export const MOCK_USERS: User[] = [
     type: UserType.MULHER,
     avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
     trustLevel: TrustLevel.PRATA,
-    following: []
+    following: [],
+    consentMatrix: [
+      { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
+      { id: 'total', label: 'Troca Total', value: 'nao' as any },
+      { id: 'menage', label: 'Ménage', value: 'talvez' as any }
+    ],
+    vouchScore: 88
+  },
+  {
+    ...MOCK_CURRENT_USER,
+    id: 'user-4',
+    nickname: 'Gabi',
+    age: 24,
+    type: UserType.MULHER,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
+    trustLevel: TrustLevel.BRONZE,
+    following: [],
+    consentMatrix: [
+      { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
+      { id: 'total', label: 'Troca Total', value: 'nao' as any },
+      { id: 'menage', label: 'Ménage', value: 'sim' as any }
+    ],
+    vouchScore: 75
+  },
+  {
+    ...MOCK_CURRENT_USER,
+    id: 'user-5',
+    nickname: 'Lia & Dan',
+    age: 29,
+    type: UserType.CASAIS,
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
+    trustLevel: TrustLevel.OURO,
+    following: [],
+    consentMatrix: [
+      { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
+      { id: 'total', label: 'Troca Total', value: 'sim' as any },
+      { id: 'menage', label: 'Ménage', value: 'sim' as any }
+    ],
+    vouchScore: 92
   }
 ];
 

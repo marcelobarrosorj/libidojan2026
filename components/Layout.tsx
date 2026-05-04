@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert } from 'lucide-react';
+import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert, Trophy } from 'lucide-react';
 import { cache } from '../services/authUtils';
 import { Plan, User } from '../types';
 import LibidoIcon from './common/LibidoIcon';
@@ -74,7 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
       <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/5 px-2 pt-4 pb-10 flex justify-between items-center z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
         <NavButton icon={<LayoutGrid size={22} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
         <NavButton icon={<Radio size={22} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
-        <NavButton icon={<CalendarDays size={22} />} isActive={activeTab === 'events'} onClick={() => setActiveTab('events')} label="Círculo" />
+        <NavButton icon={<Trophy size={22} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
         <NavButton icon={<MessageCircle size={22} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
         <NavButton icon={<UserCircle size={22} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
       </nav>

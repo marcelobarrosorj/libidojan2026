@@ -248,6 +248,16 @@ export const Auth: React.FC = () => {
             bookingPolicy: 'Livre',
             verificationScore: 50,
             hasBlurredGallery: false,
+            isSubscriber: profile?.is_premium || false,
+            dailyProfileViews: 0,
+            consentMatrix: [
+                { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
+                { id: 'total', label: 'Troca Total', value: 'nao' as any },
+                { id: 'menage', label: 'Ménage', value: 'sim' as any }
+            ],
+            vouchScore: 70,
+            isStealthMode: false,
+            prefersBlurredPhotos: false,
             rsvps: [],
             vouches: [],
             bookmarks: [],
@@ -395,7 +405,17 @@ export const Auth: React.FC = () => {
           busyMode: false,
           bookingPolicy: 'A combinar',
           verificationScore: 0,
-          hasBlurredGallery: false
+          hasBlurredGallery: false,
+          isSubscriber: false,
+          dailyProfileViews: 0,
+          consentMatrix: [
+            { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
+            { id: 'total', label: 'Troca Total', value: 'nao' as any },
+            { id: 'menage', label: 'Ménage', value: 'sim' as any }
+          ],
+          vouchScore: 0,
+          isStealthMode: false,
+          prefersBlurredPhotos: false
         };
 
         // 3. Salvar perfil na tabela 'profiles'

@@ -2,12 +2,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
 import { User, RadarProfile } from '../types';
-import { X, Heart, Zap, Radio as RadioIcon, Target } from 'lucide-react';
+import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
 import { log, likeProfile, passProfile, showNotification } from '../services/authUtils';
 import { soundService } from '../services/soundService';
-import { getCurrentPosition } from '../services/geoService';
+import { getCurrentPosition, haversineKm } from '../services/geoService';
 import RadarPage from '../radar/RadarPage';
+import { usageService } from '../services/usageService';
+import PaywallModal from './PaywallModal';
+import FilterModal, { FilterState } from './FilterModal';
 
 interface ExploreProps {
   onMatch?: (user: User) => void;
@@ -22,6 +25,26 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser 
   const [isSwiping, setIsSwiping] = useState<'left' | 'right' | 'up' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number, lon: number } | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<'limit' | 'photos' | 'radar' | 'interaction'>('limit');
+  const [showFilter, setShowFilter] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    types: currentUser?.lookingFor || [UserType.CASAIS, UserType.MULHER, UserType.HOMEM, UserType.GRUPO],
+    minTrust: 0,
+    maxDistance: 100
+  });
+
+  const handleProfileClick = (profile: RadarProfile) => {
+    if (usageService.canViewProfile(currentUser)) {
+      if (!currentUser?.isSubscriber) {
+        usageService.incrementView();
+      }
+      onProfileClick?.(profile);
+    } else {
+      setPaywallReason('limit');
+      setShowPaywall(true);
+    }
+  };
   
   const effectiveUser = useMemo(() => {
     const base = currentUser || MOCK_CURRENT_USER;
@@ -33,10 +56,23 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser 
   }, [currentUser, userLocation]);
 
   const filteredUsers = useMemo(() => {
-    return MOCK_USERS.filter(user => 
-      effectiveUser.lookingFor.includes(user.type)
-    );
-  }, [effectiveUser.lookingFor]);
+    return MOCK_USERS.filter(user => {
+      // Basic type check
+      const typeMatch = filters.types.includes(user.type);
+      
+      // Trust check
+      const trustMatch = (user.vouchScore || 0) >= filters.minTrust;
+
+      // Distance check
+      let distanceMatch = true;
+      if (effectiveUser.lat && effectiveUser.lon && user.lat && user.lon) {
+        const dist = haversineKm(effectiveUser.lat, effectiveUser.lon, user.lat, user.lon);
+        distanceMatch = dist <= filters.maxDistance;
+      }
+
+      return typeMatch && trustMatch && distanceMatch;
+    });
+  }, [filters, effectiveUser]);
 
   const currentSwipeUser = useMemo(() => {
     if (filteredUsers.length === 0) return null;
@@ -102,25 +138,33 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser 
 
   return (
     <div className="p-4 flex flex-col items-center gap-6 animate-in fade-in duration-500 pb-28">
-      <div className="w-full shrink-0">
-        <SegmentedControl 
-          activeId={viewMode}
-          onChange={(id) => setViewMode(id as 'radar' | 'swipe')}
-          tabs={[
-            { id: 'radar', label: 'Radar', icon: <RadioIcon /> },
-            { id: 'swipe', label: 'Swipe', icon: <Zap /> }
-          ]}
-        />
+      <div className="w-full shrink-0 flex items-center gap-3">
+        <div className="flex-1">
+            <SegmentedControl 
+              activeId={viewMode}
+              onChange={(id) => setViewMode(id as 'radar' | 'swipe')}
+              tabs={[
+                { id: 'radar', label: 'Radar', icon: <RadioIcon /> },
+                { id: 'swipe', label: 'Swipe', icon: <Zap /> }
+              ]}
+            />
+        </div>
+        <button 
+            onClick={() => setShowFilter(true)}
+            className="w-12 h-12 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center text-amber-500 shadow-xl transition-all active:scale-95"
+        >
+            <FilterIcon size={20} />
+        </button>
       </div>
 
       <div className="w-full flex-1">
-        {viewMode === 'radar' && <RadarPage onProfileClick={onProfileClick} />}
+        {viewMode === 'radar' && <RadarPage onProfileClick={handleProfileClick} />}
         
         {viewMode === 'swipe' && (
           filteredUsers.length > 0 && currentSwipeUser ? (
             <div className="w-full space-y-8 animate-in slide-in-from-bottom-5">
               <div 
-                onClick={() => onProfileClick?.(currentSwipeUser as any)}
+                onClick={() => handleProfileClick(currentSwipeUser as any)}
                 className={`relative w-full aspect-[4/5] rounded-[3rem] overflow-hidden shadow-2xl border border-amber-500/10 transition-all duration-700 cursor-pointer ${isSwiping === 'left' ? '-translate-x-[150%] rotate-[-20deg] opacity-0' : isSwiping === 'right' ? 'translate-x-[150%] rotate-[20deg] opacity-0' : isSwiping === 'up' ? '-translate-y-[150%] scale-110 opacity-0' : ''}`}
               >
                 <img src={currentSwipeUser.avatar} alt={currentSwipeUser.nickname} className="w-full h-full object-cover" />
@@ -171,6 +215,39 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser 
           </div>
         </div>
       )}
+
+      {/* Filter Modal */}
+      <FilterModal 
+        isOpen={showFilter}
+        onClose={() => setShowFilter(false)}
+        onApply={setFilters}
+        currentFilters={filters}
+      />
+
+      {/* Paywall Overlay */}
+      <PaywallModal 
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        reason={paywallReason}
+      />
+
+      {/* Indicator for remaining views */}
+      <ExploreFooter 
+        remaining={usageService.getRemainingViews()} 
+        isSubscriber={currentUser?.isSubscriber || false} 
+      />
+    </div>
+  );
+};
+
+const ExploreFooter: React.FC<{ remaining: number, isSubscriber: boolean }> = ({ remaining, isSubscriber }) => {
+  if (isSubscriber) return null;
+  return (
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-full border border-white/5 flex items-center gap-2 z-50">
+      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+      <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest leading-none">
+        {remaining} visualizações restantes hoje
+      </span>
     </div>
   );
 };

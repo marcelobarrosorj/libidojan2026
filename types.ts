@@ -79,6 +79,18 @@ export interface Vouch {
   timestamp: string;
 }
 
+export enum MatrixValue { 
+  YES = 'sim', 
+  NO = 'nao', 
+  MAYBE = 'talvez' 
+}
+
+export interface ConsentItem {
+  id: string;
+  label: string;
+  value: MatrixValue;
+}
+
 export interface User {
   id: string;
   nickname: string;
@@ -133,8 +145,25 @@ export interface User {
   bestTime: string;
   busyMode: boolean;
   bookingPolicy: string;
-  verificationScore: number;
+  verificationScore?: number;
+  verificationLevels?: {
+    identity: boolean;
+    photo: boolean;
+    social: boolean;
+    trust: boolean;
+  };
   hasBlurredGallery: boolean;
+  totalLikes?: number;
+  totalViews?: number;
+  rank?: number;
+  isSubscriber: boolean;
+  dailyProfileViews: number;
+  lastResetDate?: string;
+  // Novos campos estratégicos
+  consentMatrix: ConsentItem[];
+  vouchScore: number; // 0-100 refletindo respeito e presença
+  isStealthMode: boolean;
+  prefersBlurredPhotos: boolean;
 }
 
 export type Step = 'type' | 'details' | 'physical' | 'confirm';

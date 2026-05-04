@@ -9,6 +9,7 @@ import Subscription from './components/Subscription';
 import ChatDetail from './components/ChatDetail';
 import Feed from './components/Feed';
 import EventsPage from './components/EventsPage';
+import Ranking from './components/Ranking';
 import { TermsGate } from './components/TermsGate';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
@@ -203,7 +204,17 @@ export default function App() {
       vouches: p.vouches || [],
       following: p.following || [],
       lookingFor: p.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
-      rsvps: p.rsvps || []
+      rsvps: p.rsvps || [],
+      isSubscriber: p.isSubscriber || false,
+      dailyProfileViews: p.dailyProfileViews || 0,
+      consentMatrix: p.consentMatrix || [
+        { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
+        { id: 'total', label: 'Troca Total', value: 'nao' as any },
+        { id: 'menage', label: 'Ménage', value: 'sim' as any }
+      ],
+      vouchScore: p.vouchScore || 70,
+      isStealthMode: p.isStealthMode || false,
+      prefersBlurredPhotos: p.prefersBlurredPhotos || false
     };
     setViewedProfile(fullUser);
     setActiveTab('view_profile');
@@ -220,6 +231,7 @@ export default function App() {
 
     switch (activeTab) {
       case 'radar': return <Explore currentUser={currentUser} onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
+      case 'ranking': return <Ranking onSelectUser={handleViewProfile} />;
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => setActiveTab('assinatura')} currentUser={currentUser} />;

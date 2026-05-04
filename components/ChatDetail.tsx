@@ -1,7 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { User } from '../types';
-import { ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert } from 'lucide-react';
+import { 
+  ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert,
+  Clock, Image as ImageIcon, EyeOff, Timer
+} from 'lucide-react';
 import { log, handleButtonAction, showNotification } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { CONFIG } from '../config';
@@ -11,8 +14,17 @@ interface ChatDetailProps {
   onBack: () => void;
 }
 
+interface Message {
+  text?: string;
+  image?: string;
+  from: 'me' | 'them';
+  time: string;
+  isSelfDestruct?: boolean;
+  isViewed?: boolean;
+}
+
 const ChatDetail: React.FC<ChatDetailProps> = ({ user, onBack }) => {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     { text: "Olá! Vi seu perfil e senti que nossas vibes batem bastante. Topa conversar?", from: 'them', time: '14:20' }
   ]);
   const [inputText, setInputText] = useState('');
@@ -25,38 +37,46 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, onBack }) => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = async () => {
+  const handleSend = async (image?: string, isSelfDestruct: boolean = false) => {
     await handleButtonAction(
         'CHAT_SEND_MESSAGE',
         async () => {
             const textToSend = inputText.trim();
             const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             await new Promise(r => setTimeout(r, 600));
-            setMessages(prev => [...prev, { text: textToSend, from: 'me', time: timestamp }]);
-            setInputText('');
             
-            // Simulação de resposta da Matriz
-            setIsTyping(true);
-            setTimeout(() => {
-                setIsTyping(false);
-                const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                // GATILHO SONORO: Recebimento de mensagem
-                soundService.play('MESSAGE');
+            const newMsg: Message = image 
+              ? { image, from: 'me', time: timestamp, isSelfDestruct, isViewed: false }
+              : { text: textToSend, from: 'me', time: timestamp };
 
-                setMessages(prev => [...prev, { 
-                    text: "Com certeza! O que mais te chamou atenção?", 
-                    from: 'them', 
-                    time: replyTime 
-                }]);
-            }, 2000);
+            setMessages(prev => [...prev, newMsg]);
+            if (!image) setInputText('');
+            
+            if (!isSelfDestruct) {
+              setIsTyping(true);
+              setTimeout(() => {
+                  setIsTyping(false);
+                  const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  soundService.play('MESSAGE');
+                  setMessages(prev => [...prev, { 
+                      text: "Com certeza! O que mais te chamou atenção?", 
+                      from: 'them', 
+                      time: replyTime 
+                  }]);
+              }, 2000);
+            }
             return true;
         },
         {
-            validate: () => inputText.trim().length > 0 && !isProcessing,
+            validate: () => (inputText.trim().length > 0 || image) && !isProcessing,
             setLoading: setIsProcessing
         }
     );
+  };
+
+  const markAsViewed = (idx: number) => {
+    setMessages(prev => prev.map((m, i) => i === idx ? { ...m, isViewed: true } : m));
+    showNotification('Foto autodestruída com sucesso.', 'info');
   };
 
   const handleReport = () => {
@@ -100,7 +120,28 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, onBack }) => {
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${msg.from === 'me' ? 'bg-purple-600 text-white rounded-br-none' : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'}`}>
-              <p>{msg.text}</p>
+              {msg.image ? (
+                <div className="space-y-2">
+                  {msg.isSelfDestruct && !msg.isViewed ? (
+                    <button 
+                      onClick={() => markAsViewed(idx)}
+                      className="flex flex-col items-center gap-2 p-4 bg-black/20 rounded-xl border border-white/10"
+                    >
+                      <Timer size={32} className="text-amber-500 animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white">Foto Temporária (Clique para ver)</span>
+                    </button>
+                  ) : msg.isViewed ? (
+                    <div className="flex flex-col items-center gap-2 p-4 bg-slate-800/40 rounded-xl blur-[1px] opacity-40">
+                      <EyeOff size={32} className="text-slate-500" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Mídia Destruída</span>
+                    </div>
+                  ) : (
+                    <img src={msg.image} className="rounded-xl w-full max-h-60 object-cover" />
+                  )}
+                </div>
+              ) : (
+                <p>{msg.text}</p>
+              )}
               <span className="text-[10px] opacity-50 block text-right mt-1">{msg.time}</span>
             </div>
           </div>
@@ -118,9 +159,16 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, onBack }) => {
       </div>
 
       <div className="p-4 bg-slate-950 border-t border-slate-900 space-y-3 pb-8">
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => handleSend('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400', true)}
+            className="w-12 h-12 rounded-xl bg-slate-900 border border-amber-500/10 text-amber-500 flex items-center justify-center hover:bg-amber-500/10 transition-all active:scale-90"
+            title="Enviar Foto Autodestrutiva"
+          >
+            <Timer size={22} />
+          </button>
           <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} disabled={isProcessing} placeholder="Sua mensagem..." className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50" />
-          <button onClick={handleSend} disabled={!inputText.trim() || isProcessing} className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-white shadow-lg disabled:opacity-50 disabled:grayscale transition-all">
+          <button onClick={() => handleSend()} disabled={!inputText.trim() || isProcessing} className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-white shadow-lg disabled:opacity-50 disabled:grayscale transition-all">
             {isProcessing ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
           </button>
         </div>

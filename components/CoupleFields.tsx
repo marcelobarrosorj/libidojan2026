@@ -102,7 +102,16 @@ export const CoupleFields: React.FC<CoupleFieldsProps> = ({ profileType, data, o
         <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic truncate max-w-[120px]">{currentNick}</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-2">
+        <div className="space-y-1">
+          <label className="text-[8px] font-black text-slate-600 uppercase ml-1 flex items-center gap-1">Idade</label>
+          <Input 
+            type="number" 
+            value={partnerData.age?.toString() || ''} 
+            onChange={(v) => pUpdate('age', v === '' ? 0 : parseInt(v))} 
+            placeholder="EX: 25" 
+          />
+        </div>
         <div className="space-y-1">
           <label className="text-[8px] font-black text-slate-600 uppercase ml-1 flex items-center gap-1"><Fingerprint size={10}/> Altura</label>
           <Input type="number" value={partnerData.height?.toString() || ''} onChange={(v) => pUpdate('height', parseInt(v) || 0)} placeholder="CM" />

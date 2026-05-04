@@ -15,6 +15,10 @@ interface FeedProps {
 
 const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
   const [feedMode, setFeedMode] = useState<'all' | 'following'>('all');
+  
+  // Highlighted Top Users
+  const topUsers = useMemo(() => MOCK_USERS.slice(0, 8), []);
+  
   const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
   const [activeModal, setActiveModal] = useState<{ type: 'comment' | 'share' | 'gallery' | 'menu'; postId?: string | number; userId?: string } | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<{ url: string; index: number; photos: GalleryPhoto[]; ownerNickname: string } | null>(null);
@@ -102,6 +106,38 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
 
   return (
     <div className="flex flex-col gap-6 p-4 pb-28 animate-in fade-in duration-500">
+      
+      {/* Top Rankings Slider (SexLog Style) */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between px-2">
+            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                <Sparkles size={12} className="text-amber-500" /> Top Rankings
+            </h3>
+            <button className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Ver Todos</button>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+            {topUsers.map((user, i) => (
+                <div 
+                    key={user.id}
+                    onClick={() => onProfileClick?.(user)}
+                    className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
+                >
+                    <div className="relative">
+                        <div className={`w-16 h-16 rounded-2xl p-0.5 border-2 transition-all group-hover:scale-105 ${i < 3 ? 'border-amber-500 shadow-lg shadow-amber-500/20' : 'border-slate-800'}`}>
+                            <img src={user.avatar} className="w-full h-full rounded-[0.8rem] object-cover" alt="" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-lg border border-slate-800 flex items-center justify-center shadow-lg">
+                            <span className="text-[9px] font-black text-amber-500 italic">#{i + 1}</span>
+                        </div>
+                    </div>
+                    <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
+                        {user.nickname}
+                    </span>
+                </div>
+            ))}
+        </div>
+      </div>
+
       <VibeMoments />
 
       <div className="mx-auto w-full max-w-[280px] mb-2">

@@ -136,13 +136,22 @@ export const SingleFields: React.FC<SingleFieldsProps> = ({ data, onChange }) =>
             <Select value={data.sexualPreference || ''} onChange={(v) => onChange('sexualPreference', v as SexualOrientation)} options={sexualPreferenceOptions} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-600 uppercase ml-2 flex items-center gap-2"><Fingerprint size={14} /> Altura (cm)</label>
+              <label className="text-[10px] font-black text-slate-600 uppercase ml-2 flex items-center gap-2">Idade</label>
+              <Input 
+                type="number" 
+                value={data.age?.toString() || ''} 
+                onChange={(v) => onChange('age', v === '' ? 0 : parseInt(v))} 
+                placeholder="EX: 25" 
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-600 uppercase ml-2 flex items-center gap-2">Altura</label>
               <Input type="number" value={data.height?.toString() || ''} onChange={(v) => onChange('height', parseInt(v) || 0)} placeholder="EX: 175" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-600 uppercase ml-2 flex items-center gap-2"><Target size={14} /> Biotipo</label>
+              <label className="text-[10px] font-black text-slate-600 uppercase ml-2 flex items-center gap-2">Biotipo</label>
               <Select value={data.biotype || ''} onChange={(v) => onChange('biotype', v as Biotype)} options={biotypeOptions} />
             </div>
           </div>
