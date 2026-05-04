@@ -11,6 +11,7 @@ import Feed from './components/Feed';
 import EventsPage from './components/EventsPage';
 import Ranking from './components/Ranking';
 import { TermsGate } from './components/TermsGate';
+import VerificationBanner from './components/VerificationBanner';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
@@ -98,24 +99,23 @@ export default function App() {
         if (hasAuth && !hasInitialSynced.current) {
             try {
                 setLoadStep('Sincronizando Identidade com Cloud...');
-                // Timeout de 5s para o refresh
+                // Aumentamos para 12s para suportar cold starts
                 await Promise.race([
                     refreshSession(),
-                    new Promise((_, r) => setTimeout(() => r(new Error('Sync Timeout')), 5000))
+                    new Promise((_, r) => setTimeout(() => r(new Error('Sincronização excedeu tempo limite')), 12000))
                 ]);
             } catch (e) {
-                log('error', 'Init Sync Failure', e);
-                // Mesmo se falhar o sync, libera o loading para usar dados locais
+                log('warn', 'Background Sync Delay', e);
             }
         }
         setLoadStep('Matriz pronta. Descriptografando interface...');
         if (mounted) setIsInitialLoading(false);
     };
     
-    // Failsafe: Remove loading screen after 8 seconds no matter what
+    // Failsafe: Remove loading screen after 15 seconds no matter what
     const timer = setTimeout(() => {
         if (mounted) setIsInitialLoading(false);
-    }, 8000);
+    }, 15000);
 
     initApp();
 
@@ -222,7 +222,7 @@ export default function App() {
 
   const renderContent = () => {
     if (activeTab === 'chat_detail' && selectedUser) {
-      return <ChatDetail user={selectedUser} onBack={() => setActiveTab('chat')} />;
+      return <ChatDetail user={selectedUser} currentUser={currentUser} onBack={() => setActiveTab('chat')} />;
     }
     
     if (activeTab === 'view_profile' && viewedProfile) {
@@ -230,7 +230,7 @@ export default function App() {
     }
 
     switch (activeTab) {
-      case 'radar': return <Explore currentUser={currentUser} onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
+      case 'radar': return <Explore currentUser={currentUser} setCurrentUser={setCurrentUser} onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onProfileClick={handleViewProfile} />;
       case 'ranking': return <Ranking onSelectUser={handleViewProfile} />;
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} />;

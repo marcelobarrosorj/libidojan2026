@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { User } from '../types';
+import VerificationGate from './VerificationGate';
 import { 
   ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert,
   Clock, Image as ImageIcon, EyeOff, Timer
@@ -11,6 +12,7 @@ import { CONFIG } from '../config';
 
 interface ChatDetailProps {
   user: User;
+  currentUser: User | null;
   onBack: () => void;
 }
 
@@ -23,7 +25,7 @@ interface Message {
   isViewed?: boolean;
 }
 
-const ChatDetail: React.FC<ChatDetailProps> = ({ user, onBack }) => {
+const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) => {
   const [messages, setMessages] = useState<Message[]>([
     { text: "Olá! Vi seu perfil e senti que nossas vibes batem bastante. Topa conversar?", from: 'them', time: '14:20' }
   ]);
@@ -159,19 +161,21 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, onBack }) => {
       </div>
 
       <div className="p-4 bg-slate-950 border-t border-slate-900 space-y-3 pb-8">
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={() => handleSend('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400', true)}
-            className="w-12 h-12 rounded-xl bg-slate-900 border border-amber-500/10 text-amber-500 flex items-center justify-center hover:bg-amber-500/10 transition-all active:scale-90"
-            title="Enviar Foto Autodestrutiva"
-          >
-            <Timer size={22} />
-          </button>
-          <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} disabled={isProcessing} placeholder="Sua mensagem..." className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50" />
-          <button onClick={() => handleSend()} disabled={!inputText.trim() || isProcessing} className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-white shadow-lg disabled:opacity-50 disabled:grayscale transition-all">
-            {isProcessing ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
-          </button>
-        </div>
+        <VerificationGate user={currentUser}>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => handleSend('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400', true)}
+              className="w-12 h-12 rounded-xl bg-slate-900 border border-amber-500/10 text-amber-500 flex items-center justify-center hover:bg-amber-500/10 transition-all active:scale-90"
+              title="Enviar Foto Autodestrutiva"
+            >
+              <Timer size={22} />
+            </button>
+            <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} disabled={isProcessing} placeholder="Sua mensagem..." className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50" />
+            <button onClick={() => handleSend()} disabled={!inputText.trim() || isProcessing} className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center text-white shadow-lg disabled:opacity-50 disabled:grayscale transition-all">
+              {isProcessing ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+            </button>
+          </div>
+        </VerificationGate>
       </div>
     </div>
   );

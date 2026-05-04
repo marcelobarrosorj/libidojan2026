@@ -28,6 +28,7 @@ import ConsentMatrix from './ConsentMatrix';
 import StealthModeToggle from './StealthModeToggle';
 import BlurredImage from './BlurredImage';
 import PhotoGridModal from './PhotoGridModal';
+import VerificationGate from './VerificationGate';
 import { useMemo } from 'react';
 
 interface ProfileProps {
@@ -311,30 +312,32 @@ const Profile: React.FC<ProfileProps> = ({
              {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} className="text-slate-500" />}
            </button>
         ) : (
-            <div className="flex items-center gap-2">
-                <button 
-                  onClick={async () => {
-                    const newValue = !isFollowing;
-                    const result = await toggleFollow(user.id);
-                    setIsFollowing(result);
-                    soundService.play('LIKE');
-                    showNotification(result ? `Você agora segue ${user.nickname}` : `Você deixou de seguir ${user.nickname}`, 'success');
-                  }} 
-                  className={`p-3 rounded-2xl border transition-all active:scale-90 shadow-xl ${isFollowing ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 text-amber-500 border-amber-500/20'}`}
-                >
-                    {isFollowing ? <UserMinus size={20} /> : <UserPlus size={20} />}
-                </button>
-                <button 
-                  onClick={() => {
-                    showNotification(`Você deu um Vouch de respeito para ${user.nickname}!`, 'success');
-                    soundService.play('MATCH');
-                  }}
-                  className="p-3 rounded-2xl border bg-emerald-500/10 text-emerald-500 border-emerald-500/20 transition-all active:scale-90 shadow-xl"
-                  title="Dar Vouch (Endosso)"
-                >
-                    <ShieldCheck size={20} />
-                </button>
-            </div>
+            <VerificationGate user={cache.userData}>
+                <div className="flex items-center gap-2">
+                    <button 
+                    onClick={async () => {
+                        const newValue = !isFollowing;
+                        const result = await toggleFollow(user.id);
+                        setIsFollowing(result);
+                        soundService.play('LIKE');
+                        showNotification(result ? `Você agora segue ${user.nickname}` : `Você deixou de seguir ${user.nickname}`, 'success');
+                    }} 
+                    className={`p-3 rounded-2xl border transition-all active:scale-90 shadow-xl ${isFollowing ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 text-amber-500 border-amber-500/20'}`}
+                    >
+                        {isFollowing ? <UserMinus size={20} /> : <UserPlus size={20} />}
+                    </button>
+                    <button 
+                    onClick={() => {
+                        showNotification(`Você deu um Vouch de respeito para ${user.nickname}!`, 'success');
+                        soundService.play('MATCH');
+                    }}
+                    className="p-3 rounded-2xl border bg-emerald-500/10 text-emerald-500 border-emerald-500/20 transition-all active:scale-90 shadow-xl"
+                    title="Dar Vouch (Endosso)"
+                    >
+                        <ShieldCheck size={20} />
+                    </button>
+                </div>
+            </VerificationGate>
         )}
       </div>
 
@@ -669,6 +672,26 @@ const Profile: React.FC<ProfileProps> = ({
                     </div>
                     <ChevronLeft size={20} className="text-white rotate-180 group-hover:translate-x-1 transition-transform" />
                 </button>
+            </div>
+        )}
+
+        {isOwnProfile && (
+            <div className="px-2 mt-4 space-y-4">
+                <div className="p-6 rounded-[2.5rem] bg-slate-900/60 border border-white/5 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <HelpCircle size={16} className="text-amber-500" />
+                        <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Suporte à Matriz</h4>
+                    </div>
+                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
+                        Dúvidas sobre sua conta ou pagamentos? Entre em contato:
+                    </p>
+                    <a 
+                        href="mailto:libidoapp@gmail.com"
+                        className="block w-full py-3 bg-white/5 rounded-2xl text-center text-amber-500 text-[10px] font-black uppercase tracking-widest border border-white/5 hover:bg-white/10 transition-colors"
+                    >
+                        libidoapp@gmail.com
+                    </a>
+                </div>
             </div>
         )}
 

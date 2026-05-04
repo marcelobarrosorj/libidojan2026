@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
-import { User, RadarProfile } from '../types';
+import { User, RadarProfile, UserType } from '../types';
 import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
-import { log, likeProfile, passProfile, showNotification } from '../services/authUtils';
+import { log, likeProfile, passProfile, showNotification, saveUserData } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { getCurrentPosition, haversineKm } from '../services/geoService';
 import RadarPage from '../radar/RadarPage';
@@ -16,9 +16,10 @@ interface ExploreProps {
   onMatch?: (user: User) => void;
   onProfileClick?: (p: RadarProfile) => void;
   currentUser: User | null;
+  setCurrentUser: (u: User | null) => void;
 }
 
-const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser }) => {
+const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser, setCurrentUser }) => {
   const [viewMode, setViewMode] = useState<'radar' | 'swipe'>('radar');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchModal, setShowMatchModal] = useState(false);
@@ -229,6 +230,14 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser 
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
         reason={paywallReason}
+        onUpgrade={() => {
+            if (currentUser) {
+              const updatedUser = { ...currentUser, isSubscriber: true };
+              setCurrentUser(updatedUser);
+              saveUserData(updatedUser);
+              showNotification('Parabéns! Sua conta agora é Premium.', 'success');
+            }
+        }}
       />
 
       {/* Indicator for remaining views */}

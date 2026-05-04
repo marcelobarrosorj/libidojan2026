@@ -2,9 +2,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert, Trophy } from 'lucide-react';
-import { cache } from '../services/authUtils';
+import { cache, isOwner, isPremiumUser } from '../services/authUtils';
 import { Plan, User } from '../types';
 import LibidoIcon from './common/LibidoIcon';
+import VerificationBanner from './VerificationBanner';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user }) => {
-  const isPremium = user?.is_premium || user?.plan === Plan.GOLD || user?.plan === Plan.PREMIUM;
+  const isPremium = isPremiumUser(user);
 
   return (
     <div className="flex flex-col min-h-[100dvh] h-[100dvh] max-w-md mx-auto relative bg-[#050505] border-x border-slate-900/50 overflow-hidden">
@@ -58,6 +59,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto scrollbar-hide">
+        {user && !user.emailVerified && user.email && !isOwner(user) && (
+            <VerificationBanner email={user.email} />
+        )}
         {children}
         
         {/* AVISO DE SEGURANÇA: Barreira de Deterrence */}

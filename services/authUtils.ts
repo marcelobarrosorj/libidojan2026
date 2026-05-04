@@ -74,6 +74,8 @@ export function getUserData(): User | null {
           user.plan = Plan.GOLD;
           user.is_premium = true;
           user.trustLevel = TrustLevel.OURO;
+          user.emailVerified = true;
+          user.isSubscriber = true;
       }
       // Garantir que following existe
       if (!user.following) user.following = [];
@@ -110,6 +112,8 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
     if (isOwner(updated)) {
         updated.plan = Plan.GOLD;
         updated.is_premium = true;
+        updated.emailVerified = true;
+        updated.isSubscriber = true;
     }
 
     // Proteção Anti-Downgrade: Se o cache diz que é PREMIUM e o novo dado diz que é FREE,
@@ -178,7 +182,13 @@ export const syncCaches = async () => {
         }
 
         if (data) {
+            const { data: { user: supabaseUser } } = await supabase.auth.getUser();
             const cloudData = (data.data || {}) as User;
+            
+            // Sincroniza status de verificação de e-mail do Supabase Auth
+            if (supabaseUser) {
+                cloudData.emailVerified = !!supabaseUser.email_confirmed_at;
+            }
             
             // Prioriza colunas individuais do banco de dados sobre o JSON 'data'
             // Isso garante que mudanças feitas por sistemas externos (Stripe/Webhooks) sejam respeitadas
@@ -191,6 +201,9 @@ export const syncCaches = async () => {
             if (isOwner(cloudData)) {
                 cloudData.plan = Plan.GOLD;
                 cloudData.is_premium = true;
+                cloudData.emailVerified = true;
+                cloudData.isSubscriber = true;
+                cloudData.trustLevel = TrustLevel.OURO;
             }
             if (!cloudData.following) cloudData.following = [];
 

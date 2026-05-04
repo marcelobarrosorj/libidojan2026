@@ -1,5 +1,5 @@
 
-export enum UserType { HOMEM = 'Homem', MULHER = 'Mulher', CASAIS = 'Casais' }
+export enum UserType { HOMEM = 'Homem', MULHER = 'Mulher', CASAIS = 'Casais', GRUPO = 'Grupos' }
 export enum TrustLevel { BRONZE = 'Bronze', PRATA = 'Prata', OURO = 'Ouro' }
 export enum Plan { FREE = 'Free', PREMIUM = 'Premium', GOLD = 'Gold' }
 export enum TransactionType { SUBSCRIPTION = 'subscription', BOOST = 'boost', CREDITS = 'credits' }
@@ -157,6 +157,7 @@ export interface User {
   totalViews?: number;
   rank?: number;
   isSubscriber: boolean;
+  emailVerified?: boolean;
   dailyProfileViews: number;
   lastResetDate?: string;
   // Novos campos estratégicos
