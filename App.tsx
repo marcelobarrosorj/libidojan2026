@@ -267,7 +267,10 @@ export default function App() {
         </div>
         
         {isProtected && (
-          <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-500">
+          <div 
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-500 cursor-pointer"
+            onClick={() => window.location.reload()} // Failsafe para resetar o estado se necessário ou apenas instrução
+          >
              <div className="p-8 rounded-[3.5rem] bg-slate-900/80 border border-amber-500/30 flex flex-col items-center text-center space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
                <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
                  <Lock size={40} />
@@ -279,6 +282,12 @@ export default function App() {
                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-[200px]">
                  Privacidade é nosso ativo mais valioso. Capturas de tela e gravação são proibidas.
                </p>
+               <button 
+                  onClick={(e) => { e.stopPropagation(); window.location.reload(); }}
+                  className="mt-2 px-6 py-2 bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all"
+               >
+                 Tentar Novamente
+               </button>
              </div>
           </div>
         )}

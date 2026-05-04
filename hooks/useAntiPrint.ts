@@ -15,11 +15,10 @@ export function useAntiPrint() {
       return false;
     };
 
-    // 2. Hide content when window loses focus (Anti-PrtScn/Capture deterrence)
-    const handleBlur = () => {
-      setIsBlurred(true);
-    };
-
+    // 2. We removed the window 'blur' trigger because it causes a black screen
+    // when the user opens the file selection dialog for photo uploads.
+    // Instead, we will focus on preventing keyboard shortcuts and right clicks.
+    
     const handleFocus = () => {
       setIsBlurred(false);
     };
@@ -41,7 +40,6 @@ export function useAntiPrint() {
     };
 
     window.addEventListener('contextmenu', handleContextMenu);
-    window.addEventListener('blur', handleBlur);
     window.addEventListener('focus', handleFocus);
     window.addEventListener('keydown', handleKeyDown);
 
@@ -50,7 +48,6 @@ export function useAntiPrint() {
 
     return () => {
       window.removeEventListener('contextmenu', handleContextMenu);
-      window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('keydown', handleKeyDown);
       document.body.classList.remove('antiprint-active');
