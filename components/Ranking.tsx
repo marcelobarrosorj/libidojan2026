@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Trophy, Flame, TrendingUp, Award, Crown, User as UserIcon, MapPin, BadgeCheck, ShieldCheck } from 'lucide-react';
 import { User, TrustLevel } from '../types';
 import { cache } from '../services/authUtils';
+import { fetchLatestProfiles } from '../services/repo';
 
 interface RankingProps {
   onSelectUser?: (userId: string) => void;
@@ -17,27 +18,60 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    // Simulate API fetch based on tab
-    setLoading(true);
-    setTimeout(() => {
-      const mockUsers: User[] = Array.from({ length: 15 }).map((_, i) => ({
-        id: `user-${i}`,
-        nickname: `Destaque ${i + 1}`,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 100}`,
-        age: 20 + Math.floor(Math.random() * 20),
-        totalLikes: 1000 - (i * 50) + Math.floor(Math.random() * 20),
-        totalViews: 5000 - (i * 200),
-        trustLevel: i < 3 ? TrustLevel.OURO : i < 7 ? TrustLevel.PRATA : TrustLevel.BRONZE,
-        verifiedAccount: i % 3 === 0,
-        verificationScore: 70 + Math.floor(Math.random() * 30),
-        level: 25 - i,
-        rank: i + 1,
-        city: 'Rio de Janeiro',
-        neighborhood: 'Copacabana',
-      } as any));
-      setUsers(mockUsers);
+    const loadRankingData = async () => {
+      setLoading(true);
+      
+      if (activeTab === 'new') {
+        try {
+          const latest = await fetchLatestProfiles(20);
+          console.log(`[Ranking] Encontrados ${latest.filter(p => !p.isMock).length} usuários reais de ${latest.length} totais.`);
+          
+          const mappedUsers: User[] = latest.map((p, i) => ({
+            id: p.id,
+            nickname: p.name,
+            avatar: p.avatar,
+            age: (p as any).age || 18,
+            totalLikes: Math.floor(Math.random() * 50), // Dados simulados para novatos
+            totalViews: Math.floor(Math.random() * 200),
+            trustLevel: p.trustLevel || TrustLevel.BRONZE,
+            verifiedAccount: p.trustLevel === TrustLevel.OURO,
+            verificationScore: p.trustLevel === TrustLevel.OURO ? 100 : 30,
+            level: 1,
+            rank: i + 1,
+            city: p.city || 'Matriz',
+            neighborhood: p.neighborhood || '',
+            bio: p.bio || '',
+            serialNumber: p.serialNumber
+          } as any));
+          setUsers(mappedUsers);
+        } catch (e) {
+          console.error('[Ranking] Error loading new users:', e);
+        }
+      } else {
+        // Fallback para outros rankings (mock por enquanto)
+        setTimeout(() => {
+          const mockUsers: User[] = Array.from({ length: 15 }).map((_, i) => ({
+            id: `user-${i}`,
+            nickname: `Destaque ${i + 1}`,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 100}`,
+            age: 20 + Math.floor(Math.random() * 20),
+            totalLikes: 1000 - (i * 50) + Math.floor(Math.random() * 20),
+            totalViews: 5000 - (i * 200),
+            trustLevel: i < 3 ? TrustLevel.OURO : i < 7 ? TrustLevel.PRATA : TrustLevel.BRONZE,
+            verifiedAccount: i % 3 === 0,
+            verificationScore: 70 + Math.floor(Math.random() * 30),
+            level: 25 - i,
+            rank: i + 1,
+            city: 'Rio de Janeiro',
+            neighborhood: 'Copacabana',
+          } as any));
+          setUsers(mockUsers);
+        }, 800);
+      }
       setLoading(false);
-    }, 800);
+    };
+
+    loadRankingData();
   }, [activeTab]);
 
   const tabs = [

@@ -1,13 +1,14 @@
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { MOCK_POSTS, MOCK_USERS } from '../constants';
-import { Post, User, GalleryPhoto } from '../types';
-import { Heart, MessageCircle, MoreHorizontal, X, Maximize2, ChevronLeft, ChevronRight, Send, Flag, UserX, Link as LinkIcon, EyeOff, Users, Sparkles } from 'lucide-react';
+import { Post, User, GalleryPhoto, RadarProfile } from '../types';
+import { Heart, MessageCircle, MoreHorizontal, X, Maximize2, ChevronLeft, ChevronRight, Send, Flag, UserX, Link as LinkIcon, EyeOff, Users, Sparkles, UserPlus } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
 import { log, handleButtonAction, showNotification, cache } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import ProtectedImage from './common/ProtectedImage';
 import VibeMoments from './VibeMoments';
+import { fetchLatestProfiles } from '../services/repo';
 
 interface FeedProps {
   onProfileClick?: (user: User) => void;
@@ -15,10 +16,19 @@ interface FeedProps {
 
 const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
   const [feedMode, setFeedMode] = useState<'all' | 'following'>('all');
+  const [newUsers, setNewUsers] = useState<RadarProfile[]>([]);
   
   // Highlighted Top Users
   const topUsers = useMemo(() => {
     return [...MOCK_USERS].sort(() => Math.random() - 0.5).slice(0, 8);
+  }, []);
+
+  useEffect(() => {
+    const loadNewUsers = async () => {
+      const data = await fetchLatestProfiles(10);
+      setNewUsers(data);
+    };
+    loadNewUsers();
   }, []);
   
   const [posts, setPosts] = useState<Post[]>(() => [...MOCK_POSTS].sort(() => Math.random() - 0.5));
@@ -137,6 +147,47 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
                     </span>
                 </div>
             ))}
+        </div>
+      </div>
+
+      {/* Novos Usuários Slider */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between px-2">
+            <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                <UserPlus size={12} className="text-amber-500" /> Novos Agentes
+            </h3>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+            {newUsers.length > 0 ? newUsers.map((user) => (
+                <div 
+                    key={user.id}
+                    onClick={() => onProfileClick?.(user as any)}
+                    className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
+                >
+                    <div className="relative">
+                        <div className="w-16 h-16 rounded-3xl p-0.5 border border-white/10 group-hover:border-amber-500 transition-all group-hover:scale-105 overflow-hidden">
+                            <img src={user.avatar} className="w-full h-full rounded-[1.4rem] object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
+                        </div>
+                        <div className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-amber-500 rounded-md shadow-lg border border-black z-10">
+                            <span className="text-[7px] font-black text-black uppercase tracking-tighter italic">NEW</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
+                          {user.name}
+                      </span>
+                      <span className="text-[7px] font-black text-amber-500/50 font-mono tracking-widest">{user.serialNumber}</span>
+                    </div>
+                </div>
+            )) : (
+              // Skeleton/Loading
+              [1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="w-16 flex flex-col items-center gap-2 shrink-0 animate-pulse">
+                  <div className="w-16 h-16 rounded-3xl bg-slate-900 border border-white/5" />
+                  <div className="w-10 h-2 bg-slate-900 rounded" />
+                </div>
+              ))
+            )}
         </div>
       </div>
 

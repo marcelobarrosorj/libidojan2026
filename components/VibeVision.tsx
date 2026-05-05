@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Sparkles, ImageIcon, Loader2, Wand2, Download, RefreshCw } from 'lucide-react';
+import { Sparkles, ImageIcon, Loader2, Wand2, Download, RefreshCw, Send } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
-import { log } from '../services/authUtils';
+import { log, cache, saveUserData, showNotification } from '../services/authUtils';
 
 const VibeVision: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -63,6 +63,26 @@ const VibeVision: React.FC = () => {
     link.click();
   };
 
+  const handlePublish = () => {
+    if (!generatedContent) return;
+    const currentUser = cache.userData;
+    if (currentUser) {
+        const photoId = `ai_vision_${Date.now()}`;
+        const newPhoto = {
+            id: photoId,
+            url: generatedContent,
+            timestamp: new Date().toISOString(),
+            isAI: true
+        };
+        const updatedGallery = [newPhoto, ...(currentUser.gallery || [])];
+        const updatedUser = { ...currentUser, gallery: updatedGallery };
+        saveUserData(updatedUser);
+        showNotification('Visão publicada na sua Galeria da Matriz!', 'success');
+    } else {
+        showNotification('Acesse sua conta para publicar.', 'error');
+    }
+  };
+
   return (
     <div className="p-6 space-y-8 animate-in fade-in duration-500 pb-24 max-w-lg mx-auto">
       <div className="space-y-1">
@@ -78,12 +98,21 @@ const VibeVision: React.FC = () => {
           <div className="relative w-full h-full animate-in zoom-in-95 duration-1000">
             <img src={generatedContent} alt="AI Vision" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-8">
-              <button 
-                onClick={handleDownload}
-                className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl text-white hover:bg-white/20 transition-all active:scale-95"
-              >
-                <Download size={24} />
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  onClick={handleDownload}
+                  className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl text-white hover:bg-white/20 transition-all active:scale-95"
+                >
+                  <Download size={24} />
+                </button>
+                <button 
+                  onClick={handlePublish}
+                  className="bg-amber-500 p-4 rounded-2xl text-black shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  <Send size={20} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Publicar</span>
+                </button>
+              </div>
               <button 
                 onClick={() => { setGeneratedContent(null); setPrompt(''); }}
                 className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl text-white hover:bg-white/20 transition-all active:scale-95"

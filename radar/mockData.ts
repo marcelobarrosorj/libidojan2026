@@ -15,6 +15,7 @@ const generateGallery = (id: string, count: number) => {
 export const mockRadarProfiles: RadarProfile[] = [
   {
     id: 'm1', name: 'Ana & Bruno', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    serialNumber: '200001',
     lat: -23.5595, lon: -46.6533, city: 'São Paulo', neighborhood: 'Jardins',
     bio: 'Casal liberal em busca de novas experiências.', category: 'Casais',
     trustLevel: TrustLevel.OURO, braveryLevel: 9, gallery: generateGallery('m1', 4),
@@ -22,6 +23,7 @@ export const mockRadarProfiles: RadarProfile[] = [
   },
   {
     id: 'm2', name: 'Carla', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
+    serialNumber: '200002',
     lat: -23.5650, lon: -46.6510, city: 'São Paulo', neighborhood: 'Paulista',
     bio: 'Discreta e decidida.', category: 'Mulher',
     trustLevel: TrustLevel.PRATA, braveryLevel: 7, gallery: generateGallery('m2', 3),
@@ -29,12 +31,14 @@ export const mockRadarProfiles: RadarProfile[] = [
   },
   {
     id: 'm3', name: 'Marcos', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+    serialNumber: '200003',
     lat: -23.5400, lon: -46.6300, city: 'São Paulo', neighborhood: 'Centro',
     bio: 'Aproveitando o melhor do lifestyle.', category: 'Homem',
     trustLevel: TrustLevel.BRONZE, braveryLevel: 6, gallery: generateGallery('m3', 2)
   },
   {
     id: 'm4', name: 'Lia & Dan', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
+    serialNumber: '200004',
     lat: -23.5800, lon: -46.6800, city: 'São Paulo', neighborhood: 'Itaim Bibi',
     bio: 'Casal bi, amamos conhecer pessoas novas.', category: 'Casais',
     trustLevel: TrustLevel.OURO, braveryLevel: 10, gallery: generateGallery('m4', 5),
@@ -42,6 +46,7 @@ export const mockRadarProfiles: RadarProfile[] = [
   },
   {
     id: 'm5', name: 'Julia', avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400',
+    serialNumber: '200005',
     lat: -23.6000, lon: -46.6600, city: 'São Paulo', neighborhood: 'Moema',
     bio: 'Curiosa e autêntica.', category: 'Mulher',
     trustLevel: TrustLevel.PRATA, braveryLevel: 8, gallery: generateGallery('m5', 3)

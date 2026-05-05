@@ -46,6 +46,10 @@ export const isPremiumUser = (user: User | null): boolean => {
 export const syncWithCloud = async (user: User) => {
     try {
         if (!user || !user.id) return;
+        
+        const timestamp = new Date().toISOString();
+        
+        // Tentativa de upsert com colunas básicas que devem existir
         const { error } = await supabase
             .from('profiles')
             .upsert({ 
@@ -53,9 +57,31 @@ export const syncWithCloud = async (user: User) => {
                 nickname: user.nickname, 
                 data: user,
                 plan: user.plan,
-                updated_at: new Date().toISOString()
-            });
-        if (error) log('warn', 'Cloud Sync Error', error);
+                updated_at: timestamp
+            }, { onConflict: 'id' });
+            
+        if (error) {
+            log('warn', 'Cloud Sync Error (Tentando modo simplificado)', error);
+            // Fallback simplificado garantindo id, data e updated_at
+            const fallbackData: any = { 
+                id: user.id, 
+                data: user,
+                updated_at: timestamp
+            };
+            if (user.nickname) fallbackData.nickname = user.nickname;
+            
+            // Tenta o upsert mais básico possível
+            const { error: secondError } = await supabase.from('profiles').upsert(fallbackData, { onConflict: 'id' });
+            
+            if (secondError) {
+                // Última tentativa: apenas ID e DATA JSON + timestamp
+                await supabase.from('profiles').upsert({ 
+                    id: user.id, 
+                    data: user,
+                    updated_at: timestamp
+                }, { onConflict: 'id' });
+            }
+        }
     } catch (e) {
         log('warn', 'Cloud Sync Offline ou Erro de Rede', e);
     }
@@ -76,6 +102,7 @@ export function getUserData(): User | null {
           user.trustLevel = TrustLevel.OURO;
           user.emailVerified = true;
           user.isSubscriber = true;
+          if (!user.serialNumber) user.serialNumber = '000001';
       }
       // Garantir que following existe
       if (!user.following) user.following = [];
@@ -104,6 +131,34 @@ export const authEvents = {
     }
 };
 
+/**
+ * Gera o próximo número de série sequencial
+ */
+export const getNextSerialNumber = async (user: Partial<User>): Promise<string> => {
+    // Se for o proprietário, sempre retorna 000001
+    if (user.email === OWNER_EMAIL || user.id === OWNER_ID) {
+        return '000001';
+    }
+
+    try {
+        // Busca a contagem total de perfis no Supabase
+        const { count, error } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) throw error;
+
+        // O número será a contagem + 1 (ajustado para não colidir com o 000001 se já houver registros)
+        // Se a contagem for 0, o primeiro usuário (não dono) seria 000002? 
+        // Na verdade, se o dono já existe, count será pelo menos 1.
+        const nextNum = (count || 0) + 1;
+        return nextNum.toString().padStart(6, '0');
+    } catch (e) {
+        log('warn', 'Erro ao gerar número de série sequencial, usando fallback aleatório', e);
+        return Math.floor(Math.random() * 900000 + 100000).toString();
+    }
+};
+
 export const saveUserData = (userData: Partial<User> | UserData) => {
     const current = cache.userData || {} as User;
     let updated = { ...current, ...userData } as User;
@@ -114,6 +169,7 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
         updated.is_premium = true;
         updated.emailVerified = true;
         updated.isSubscriber = true;
+        if (!updated.serialNumber) updated.serialNumber = '000001';
         // Se mudou a idade manualmente, não deixa resetar
         if (userData.age) updated.age = userData.age;
     }
@@ -222,6 +278,7 @@ export const syncCaches = async () => {
                 cloudData.emailVerified = true;
                 cloudData.isSubscriber = true;
                 cloudData.trustLevel = TrustLevel.OURO;
+                if (!cloudData.serialNumber) cloudData.serialNumber = '000001';
             }
             if (!cloudData.following) cloudData.following = [];
 
@@ -306,10 +363,6 @@ export const passProfile = async (id: string) => ({});
 
 export const simulateApiCall = async (tag: string, data: any, delay: number = 1000) => {
     log('info', `[AUDIT][API_REQUEST][${tag}]`, data);
-    // Simula uma falha em 5% das vezes para auditoria de tratamento de erro
-    if (Math.random() < 0.05) {
-        throw new Error('Falha simulada na comunicação com o servidor.');
-    }
     return new Promise(resolve => setTimeout(resolve, delay));
 };
 

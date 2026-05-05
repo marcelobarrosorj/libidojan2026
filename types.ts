@@ -167,9 +167,14 @@ export interface User {
   prefersBlurredPhotos: boolean;
   partner1?: ProfileData;
   partner2?: ProfileData;
+  serialNumber?: string;
+  lastMoment?: {
+    imageUrl: string;
+    timestamp: string;
+  };
 }
 
-export type Step = 'type' | 'details' | 'physical' | 'confirm';
+export type Step = 'type' | 'details' | 'physical' | 'photo' | 'confirm';
 export type ProfileType = 'man' | 'woman' | 'couple_fxm' | 'couple_mxm' | 'couple_fxf' | 'trans_man' | 'trans_woman';
 
 export interface CoupleProfileData { 
@@ -238,6 +243,7 @@ export interface RadarResultItem {
   lat: number;
   lon: number;
   trustLevel: TrustLevel;
+  serialNumber?: string;
   isLocked?: boolean;
   isMock?: boolean;
 }
@@ -249,10 +255,11 @@ export interface UserProfile {
   lon: number;
   city: string;
   neighborhood: string;
-  category: string;
+  category: string | UserType;
   categories: string[];
   avatar: string;
   bio: string;
+  serialNumber?: string;
 }
 
 export interface RadarProfile {
@@ -268,6 +275,7 @@ export interface RadarProfile {
   locationLabel?: string;
   bio?: string;
   category?: string;
+  serialNumber?: string;
   isMock?: boolean;
   braveryLevel?: number;
   trustLevel?: TrustLevel;

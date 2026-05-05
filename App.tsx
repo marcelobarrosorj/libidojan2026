@@ -14,6 +14,8 @@ import { soundService } from './services/soundService';
 import { TermsGate } from './components/TermsGate';
 import VerificationBanner from './components/VerificationBanner';
 import AdminReports from './components/AdminReports';
+import { GlobalSearch } from './components/GlobalSearch';
+import { PhotoReminder } from './components/PhotoReminder';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
@@ -22,6 +24,7 @@ import { Lock } from 'lucide-react';
 import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log, authEvents } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
 import { initSecurityLayer } from './services/securityService';
+import { getProfileById } from './services/repo';
 
 export default function App() {
   const isProtected = useAntiPrint();
@@ -33,6 +36,7 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loadStep, setLoadStep] = useState('Iniciando Matriz...');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const local = getUserData();
     if (local) cache.userData = local;
@@ -199,6 +203,17 @@ export default function App() {
     setActiveTab('view_profile');
   };
 
+  const handleSearchSelect = async (profileId: string) => {
+    try {
+        const profile = await getProfileById(profileId);
+        if (profile) {
+            handleViewProfile(profile);
+        }
+    } catch (e) {
+        log('error', 'Erro ao carregar perfil da busca', e);
+    }
+  };
+
   const renderContent = () => {
     // Rotas de detalhe que sobrepõem abas principais
     if (activeTab === 'chat_detail' && selectedUser) {
@@ -278,10 +293,31 @@ export default function App() {
     <AuthContext.Provider value={authContextValue}>
       <div className="relative w-full h-[100dvh] flex justify-center bg-black overflow-hidden">
         <div className={`w-full h-full flex flex-col blur-on-focus-loss transition-all duration-500 ${isProtected ? 'blurred' : ''}`}>
-          <Layout activeTab={activeTab} setActiveTab={handleTabChange} user={currentUser}>
+          <Layout 
+            activeTab={activeTab} 
+            setActiveTab={handleTabChange} 
+            user={currentUser}
+            onSearch={() => setIsSearchOpen(true)}
+          >
             {renderContent()}
           </Layout>
         </div>
+
+        <GlobalSearch 
+          isOpen={isSearchOpen} 
+          onClose={() => setIsSearchOpen(false)} 
+          onSelectProfile={handleSearchSelect} 
+        />
+
+        <PhotoReminder 
+          isVisible={
+            isAuthenticated && 
+            !!currentUser && 
+            (!currentUser.avatar || currentUser.avatar.includes('picsum.photos/seed')) &&
+            activeTab !== 'profile_settings'
+          }
+          onUpdate={() => setActiveTab('profile_settings')}
+        />
         
         {isProtected && (
           <div 

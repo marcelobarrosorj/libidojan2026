@@ -59,7 +59,8 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
             </div>
             
             <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex flex-col mb-1">
+                <span className="text-[7px] font-black font-mono text-amber-500/50 tracking-widest uppercase">{isLocked ? 'ID Oculto' : `ID: ${p.serialNumber || '------'}`}</span>
                 <h4 className={`text-sm font-bold text-white truncate italic ${isLocked ? 'opacity-30' : ''}`}>
                     {isLocked ? 'Sinal não sincronizado' : p.name}
                 </h4>

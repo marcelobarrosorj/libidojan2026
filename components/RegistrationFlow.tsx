@@ -19,7 +19,9 @@ import {
   ShieldCheck, 
   Mail, 
   User as UserIcon, 
-  Users 
+  Users,
+  Camera,
+  Trash2
 } from 'lucide-react';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,12 +34,12 @@ export const RegistrationFlow: React.FC<{
   const [profileType, setProfileType] = useState<ProfileType>('couple_fxm');
   const [error, setError] = useState<string | null>(null);
 
-  const [singleData, setSingleData] = useState<ProfileData & { password?: string }>({ 
-    nickname: '', email: '', biotype: Biotype.PADRAO, lookingFor: [], password: ''
+  const [singleData, setSingleData] = useState<ProfileData & { password?: string, avatar?: string }>({ 
+    nickname: '', email: '', biotype: Biotype.PADRAO, lookingFor: [], password: '', avatar: ''
   });
 
-  const [coupleData, setCoupleData] = useState<CoupleProfileData & { password?: string }>({
-    mainNickname: '', email: '', password: '',
+  const [coupleData, setCoupleData] = useState<CoupleProfileData & { password?: string, avatar?: string }>({
+    mainNickname: '', email: '', password: '', avatar: '',
     partner1: { nickname: '', biotype: Biotype.PADRAO }, 
     partner2: { nickname: '', biotype: Biotype.PADRAO },
     lookingFor: [UserType.CASAIS]
@@ -78,6 +80,16 @@ export const RegistrationFlow: React.FC<{
     }
 
     if (step === 'physical') {
+      setStep('photo');
+      return;
+    }
+
+    if (step === 'photo') {
+      const avatar = isCouple ? coupleData.avatar : singleData.avatar;
+      if (!avatar) {
+        setError('Obrigatório: Envie pelo menos 1 foto para se cadastrar na Matriz.');
+        return;
+      }
       setStep('confirm');
       return;
     }
@@ -96,7 +108,24 @@ export const RegistrationFlow: React.FC<{
     if (step === 'type') onCancel?.();
     else if (step === 'details') setStep('type');
     else if (step === 'physical') setStep('details');
-    else if (step === 'confirm') setStep('physical');
+    else if (step === 'photo') setStep('physical');
+    else if (step === 'confirm') setStep('photo');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        if (isCouple) {
+          setCoupleData({...coupleData, avatar: base64String});
+        } else {
+          setSingleData({...singleData, avatar: base64String});
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -189,15 +218,70 @@ export const RegistrationFlow: React.FC<{
           </div>
         )}
 
+        {step === 'photo' && (
+          <div className="space-y-8 animate-in slide-in-from-right-4">
+            <StepHeader title="Identidade Visual" subtitle="Uma foto é obrigatória para cadastro" />
+            <div className="flex flex-col items-center">
+              <div className="relative group">
+                <div className={`w-48 h-48 rounded-[3rem] border-2 border-dashed overflow-hidden flex items-center justify-center transition-all ${
+                  (isCouple ? coupleData.avatar : singleData.avatar) 
+                  ? 'border-amber-500/50 bg-slate-900' 
+                  : 'border-white/10 bg-slate-900/50'
+                }`}>
+                  {(isCouple ? coupleData.avatar : singleData.avatar) ? (
+                    <img src={isCouple ? coupleData.avatar : singleData.avatar} className="w-full h-full object-cover" alt="Profile" />
+                  ) : (
+                    <div className="text-center p-6">
+                      <Camera size={40} className="text-slate-700 mx-auto mb-2" />
+                      <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Toque para enviar</p>
+                    </div>
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+                {(isCouple ? coupleData.avatar : singleData.avatar) && (
+                   <button 
+                    onClick={() => isCouple ? setCoupleData({...coupleData, avatar: ''}) : setSingleData({...singleData, avatar: ''})}
+                    className="absolute -top-3 -right-3 w-10 h-10 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-lg active:scale-95"
+                   >
+                     <Trash2 size={16} />
+                   </button>
+                )}
+              </div>
+              <div className="mt-8 space-y-4 max-w-[280px]">
+                <div className="flex items-start gap-3 bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10">
+                  <ShieldCheck size={18} className="text-amber-500 shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-amber-500/80 font-bold uppercase leading-relaxed text-left">
+                    Sua foto será analisada pela governança. Evite fotos de terceiros ou paisagens.
+                  </p>
+                </div>
+                <p className="text-[9px] text-slate-600 uppercase font-black tracking-widest text-center leading-relaxed">
+                  A Matriz exige pelo menos uma foto nítida para garantir a segurança da comunidade NoFake.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {step === 'confirm' && (
           <div className="space-y-8 text-center py-10 animate-in zoom-in-95">
-            <ShieldCheck size={80} className="text-amber-500 mx-auto animate-pulse" />
+            <div className="relative inline-block">
+               <ShieldCheck size={80} className="text-amber-500 mx-auto animate-pulse" />
+               <div className="absolute inset-0 bg-amber-500/20 blur-[40px] -z-10 rounded-full" />
+            </div>
             <div className="space-y-2">
               <h3 className="text-4xl font-black text-white italic uppercase tracking-tighter">
                 {isCouple ? coupleData.mainNickname : singleData.nickname}
               </h3>
               <p className="text-[10px] text-amber-500 font-black uppercase tracking-[0.4em]">Cadastro Pré-Aprovado</p>
               <p className="text-slate-500 font-mono text-xs">{isCouple ? coupleData.email : singleData.email}</p>
+            </div>
+            <div className="w-20 h-20 rounded-2xl border border-white/10 mx-auto overflow-hidden grayscale">
+               <img src={isCouple ? coupleData.avatar : singleData.avatar} alt="" className="w-full h-full object-cover" />
             </div>
             <p className="text-xs text-slate-400 italic max-w-[250px] mx-auto leading-relaxed pt-4">
               Ao concluir, você confirma ser maior de 18 anos e aceita as políticas de privacidade da Matriz Libido.

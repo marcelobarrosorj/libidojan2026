@@ -53,7 +53,8 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
       neighborhood: p.neighborhood,
       lat: p.lat,
       lon: p.lon,
-      trustLevel: (p as any).trustLevel || TrustLevel.BRONZE
+      trustLevel: (p as any).trustLevel || TrustLevel.BRONZE,
+      serialNumber: p.serialNumber
     });
   }
 

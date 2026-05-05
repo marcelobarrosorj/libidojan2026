@@ -92,7 +92,10 @@ const Profile: React.FC<ProfileProps> = ({
   /**
    * Adiciona nova foto à galeria
    */
-  const handleAddPhoto = () => {
+  const [editingMode, setEditingMode] = useState<'avatar' | 'gallery' | null>(null);
+
+  const handleAddPhoto = (mode: 'avatar' | 'gallery' = 'gallery') => {
+    setEditingMode(mode);
     if (fileInputRef.current) {
         fileInputRef.current.click();
     }
@@ -112,21 +115,32 @@ const Profile: React.FC<ProfileProps> = ({
   };
 
   const handlePhotoSave = async (newImageUrl: string) => {
-    const photoId = `gallery_${Date.now()}`;
-    const newPhoto: GalleryPhoto = {
-        id: photoId,
-        url: newImageUrl,
-        timestamp: new Date().toISOString()
-    };
-    
-    const updatedGallery = [...(user.gallery || []), newPhoto];
-    const updatedUser = { ...user, gallery: updatedGallery };
-    
-    setUser(updatedUser);
-    saveUserData(updatedUser);
-    setEditingImageUrl(null);
-    showNotification('Foto adicionada com sucesso!', 'success');
+    if (editingMode === 'avatar') {
+        const updatedUser = { ...user, avatar: newImageUrl };
+        setUser(updatedUser);
+        saveUserData(updatedUser);
+        setEditingImageUrl(null);
+        setEditingMode(null);
+        showNotification('Foto de perfil atualizada!', 'success');
+    } else {
+        const photoId = `gallery_${Date.now()}`;
+        const newPhoto: GalleryPhoto = {
+            id: photoId,
+            url: newImageUrl,
+            timestamp: new Date().toISOString()
+        };
+        
+        const updatedGallery = [...(user.gallery || []), newPhoto];
+        const updatedUser = { ...user, gallery: updatedGallery };
+        
+        setUser(updatedUser);
+        saveUserData(updatedUser);
+        setEditingImageUrl(null);
+        setEditingMode(null);
+        showNotification('Foto adicionada à galeria!', 'success');
+    }
     soundService.play('MATCH');
+    refreshSession();
   };
 
   const handleDeletePhoto = (id: string) => {
@@ -262,6 +276,24 @@ const Profile: React.FC<ProfileProps> = ({
             <div className="flex items-center gap-2 px-2 border-b border-white/5 pb-2">
                 <Settings size={16} className="text-amber-500" />
                 <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Edição de Matriz</h3>
+            </div>
+
+            {/* Nova Seção: Alterar Avatar */}
+            <div className="flex flex-col items-center gap-4 py-4 bg-slate-900/40 rounded-[2rem] border border-white/5">
+                <div className="relative group">
+                    <img 
+                      src={user.avatar} 
+                      alt="Avatar" 
+                      className="w-24 h-24 rounded-[1.8rem] object-cover border-2 border-amber-500/30 group-hover:border-amber-500 transition-all shadow-xl"
+                    />
+                    <button 
+                      onClick={() => handleAddPhoto('avatar')}
+                      className="absolute -bottom-2 -right-2 w-10 h-10 bg-amber-500 rounded-2xl flex items-center justify-center text-black shadow-lg hover:scale-110 active:scale-95 transition-all"
+                    >
+                        <Camera size={18} />
+                    </button>
+                </div>
+                <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Alterar Foto Principal</p>
             </div>
             
             <div className="space-y-6">
@@ -591,12 +623,15 @@ const Profile: React.FC<ProfileProps> = ({
         </div>
         
         <div>
-          <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>
-            {user.nickname}
-            {!(user.type === UserType.CASAIS || 
-              String(user.type).toLowerCase() === 'casais' || 
-              String(user.type).toLowerCase() === 'casal') && `, ${user.age}`}
-          </h2>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-black font-mono text-amber-500/60 tracking-[0.4em] uppercase">ID: {user.serialNumber || '------'}</span>
+            <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>
+              {user.nickname}
+              {!(user.type === UserType.CASAIS || 
+                String(user.type).toLowerCase() === 'casais' || 
+                String(user.type).toLowerCase() === 'casal') && `, ${user.age}`}
+            </h2>
+          </div>
           
           {(user.type === UserType.CASAIS || 
             String(user.type).toLowerCase() === 'casais' || 
@@ -831,7 +866,7 @@ const Profile: React.FC<ProfileProps> = ({
             <div className="grid grid-cols-3 gap-2 px-1">
                 {isEditingGallery && (
                     <button 
-                        onClick={handleAddPhoto}
+                        onClick={() => handleAddPhoto('gallery')}
                         className="aspect-square bg-slate-900/40 rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-900/60 group"
                     >
                         <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">

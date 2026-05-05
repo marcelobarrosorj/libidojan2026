@@ -15,6 +15,7 @@ export interface RadarProfile {
   bio?: string;
   category?: string;
   isMock?: boolean;
+  serialNumber?: string;
   braveryLevel?: number;
   trustLevel?: TrustLevel;
   isGhostMode?: boolean;

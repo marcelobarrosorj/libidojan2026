@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert, Trophy } from 'lucide-react';
+import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert, Trophy, Search } from 'lucide-react';
 import { cache, isOwner, isPremiumUser } from '../services/authUtils';
 import { Plan, User } from '../types';
 import LibidoIcon from './common/LibidoIcon';
@@ -12,9 +12,10 @@ interface LayoutProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   user: User | null;
+  onSearch?: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user }) => {
+const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user, onSearch }) => {
   const isPremium = isPremiumUser(user);
 
   return (
@@ -31,6 +32,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={onSearch}
+            className="p-2 rounded-full bg-slate-900 border border-white/5 text-amber-500 hover:bg-amber-500/10 transition-colors"
+          >
+            <Search size={20} />
+          </button>
+
           {!isPremium && (
              <button 
                 onClick={() => setActiveTab('assinatura')}

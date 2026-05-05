@@ -3,6 +3,7 @@ import { User, UserType, Vibes, Plan, Post, Biotype, Gender, SexualOrientation, 
 
 export const MOCK_CURRENT_USER: User = {
   id: 'me',
+  serialNumber: '000001',
   nickname: 'User_Libido',
   email: 'marcelo@libido.app',
   age: 28,
@@ -72,6 +73,7 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-1',
+    serialNumber: '000010',
     nickname: 'Ana & Bruno',
     email: 'anaebruno@lifestyle.com',
     age: 26,
@@ -89,6 +91,7 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-3',
+    serialNumber: '000011',
     nickname: 'Carla',
     email: 'carla.lib@gmail.com',
     age: 27,
@@ -106,6 +109,7 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-4',
+    serialNumber: '000012',
     nickname: 'Gabi',
     age: 24,
     type: UserType.MULHER,
@@ -122,6 +126,7 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-5',
+    serialNumber: '000013',
     nickname: 'Lia & Dan',
     age: 29,
     type: UserType.CASAIS,

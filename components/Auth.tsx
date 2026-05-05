@@ -5,7 +5,7 @@ import { RegistrationFlow } from './RegistrationFlow';
 import { PinSetup } from './PinSetup';
 import { PinUnlock } from './PinUnlock';
 import { supabase } from '../services/supabase';
-import { saveUserData, setAuthFlag, getUserData, showNotification, log } from '../services/authUtils';
+import { saveUserData, setAuthFlag, getUserData, showNotification, log, getNextSerialNumber } from '../services/authUtils';
 import { isPinConfigured } from '../services/pinService';
 import { User, Plan, TrustLevel, UserType, Biotype, Gender, SexualOrientation, Vibes } from '../types';
 
@@ -349,14 +349,23 @@ export const Auth: React.FC = () => {
             }
         });
 
-        if (authError) throw authError;
+        if (authError) {
+            if (authError.message.includes('User already registered')) {
+                throw new Error('ESTE E-MAIL JÁ POSSUI CADASTRO NA MATRIZ. TENTE FAZER LOGIN OU RECUPERAR SENHA.');
+            }
+            throw authError;
+        }
         if (!authData.user) throw new Error('Falha ao criar identidade na Matriz.');
 
         const userId = authData.user.id;
+        
+        // 1.1 Gerar número de série sequencial
+        const serialNumber = await getNextSerialNumber({ id: userId, email });
 
         // 2. Preparar objeto de usuário completo
         const newUser: User = {
           id: userId,
+          serialNumber,
           nickname,
           email,
           age: isCouple ? data.partner1?.age || 18 : data.age || 18,
@@ -365,7 +374,7 @@ export const Auth: React.FC = () => {
           boosts_active: 0,
           trustLevel: TrustLevel.BRONZE,
           is_premium: false,
-          avatar: `https://picsum.photos/seed/${nickname}/400`,
+          avatar: data.avatar || `https://picsum.photos/seed/${nickname}/400`,
           biotype: isCouple ? data.partner1?.biotype || Biotype.PADRAO : data.biotype || Biotype.PADRAO,
           bio: 'Novo explorador na Matriz Libido 2026.',
           gender: isCouple ? data.partner1?.gender || Gender.MASCULINO : data.gender || Gender.MASCULINO,

@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { MOCK_MOMENTS } from '../constants';
 import { Moment } from '../types';
-import { X, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Zap, RefreshCw } from 'lucide-react';
+import { cache, saveUserData, showNotification } from '../services/authUtils';
+import { soundService } from '../services/soundService';
 
 interface VibeMomentsProps {
   onMomentClick?: (moment: Moment) => void;
@@ -11,6 +13,8 @@ interface VibeMomentsProps {
 const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
   const [activeMoment, setActiveMoment] = useState<Moment | null>(null);
   const [progress, setProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const openMoment = (moment: Moment) => {
     setActiveMoment(moment);
@@ -28,18 +32,95 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
     }, 100);
   };
 
+  const handleVibeClick = () => {
+    if (fileInputRef.current) {
+        fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const base64 = event.target?.result as string;
+            if (!base64) return;
+            
+            // Salva na "vibe" do usuário logado
+            const currentUser = cache.userData;
+            if (currentUser) {
+                const updatedUser = { 
+                    ...currentUser, 
+                    lastMoment: {
+                        imageUrl: base64,
+                        timestamp: new Date().toISOString()
+                    }
+                };
+                saveUserData(updatedUser);
+                showNotification('Sua Vibe foi publicada na Matriz!', 'success');
+                soundService.play('MATCH');
+            } else {
+                showNotification('Você precisa estar logado para publicar.', 'error');
+            }
+            setIsUploading(false);
+        };
+        reader.readAsDataURL(file);
+    } catch (err) {
+        console.error(err);
+        showNotification('Erro ao publicar vibe.', 'error');
+        setIsUploading(false);
+    }
+  };
+
+  const currentUser = cache.userData;
+
   return (
     <div className="w-full">
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        accept="image/*" 
+        className="hidden" 
+      />
       {/* Horizontal Scroll Bar */}
       <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide">
         {/* Adicionar Próprio Moment */}
-        <div className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer">
-          <div className="w-16 h-16 rounded-full border-2 border-dashed border-slate-700 flex items-center justify-center p-1 bg-slate-900/50">
-            <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-amber-500">
-               <Zap size={24} />
+        <div 
+            onClick={handleVibeClick}
+            className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer active:scale-95 transition-transform"
+        >
+          <div className={`w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center p-1 bg-slate-900/50 ${isUploading ? 'border-amber-500 animate-pulse' : 'border-slate-700'}`}>
+            <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-amber-500 overflow-hidden">
+               {currentUser?.lastMoment ? (
+                   <img 
+                    src={currentUser.lastMoment.imageUrl} 
+                    className="w-full h-full object-cover" 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        openMoment({
+                            id: 'own',
+                            userId: currentUser.id,
+                            nickname: currentUser.nickname,
+                            avatar: currentUser.avatar,
+                            imageUrl: currentUser.lastMoment!.imageUrl,
+                            timestamp: 'Agora',
+                            viewed: false
+                        });
+                    }}
+                    alt="Sua Vibe" 
+                   />
+               ) : (
+                   isUploading ? <RefreshCw className="animate-spin" size={20} /> : <Zap size={24} />
+               )}
             </div>
           </div>
-          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Sua Vibe</span>
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
+            {isUploading ? 'Enviando...' : (currentUser?.lastMoment ? 'Sua Vibe' : 'Toque p/ Postar')}
+          </span>
         </div>
 
         {MOCK_MOMENTS.map((moment) => (
