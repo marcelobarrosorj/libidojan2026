@@ -21,7 +21,8 @@ import {
   User as UserIcon, 
   Users,
   Camera,
-  Trash2
+  Trash2,
+  Loader2
 } from 'lucide-react';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -112,19 +113,65 @@ export const RegistrationFlow: React.FC<{
     else if (step === 'confirm') setStep('photo');
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        if (isCouple) {
-          setCoupleData({...coupleData, avatar: base64String});
-        } else {
-          setSingleData({...singleData, avatar: base64String});
-        }
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        if (!base64) return;
+
+        // Criar elemento de imagem para redimensionar via Canvas
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const MAX_SIZE = 1600;
+
+          if (width > MAX_SIZE || height > MAX_SIZE) {
+            if (width > height) {
+              height = (MAX_SIZE / width) * height;
+              width = MAX_SIZE;
+            } else {
+              width = (MAX_SIZE / height) * width;
+              height = MAX_SIZE;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.82);
+            
+            if (isCouple) {
+              setCoupleData(prev => ({...prev, avatar: compressedBase64}));
+            } else {
+              setSingleData(prev => ({...prev, avatar: compressedBase64}));
+            }
+          }
+          setIsProcessing(false);
+        };
+        img.onerror = () => {
+          setError('Falha ao processar imagem.');
+          setIsProcessing(false);
+        };
+        img.src = base64;
       };
       reader.readAsDataURL(file);
+    } catch (err) {
+      console.error(err);
+      setError('Erro ao ler arquivo.');
+      setIsProcessing(false);
     }
   };
 
@@ -228,7 +275,12 @@ export const RegistrationFlow: React.FC<{
                   ? 'border-amber-500/50 bg-slate-900' 
                   : 'border-white/10 bg-slate-900/50'
                 }`}>
-                  {(isCouple ? coupleData.avatar : singleData.avatar) ? (
+                  {isProcessing ? (
+                    <div className="flex flex-col items-center gap-2">
+                       <Loader2 className="text-amber-500 animate-spin" size={40} />
+                       <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest animate-pulse">Sincronizando...</p>
+                    </div>
+                  ) : (isCouple ? coupleData.avatar : singleData.avatar) ? (
                     <img src={isCouple ? coupleData.avatar : singleData.avatar} className="w-full h-full object-cover" alt="Profile" />
                   ) : (
                     <div className="text-center p-6">

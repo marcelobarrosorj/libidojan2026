@@ -335,6 +335,7 @@ export const Auth: React.FC = () => {
 
     setLoading(true);
     setError(null);
+    showNotification('Sincronizando com a Matriz... Aguarde.', 'info');
 
     try {
         const data = regData.data;

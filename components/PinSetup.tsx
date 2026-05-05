@@ -7,7 +7,7 @@ import ActionButton from './common/ActionButton';
 import { log } from '../services/authUtils';
 
 interface PinSetupProps {
-  onDone: () => void;
+  onDone: () => void | Promise<void>;
 }
 
 export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
@@ -58,7 +58,7 @@ export const PinSetup: React.FC<PinSetupProps> = ({ onDone }) => {
       
       if (result.ok) {
         log('info', '[PIN_SETUP] Sucesso. Prosseguindo...');
-        onDone();
+        await onDone();
       } else {
         setError('message' in result ? result.message : 'Erro ao configurar PIN');
       }

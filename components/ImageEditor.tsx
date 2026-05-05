@@ -30,19 +30,36 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageUrl, onSave, onCancel })
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   // Renderiza a imagem no canvas aplicando apenas os filtros e ajustes selecionados
-  const renderPreview = useCallback(() => {
+  const renderPreview = useCallback((isFinal: boolean = false) => {
     const canvas = canvasRef.current;
     const img = imgRef.current;
     
-    if (!canvas || !img || !isImgLoaded) return;
+    if (!canvas || !img || !isImgLoaded) return null;
 
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return;
+    if (!ctx) return null;
 
-    // Sincroniza dimensões do canvas com a imagem original
-    canvas.width = imgSize.width;
-    canvas.height = imgSize.height;
+    // Redimensionamento Inteligente para Produção (Max 1600px)
+    const MAX_DIM = 1600;
+    let targetWidth = imgSize.width;
+    let targetHeight = imgSize.height;
+
+    if (isFinal && (targetWidth > MAX_DIM || targetHeight > MAX_DIM)) {
+        if (targetWidth > targetHeight) {
+            targetHeight = (MAX_DIM / targetWidth) * targetHeight;
+            targetWidth = MAX_DIM;
+        } else {
+            targetWidth = (MAX_DIM / targetHeight) * targetWidth;
+            targetHeight = MAX_DIM;
+        }
+    }
+
+    // Sincroniza dimensões do canvas
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -52,6 +69,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageUrl, onSave, onCancel })
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     
     ctx.restore();
+    return canvas;
   }, [brightness, contrast, activeFilter, imgSize, isImgLoaded]);
 
   const handleImageLoad = () => {
@@ -65,14 +83,30 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageUrl, onSave, onCancel })
 
   useEffect(() => {
     if (isImgLoaded) {
-      renderPreview();
+      renderPreview(false);
     }
-  }, [renderPreview, isImgLoaded]);
+  }, [brightness, contrast, activeFilter, imgSize, isImgLoaded]); // Dependências limpas para não re-renderizar sem necessidade
 
-  const handleFinish = () => {
-    if (canvasRef.current) {
-      // Exporta a imagem final sem qualquer desfoque
-      onSave(canvasRef.current.toDataURL('image/jpeg', 0.95));
+  const handleFinish = async () => {
+    if (canvasRef.current && !isProcessing) {
+      setIsProcessing(true);
+      
+      // Pequeno delay para garantir que o UI de loading apareça
+      await new Promise(r => setTimeout(r, 100));
+      
+      try {
+          // Renderiza a versão final redimensionada
+          const finalCanvas = renderPreview(true);
+          if (finalCanvas) {
+              // Exporta com compressão equilibrada (0.8 é o sweet spot)
+              const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.8);
+              onSave(dataUrl);
+          }
+      } catch (err) {
+          console.error('[EDITOR_ERROR]', err);
+      } finally {
+          setIsProcessing(false);
+      }
     }
   };
 
@@ -85,8 +119,12 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageUrl, onSave, onCancel })
         <h2 className="text-[10px] font-black text-white uppercase tracking-[0.4em] italic flex items-center gap-2">
             <Sparkles size={14} className="text-pink" /> Photo Matrix Editor
         </h2>
-        <button onClick={handleFinish} className="p-2 text-pink active:scale-90 transition-transform">
-          <Check size={28} />
+        <button 
+          onClick={handleFinish} 
+          disabled={isProcessing}
+          className={`p-2 transition-transform ${isProcessing ? 'text-slate-500' : 'text-pink active:scale-90 hover:scale-110'}`}
+        >
+          {isProcessing ? <Loader2 size={24} className="animate-spin" /> : <Check size={28} />}
         </button>
       </header>
 
@@ -182,8 +220,17 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageUrl, onSave, onCancel })
                <button onClick={onCancel} className="flex-1 py-4 bg-slate-900 text-slate-500 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5 hover:text-white transition-colors">
                  Descartar
                </button>
-               <button onClick={handleFinish} className="flex-[2] py-4 gradient-libido text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-pink/30 hover:brightness-110 active:scale-95 transition-all">
-                 Publicar Agora
+               <button 
+                 onClick={handleFinish} 
+                 disabled={isProcessing}
+                 className="flex-[2] py-4 gradient-libido text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-pink/30 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale"
+               >
+                 {isProcessing ? (
+                   <>
+                     <Loader2 size={16} className="animate-spin" />
+                     Sincronizando...
+                   </>
+                 ) : 'Publicar Agora'}
                </button>
           </div>
         </footer>
