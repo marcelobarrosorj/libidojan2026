@@ -199,78 +199,38 @@ export const Auth: React.FC = () => {
           log('info', 'Perfil não encontrado ou erro na busca, verificando fallback...');
           // Tenta buscar apenas e-mail se o select * falhou (tabela pode estar vazia)
           if (!profile) {
-              const { data: retryProfile } = await supabase.from('profiles').select('id').eq('id', data.user.id).single();
+              const { data: retryProfile } = await supabase.from('profiles').select('id, nickname, plan, type').eq('id', data.user.id).single();
               if (retryProfile) profile = retryProfile as any;
           }
         }
 
-        // Se ainda não temos um perfil, construímos o usuário a partir do que temos
-        const userData = (profile && profile.data) ? (profile.data as User) : {
+        // CONSTRUÇÃO ROBUSTA DO PERFIL: Priorizamos DATA (JSON), depois colunas do banco, depois fallback
+        const cloudDataSnapshot = (profile?.data || {}) as Partial<User>;
+        
+        const userData: User = {
+            serialNumber: cloudDataSnapshot.serialNumber || profile?.serial_number || (profile?.data as any)?.serialNumber || '000000',
+            
+            // Campos de Perfil (Prioridade: JSON -> Coluna -> Cache Local (se existir) -> Default)
+            nickname: cloudDataSnapshot.nickname || profile?.nickname || email.split('@')[0],
+            age: cloudDataSnapshot.age || profile?.age || 18,
+            plan: profile?.plan || cloudDataSnapshot.plan || Plan.FREE,
+            is_premium: profile?.is_premium || cloudDataSnapshot.is_premium || false,
+            type: cloudDataSnapshot.type || profile?.type || UserType.HOMEM,
+            gender: cloudDataSnapshot.gender || profile?.gender || Gender.MASCULINO,
+            
+            // Resto dos dados vêm do snapshot ou fallback
+            avatar: cloudDataSnapshot.avatar || `https://picsum.photos/seed/${data.user.id}/400`,
+            gallery: cloudDataSnapshot.gallery || [],
+            lookingFor: cloudDataSnapshot.lookingFor || [UserType.MULHER],
+            
+            // Mescla o objeto cloudDataSnapshot para não perder campos novos
+            ...cloudDataSnapshot,
+            
+            // Campos de Identidade (NUNCA resetam) - Colocados por último para garantir consistência
             id: data.user.id,
-            serialNumber: profile?.serial_number || (profile?.data as any)?.serialNumber,
-            nickname: profile?.nickname || email.split('@')[0],
             email: email.trim(),
-            age: profile?.age || 18,
-            plan: profile?.plan || Plan.FREE,
-            is_premium: profile?.is_premium || false,
-            balance: 0,
-            boosts_active: 0,
-            trustLevel: TrustLevel.BRONZE,
-            avatar: `https://picsum.photos/seed/${data.user.id}/400`,
-            biotype: Biotype.PADRAO,
-            gender: profile?.gender || Gender.MASCULINO,
-            sexualOrientation: profile?.sexualOrientation || SexualOrientation.HETERO,
-            type: profile?.type || UserType.HOMEM,
-            lookingFor: profile?.lookingFor || [UserType.MULHER],
-            xp: 500,
-            level: 1,
             isOnline: true,
             updatedAt: new Date().toISOString(),
-            vibes: [Vibes.LIBERAL],
-            lat: -23.5505,
-            lon: -46.6333,
-            birthDate: '2000-01-01',
-            verifiedAccount: false,
-            isGhostMode: false,
-            gallery: [],
-            badges: [],
-            boundaries: [],
-            behaviors: [],
-            braveryLevel: 5,
-            bio: 'Explorador Libido.',
-            height: 170,
-            location: 'São Paulo, SP',
-            bucketList: [],
-            bestMoments: [],
-            bestFeature: 'Personalidade',
-            beveragePref: 'Gelo',
-            bestTime: 'Noite',
-            busyMode: false,
-            bookingPolicy: 'Livre',
-            verificationScore: 50,
-            hasBlurredGallery: false,
-            isSubscriber: profile?.is_premium || false,
-            dailyProfileViews: 0,
-            consentMatrix: [
-                { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
-                { id: 'total', label: 'Troca Total', value: 'nao' as any },
-                { id: 'menage', label: 'Ménage', value: 'sim' as any }
-            ],
-            vouchScore: 70,
-            isStealthMode: false,
-            prefersBlurredPhotos: false,
-            rsvps: [],
-            vouches: [],
-            bookmarks: [],
-            blockedUsers: [],
-            matches: [],
-            following: [],
-            seenBy: [],
-            bodyMods: [],
-            bodyHair: 'Naturais',
-            bodyArt: [],
-            bondageExp: 'Nenhuma',
-            neighborhood: 'Centro'
         } as User;
 
         saveUserData(userData);

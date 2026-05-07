@@ -1,5 +1,5 @@
 
-import { User, Vouch, Shoutout, TrustLevel, Plan } from "../types";
+import { User, Vouch, Shoutout, TrustLevel, Plan, UserType } from "../types";
 import { supabase } from "./supabase";
 import { CONFIG } from "../config";
 
@@ -228,7 +228,7 @@ export const syncCaches = async () => {
         log('info', 'Sincronizando cache com Supabase...');
         const { data, error } = await supabase
             .from('profiles')
-            .select('data, plan, is_premium, trust_level, xp, level')
+            .select('data, plan, is_premium, trust_level, xp, level, type, nickname, age, serial_number')
             .eq('id', local.id)
             .single();
         
@@ -253,6 +253,10 @@ export const syncCaches = async () => {
             if (data.trust_level) cloudData.trustLevel = data.trust_level as TrustLevel;
             if (data.xp !== undefined) cloudData.xp = data.xp;
             if (data.level !== undefined) cloudData.level = data.level;
+            if (data.type) cloudData.type = data.type as UserType;
+            if (data.nickname) cloudData.nickname = data.nickname;
+            if (data.age) cloudData.age = data.age;
+            if (data.serial_number) cloudData.serialNumber = data.serial_number;
             
             // PROTEÇÃO DE INTEGRIDADE DE DADOS (IDADE e FOTO)
             // Se o usuário local tem uma foto real (não seed) e a nuvem tem um seed, preferimos o local.

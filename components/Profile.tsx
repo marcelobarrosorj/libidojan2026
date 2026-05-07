@@ -191,41 +191,37 @@ const Profile: React.FC<ProfileProps> = ({
     // Simula transição de tipo de perfil
     const nextType = user.type === UserType.CASAIS ? UserType.HOMEM : UserType.CASAIS;
     
-    setIsSaving(true);
     soundService.play('MATCH');
     
-    setTimeout(() => {
-        let updatedUser = { ...user, type: nextType };
-        
-        // Se mudou para casal e não tem dados de parceiros, inicializa
-        if (nextType === UserType.CASAIS) {
-          if (!updatedUser.partner1) {
-            updatedUser.partner1 = { 
-              nickname: `${user.nickname} (P1)`, 
-              age: user.age, 
-              gender: user.gender,
-              biotype: user.biotype,
-              height: user.height,
-              sexualPreference: user.sexualOrientation
-            };
-          }
-          if (!updatedUser.partner2) {
-            updatedUser.partner2 = { 
-              nickname: `${user.nickname} (P2)`, 
-              age: user.age, 
-              gender: user.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
-              biotype: Biotype.PADRAO,
-              height: 165,
-              sexualPreference: SexualOrientation.BISSEXUAL
-            };
-          }
-        }
-        
-        setUser(updatedUser);
-        saveUserData(updatedUser);
-        setIsSaving(false);
-        showNotification(`Status alterado para: ${nextType === UserType.CASAIS ? 'MODO CASAL' : 'MODO SOLTEIRO'}`, 'success');
-    }, 800);
+    let updatedUser = { ...user, type: nextType };
+    
+    // Se mudou para casal e não tem dados de parceiros, inicializa com dados base
+    if (nextType === UserType.CASAIS) {
+      if (!updatedUser.partner1) {
+        updatedUser.partner1 = { 
+          nickname: `${user.nickname} (P1)`, 
+          age: user.age, 
+          gender: user.gender,
+          biotype: user.biotype,
+          height: user.height,
+          sexualPreference: user.sexualOrientation
+        };
+      }
+      if (!updatedUser.partner2) {
+        updatedUser.partner2 = { 
+          nickname: `${user.nickname} (P2)`, 
+          age: user.age, 
+          gender: user.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
+          biotype: Biotype.PADRAO,
+          height: 165,
+          sexualPreference: SexualOrientation.BISSEXUAL
+        };
+      }
+    }
+    
+    setUser(updatedUser);
+    saveUserData(updatedUser);
+    showNotification(`Status alterado para: ${nextType === UserType.CASAIS ? 'MODO CASAL' : 'MODO SOLTEIRO'}`, 'success');
   };
 
   /**
