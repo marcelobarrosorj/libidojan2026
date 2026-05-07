@@ -16,11 +16,12 @@ import FilterModal, { FilterState } from './FilterModal';
 interface ExploreProps {
   onMatch?: (user: User) => void;
   onProfileClick?: (p: RadarProfile) => void;
+  registerProfiles?: (users: User[]) => void;
   currentUser: User | null;
   setCurrentUser: (u: User | null) => void;
 }
 
-const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser, setCurrentUser }) => {
+const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProfiles, currentUser, setCurrentUser }) => {
   const [viewMode, setViewMode] = useState<'radar' | 'swipe' | 'venues'>('radar');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchModal, setShowMatchModal] = useState(false);
@@ -197,7 +198,7 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
       </div>
 
       <div className="w-full flex-1">
-        {viewMode === 'radar' && <RadarPage onProfileClick={handleProfileClick} />}
+        {viewMode === 'radar' && <RadarPage onProfileClick={handleProfileClick} registerProfiles={registerProfiles} />}
         
         {viewMode === 'venues' && (
           <VenueList userLocation={userLocation} userId={currentUser?.id || 'anonymous'} />

@@ -140,6 +140,17 @@ export default function App() {
   }, [refreshSession]);
 
   const [radarResetKey, setRadarResetKey] = useState(0);
+  const [profileRegistry, setProfileRegistry] = useState<Record<string, User>>({});
+
+  const registerProfiles = React.useCallback((users: User[]) => {
+    setProfileRegistry(prev => {
+        const next = { ...prev };
+        users.forEach(u => {
+            if (u.id) next[u.id] = u;
+        });
+        return next;
+    });
+  }, []);
 
   const handleTabChange = (tab: string) => {
     // Limpa estados de detalhe de forma robusta ao trocar de aba principal
@@ -175,41 +186,55 @@ export default function App() {
   const handleViewProfile = async (p: any) => {
     if (!p) return;
 
-    let targetProfile = p;
+    let targetProfile = typeof p === 'object' ? p : null;
+    const profileId = typeof p === 'string' ? p : p.id;
 
-    // Se receber apenas o ID (string), tentamos encontrar o perfil completo
-    if (typeof p === 'string') {
-        log('info', `[APP] Requisitado perfil via ID: ${p}`);
-        // 1. Tenta buscar nos mocks
-        const mock = MOCK_USERS.find((u: User) => u.id === p);
-        if (mock) {
-            targetProfile = mock;
-        } else {
-            // 2. Tenta buscar no repo (Supabase ou mock fallback)
-            try {
-                const real = await getProfileById(p);
-                if (real) targetProfile = real;
-            } catch (e) {
-                console.error('[APP] Erro ao buscar perfil por ID:', p, e);
-                return;
+    if (!profileId) return;
+
+    // 1. Tenta buscar no registro global (mais atualizado)
+    if (profileRegistry[profileId]) {
+        targetProfile = profileRegistry[profileId];
+    } 
+    // 2. Se for um ID de mock conhecido que não está no registro
+    else if (profileId.startsWith('mock-')) {
+        targetProfile = MOCK_USERS.find(u => u.id === profileId) || null;
+    }
+
+    // 3. Se ainda não temos o perfil completo, buscamos no repo
+    if (!targetProfile || (!targetProfile.email && !targetProfile.serialNumber)) {
+        log('info', `[APP] Buscando perfil completo via Matriz DB: ${profileId}`);
+        try {
+            const real = await getProfileById(profileId);
+            if (real) {
+                targetProfile = real;
+                // Registra para futuras visualizações rápidas
+                registerProfiles([real as any]);
             }
+        } catch (e) {
+            log('error', `[APP] Erro crítico ao localizar usuário real: ${profileId}`, e);
         }
     }
 
+    if (!targetProfile) {
+        log('warn', `[APP] Perfil ${profileId} não encontrado. Abortando navegação.`);
+        return;
+    }
+
+    // Conversão segura do RadarProfile/Any para User completo
     const fullUser: User = {
       id: targetProfile.id, 
-      nickname: targetProfile.name || targetProfile.nickname || 'Agente Anônimo', 
+      nickname: targetProfile.nickname || targetProfile.name || 'Agente Anônimo', 
       email: targetProfile.email || `${targetProfile.id}@libido.app`, 
       age: targetProfile.age || 25, 
       avatar: targetProfile.avatar, 
       bio: targetProfile.bio || 'Sem biografia.',
-      type: targetProfile.category || targetProfile.type || UserType.HOMEM, 
+      type: targetProfile.type || targetProfile.category || UserType.HOMEM, 
       birthDate: targetProfile.birthDate || '1995-01-01', 
       biotype: targetProfile.biotype || Biotype.PADRAO,
       gender: targetProfile.gender || Gender.MASCULINO, 
       sexualOrientation: targetProfile.sexualOrientation || SexualOrientation.BISSEXUAL, 
       vibes: targetProfile.vibes || [Vibes.LIBERAL],
-      location: targetProfile.city || targetProfile.location || 'Brasil', 
+      location: targetProfile.location || targetProfile.city || 'Brasil', 
       isOnline: true, 
       verifiedAccount: targetProfile.verifiedAccount || targetProfile.trustLevel === TrustLevel.OURO || false, 
       verificationScore: targetProfile.verificationScore || (targetProfile.trustLevel === TrustLevel.OURO ? 100 : 50), 
@@ -240,10 +265,10 @@ export default function App() {
       height: targetProfile.height || 170,
       lat: targetProfile.lat || -23.5505, 
       lon: targetProfile.lon || -46.6333, 
-      city: targetProfile.city || 'São Paulo', 
+      city: targetProfile.city || targetProfile.location || 'São Paulo', 
       neighborhood: targetProfile.neighborhood || 'Centro', 
       seenBy: targetProfile.seenBy || [],
-      gallery: targetProfile.gallery || [{ id: `${targetProfile.id}-default`, url: targetProfile.avatar, timestamp: new Date().toISOString() }],
+      gallery: targetProfile.gallery || (targetProfile.avatar ? [{ id: `${targetProfile.id}-default`, url: targetProfile.avatar, timestamp: new Date().toISOString() }] : []),
       trustLevel: targetProfile.trustLevel || TrustLevel.BRONZE, 
       isGhostMode: targetProfile.isGhostMode || false, 
       hasBlurredGallery: targetProfile.hasBlurredGallery || (targetProfile.trustLevel === TrustLevel.OURO),
@@ -260,7 +285,8 @@ export default function App() {
       ],
       vouchScore: targetProfile.vouchScore || 70,
       isStealthMode: targetProfile.isStealthMode || false,
-      prefersBlurredPhotos: targetProfile.prefersBlurredPhotos || false
+      prefersBlurredPhotos: targetProfile.prefersBlurredPhotos || false,
+      serialNumber: targetProfile.serialNumber || '000000'
     };
     setViewedProfile(fullUser);
     setActiveTab('view_profile');
@@ -297,10 +323,11 @@ export default function App() {
           setCurrentUser={setCurrentUser} 
           onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} 
           onProfileClick={handleViewProfile} 
+          registerProfiles={registerProfiles}
         />;
       case 'ranking': return <Ranking onSelectUser={handleViewProfile} />;
       case 'events': return <EventsPage />;
-      case 'feed': return <Feed onProfileClick={handleViewProfile} />;
+      case 'feed': return <Feed onProfileClick={handleViewProfile} registerProfiles={registerProfiles} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => handleTabChange('assinatura')} currentUser={currentUser} />;
       case 'admin_moderation': return <AdminReports />;
       case 'profile': 

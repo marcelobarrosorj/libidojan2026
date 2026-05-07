@@ -12,9 +12,10 @@ import { fetchLatestProfiles } from '../services/repo';
 
 interface FeedProps {
   onProfileClick?: (user: User) => void;
+  registerProfiles?: (users: User[]) => void;
 }
 
-const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
+const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
   const [feedMode, setFeedMode] = useState<'all' | 'following'>('all');
   const [newUsers, setNewUsers] = useState<RadarProfile[]>([]);
   
@@ -30,12 +31,15 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
         const data = await fetchLatestProfiles(10);
         console.log('[FEED] Novatos carregados:', data.length);
         setNewUsers(data);
+        if (registerProfiles && data.length > 0) {
+            registerProfiles(data as any);
+        }
       } catch (e) {
         console.error('[FEED] Erro ao carregar novatos:', e);
       }
     };
     loadNewUsers();
-  }, []);
+  }, [registerProfiles]);
   
   const [posts, setPosts] = useState<Post[]>(() => [...MOCK_POSTS].sort(() => Math.random() - 0.5));
   const [activeModal, setActiveModal] = useState<{ type: 'comment' | 'share' | 'gallery' | 'menu'; postId?: string | number; userId?: string } | null>(null);

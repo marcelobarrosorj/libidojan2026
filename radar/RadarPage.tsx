@@ -13,10 +13,12 @@ import { venueService } from '../services/venueService';
 
 export default function RadarPage({ 
     onProfileClick, 
-    onUpgrade 
+    onUpgrade,
+    registerProfiles
 }: { 
     onProfileClick?: (p: RadarProfile) => void;
     onUpgrade?: () => void;
+    registerProfiles?: (users: User[]) => void;
 }) {
   const { location } = useUserLocation();
   const userPlan = cache.userData?.plan || Plan.FREE;
@@ -73,7 +75,11 @@ export default function RadarPage({
         });
         
         console.log(`[RADAR] Encontrados ${data?.length || 0} perfis próximos`);
-        setProfiles(data as RadarProfile[]);
+        const profileData = data as RadarProfile[];
+        setProfiles(profileData);
+        if (registerProfiles && profileData.length > 0) {
+            registerProfiles(profileData as any);
+        }
       } catch (e) {
         console.error('Radar fetch failed', e);
       } finally {
