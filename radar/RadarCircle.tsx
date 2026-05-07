@@ -142,7 +142,7 @@ export default function RadarCircle(props: RadarCircleProps) {
                 
                 {!isLocked && (
                   <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-black/80 px-2 py-0.5 rounded text-[8px] text-white font-black uppercase tracking-widest transition-opacity pointer-events-none">
-                    {p.name.split(' ')[0]} • {p.distanceLabel}
+                    {(p.name || 'Agente').split(' ')[0]} • {p.distanceLabel}
                   </div>
                 )}
               </div>

@@ -3,7 +3,7 @@
  * Calculates the Haversine distance between two points in kilometers.
  */
 export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  if (lat1 === lat2 && lon1 === lon2) return 0.1;
+  if (lat1 === lat2 && lon1 === lon2) return 0; // Distância real zero se a posição for idêntica
   const R = 6371; // km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -42,13 +42,16 @@ export function boundingBox(
  * Formats a distance in km for human reading.
  */
 export function formatDistanceLabel(distanceKm: number): string {
-  const effectiveKm = Math.max(distanceKm, 0.1);
-  if (effectiveKm < 1) {
-    const meters = Math.round(effectiveKm * 1000);
-    const roundedMeters = Math.ceil(meters / 100) * 100;
+  if (distanceKm <= 0.005) return "Aqui agora"; // Menos de 5 metros
+  
+  if (distanceKm < 1) {
+    const meters = Math.round(distanceKm * 1000);
+    if (meters < 50) return "Muito perto";
+    // Arredonda para os 50m mais próximos para manter alguma privacidade mas ser mais preciso que 100m
+    const roundedMeters = Math.max(50, Math.ceil(meters / 50) * 50);
     return `${roundedMeters} m`;
   }
-  return `${effectiveKm.toFixed(1).replace('.', ',')} km`;
+  return `${distanceKm.toFixed(1).replace('.', ',')} km`;
 }
 
 /**

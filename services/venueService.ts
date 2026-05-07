@@ -23,18 +23,28 @@ export const mockVenues: Venue[] = [
     lon: -46.6343
   },
   {
-    id: 'venue-3',
-    name: 'Lounge Red Light',
-    address: 'Vila Madalena - SP',
+    id: 'venue-4',
+    name: 'Matriz Rio - Ipanema',
+    address: 'Rua Garcia d\'Avila, 100 - RJ',
     category: 'Lounge',
     image: 'https://images.unsplash.com/photo-1574096079513-d8259312b785?auto=format&fit=crop&q=80&w=800',
-    checkInCount: 28,
-    lat: -23.5525,
-    lon: -46.6353
+    checkInCount: 67,
+    lat: -22.9839,
+    lon: -43.2102
+  },
+  {
+    id: 'venue-5',
+    name: 'Carioca Privè - Barra',
+    address: 'Av. Lucio Costa, 3000 - RJ',
+    category: 'Beach Club',
+    image: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&q=80&w=800',
+    checkInCount: 124,
+    lat: -23.0067,
+    lon: -43.3444
   }
 ];
 
-let activeCheckIn: CheckIn | null = null;
+const CHECKIN_STORAGE_KEY = 'matriz_active_checkin';
 
 export const venueService = {
   getVenues: async () => {
@@ -42,25 +52,30 @@ export const venueService = {
   },
 
   checkIn: async (userId: string, venueId: string): Promise<CheckIn> => {
-    activeCheckIn = {
+    const checkIn: CheckIn = {
       userId,
       venueId,
       timestamp: new Date().toISOString()
     };
-    return activeCheckIn;
+    localStorage.setItem(CHECKIN_STORAGE_KEY, JSON.stringify(checkIn));
+    return checkIn;
   },
 
   checkOut: async () => {
-    activeCheckIn = null;
+    localStorage.removeItem(CHECKIN_STORAGE_KEY);
   },
 
-  getCurrentCheckIn: () => {
-    return activeCheckIn;
+  getCurrentCheckIn: (): CheckIn | null => {
+    const saved = localStorage.getItem(CHECKIN_STORAGE_KEY);
+    if (!saved) return null;
+    try {
+        return JSON.parse(saved);
+    } catch {
+        return null;
+    }
   },
 
   getGuestsAtVenue: async (venueId: string) => {
-    // In a real app, this would query the DB for users with active check-ins
-    // For now, we simulate guests by filtering mock data
     return []; 
   }
 };

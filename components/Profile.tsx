@@ -609,11 +609,29 @@ const Profile: React.FC<ProfileProps> = ({
               className="w-full h-full rounded-[2.2rem] border-4 border-[#050505]"
             />
             
-            {!isOwnProfile && cache.userData?.lat && cache.userData?.lon && user.lat && user.lon && (
-              <div className="absolute bottom-2 left-0 right-0 py-1 bg-black/40 backdrop-blur-md flex items-center justify-center">
-                <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">
-                  {formatDistanceLabel(haversineKm(cache.userData.lat, cache.userData.lon, user.lat, user.lon))}
-                </span>
+            {!isOwnProfile && (
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center border-t border-white/5">
+                <div className="flex items-center gap-1.5 mb-1">
+                   <Globe size={10} className={user.isOnline ? "text-emerald-500 animate-pulse" : "text-amber-500"} />
+                   <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">
+                     {user.city || user.location || 'Localização Oculta'}
+                   </span>
+                </div>
+                {cache.userData?.lat && cache.userData?.lon && user.lat && user.lon ? (
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none mb-1">
+                      {formatDistanceLabel(haversineKm(cache.userData.lat, cache.userData.lon, user.lat, user.lon))} de você
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <div className={`w-1 h-1 rounded-full ${user.isOnline ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-slate-600'}`} />
+                      <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">
+                        {user.isOnline ? 'Localização em Tempo Real' : (user.updatedAt ? `Visto em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">Distância Indisponível</span>
+                )}
               </div>
             )}
           </div>

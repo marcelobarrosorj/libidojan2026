@@ -9,7 +9,7 @@ import { formatDistanceLabel } from './geo';
 export default function RadarList({ profiles, loading, onSelectProfile, onUpgrade }: { 
   profiles: RadarProfile[]; 
   loading: boolean; 
-  onSelectProfile?: (id: string) => void;
+  onSelectProfile?: (p: RadarProfile) => void;
   onUpgrade?: () => void;
 }) {
   if (loading && profiles.length === 0) {
@@ -29,7 +29,7 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
         return (
           <div 
             key={p.id} 
-            onClick={() => isLocked ? onUpgrade?.() : onSelectProfile?.(p.id)}
+            onClick={() => isLocked ? onUpgrade?.() : onSelectProfile?.(p)}
             className={`flex items-center gap-4 bg-slate-900/40 p-5 rounded-[2.5rem] border transition-all relative overflow-hidden group ${
               isLocked 
                 ? 'border-white/5 cursor-default' 

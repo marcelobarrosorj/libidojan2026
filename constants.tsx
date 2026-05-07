@@ -81,6 +81,8 @@ export const MOCK_USERS: User[] = [
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     trustLevel: TrustLevel.OURO,
     following: [],
+    lat: -23.5617,
+    lon: -46.6623,
     consentMatrix: [
       { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
       { id: 'total', label: 'Troca Total', value: 'sim' as any },
@@ -99,6 +101,8 @@ export const MOCK_USERS: User[] = [
     avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
     trustLevel: TrustLevel.PRATA,
     following: [],
+    lat: -23.5855,
+    lon: -46.6765,
     consentMatrix: [
       { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
       { id: 'total', label: 'Troca Total', value: 'nao' as any },
@@ -116,6 +120,8 @@ export const MOCK_USERS: User[] = [
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
     trustLevel: TrustLevel.BRONZE,
     following: [],
+    lat: -23.5433,
+    lon: -46.6433,
     consentMatrix: [
       { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
       { id: 'total', label: 'Troca Total', value: 'nao' as any },
@@ -133,6 +139,8 @@ export const MOCK_USERS: User[] = [
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
     trustLevel: TrustLevel.OURO,
     following: [],
+    lat: -23.6001,
+    lon: -46.6722,
     consentMatrix: [
       { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
       { id: 'total', label: 'Troca Total', value: 'sim' as any },

@@ -54,16 +54,23 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
       lat: p.lat,
       lon: p.lon,
       trustLevel: (p as any).trustLevel || TrustLevel.BRONZE,
-      serialNumber: p.serialNumber
+      serialNumber: p.serialNumber,
+      isMock: false
     });
   }
 
-  // Se o radar estiver vazio, usamos os mocks formatados e embaralhados
-  if (out.length === 0) {
-    const shuffledMocks = [...mockRadarProfiles].sort(() => Math.random() - 0.5);
-    out = shuffledMocks.map((m, idx) => {
+  // Se tivermos poucos resultados reais, preenchemos com mocks para o radar não parecer vazio
+  // Mas PRIORIZAMOS usuários reais no topo/centro
+  if (out.length < 10) {
+    const existingIds = new Set(out.map(o => o.id));
+    const shuffledMocks = [...mockRadarProfiles]
+      .filter(m => !existingIds.has(m.id))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10 - out.length);
+
+    const injectedMocks = shuffledMocks.map((m, idx) => {
       const angle = (idx / shuffledMocks.length) * Math.PI * 2;
-      const randomDist = 2 + Math.random() * (activeMaxKm - 2); 
+      const randomDist = 2 + Math.random() * (activeMaxKm / 2); 
       
       const offsetLat = (randomDist / 111) * Math.cos(angle);
       const offsetLon = (randomDist / (111 * Math.cos(viewerLat * Math.PI / 180))) * Math.sin(angle);
@@ -75,9 +82,12 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
         distanceKm: randomDist,
         distanceLabel: formatDistanceLabel(randomDist),
         locationLabel: 'Sinal Matriz',
-        isMock: true
+        isMock: true,
+        trustLevel: m.trustLevel || TrustLevel.BRONZE
       };
-    }) as any;
+    });
+    
+    out = [...out, ...injectedMocks];
   }
 
   out.sort((a, b) => a.distanceKm - b.distanceKm);

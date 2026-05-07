@@ -207,6 +207,7 @@ export const Auth: React.FC = () => {
         // Se ainda não temos um perfil, construímos o usuário a partir do que temos
         const userData = (profile && profile.data) ? (profile.data as User) : {
             id: data.user.id,
+            serialNumber: profile?.serial_number || (profile?.data as any)?.serialNumber,
             nickname: profile?.nickname || email.split('@')[0],
             email: email.trim(),
             age: profile?.age || 18,
@@ -341,6 +342,19 @@ export const Auth: React.FC = () => {
         const data = regData.data;
         const isCouple = regData.profileType.startsWith('couple');
         
+        // Tenta obter localização real antes de salvar
+        let finalLat = -23.5505;
+        let finalLon = -46.6333;
+        try {
+            const { getCurrentPosition } = await import('../services/geoService');
+            const pos = await getCurrentPosition();
+            finalLat = pos.lat;
+            finalLon = pos.lon;
+            log('info', '[AUTH] GPS Fix obtido para novo registro');
+        } catch (err) {
+            log('warn', '[AUTH] Falha ao obter GPS no registro, usando São Paulo como base');
+        }
+
         // 1. Criar usuário real no Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: email.trim(),
@@ -376,6 +390,9 @@ export const Auth: React.FC = () => {
           trustLevel: TrustLevel.BRONZE,
           is_premium: false,
           avatar: data.avatar || `https://picsum.photos/seed/${nickname}/400`,
+          gallery: data.avatar ? [
+            { id: `init-p-${Date.now()}`, url: data.avatar, timestamp: new Date().toISOString() }
+          ] : [],
           biotype: isCouple ? data.partner1?.biotype || Biotype.PADRAO : data.biotype || Biotype.PADRAO,
           bio: 'Novo explorador na Matriz Libido 2026.',
           gender: isCouple ? data.partner1?.gender || Gender.MASCULINO : data.gender || Gender.MASCULINO,
@@ -391,7 +408,6 @@ export const Auth: React.FC = () => {
           isOnline: true,
           verifiedAccount: false,
           isGhostMode: false,
-          gallery: [],
           badges: ['Iniciante'],
           boundaries: [],
           behaviors: [],
@@ -399,8 +415,8 @@ export const Auth: React.FC = () => {
           updatedAt: new Date().toISOString(),
           vibes: [Vibes.LIBERAL],
           bucketList: [],
-          lat: -23.5505,
-          lon: -46.6333,
+          lat: finalLat,
+          lon: finalLon,
           birthDate: '2000-01-01',
           rsvps: [],
           vouches: [],

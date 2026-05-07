@@ -131,6 +131,8 @@ export const authEvents = {
     }
 };
 
+import { dbGetNextSerialNumber } from "./repo";
+
 /**
  * Gera o próximo número de série sequencial
  */
@@ -141,18 +143,7 @@ export const getNextSerialNumber = async (user: Partial<User>): Promise<string> 
     }
 
     try {
-        // Busca a contagem total de perfis no Supabase
-        const { count, error } = await supabase
-            .from('profiles')
-            .select('*', { count: 'exact', head: true });
-        
-        if (error) throw error;
-
-        // O número será a contagem + 1 (ajustado para não colidir com o 000001 se já houver registros)
-        // Se a contagem for 0, o primeiro usuário (não dono) seria 000002? 
-        // Na verdade, se o dono já existe, count será pelo menos 1.
-        const nextNum = (count || 0) + 1;
-        return nextNum.toString().padStart(6, '0');
+        return await dbGetNextSerialNumber();
     } catch (e) {
         log('warn', 'Erro ao gerar número de série sequencial, usando fallback aleatório', e);
         return Math.floor(Math.random() * 900000 + 100000).toString();
@@ -174,12 +165,19 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
         if (userData.age) updated.age = userData.age;
     }
 
-    // Proteção Anti-Downgrade: Se o cache diz que é PREMIUM e o novo dado diz que é FREE,
-    // mantém o status PREMIUM a menos que seja uma redefinição total.
+    // Proteção Anti-Downgrade de Plano
     if (cache.userData?.is_premium && !updated.is_premium && Object.keys(userData).length < 10) {
         log('warn', '[AUTH] Bloqueado downgrade acidental de plano detectado em salvamento parcial.');
         updated.is_premium = true;
         updated.plan = cache.userData.plan;
+    }
+
+    const isSeed = (url?: string) => !url || url.includes('picsum.photos') || url.includes('dicebear.com') || url.includes('initials');
+
+    // Proteção Anti-Downgrade de Foto (Não permitir que um avatar real seja substituído por um seed em salvamento parcial)
+    if (!isSeed(cache.userData?.avatar) && isSeed(updated.avatar) && Object.keys(userData).length < 10) {
+        log('warn', '[AUTH] Bloqueado reset acidental de avatar real.');
+        updated.avatar = cache.userData?.avatar || updated.avatar;
     }
 
     if (!updated.following) updated.following = [];
@@ -256,11 +254,29 @@ export const syncCaches = async () => {
             if (data.xp !== undefined) cloudData.xp = data.xp;
             if (data.level !== undefined) cloudData.level = data.level;
             
-            // PROTEÇÃO DE INTEGRIDADE DE DADOS (IDADE)
-            // Se o usuário local tem uma idade definida (diferente de 18 default) e a nuvem retorna 18,
-            // ou se o cloudData não tem idade, preservamos o local.
+            // PROTEÇÃO DE INTEGRIDADE DE DADOS (IDADE e FOTO)
+            // Se o usuário local tem uma foto real (não seed) e a nuvem tem um seed, preferimos o local.
             const localAge = Number(local.age);
             const cloudAge = Number(cloudData.age || 0);
+
+            const isSeed = (url?: string) => !url || url.includes('picsum.photos') || url.includes('dicebear.com') || url.includes('initials');
+
+            // Preservar Avatar e Nickname se a nuvem estiver com placeholders e o local tiver algo real
+            if (local.avatar && !isSeed(local.avatar) && isSeed(cloudData.avatar)) {
+                log('info', '[AUTH] Integrity Gate: Protegendo foto real local contra placeholder da nuvem');
+                cloudData.avatar = local.avatar;
+            }
+            
+            // Sincroniza a galeria se a local for mais rica
+            if (local.gallery && local.gallery.length > (cloudData.gallery?.length || 0)) {
+                log('info', '[AUTH] Integrity Gate: Protegendo galeria local mais completa');
+                cloudData.gallery = local.gallery;
+            }
+
+            if (local.nickname && (!cloudData.nickname || cloudData.nickname === 'Anon')) {
+                log('info', '[AUTH] Integrity Gate: Protegendo nickname local');
+                cloudData.nickname = local.nickname;
+            }
 
             // Se o local é um valor de "adulto" real e a nuvem está no default de reset ou vazia
             if (localAge > 18 && (cloudAge <= 18)) {

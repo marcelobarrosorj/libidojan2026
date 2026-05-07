@@ -25,8 +25,14 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
 
   useEffect(() => {
     const loadNewUsers = async () => {
-      const data = await fetchLatestProfiles(10);
-      setNewUsers(data);
+      try {
+        console.log('[FEED] Carregando novatos...');
+        const data = await fetchLatestProfiles(10);
+        console.log('[FEED] Novatos carregados:', data.length);
+        setNewUsers(data);
+      } catch (e) {
+        console.error('[FEED] Erro ao carregar novatos:', e);
+      }
     };
     loadNewUsers();
   }, []);
@@ -114,7 +120,31 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
     else if (deltaX < -threshold) navigateFullscreen('prev');
   };
 
-  const getUser = (userId: string) => MOCK_USERS.find(u => u.id === userId) || MOCK_USERS[0];
+  const getUser = (userId: string, post?: Post) => {
+    // 1. Tenta buscar nos usuários de radar reais (Novatos)
+    const realUser = newUsers.find(u => u.id === userId);
+    if (realUser) return realUser as any;
+    
+    // 2. Tenta buscar nos Mocks
+    const mockUser = MOCK_USERS.find(u => u.id === userId);
+    if (mockUser) return mockUser;
+
+    // 3. Fallback inteligente: se temos dados do post, construímos um usuário temporário (Ghost)
+    if (post && post.userId === userId) {
+        return {
+            id: post.userId,
+            nickname: post.user,
+            avatar: post.avatar,
+            age: post.age,
+            type: 'Explorador',
+            isGhost: true,
+            bio: post.description,
+            vouchScore: 70
+        } as any;
+    }
+
+    return null;
+  };
 
   return (
     <div className="flex flex-col gap-6 p-4 pb-28 animate-in fade-in duration-500">
@@ -215,7 +245,10 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
           return (
             <div key={post.id} className="glass-card rounded-[2.5rem] overflow-hidden border-amber-500/10 shadow-2xl relative">
               <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onProfileClick?.(getUser(post.userId))}>
+                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => {
+                  const u = getUser(post.userId, post);
+                  if (u) onProfileClick?.(u);
+                }}>
                   <img src={post.avatar} className="w-10 h-10 rounded-full border-2 border-amber-500/30 object-cover group-hover:border-amber-500 transition-colors" />
                   <div>
                     <h4 className="text-sm font-bold text-white group-hover:text-amber-500 transition-colors">{post.user}, {post.age}</h4>
@@ -225,7 +258,10 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick }) => {
                 <button onClick={() => setActiveModal({ type: 'menu', postId: post.id })} className="p-2 hover:bg-amber-500/10 rounded-full text-slate-500 hover:text-amber-500 transition-colors"><MoreHorizontal size={20} /></button>
               </div>
 
-              <div className="relative aspect-square cursor-pointer overflow-hidden" onClick={() => onProfileClick?.(getUser(post.userId))}>
+              <div className="relative aspect-square cursor-pointer overflow-hidden" onClick={() => {
+                const u = getUser(post.userId, post);
+                if (u) onProfileClick?.(u);
+              }}>
                 <ProtectedImage src={post.image} alt={post.description} className="w-full h-full hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-6 z-[65]">
                   <p className="text-[11px] text-white font-black uppercase tracking-[0.2em] flex items-center gap-2">Ver Matriz <Maximize2 size={12} /></p>

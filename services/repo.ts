@@ -38,22 +38,34 @@ const viewers: Record<string, Viewer> = {
 };
 
 export function loadViewer(viewerId: string): Viewer | null {
+  // Se for um usuário real logado (cache), usamos os dados dele
+  if (cache.userData && (viewerId === 'me' || viewerId === cache.userData.id)) {
+      return {
+          id: cache.userData.id,
+          preferredCategories: cache.userData.vibes || [],
+          lookingFor: cache.userData.lookingFor || [UserType.MULHER, UserType.CASAIS, UserType.HOMEM],
+          city: cache.userData.city || 'São Paulo'
+      };
+  }
   return viewers[viewerId] || viewers['me'];
 }
 
 import { supabase } from './supabase';
+import { cache } from './authUtils';
 
 /**
  * Busca perfis reais no banco de dados usando o retângulo envolvente (Bounding Box).
  */
 export async function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: number; minLon: number; maxLon: number }): Promise<UserProfile[]> {
   try {
+    // Usamos filtros que funcionam melhor com números em JSONB no Supabase
+    // O operador ->lat pega o valor numérico se estiver armazenado como número
     const { data, error } = await supabase
       .from('profiles')
-      .select('*') // Pega tudo para processar corretamente
-      .gte('data->>lat', box.minLat.toString())
-      .lte('data->>lat', box.maxLat.toString())
-      .limit(50);
+      .select('*')
+      .filter('data->lat', 'gte', box.minLat)
+      .filter('data->lat', 'lte', box.maxLat)
+      .limit(100);
 
     if (error) throw error;
 
@@ -134,8 +146,10 @@ export async function fetchLatestProfiles(limitCount: number = 20): Promise<Rada
     };
 
     try {
+        console.log('[REPO] Buscando novatos com limite:', limitCount);
         // Estratégia 1: Ordem de criação (Padrão Supabase)
         let { data, error } = await tryQuery('created_at');
+        if (error) console.warn('[REPO] created_at order failed, trying next...');
         
         // Estratégia 2: Ordem de atualização manual
         if (error || !data || data.length === 0) {
@@ -143,6 +157,8 @@ export async function fetchLatestProfiles(limitCount: number = 20): Promise<Rada
             if (result.data && result.data.length > 0) {
                 data = result.data;
                 error = result.error;
+            } else if (result.error) {
+                console.warn('[REPO] updated_at order failed, trying next...');
             }
         }
 
@@ -156,11 +172,14 @@ export async function fetchLatestProfiles(limitCount: number = 20): Promise<Rada
             if (result.data && result.data.length > 0) {
                 data = result.data;
                 error = result.error;
+            } else if (result.error) {
+                console.warn('[REPO] JSON updatedAt order failed, trying next...');
             }
         }
 
         // Estratégia 4: Simplesmente pegar os primeiros sem ordem (último recurso real)
         if (error || !data || data.length === 0) {
+            console.log('[REPO] Usando fetch sem ordem como último recurso');
             const result = await tryQuery(); // Sem order
             data = result.data;
             error = result.error;
@@ -169,10 +188,27 @@ export async function fetchLatestProfiles(limitCount: number = 20): Promise<Rada
         if (error) throw error;
         
         if (!data || data.length === 0) {
-            throw new Error('Nenhum dado real no banco');
+            console.log('[REPO] Banco de dados vazio, usando fallback de mocks');
+            return MOCK_USERS.map(u => ({
+                id: u.id,
+                name: u.nickname,
+                lat: u.lat || 0,
+                lon: u.lon || 0,
+                city: 'Matriz (Mock)',
+                neighborhood: '',
+                category: u.type,
+                avatar: u.avatar,
+                bio: u.bio,
+                serialNumber: u.serialNumber,
+                trustLevel: u.trustLevel || TrustLevel.BRONZE,
+                isMock: true,
+                age: u.age
+            })) as RadarProfile[];
         }
 
-        return processProfileData(data);
+        const processed = processProfileData(data);
+        console.log('[REPO] Novatos processados:', processed.length);
+        return processed;
     } catch (e) {
         console.error('[REPO] Falha ao obter novatos reais:', e);
         // Fallback para mocks apenas se o banco estiver inacessível ou vazio
@@ -275,5 +311,25 @@ export async function getProfileById(id: string): Promise<RadarProfile | null> {
             };
         }
         return null;
+    }
+}
+
+/**
+ * Retorna o próximo Serial Number disponível (000001...) vindo do banco de dados
+ */
+export async function dbGetNextSerialNumber(): Promise<string> {
+    try {
+        const { count, error } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) throw error;
+        
+        const nextId = (count || 0) + 1;
+        return nextId.toString().padStart(6, '0');
+    } catch (e) {
+        console.error('[REPO] Erro ao gerar Serial Number:', e);
+        // Fallback baseado em timestamp se o banco falhar
+        return Math.floor(Date.now() / 1000).toString().slice(-6);
     }
 }

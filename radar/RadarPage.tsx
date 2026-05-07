@@ -66,15 +66,14 @@ export default function RadarPage({
       try {
         const { queryRadar } = await import('../services/radarService');
         const data = await queryRadar({ 
-          viewerId: 'me', 
+          viewerId: cache.userData?.id || 'me', 
           viewerLat: center.lat, 
           viewerLon: center.lon,
           plan: userPlan
         });
         
-        if (data && data.length > 0) {
-          setProfiles(data as RadarProfile[]);
-        }
+        console.log(`[RADAR] Encontrados ${data?.length || 0} perfis próximos`);
+        setProfiles(data as RadarProfile[]);
       } catch (e) {
         console.error('Radar fetch failed', e);
       } finally {
@@ -164,9 +163,8 @@ export default function RadarPage({
             <RadarList 
                 profiles={profiles} 
                 loading={isFetching} 
-                onSelectProfile={(id) => {
-                    const p = profiles.find(x => x.id === id);
-                    if (p) onProfileClick?.(p);
+                onSelectProfile={(p) => {
+                    onProfileClick?.(p);
                 }} 
                 onUpgrade={onUpgrade}
             />

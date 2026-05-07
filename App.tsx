@@ -19,6 +19,7 @@ import { PhotoReminder } from './components/PhotoReminder';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
+import { MOCK_USERS } from './constants';
 import { useAntiPrint } from './hooks/useAntiPrint';
 import { Lock } from 'lucide-react';
 import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log, authEvents } from './services/authUtils';
@@ -146,7 +147,7 @@ export default function App() {
     
     // Se clicar na aba que já está ativa, forçamos um reset visual (efeito Refresh)
     if (tab === activeTab) {
-        if (tab === 'radar') setRadarResetKey(prev => prev + 1);
+        if (tab === 'radar') setRadarResetKey((prev: number) => prev + 1);
         return;
     }
 
@@ -171,33 +172,95 @@ export default function App() {
     setIsAuthenticated
   }), [logout, refreshSession]);
 
-  const handleViewProfile = (p: any) => {
+  const handleViewProfile = async (p: any) => {
+    if (!p) return;
+
+    let targetProfile = p;
+
+    // Se receber apenas o ID (string), tentamos encontrar o perfil completo
+    if (typeof p === 'string') {
+        log('info', `[APP] Requisitado perfil via ID: ${p}`);
+        // 1. Tenta buscar nos mocks
+        const mock = MOCK_USERS.find((u: User) => u.id === p);
+        if (mock) {
+            targetProfile = mock;
+        } else {
+            // 2. Tenta buscar no repo (Supabase ou mock fallback)
+            try {
+                const real = await getProfileById(p);
+                if (real) targetProfile = real;
+            } catch (e) {
+                console.error('[APP] Erro ao buscar perfil por ID:', p, e);
+                return;
+            }
+        }
+    }
+
     const fullUser: User = {
-      id: p.id, nickname: p.name || p.nickname, email: p.email || `${p.id}@libido.app`, age: p.age || 25, avatar: p.avatar, bio: p.bio || 'Sem biografia.',
-      type: p.category || p.type || UserType.HOMEM, birthDate: p.birthDate || '1995-01-01', biotype: p.biotype || Biotype.PADRAO,
-      gender: p.gender || Gender.MASCULINO, sexualOrientation: p.sexualOrientation || SexualOrientation.BISSEXUAL, vibes: p.vibes || [Vibes.LIBERAL],
-      location: p.city || p.location || 'Brasil', isOnline: true, verifiedAccount: p.verifiedAccount || false, verificationScore: p.verificationScore || 50, xp: p.xp || 100, level: p.level || 1,
-      plan: p.plan || Plan.FREE, matches: p.matches || [], bookmarks: p.bookmarks || [], blockedUsers: p.blockedUsers || [], badges: p.badges || [], boundaries: p.boundaries || [],
-      behaviors: p.behaviors || [], bodyMods: p.bodyMods || [], bodyHair: p.bodyHair || 'Aparado', bodyArt: p.bodyArt || [], bondageExp: p.bondageExp || 'Iniciante',
-      bucketList: p.bucketList || [], bestMoments: p.bestMoments || [], bestFeature: p.bestFeature || 'Olhar', beveragePref: p.beveragePref || 'Gin', bestTime: p.bestTime || 'Noite', braveryLevel: p.braveryLevel || 7,
-      busyMode: p.busyMode || false, bookingPolicy: p.bookingPolicy || 'A combinar', balance: p.balance || 0, boosts_active: p.boosts_active || 0, is_premium: p.is_premium || false, height: p.height || 170,
-      lat: p.lat || -23.5505, lon: p.lon || -46.6333, city: p.city || 'São Paulo', neighborhood: p.neighborhood || 'Centro', seenBy: p.seenBy || [],
-      gallery: p.gallery || [{ id: `${p.id}-default`, url: p.avatar, timestamp: new Date().toISOString() }],
-      trustLevel: p.trustLevel || TrustLevel.BRONZE, isGhostMode: p.isGhostMode || false, hasBlurredGallery: p.hasBlurredGallery || (p.trustLevel === TrustLevel.OURO),
-      vouches: p.vouches || [],
-      following: p.following || [],
-      lookingFor: p.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
-      rsvps: p.rsvps || [],
-      isSubscriber: p.isSubscriber || false,
-      dailyProfileViews: p.dailyProfileViews || 0,
-      consentMatrix: p.consentMatrix || [
+      id: targetProfile.id, 
+      nickname: targetProfile.name || targetProfile.nickname || 'Agente Anônimo', 
+      email: targetProfile.email || `${targetProfile.id}@libido.app`, 
+      age: targetProfile.age || 25, 
+      avatar: targetProfile.avatar, 
+      bio: targetProfile.bio || 'Sem biografia.',
+      type: targetProfile.category || targetProfile.type || UserType.HOMEM, 
+      birthDate: targetProfile.birthDate || '1995-01-01', 
+      biotype: targetProfile.biotype || Biotype.PADRAO,
+      gender: targetProfile.gender || Gender.MASCULINO, 
+      sexualOrientation: targetProfile.sexualOrientation || SexualOrientation.BISSEXUAL, 
+      vibes: targetProfile.vibes || [Vibes.LIBERAL],
+      location: targetProfile.city || targetProfile.location || 'Brasil', 
+      isOnline: true, 
+      verifiedAccount: targetProfile.verifiedAccount || targetProfile.trustLevel === TrustLevel.OURO || false, 
+      verificationScore: targetProfile.verificationScore || (targetProfile.trustLevel === TrustLevel.OURO ? 100 : 50), 
+      xp: targetProfile.xp || 100, 
+      level: targetProfile.level || 1,
+      plan: targetProfile.plan || Plan.FREE, 
+      matches: targetProfile.matches || [], 
+      bookmarks: targetProfile.bookmarks || [], 
+      blockedUsers: targetProfile.blockedUsers || [], 
+      badges: targetProfile.badges || [], 
+      boundaries: targetProfile.boundaries || [],
+      behaviors: targetProfile.behaviors || [], 
+      bodyMods: targetProfile.bodyMods || [], 
+      bodyHair: targetProfile.bodyHair || 'Aparado', 
+      bodyArt: targetProfile.bodyArt || [], 
+      bondageExp: targetProfile.bondageExp || 'Iniciante',
+      bucketList: targetProfile.bucketList || [], 
+      bestMoments: targetProfile.bestMoments || [], 
+      bestFeature: targetProfile.bestFeature || 'Olhar', 
+      beveragePref: targetProfile.beveragePref || 'Gin', 
+      bestTime: targetProfile.bestTime || 'Noite', 
+      braveryLevel: targetProfile.braveryLevel || 7,
+      busyMode: targetProfile.busyMode || false, 
+      bookingPolicy: targetProfile.bookingPolicy || 'A combinar', 
+      balance: targetProfile.balance || 0, 
+      boosts_active: targetProfile.boosts_active || 0, 
+      is_premium: targetProfile.is_premium || false, 
+      height: targetProfile.height || 170,
+      lat: targetProfile.lat || -23.5505, 
+      lon: targetProfile.lon || -46.6333, 
+      city: targetProfile.city || 'São Paulo', 
+      neighborhood: targetProfile.neighborhood || 'Centro', 
+      seenBy: targetProfile.seenBy || [],
+      gallery: targetProfile.gallery || [{ id: `${targetProfile.id}-default`, url: targetProfile.avatar, timestamp: new Date().toISOString() }],
+      trustLevel: targetProfile.trustLevel || TrustLevel.BRONZE, 
+      isGhostMode: targetProfile.isGhostMode || false, 
+      hasBlurredGallery: targetProfile.hasBlurredGallery || (targetProfile.trustLevel === TrustLevel.OURO),
+      vouches: targetProfile.vouches || [],
+      following: targetProfile.following || [],
+      lookingFor: targetProfile.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
+      rsvps: targetProfile.rsvps || [],
+      isSubscriber: targetProfile.isSubscriber || false,
+      dailyProfileViews: targetProfile.dailyProfileViews || 0,
+      consentMatrix: targetProfile.consentMatrix || [
         { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
         { id: 'total', label: 'Troca Total', value: 'nao' as any },
         { id: 'menage', label: 'Ménage', value: 'sim' as any }
       ],
-      vouchScore: p.vouchScore || 70,
-      isStealthMode: p.isStealthMode || false,
-      prefersBlurredPhotos: p.prefersBlurredPhotos || false
+      vouchScore: targetProfile.vouchScore || 70,
+      isStealthMode: targetProfile.isStealthMode || false,
+      prefersBlurredPhotos: targetProfile.prefersBlurredPhotos || false
     };
     setViewedProfile(fullUser);
     setActiveTab('view_profile');

@@ -2,12 +2,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
 import { User, RadarProfile, UserType } from '../types';
-import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon } from 'lucide-react';
+import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon, Building } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
-import { log, likeProfile, passProfile, showNotification, saveUserData } from '../services/authUtils';
+import { log, likeProfile, passProfile, showNotification, saveUserData, cache } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { getCurrentPosition, haversineKm } from '../services/geoService';
 import RadarPage from '../radar/RadarPage';
+import { VenueList } from './VenueList';
 import { usageService } from '../services/usageService';
 import PaywallModal from './PaywallModal';
 import FilterModal, { FilterState } from './FilterModal';
@@ -20,7 +21,7 @@ interface ExploreProps {
 }
 
 const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser, setCurrentUser }) => {
-  const [viewMode, setViewMode] = useState<'radar' | 'swipe'>('radar');
+  const [viewMode, setViewMode] = useState<'radar' | 'swipe' | 'venues'>('radar');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [isSwiping, setIsSwiping] = useState<'left' | 'right' | 'up' | null>(null);
@@ -35,7 +36,11 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
     maxDistance: 100
   });
 
-  const handleProfileClick = (profile: RadarProfile) => {
+  const handleProfileClick = (profile: any) => {
+    if (!profile) return;
+    
+    console.log('[EXPLORE] Perfil aberto:', profile.id, profile.name || profile.nickname);
+
     if (usageService.canViewProfile(currentUser)) {
       if (!currentUser?.isSubscriber) {
         usageService.incrementView();
@@ -57,21 +62,21 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
   }, [currentUser, userLocation]);
 
   const filteredUsers = useMemo(() => {
-    // Fisher-Yates Shuffle para aleatorização estatisticamente superior
-    const baseList = [...MOCK_USERS];
+    // Começamos com os mocks como base
+    let baseList = [...MOCK_USERS];
+    
+    // Embaralhamento estatístico
     for (let i = baseList.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [baseList[i], baseList[j]] = [baseList[j], baseList[i]];
     }
 
     return baseList.filter(user => {
-      // Basic type check
-      const typeMatch = filters.types.includes(user.type);
+      if (user.id === currentUser?.id) return false;
       
-      // Trust check
+      const typeMatch = filters.types.includes(user.type);
       const trustMatch = (user.vouchScore || 0) >= filters.minTrust;
 
-      // Distance check
       let distanceMatch = true;
       if (effectiveUser.lat && effectiveUser.lon && user.lat && user.lon) {
         const dist = haversineKm(effectiveUser.lat, effectiveUser.lon, user.lat, user.lon);
@@ -80,7 +85,7 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
 
       return typeMatch && trustMatch && distanceMatch;
     });
-  }, [filters, effectiveUser]);
+  }, [filters, effectiveUser, currentUser?.id]);
 
   const currentSwipeUser = useMemo(() => {
     if (filteredUsers.length === 0) return null;
@@ -89,7 +94,16 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
 
   useEffect(() => {
     getCurrentPosition()
-      .then(pos => setUserLocation(pos))
+      .then(pos => {
+        setUserLocation(pos);
+        if (currentUser) {
+            const updated = { ...currentUser, lat: pos.lat, lon: pos.lon };
+            cache.userData = updated;
+            saveUserData(updated);
+            setCurrentUser(updated);
+            console.log('[EXPLORE] GPS Fix: Localização global sincronizada');
+        }
+      })
       .catch(err => log('warn', 'Geolocation failed', err));
   }, []);
 
@@ -144,16 +158,33 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
     setIsProcessing(false);
   };
 
+  const handleViewModeChange = (id: string) => {
+    const mode = id as 'radar' | 'swipe' | 'venues';
+    setViewMode(mode);
+    soundService.play('TAP');
+    
+    // Se mudar para Lugares, tenta atualizar a posição para ser mais preciso
+    if (mode === 'venues') {
+        getCurrentPosition()
+            .then(pos => {
+                setUserLocation(pos);
+                console.log('[EXPLORE] Localização atualizada para Check-in');
+            })
+            .catch(err => console.warn('[EXPLORE] GPS Update failed', err));
+    }
+  };
+
   return (
     <div className="p-4 flex flex-col items-center gap-6 animate-in fade-in duration-500 pb-28">
       <div className="w-full shrink-0 flex items-center gap-3">
         <div className="flex-1">
             <SegmentedControl 
               activeId={viewMode}
-              onChange={(id) => setViewMode(id as 'radar' | 'swipe')}
+              onChange={handleViewModeChange}
               tabs={[
                 { id: 'radar', label: 'Radar', icon: <RadioIcon /> },
-                { id: 'swipe', label: 'Swipe', icon: <Zap /> }
+                { id: 'swipe', label: 'Swipe', icon: <Zap /> },
+                { id: 'venues', label: 'Lugares', icon: <Building /> }
               ]}
             />
         </div>
@@ -168,6 +199,10 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, currentUser,
       <div className="w-full flex-1">
         {viewMode === 'radar' && <RadarPage onProfileClick={handleProfileClick} />}
         
+        {viewMode === 'venues' && (
+          <VenueList userLocation={userLocation} userId={currentUser?.id || 'anonymous'} />
+        )}
+
         {viewMode === 'swipe' && (
           filteredUsers.length > 0 && currentSwipeUser ? (
             <div className="w-full space-y-8 animate-in slide-in-from-bottom-5">
