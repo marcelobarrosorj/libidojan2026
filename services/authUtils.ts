@@ -259,23 +259,26 @@ export const syncCaches = async () => {
             if (data.serial_number) cloudData.serialNumber = data.serial_number;
             
             // PROTEÇÃO DE INTEGRIDADE DE DADOS (IDADE e FOTO)
-            // Se o usuário local tem uma foto real (não seed) e a nuvem tem um seed, preferimos o local.
-            const localAge = Number(local.age);
-            const cloudAge = Number(cloudData.age || 0);
+            const localGallery = local.gallery || [];
+            const cloudGallery = cloudData.gallery || [];
 
-            const isSeed = (url?: string) => !url || url.includes('picsum.photos') || url.includes('dicebear.com') || url.includes('initials');
+            // SMART MERGE: Se o local tem MENOS fotos e todas as fotos do local estão na nuvem, 
+            // assumimos que foi uma exclusão local intencional que ainda não sincronizou.
+            const isLocalDeletion = localGallery.length < cloudGallery.length && 
+                                   localGallery.every(lp => cloudGallery.some(cp => String(cp.id) === String(lp.id)));
+            
+            if (isLocalDeletion) {
+                log('info', `[AUTH] Smart Merge: Preservando exclusão local detectada (${localGallery.length} vs ${cloudGallery.length})`);
+                cloudData.gallery = localGallery;
+            } else if (cloudGallery.length > localGallery.length) {
+                log('info', `[AUTH] Sincronizando novas mídias da nuvem (${cloudGallery.length} vs ${localGallery.length})`);
+                // cloudData.gallery permanece como está
+            }
 
             // Preservar Avatar e Nickname se a nuvem estiver com placeholders e o local tiver algo real
-            if (local.avatar && !isSeed(local.avatar) && isSeed(cloudData.avatar)) {
-                log('info', '[AUTH] Integrity Gate: Protegendo foto real local contra placeholder da nuvem');
-                cloudData.avatar = local.avatar;
-            }
-            
-            // Sincroniza a galeria se a local for mais rica
-            if (local.gallery && local.gallery.length > (cloudData.gallery?.length || 0)) {
-                log('info', '[AUTH] Integrity Gate: Protegendo galeria local mais completa');
-                cloudData.gallery = local.gallery;
-            }
+            const isSeed = (url?: string) => !url || url.includes('picsum.photos') || url.includes('dicebear.com') || url.includes('initials');
+            const localAge = Number(local.age || 0);
+            const cloudAge = Number(cloudData.age || 0);
 
             if (local.nickname && (!cloudData.nickname || cloudData.nickname === 'Anon')) {
                 log('info', '[AUTH] Integrity Gate: Protegendo nickname local');

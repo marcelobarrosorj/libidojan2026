@@ -45,10 +45,25 @@ export const mockVenues: Venue[] = [
 ];
 
 const CHECKIN_STORAGE_KEY = 'matriz_active_checkin';
+const USER_VENUES_KEY = 'matriz_user_venues';
 
 export const venueService = {
   getVenues: async () => {
-    return mockVenues;
+    const userVenuesJson = localStorage.getItem(USER_VENUES_KEY);
+    const userVenues: Venue[] = userVenuesJson ? JSON.parse(userVenuesJson) : [];
+    return [...mockVenues, ...userVenues];
+  },
+
+  addVenue: async (venue: Venue): Promise<void> => {
+    const userVenuesJson = localStorage.getItem(USER_VENUES_KEY);
+    const userVenues: Venue[] = userVenuesJson ? JSON.parse(userVenuesJson) : [];
+    
+    // Evita duplicatas por ID ou Nome+Endereço
+    const exists = userVenues.some(v => v.id === venue.id || (v.name === venue.name && v.address === venue.address));
+    if (exists) return;
+
+    userVenues.push(venue);
+    localStorage.setItem(USER_VENUES_KEY, JSON.stringify(userVenues));
   },
 
   checkIn: async (userId: string, venueId: string): Promise<CheckIn> => {

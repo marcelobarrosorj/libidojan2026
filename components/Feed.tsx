@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { MOCK_POSTS, MOCK_USERS } from '../constants';
 import { Post, User, GalleryPhoto, RadarProfile } from '../types';
-import { Heart, MessageCircle, MoreHorizontal, X, Maximize2, ChevronLeft, ChevronRight, Send, Flag, UserX, Link as LinkIcon, EyeOff, Users, Sparkles, UserPlus } from 'lucide-react';
+import { Heart, MessageCircle, MoreHorizontal, X, Maximize2, ChevronLeft, ChevronRight, Send, Flag, UserX, Link as LinkIcon, EyeOff, Users, Sparkles, UserPlus, MapPin } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
 import { log, handleButtonAction, showNotification, cache } from '../services/authUtils';
 import { soundService } from '../services/soundService';
@@ -28,11 +28,13 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
     const loadNewUsers = async () => {
       try {
         console.log('[FEED] Carregando novatos...');
-        const data = await fetchLatestProfiles(10);
-        console.log('[FEED] Novatos carregados:', data.length);
-        setNewUsers(data);
-        if (registerProfiles && data.length > 0) {
-            registerProfiles(data as any);
+        const data = await fetchLatestProfiles(12);
+        // Filtro rigoroso: remove qualquer dado sem ID ou id inválido
+        const validProfiles = data.filter(u => u.id && u.id !== 'undefined' && u.id !== 'null');
+        console.log('[FEED] Novatos carregados e validados:', validProfiles.length);
+        setNewUsers(validProfiles);
+        if (registerProfiles && validProfiles.length > 0) {
+            registerProfiles(validProfiles as any);
         }
       } catch (e) {
         console.error('[FEED] Erro ao carregar novatos:', e);
@@ -162,22 +164,28 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
             <button className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Ver Todos</button>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-            {topUsers.map((user, i) => (
+            {topUsers.map((user, index) => (
                 <div 
-                    key={user.id}
-                    onClick={() => onProfileClick?.(user)}
+                    key={`top-user-feed-${user.id}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onProfileClick?.(user.id as any);
+                    }}
                     className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
                 >
                     <div className="relative">
-                        <div className={`w-16 h-16 rounded-2xl p-0.5 border-2 transition-all group-hover:scale-105 ${i < 3 ? 'border-amber-500 shadow-lg shadow-amber-500/20' : 'border-slate-800'}`}>
+                        <div className={`w-16 h-16 rounded-2xl p-0.5 border-2 transition-all group-hover:scale-105 ${index < 3 ? 'border-amber-500 shadow-lg shadow-amber-500/20' : 'border-slate-800'}`}>
                             <img src={user.avatar} className="w-full h-full rounded-[0.8rem] object-cover" alt="" />
                         </div>
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-lg border border-slate-800 flex items-center justify-center shadow-lg">
-                            <span className="text-[9px] font-black text-amber-500 italic">#{i + 1}</span>
+                            <span className="text-[9px] font-black text-amber-500 italic">#{index + 1}</span>
                         </div>
                     </div>
                     <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
                         {user.nickname}
+                    </span>
+                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[100px]">
+                        {user.city || 'MATRIX'}
                     </span>
                 </div>
             ))}
@@ -194,8 +202,11 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
         <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
             {newUsers.length > 0 ? newUsers.map((user) => (
                 <div 
-                    key={user.id}
-                    onClick={() => onProfileClick?.(user as any)}
+                    key={`novato-${user.id}`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onProfileClick?.(user.id as any);
+                    }}
                     className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
                 >
                     <div className="relative">
@@ -209,6 +220,9 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
                     <div className="flex flex-col items-center">
                       <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
                           {user.name}
+                      </span>
+                      <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest truncate max-w-[100px]">
+                        {user.city || 'MATRIX'}
                       </span>
                       <span className="text-[7px] font-black text-amber-500/50 font-mono tracking-widest">{user.serialNumber}</span>
                     </div>
@@ -251,12 +265,17 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
               <div className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3 cursor-pointer group" onClick={() => {
                   const u = getUser(post.userId, post);
-                  if (u) onProfileClick?.(u);
+                  if (u) onProfileClick?.(u.id);
                 }}>
                   <img src={post.avatar} className="w-10 h-10 rounded-full border-2 border-amber-500/30 object-cover group-hover:border-amber-500 transition-colors" />
                   <div>
                     <h4 className="text-sm font-bold text-white group-hover:text-amber-500 transition-colors">{post.user}, {post.age}</h4>
-                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Sincronizado</p>
+                    <div className="flex items-center gap-1 opacity-60">
+                      <MapPin size={8} className="text-amber-500" />
+                      <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">
+                        {(getUser(post.userId, post) as any)?.city || (getUser(post.userId, post) as any)?.location || 'MATRIX'}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <button onClick={() => setActiveModal({ type: 'menu', postId: post.id })} className="p-2 hover:bg-amber-500/10 rounded-full text-slate-500 hover:text-amber-500 transition-colors"><MoreHorizontal size={20} /></button>
@@ -264,7 +283,7 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
 
               <div className="relative aspect-square cursor-pointer overflow-hidden" onClick={() => {
                 const u = getUser(post.userId, post);
-                if (u) onProfileClick?.(u);
+                if (u) onProfileClick?.(u.id);
               }}>
                 <ProtectedImage src={post.image} alt={post.description} className="w-full h-full hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-6 z-[65]">

@@ -5,6 +5,7 @@ import { User, Biotype, UserType, Gender, SexualOrientation, PartnerData, TrustL
 import { useAuth } from '../hooks/useAuthContext';
 import ActionButton from './common/ActionButton';
 import { Select, Input } from './common/RegistrationUI';
+import { CityAutocomplete } from './common/CityAutocomplete';
 import ImageEditor from './ImageEditor';
 import VerificationPortal from './VerificationPortal';
 import VerificationModal from './VerificationModal';
@@ -13,16 +14,18 @@ import {
   BadgeCheck, Settings, LogOut, ShieldCheck, 
   ChevronLeft, Ruler, Eye, Palette, Crown, 
   Fingerprint, Wind, X, Heart, Ghost,
-  ImageIcon, Plus, Trash2, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
-  UserCheck, Globe,
+  ImageIcon, Plus, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
+  UserCheck, Globe, MapPin, Grid,
   Zap
 } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { 
     saveUserData, sanitizeInput, simulateApiCall,
     handleButtonAction, showNotification, cache, toggleFollow, isPremiumUser, log,
     toggleGhostMode
 } from '../services/authUtils';
 import { haversineKm, formatDistanceLabel } from '../services/geoService';
+import { useUserLocation } from '../hooks/useUserLocation';
 import { soundService } from '../services/soundService';
 import ConsentMatrix from './ConsentMatrix';
 import StealthModeToggle from './StealthModeToggle';
@@ -44,23 +47,46 @@ const Profile: React.FC<ProfileProps> = ({
     user: propUser, onBack, onNavigate, isOwnProfile = true, startEditing = false 
 }) => {
   const { logout, refreshSession } = useAuth();
+  const { location: gpsLocation } = useUserLocation();
   
   const [user, setUser] = useState<User>(propUser || cache.userData || MOCK_CURRENT_USER);
   const [isEditing, setIsEditing] = useState(startEditing);
+  
+  // Sincroniza estado de forma profunda ao mudar o propUser
+  useEffect(() => {
+    if (propUser) {
+        log('info', '[PROFILE] Deep Sync Reactivity Gate');
+        setUser(prev => {
+            // Se o ID mudou, resetamos a aba
+            if (prev.id !== propUser.id) {
+                setActiveTab('info');
+            }
+            return { ...propUser };
+        });
+        setIsFollowing(cache.userData?.following?.includes(propUser.id) || false);
+    }
+  }, [propUser]);
+
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setIsEditing(startEditing);
   }, [startEditing]);
+  
   const [activeTab, setActiveTab] = useState<'info' | 'gallery' | 'trust'>('info');
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
-  const [isEditingGallery, setIsEditingGallery] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(soundService.isEnabled());
   const [showVerification, setShowVerification] = useState(false);
   const [showNoFakeModal, setShowNoFakeModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  
+  // Protocolo de Profundidade: Parallax para a Galeria
+  const { scrollYProgress } = useScroll();
+  const yCol1 = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const yCol2 = useTransform(scrollYProgress, [0, 1], [0, 20]);
+  const yCol3 = useTransform(scrollYProgress, [0, 1], [0, -20]);
   
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,12 +99,10 @@ const Profile: React.FC<ProfileProps> = ({
   };
 
   useEffect(() => {
-    if (propUser) {
-        setUser(propUser);
-        setIsFollowing(cache.userData?.following?.includes(propUser.id) || false);
+    if (!propUser && isOwnProfile && cache.userData) {
+        setUser(cache.userData);
     }
-    else if (isOwnProfile && cache.userData) setUser(cache.userData);
-  }, [propUser, isOwnProfile]);
+  }, [isOwnProfile, cache.userData]);
 
   const handleFollow = async () => {
     if (isOwnProfile) return;
@@ -116,12 +140,14 @@ const Profile: React.FC<ProfileProps> = ({
 
   const handlePhotoSave = async (newImageUrl: string) => {
     if (editingMode === 'avatar') {
-        const updatedUser = { ...user, avatar: newImageUrl };
-        setUser(updatedUser);
-        saveUserData(updatedUser);
+        setUser(prev => {
+            const updatedUser = { ...prev, avatar: newImageUrl };
+            saveUserData(updatedUser);
+            showNotification('Foto de perfil atualizada!', 'success');
+            return updatedUser;
+        });
         setEditingImageUrl(null);
         setEditingMode(null);
-        showNotification('Foto de perfil atualizada!', 'success');
     } else {
         const photoId = `gallery_${Date.now()}`;
         const newPhoto: GalleryPhoto = {
@@ -130,25 +156,19 @@ const Profile: React.FC<ProfileProps> = ({
             timestamp: new Date().toISOString()
         };
         
-        const updatedGallery = [...(user.gallery || []), newPhoto];
-        const updatedUser = { ...user, gallery: updatedGallery };
+        setUser(prev => {
+            const updatedGallery = [...(prev.gallery || []), newPhoto];
+            const updatedUser = { ...prev, gallery: updatedGallery };
+            saveUserData(updatedUser);
+            showNotification('Foto adicionada à galeria!', 'success');
+            return updatedUser;
+        });
         
-        setUser(updatedUser);
-        saveUserData(updatedUser);
         setEditingImageUrl(null);
         setEditingMode(null);
-        showNotification('Foto adicionada à galeria!', 'success');
     }
     soundService.play('MATCH');
     refreshSession();
-  };
-
-  const handleDeletePhoto = (id: string) => {
-    const updatedGallery = (user.gallery || []).filter(p => p.id !== id);
-    const updatedUser = { ...user, gallery: updatedGallery };
-    setUser(updatedUser);
-    saveUserData(updatedUser);
-    showNotification('Foto removida da galeria.', 'info');
   };
 
   // Efeito para sincronizar parceiros quando muda para tipo CASAL
@@ -167,14 +187,16 @@ const Profile: React.FC<ProfileProps> = ({
             age: user.age > 18 ? user.age : 30, 
             gender: Gender.MASCULINO,
             biotype: Biotype.PADRAO,
-            height: 175
+            height: 175,
+            city: user.city
           },
           partner2: user.partner2 || { 
             nickname: `${user.nickname} (P2)`, 
             age: user.age > 18 ? user.age - 2 : 28, 
             gender: Gender.FEMININO,
             biotype: Biotype.CURVILINEO,
-            height: 165
+            height: 165,
+            city: user.city
           }
         };
         setUser(updatedUser);
@@ -188,40 +210,42 @@ const Profile: React.FC<ProfileProps> = ({
   const toggleStatus = () => {
     if (!isOwnProfile) return;
     
-    // Simula transição de tipo de perfil
-    const nextType = user.type === UserType.CASAIS ? UserType.HOMEM : UserType.CASAIS;
-    
     soundService.play('MATCH');
     
-    let updatedUser = { ...user, type: nextType };
-    
-    // Se mudou para casal e não tem dados de parceiros, inicializa com dados base
-    if (nextType === UserType.CASAIS) {
-      if (!updatedUser.partner1) {
-        updatedUser.partner1 = { 
-          nickname: `${user.nickname} (P1)`, 
-          age: user.age, 
-          gender: user.gender,
-          biotype: user.biotype,
-          height: user.height,
-          sexualPreference: user.sexualOrientation
-        };
-      }
-      if (!updatedUser.partner2) {
-        updatedUser.partner2 = { 
-          nickname: `${user.nickname} (P2)`, 
-          age: user.age, 
-          gender: user.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
-          biotype: Biotype.PADRAO,
-          height: 165,
-          sexualPreference: SexualOrientation.BISSEXUAL
-        };
-      }
-    }
-    
-    setUser(updatedUser);
-    saveUserData(updatedUser);
-    showNotification(`Status alterado para: ${nextType === UserType.CASAIS ? 'MODO CASAL' : 'MODO SOLTEIRO'}`, 'success');
+    setUser(prev => {
+        const nextType = prev.type === UserType.CASAIS ? UserType.HOMEM : UserType.CASAIS;
+        let updatedUser = { ...prev, type: nextType };
+        
+        // Se mudou para casal e não tem dados de parceiros, inicializa com dados base
+        if (nextType === UserType.CASAIS) {
+          if (!updatedUser.partner1) {
+            updatedUser.partner1 = { 
+              nickname: `${prev.nickname} (P1)`, 
+              age: prev.age, 
+              gender: prev.gender,
+              biotype: prev.biotype,
+              height: prev.height,
+              sexualPreference: prev.sexualOrientation,
+              city: prev.city
+            };
+          }
+          if (!updatedUser.partner2) {
+            updatedUser.partner2 = { 
+              nickname: `${prev.nickname} (P2)`, 
+              age: prev.age, 
+              gender: prev.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
+              biotype: Biotype.PADRAO,
+              height: 165,
+              sexualPreference: SexualOrientation.BISSEXUAL,
+              city: prev.city
+            };
+          }
+        }
+        
+        saveUserData(updatedUser);
+        showNotification(`Status alterado para: ${nextType === UserType.CASAIS ? 'MODO CASAL' : 'MODO SOLTEIRO'}`, 'success');
+        return updatedUser;
+    });
   };
 
   /**
@@ -231,24 +255,30 @@ const Profile: React.FC<ProfileProps> = ({
     if (isSaving) return;
     
     setIsSaving(true);
-    log('info', '[AUDIT][EDIT_PROFILE] Iniciando salvamento de dados', user);
+    log('info', '[AUDIT][EDIT_PROFILE] Iniciando salvamento de dados');
 
     try {
-        // Validação de inputs (Campos obrigatórios e tipos)
+        // Validação de inputs
         if (!user.nickname || user.nickname.length < 3) {
             throw new Error('Apelido deve ter pelo menos 3 caracteres');
         }
         
+        if (!user.city || user.city.trim().length < 2) {
+            throw new Error('A cidade é obrigatória');
+        }
+
         if (!user.age || user.age < 18) {
             throw new Error('Idade mínima permitida é 18 anos');
         }
 
-        // Sanitização e Simulação de API
         const sanitizedNickname = sanitizeInput(user.nickname);
-        await simulateApiCall('PROFILE_UPDATE', { ...user, nickname: sanitizedNickname });
+        const userToSave = { ...user, nickname: sanitizedNickname };
+        
+        await simulateApiCall('PROFILE_UPDATE', userToSave);
 
         // Persistência
-        saveUserData(user);
+        setUser(userToSave);
+        saveUserData(userToSave);
         setIsEditing(false);
         showNotification('Perfil atualizado com sucesso!', 'success');
         log('info', '[AUDIT][EDIT_PROFILE] Sucesso na persistência de dados');
@@ -266,6 +296,28 @@ const Profile: React.FC<ProfileProps> = ({
   /**
    * Renderiza o formulário de edição
    */
+  const formatLocationDisplay = (loc: string | undefined | null) => {
+    if (!loc || loc === 'MATRIX') return 'MATRIX';
+    let display = loc.toUpperCase().trim();
+    
+    // Auto-correção para cidades conhecidas sem estado
+    if (!display.includes('-') && !display.includes(',')) {
+        if (display.includes('VOLTA REDONDA')) return 'VOLTA REDONDA - RJ';
+        if (display.includes('BARRA MANSA')) return 'BARRA MANSA - RJ';
+        if (display.includes('ANGRA')) return 'ANGRA DOS REIS - RJ';
+        if (display.includes('RIO DE JANEIRO')) return 'RIO DE JANEIRO - RJ';
+        if (display.includes('SÃO PAULO') || display.includes('SAO PAULO')) return 'SÃO PAULO - SP';
+        if (display.includes('CAMPINAS')) return 'CAMPINAS - SP';
+    }
+    
+    // Fallback agressivo para evitar erro comum 'Volta Redonda - SP' relatado pelo usuário
+    if (display.includes('VOLTA REDONDA') && (display.includes('- SP') || display.endsWith(' SP'))) {
+        return display.replace('- SP', '- RJ').replace(' SP', ' - RJ');
+    }
+
+    return display;
+  };
+
   const renderEditForm = () => (
     <div className="space-y-8 animate-in slide-in-from-bottom-5">
         <section className="space-y-6">
@@ -275,21 +327,30 @@ const Profile: React.FC<ProfileProps> = ({
             </div>
 
             {/* Nova Seção: Alterar Avatar */}
-            <div className="flex flex-col items-center gap-4 py-4 bg-slate-900/40 rounded-[2rem] border border-white/5">
-                <div className="relative group">
-                    <img 
-                      src={user.avatar} 
-                      alt="Avatar" 
-                      className="w-24 h-24 rounded-[1.8rem] object-cover border-2 border-amber-500/30 group-hover:border-amber-500 transition-all shadow-xl"
-                    />
-                    <button 
-                      onClick={() => handleAddPhoto('avatar')}
-                      className="absolute -bottom-2 -right-2 w-10 h-10 bg-amber-500 rounded-2xl flex items-center justify-center text-black shadow-lg hover:scale-110 active:scale-95 transition-all"
-                    >
-                        <Camera size={18} />
-                    </button>
+            <div className="grid grid-cols-2 gap-4 py-4 px-2">
+                <div className="flex flex-col items-center gap-4 py-4 bg-slate-900/40 rounded-[2rem] border border-white/5">
+                    <div className="relative group">
+                        <img 
+                            src={user.avatar} 
+                            alt="Avatar" 
+                            className="w-24 h-24 rounded-[1.8rem] object-cover border-2 border-amber-500/30 group-hover:border-amber-500 transition-all shadow-xl"
+                        />
+                        <button 
+                            onClick={() => handleAddPhoto('avatar')}
+                            className="absolute -bottom-2 -right-2 w-10 h-10 bg-amber-500 rounded-2xl flex items-center justify-center text-black shadow-lg hover:scale-110 active:scale-95 transition-all"
+                        >
+                            <Camera size={18} />
+                        </button>
+                    </div>
+                    <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Mudar Avatar</p>
                 </div>
-                <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Alterar Foto Principal</p>
+
+                <div className="flex flex-col items-center gap-4 py-4 bg-slate-900/40 rounded-[2rem] border border-dashed border-white/10 hover:bg-slate-900/60 transition-all cursor-pointer group" onClick={() => handleAddPhoto('gallery')}>
+                    <div className="w-24 h-24 rounded-[1.8rem] bg-slate-950 flex items-center justify-center text-slate-500 group-hover:text-amber-500 transition-all">
+                        <Plus size={40} className="group-hover:scale-110 transition-transform" />
+                    </div>
+                    <p className="text-[9px] font-black text-slate-500 group-hover:text-amber-500 uppercase tracking-widest">Adicionar Fotos</p>
+                </div>
             </div>
             
             <div className="space-y-6">
@@ -318,6 +379,15 @@ const Profile: React.FC<ProfileProps> = ({
                             placeholder="Nome de Exibição"
                         />
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Cidade de Residência</label>
+                    <CityAutocomplete 
+                        value={user.city || ''}
+                        onChange={(val) => setUser({...user, city: val})}
+                        className="bg-slate-900 shadow-xl"
+                    />
                 </div>
 
                 {/* Bio sempre visível */}
@@ -411,7 +481,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner1?.age ? user.partner1.age.toString() : user.age.toString()}
                                             onChange={(val) => {
                                                 const age = parseInt(val) || 0;
-                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), age }});
+                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), age }});
                                             }}
                                             placeholder="Ex: 53"
                                         />
@@ -423,7 +493,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner1?.height ? user.partner1.height.toString() : user.height.toString()}
                                             onChange={(val) => {
                                                 const height = parseInt(val) || 0;
-                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), height }});
+                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), height }});
                                             }}
                                             placeholder="Ex: 180"
                                         />
@@ -434,7 +504,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
                                         <Select 
                                             value={user.partner1?.biotype || user.biotype}
-                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), biotype: val as Biotype }})}
+                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), biotype: val as Biotype }})}
                                             options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
                                         />
                                     </div>
@@ -442,7 +512,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Orientação</label>
                                         <Select 
                                             value={user.partner1?.sexualPreference || user.sexualOrientation}
-                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation }), sexualPreference: val as SexualOrientation }})}
+                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), sexualPreference: val as SexualOrientation }})}
                                             options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
                                         />
                                     </div>
@@ -467,7 +537,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner2?.age ? user.partner2.age.toString() : ''}
                                             onChange={(val) => {
                                                 const age = parseInt(val) || 0;
-                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), age }});
+                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), age }});
                                             }}
                                             placeholder="Ex: 45"
                                         />
@@ -479,7 +549,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner2?.height ? user.partner2.height.toString() : ''}
                                             onChange={(val) => {
                                                 const height = parseInt(val) || 0;
-                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), height }});
+                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), height }});
                                             }}
                                             placeholder="Ex: 165"
                                         />
@@ -490,7 +560,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
                                         <Select 
                                             value={user.partner2?.biotype || ''}
-                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), biotype: val as Biotype }})}
+                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), biotype: val as Biotype }})}
                                             options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
                                         />
                                     </div>
@@ -498,7 +568,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Orientação</label>
                                         <Select 
                                             value={user.partner2?.sexualPreference || ''}
-                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL }), sexualPreference: val as SexualOrientation }})}
+                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), sexualPreference: val as SexualOrientation }})}
                                             options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
                                         />
                                     </div>
@@ -592,19 +662,36 @@ const Profile: React.FC<ProfileProps> = ({
       </div>
 
       <div className="text-center space-y-4">
-        <div className="relative inline-block">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative inline-block"
+        >
           <div 
-            onClick={() => setShowPhotoGrid(true)}
+            onClick={(e) => {
+               if (isOwnProfile) {
+                 handleAddPhoto('avatar');
+               } else {
+                 setShowPhotoGrid(true);
+               }
+            }}
             className={`w-32 h-32 rounded-[2.5rem] p-1 shadow-2xl transition-transform active:scale-95 cursor-pointer relative overflow-hidden ${isOuro ? 'bg-gradient-to-tr from-amber-400 to-amber-700 shadow-amber-500/30' : 'bg-slate-800'}`}
           >
             <BlurredImage 
               src={user.avatar} 
               alt={user.nickname}
-              isInitiallyBlurred={!isOwnProfile && user.prefersBlurredPhotos}
+              isInitiallyBlurred={isOwnProfile ? false : (user.type === UserType.CASAIS ? false : !!user.prefersBlurredPhotos)}
               canUnlock={!isOwnProfile}
               className="w-full h-full rounded-[2.2rem] border-4 border-[#050505]"
             />
             
+            {isOwnProfile && (
+              <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                <Camera size={24} className="text-white" />
+              </div>
+            )}
+
             {!isOwnProfile && (
               <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center border-t border-white/5">
                 <div className="flex items-center gap-1.5 mb-1">
@@ -613,30 +700,40 @@ const Profile: React.FC<ProfileProps> = ({
                      {user.city || user.location || 'Localização Oculta'}
                    </span>
                 </div>
-                {cache.userData?.lat && cache.userData?.lon && user.lat && user.lon ? (
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none mb-1">
-                      {formatDistanceLabel(haversineKm(cache.userData.lat, cache.userData.lon, user.lat, user.lon))} de você
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <div className={`w-1 h-1 rounded-full ${user.isOnline ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-slate-600'}`} />
-                      <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">
-                        {user.isOnline ? 'Localização em Tempo Real' : (user.updatedAt ? `Visto em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">Distância Indisponível</span>
-                )}
+                {(() => {
+                  const currentLat = gpsLocation?.lat ?? cache.userData?.lat;
+                  const currentLon = gpsLocation?.lon ?? cache.userData?.lon;
+                  
+                  if (currentLat && currentLon && user.lat && user.lon) {
+                    return (
+                      <div className="flex flex-col items-center">
+                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none mb-1">
+                          {formatDistanceLabel(haversineKm(currentLat, currentLon, user.lat, user.lon))} de você
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <div className={`w-1 h-1 rounded-full ${user.isOnline ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-slate-600'}`} />
+                          <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">
+                            {user.isOnline ? 'Localização em Tempo Real' : (user.updatedAt ? `Visto em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">Distância Indisponível</span>;
+                })()}
               </div>
             )}
           </div>
           <div className={`absolute -bottom-1 -right-1 p-2 rounded-xl border-2 border-[#050505] shadow-lg ${user.verifiedAccount ? 'bg-amber-500 text-black' : 'bg-slate-700 text-slate-400'}`}>
             {isOuro ? <Crown size={18} fill="currentColor" /> : <BadgeCheck size={18} />}
           </div>
-        </div>
+        </motion.div>
         
-        <div>
+        <motion.div
+           initial={{ opacity: 0, y: 15 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+        >
           <div className="flex flex-col items-center gap-1">
             <span className="text-[9px] font-black font-mono text-amber-500/60 tracking-[0.4em] uppercase">ID: {user.serialNumber || '------'}</span>
             <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>
@@ -645,6 +742,15 @@ const Profile: React.FC<ProfileProps> = ({
                 String(user.type).toLowerCase() === 'casais' || 
                 String(user.type).toLowerCase() === 'casal') && `, ${user.age}`}
             </h2>
+            <div 
+              className={`flex items-center gap-1.5 justify-center mt-0.5 opacity-60 ${isOwnProfile ? 'cursor-pointer hover:opacity-100 group/loc' : ''}`}
+              onClick={() => isOwnProfile && setIsEditing(true)}
+            >
+              <MapPin size={10} className={`text-amber-500 ${isOwnProfile ? 'group-hover/loc:scale-125 transition-transform' : ''}`} />
+                <span className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                  {formatLocationDisplay(user.city || user.location)}
+                </span>
+            </div>
           </div>
           
           {(user.type === UserType.CASAIS || 
@@ -691,7 +797,7 @@ const Profile: React.FC<ProfileProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
 
           <div className={`p-6 rounded-3xl bg-slate-900/60 border border-white/5 flex justify-between items-center mt-6`}>
@@ -785,7 +891,25 @@ const Profile: React.FC<ProfileProps> = ({
                     <Fingerprint size={16} className="text-amber-500" />
                     <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Identidade</h3>
                 </div>
-                {user.bio && <div className="px-2"><p className="text-[10px] text-slate-300 italic leading-relaxed">"{user.bio}"</p></div>}
+                <div className="flex items-center justify-between px-2 gap-4">
+                    <div className="flex-1 min-w-0">
+                        {user.bio ? (
+                            <p className="text-[10px] text-slate-300 italic leading-relaxed">"{user.bio}"</p>
+                        ) : (
+                            <p className="text-[9px] text-slate-600 font-medium uppercase tracking-widest italic opacity-50">Silêncio absoluto na bio.</p>
+                        )}
+                    </div>
+                    {!isOwnProfile && (
+                        <button 
+                            onClick={() => setShowReportModal(true)}
+                            className="shrink-0 flex items-center gap-2 px-4 py-2 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-[9px] font-black text-rose-500 uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white transition-all active:scale-95 shadow-xl shadow-rose-500/5 group"
+                            title="Governança: Denunciar Perfil"
+                        >
+                            <ShieldAlert size={14} className="group-hover:scale-110 transition-transform" />
+                            Denunciar
+                        </button>
+                    )}
+                </div>
                 
                 {(user.type === UserType.CASAIS || 
                   String(user.type).toLowerCase() === 'casais' || 
@@ -863,52 +987,51 @@ const Profile: React.FC<ProfileProps> = ({
             <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-2">
                     <ImageIcon size={16} className="text-amber-500" />
-                    <h3 className="text-[11px] font-black text-white uppercase tracking-widest">
-                        {isEditingGallery ? 'Gerenciar Galeria' : 'Galeria Central'}
-                    </h3>
+                    <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Galeria Central</h3>
                 </div>
                 {isOwnProfile && (
                     <button 
-                        onClick={() => setIsEditingGallery(!isEditingGallery)} 
-                        className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isEditingGallery ? 'text-white' : 'text-amber-500'}`}
+                        onClick={() => handleAddPhoto('gallery')}
+                        className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-[9px] font-black text-amber-500 uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all"
                     >
-                        {isEditingGallery ? 'Concluído' : 'Editar'}
+                        <Plus size={12} />
+                        Adicionar
                     </button>
                 )}
             </div>
             
-            <div className="grid grid-cols-3 gap-2 px-1">
-                {isEditingGallery && (
+            <div className="grid grid-cols-3 gap-3 px-1">
+                {isOwnProfile && (
                     <button 
                         onClick={() => handleAddPhoto('gallery')}
-                        className="aspect-square bg-slate-900/40 rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-900/60 group"
+                        className="aspect-square bg-slate-900/40 rounded-3xl border-2 border-dashed border-amber-500/10 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-900/60 group hover:border-amber-500/30"
                     >
-                        <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
-                            <Plus size={20} />
+                        <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+                            <Plus size={24} />
                         </div>
-                        <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest">Adicionar</span>
+                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Postar</span>
                     </button>
                 )}
-                {(user.gallery || []).slice(0, isEditingGallery ? 20 : 6).map((photo, i) => (
-                    <div 
-                        key={photo.id} 
-                        onClick={() => !isEditingGallery && setShowPhotoGrid(true)}
-                        className="aspect-square bg-slate-900 rounded-2xl overflow-hidden relative border border-white/5 active:scale-95 transition-transform"
-                    >
-                        <img src={photo.url} className="w-full h-full object-cover" alt="Galeria" />
-                        {isEditingGallery && (
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id); }}
-                                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-lg bg-red-500/80 backdrop-blur-md flex items-center justify-center text-white shadow-lg active:scale-90"
-                            >
-                                <Trash2 size={12} />
-                            </button>
-                        )}
-                    </div>
-                ))}
+                {(user.gallery || []).slice(0, 12).map((photo, i) => {
+                    const parallaxY = [yCol1, yCol2, yCol3][i % 3];
+                    return (
+                        <motion.div 
+                            key={photo.id} 
+                            onClick={() => setShowPhotoGrid(true)}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            style={{ y: parallaxY }}
+                            transition={{ duration: 0.5, delay: i * 0.05 }}
+                            className="aspect-square bg-slate-900 rounded-[2rem] overflow-hidden relative border border-white/5 active:scale-95 transition-all duration-300"
+                        >
+                            <img src={photo.url} className="w-full h-full object-cover transition-all duration-500 hover:scale-110" alt="Galeria" />
+                        </motion.div>
+                    );
+                })}
             </div>
 
-            {!isEditingGallery && (
+            {(user.gallery?.length || 0) > 12 && (
                 <button 
                     onClick={() => setShowPhotoGrid(true)}
                     className="w-full py-4 bg-slate-900/50 border border-white/5 rounded-3xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-900 transition-colors"

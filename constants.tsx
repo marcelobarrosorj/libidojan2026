@@ -7,6 +7,7 @@ export const MOCK_CURRENT_USER: User = {
   nickname: 'User_Libido',
   email: 'marcelo@libido.app',
   age: 28,
+  city: 'VOLTA REDONDA - RJ',
   plan: Plan.GOLD,
   balance: 500,
   boosts_active: 2,
@@ -30,7 +31,10 @@ export const MOCK_CURRENT_USER: User = {
   isGhostMode: false,
   hasBlurredGallery: false,
   gallery: [
-    { id: '1', url: 'https://picsum.photos/seed/me1/800/800', timestamp: '2026-01-01' }
+    { id: 'g1', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800', timestamp: '2026-01-01' },
+    { id: 'g2', url: 'https://images.unsplash.com/photo-1514525253361-bee8718a74a2?w=800', timestamp: '2026-01-02' },
+    { id: 'g3', url: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800', timestamp: '2026-01-03', isBlurred: true },
+    { id: 'g4', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800', timestamp: '2026-01-04', isBlurred: true }
   ],
   vouches: [],
   badges: ['Pioneiro', 'Staff'],
@@ -53,8 +57,8 @@ export const MOCK_CURRENT_USER: User = {
   braveryLevel: 8,
   busyMode: false,
   bookingPolicy: 'A combinar',
-  lat: -23.5505,
-  lon: -46.6333,
+  lat: -22.5231,
+  lon: -44.1041,
   isSubscriber: false,
   dailyProfileViews: 0,
   birthDate: '1995-01-01',
@@ -66,7 +70,7 @@ export const MOCK_CURRENT_USER: User = {
   ],
   vouchScore: 98,
   isStealthMode: false,
-  prefersBlurredPhotos: true
+  prefersBlurredPhotos: false
 };
 
 export const MOCK_USERS: User[] = [
@@ -78,6 +82,7 @@ export const MOCK_USERS: User[] = [
     email: 'anaebruno@lifestyle.com',
     age: 26,
     type: UserType.CASAIS,
+    city: 'FLORIANÓPOLIS - SC',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     trustLevel: TrustLevel.OURO,
     following: [],
@@ -88,7 +93,35 @@ export const MOCK_USERS: User[] = [
       { id: 'total', label: 'Troca Total', value: 'sim' as any },
       { id: 'menage', label: 'Ménage', value: 'sim' as any }
     ],
-    vouchScore: 95
+    vouchScore: 95,
+    gallery: [
+      { id: 'g1', url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800', timestamp: '2026-01-01' },
+      { id: 'g2', url: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800', timestamp: '2026-01-02' }
+    ]
+  },
+  {
+    ...MOCK_CURRENT_USER,
+    id: 'user-2',
+    serialNumber: '000014',
+    nickname: 'Paola & Gui',
+    email: 'paolaegui@vip.com',
+    age: 31,
+    type: UserType.CASAIS,
+    city: 'CURITIBA - PR',
+    avatar: 'https://images.unsplash.com/photo-1516575334481-f85287c2c82d?w=400',
+    trustLevel: TrustLevel.OURO,
+    following: [],
+    lat: -23.5700,
+    lon: -46.6500,
+    consentMatrix: [
+      { id: 'soft', label: 'Soft Swing', value: 'sim' as any },
+      { id: 'total', label: 'Troca Total', value: 'sim' as any },
+      { id: 'menage', label: 'Ménage', value: 'sim' as any }
+    ],
+    vouchScore: 99,
+    gallery: [
+      { id: 'g3', url: 'https://images.unsplash.com/photo-1516195851888-6f1a981a8a2a?w=800', timestamp: '2026-01-04' }
+    ]
   },
   {
     ...MOCK_CURRENT_USER,
@@ -98,6 +131,7 @@ export const MOCK_USERS: User[] = [
     email: 'carla.lib@gmail.com',
     age: 27,
     type: UserType.MULHER,
+    city: 'RIO DE JANEIRO - RJ',
     avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
     trustLevel: TrustLevel.PRATA,
     following: [],
@@ -117,6 +151,7 @@ export const MOCK_USERS: User[] = [
     nickname: 'Gabi',
     age: 24,
     type: UserType.MULHER,
+    city: 'CAMPINAS - SP',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
     trustLevel: TrustLevel.BRONZE,
     following: [],
@@ -136,6 +171,7 @@ export const MOCK_USERS: User[] = [
     nickname: 'Lia & Dan',
     age: 29,
     type: UserType.CASAIS,
+    city: 'VITÓRIA - ES',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
     trustLevel: TrustLevel.OURO,
     following: [],
@@ -171,7 +207,7 @@ export const MOCK_MOMENTS: Moment[] = [
   },
   {
     id: 'm3',
-    userId: 'm8',
+    userId: 'user-4',
     nickname: 'Gabi',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
     imageUrl: 'https://images.unsplash.com/photo-1514525253361-bee8718a74a2?w=800',
@@ -211,7 +247,7 @@ export const MOCK_POSTS: Post[] = [
   },
   {
     id: "post-3",
-    userId: 'm4',
+    userId: 'user-5',
     user: 'Lia & Dan',
     age: 29,
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
@@ -225,7 +261,7 @@ export const MOCK_POSTS: Post[] = [
   },
   {
     id: "post-4",
-    userId: 'm8',
+    userId: 'user-4',
     user: 'Gabi',
     age: 24,
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
@@ -239,7 +275,7 @@ export const MOCK_POSTS: Post[] = [
   },
   {
     id: "post-5",
-    userId: 'm26',
+    userId: 'user-2',
     user: 'Paola & Gui',
     age: 31,
     avatar: 'https://images.unsplash.com/photo-1516575334481-f85287c2c82d?w=400',

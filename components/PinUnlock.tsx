@@ -1,6 +1,7 @@
 
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Lock, Unlock, AlertCircle, ShieldAlert } from 'lucide-react';
+import LibidoIcon from './common/LibidoIcon';
 import { verifyUserPin, resetPinLocalOnly } from '../services/pinService';
 import { isValidPinFormat } from '../services/pinPolicy';
 import ActionButton from './common/ActionButton';
@@ -97,10 +98,8 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
 
   return (
     <div className="w-full max-w-sm glass-card rounded-[3rem] p-10 border-amber-500/10 shadow-2xl animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
-      <div className="text-center space-y-4 mb-8">
-        <div className="w-16 h-16 bg-amber-500/10 rounded-[1.5rem] flex items-center justify-center mx-auto text-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
-          <Lock size={32} />
-        </div>
+      <div className="text-center space-y-4 mb-8 flex flex-col items-center">
+        <LibidoIcon size={48} className="mb-2" />
         <div className="space-y-1">
           <h2 className="text-white font-black text-xs uppercase tracking-[0.3em]">Acesso Bloqueado</h2>
           <p className="text-[10px] text-amber-500/70 font-bold uppercase tracking-widest">Insira seu PIN para continuar</p>

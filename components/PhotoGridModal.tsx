@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Grid, Camera, ChevronLeft, ChevronRight, Maximize2, ShieldCheck, Eye } from 'lucide-react';
+import { X, Grid, Camera, ChevronLeft, ChevronRight, Maximize2, ShieldCheck, Eye, Trash2 } from 'lucide-react';
 import { GalleryPhoto } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -9,9 +9,17 @@ interface PhotoGridModalProps {
   onClose: () => void;
   onPhotoClick?: (index: number) => void;
   isBlurred?: boolean;
+  canDelete?: boolean;
+  onDeletePhoto?: (photoId: string) => void;
 }
 
-const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ photos, onClose, isBlurred: initialBlurred }) => {
+const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ 
+  photos, 
+  onClose, 
+  isBlurred: initialBlurred,
+  canDelete,
+  onDeletePhoto
+}) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isPhotoBlurred, setIsPhotoBlurred] = useState(initialBlurred);
 
@@ -27,6 +35,12 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ photos, onClose, isBlur
     if (selectedIndex !== null) {
       setSelectedIndex((selectedIndex - 1 + photos.length) % photos.length);
     }
+  };
+
+  const handleDelete = (e: React.MouseEvent, photoId: string) => {
+    e.stopPropagation();
+    onDeletePhoto?.(photoId);
+    if (selectedIndex !== null) setSelectedIndex(null);
   };
 
   return (
@@ -70,7 +84,18 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ photos, onClose, isBlur
                 )}
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-4 right-4 p-2 bg-black/40 backdrop-blur-md rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                
+                {canDelete && (
+                  <button 
+                    onClick={(e) => handleDelete(e, photo.id)}
+                    className="absolute top-3 right-3 p-2.5 bg-rose-500 text-white rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-75 z-20 backdrop-blur-md border border-rose-400/20"
+                    title="Excluir"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+
+                <div className="absolute bottom-4 left-4 p-2 bg-black/40 backdrop-blur-md rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
                     <Maximize2 size={16} className="text-white" />
                 </div>
               </div>
@@ -101,12 +126,22 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ photos, onClose, isBlur
             className="fixed inset-0 z-[3000] bg-black flex flex-col items-center justify-center p-4 sm:p-12"
             onClick={() => setSelectedIndex(null)}
           >
-            <button 
-                className="absolute top-8 right-8 p-4 bg-white/5 hover:bg-white/10 rounded-full text-white z-[3001]"
-                onClick={() => setSelectedIndex(null)}
-            >
-                <X size={32} />
-            </button>
+            <div className="absolute top-8 right-8 flex items-center gap-3 z-[3001]">
+                {canDelete && (
+                  <button 
+                      className="p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-full transition-all active:scale-90 border border-rose-500/20"
+                      onClick={(e) => handleDelete(e, photos[selectedIndex].id)}
+                  >
+                      <Trash2 size={24} />
+                  </button>
+                )}
+                <button 
+                    className="p-4 bg-white/5 hover:bg-white/10 rounded-full text-white"
+                    onClick={() => setSelectedIndex(null)}
+                >
+                    <X size={32} />
+                </button>
+            </div>
 
             <div className="relative w-full max-w-4xl aspect-[4/5] sm:aspect-square flex items-center justify-center group">
                 <motion.img

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
 import { User, RadarProfile, UserType } from '../types';
-import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon, Building } from 'lucide-react';
+import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon, Building, MapPin } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
 import { log, likeProfile, passProfile, showNotification, saveUserData, cache } from '../services/authUtils';
 import { soundService } from '../services/soundService';
@@ -40,13 +40,17 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProf
   const handleProfileClick = (profile: any) => {
     if (!profile) return;
     
-    console.log('[EXPLORE] Perfil aberto:', profile.id, profile.name || profile.nickname);
+    // Suporte robusto para ID string ou Objeto de perfil
+    const profileId = typeof profile === 'string' ? profile : (profile.id || profile.uid);
+    if (!profileId) return;
+
+    console.log('[EXPLORE] Perfil aberto:', profileId);
 
     if (usageService.canViewProfile(currentUser)) {
       if (!currentUser?.isSubscriber) {
         usageService.incrementView();
       }
-      onProfileClick?.(profile);
+      onProfileClick?.(profileId as any);
     } else {
       setPaywallReason('limit');
       setShowPaywall(true);
@@ -92,6 +96,10 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProf
     if (filteredUsers.length === 0) return null;
     return filteredUsers[currentIndex % filteredUsers.length];
   }, [filteredUsers, currentIndex]);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [filters]);
 
   useEffect(() => {
     getCurrentPosition()
@@ -185,7 +193,7 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProf
               tabs={[
                 { id: 'radar', label: 'Radar', icon: <RadioIcon /> },
                 { id: 'swipe', label: 'Swipe', icon: <Zap /> },
-                { id: 'venues', label: 'Lugares', icon: <Building /> }
+                { id: 'venues', label: 'Vibe Grounds', icon: <Building /> }
               ]}
             />
         </div>
@@ -218,7 +226,16 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProf
                     <h2 className="text-4xl font-black text-white font-outfit italic tracking-tighter">{currentSwipeUser.nickname}</h2>
                     <span className="text-2xl text-white/50 font-outfit">{currentSwipeUser.age}</span>
                   </div>
-                  <p className="text-amber-500 font-bold text-[10px] uppercase tracking-widest">{currentSwipeUser.type}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-amber-500 font-bold text-[10px] uppercase tracking-widest">{currentSwipeUser.type}</p>
+                    <span className="text-slate-600">•</span>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin size={10} className="text-slate-500" />
+                      <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                        {currentSwipeUser.city || currentSwipeUser.location || 'MATRIX'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

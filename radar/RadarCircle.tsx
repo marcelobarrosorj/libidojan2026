@@ -1,8 +1,9 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { RadarProfile } from './types';
 import { TrustLevel, HeatZone } from '../types';
-import { Lock } from 'lucide-react';
+import { Lock, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 function hashToUnit(id: string): number {
   let h = 2166136261;
@@ -28,6 +29,7 @@ interface RadarCircleProps {
 
 export default function RadarCircle(props: RadarCircleProps) {
   const { profiles, radiusKm, onProfileClick } = props;
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const visibleProfiles = profiles.filter(p => !(p as any).isGhostMode);
 
@@ -44,6 +46,14 @@ export default function RadarCircle(props: RadarCircleProps) {
     });
   }, [visibleProfiles, radiusKm]);
 
+  const handlePointClick = (p: RadarProfile) => {
+    setActiveId(p.id);
+    setTimeout(() => {
+        onProfileClick?.(p.id as any);
+        setActiveId(null);
+    }, 400);
+  };
+
   return (
     <div style={{
       width: 'min(90vw, 420px)',
@@ -54,10 +64,22 @@ export default function RadarCircle(props: RadarCircleProps) {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      {/* Background Dim Layer when something is selected */}
+      <AnimatePresence>
+        {activeId && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.6 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm z-[18] pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       {/* NOVO: Camada de Heatmap (Energia da Matriz) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
          {MOCK_HEAT_ZONES.map(zone => (
-           <div 
+            <div 
             key={zone.id}
             className={`absolute rounded-full blur-[60px] animate-pulse`}
             style={{
@@ -83,41 +105,59 @@ export default function RadarCircle(props: RadarCircleProps) {
         }} />
       ))}
       
-      <div style={{ 
-        position: 'absolute', 
-        left: '50%', 
-        top: '50%', 
-        width: 12, 
-        height: 12, 
-        marginLeft: -6, 
-        marginTop: -6, 
-        borderRadius: '50%', 
-        background: '#ff1493', 
-        boxShadow: '0 0 20px #ff1493', 
-        zIndex: 20,
-        border: '2px solid white'
-      }} />
+      {/* Central Point with Attraction Effect */}
+      <motion.div 
+        animate={{
+          boxShadow: ['0 0 20px #ff1493', '0 0 40px #ff1493', '0 0 20px #ff1493'],
+          scale: [1, 1.2, 1]
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ 
+          position: 'absolute', 
+          left: '50%', 
+          top: '50%', 
+          width: 14, 
+          height: 14, 
+          marginLeft: -7, 
+          marginTop: -7, 
+          borderRadius: '50%', 
+          background: '#ff1493', 
+          zIndex: 20,
+          border: '2px solid white'
+        }} 
+      >
+        <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-20" />
+      </motion.div>
 
       {points.map(({ p, x, y }) => {
           const isLocked = (p as any).isLocked;
           const isOuro = (p as any).trustLevel === TrustLevel.OURO;
+          const isSelected = activeId === p.id;
           
           return (
-            <button
-              key={p.id}
-              onClick={() => !isLocked && onProfileClick?.(p)}
-              disabled={isLocked}
-              className={`group transition-all duration-500 ${isLocked ? 'cursor-default' : 'cursor-pointer'}`}
-              style={{ 
-                position: 'absolute', 
-                left: `${x}%`, 
-                top: `${y}%`, 
-                width: 32, 
-                height: 32, 
-                marginLeft: -16, 
-                marginTop: -16, 
-                zIndex: 15,
-              }}
+            <motion.button
+               key={`radar-point-${p.id}`}
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handlePointClick(p);
+               }}
+               disabled={isLocked}
+               animate={{
+                 scale: isSelected ? 4 : 1,
+                 zIndex: isSelected ? 30 : 15,
+                 opacity: (activeId && !isSelected) ? 0.2 : 1
+               }}
+               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+               className={`group transition-all duration-500 ${isLocked ? 'cursor-default' : 'cursor-pointer'}`}
+               style={{ 
+                 position: 'absolute', 
+                 left: `${x}%`, 
+                 top: `${y}%`, 
+                 width: 32, 
+                 height: 32, 
+                 marginLeft: -16, 
+                 marginTop: -16, 
+               }}
             >
               <div className="relative w-full h-full">
                 <div className={`
@@ -140,13 +180,25 @@ export default function RadarCircle(props: RadarCircleProps) {
                   `} />
                 )}
                 
-                {!isLocked && (
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-black/80 px-2 py-0.5 rounded text-[8px] text-white font-black uppercase tracking-widest transition-opacity pointer-events-none">
-                    {(p.name || 'Agente').split(' ')[0]} • {p.distanceLabel}
-                  </div>
+                <AnimatePresence>
+                  {!isLocked && !isSelected && (
+                    <motion.div 
+                      className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-black/80 px-2 py-0.5 rounded text-[8px] text-white font-black uppercase tracking-widest transition-opacity pointer-events-none z-50 shadow-2xl border border-white/5"
+                      initial={{ opacity: 0, y: 5 }}
+                      whileHover={{ opacity: 1, y: 0 }}
+                    >
+                      {(p.name || 'Agente').split(' ')[0]} • {p.distanceLabel}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {isSelected && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Zap size={8} className="text-pink animate-pulse" fill="currentColor" />
+                    </div>
                 )}
               </div>
-            </button>
+            </motion.button>
           );
       })}
     </div>

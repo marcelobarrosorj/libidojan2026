@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lock, Eye } from 'lucide-react';
 
@@ -18,6 +18,11 @@ const BlurredImage: React.FC<BlurredImageProps> = ({
   className = "" 
 }) => {
   const [isBlurred, setIsBlurred] = useState(isInitiallyBlurred);
+
+  // Sincroniza estado se a prop mudar (importante para troca de perfil ou carregamento tardio)
+  useEffect(() => {
+    setIsBlurred(isInitiallyBlurred);
+  }, [isInitiallyBlurred]);
 
   return (
     <div className={`relative overflow-hidden group ${className}`}>

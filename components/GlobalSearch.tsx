@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, User as UserIcon, Shield, Hash, Mail } from 'lucide-react';
+import LibidoIcon from './common/LibidoIcon';
 import { searchProfiles } from '../services/repo';
 import { RadarProfile } from '../types';
 
@@ -49,6 +50,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onS
         >
           {/* Header */}
           <div className="p-6 border-b border-white/10 flex items-center gap-4">
+            <LibidoIcon size={24} className="shrink-0" />
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-500" size={18} />
               <input 

@@ -70,6 +70,7 @@ export interface ProfileData {
   hairColor?: string;
   hairType?: string;
   eyeColor?: string;
+  city: string;
 }
 
 export interface Vouch {
@@ -110,7 +111,7 @@ export interface User {
   lookingFor: UserType[];
   height: number;
   location: string;
-  city?: string;
+  city: string;
   neighborhood?: string;
   xp: number;
   level: number;
@@ -181,6 +182,7 @@ export interface CoupleProfileData {
   mainNickname: string; 
   email: string; 
   password?: string;
+  city: string;
   partner1: ProfileData; 
   partner2: ProfileData; 
   lookingFor: UserType[]; 

@@ -27,15 +27,34 @@ export function useAntiPrint() {
     const handleKeyDown = (e: KeyboardEvent) => {
       // PrintScreen Key
       if (e.key === 'PrintScreen') {
-        navigator.clipboard.writeText(""); // Clear clipboard
-        alert("Captura de tela proibida neste ambiente seguro.");
+        try {
+          navigator.clipboard.writeText(""); // Clear clipboard if possible
+        } catch (err) {
+          // ignore
+        }
         setIsBlurred(true);
       }
 
-      // Cmd+Shift+4 / Ctrl+Shift+S detection is tricky in browser, but we can catch some
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 's' || e.key === 'S' || e.key === '4')) {
+      // Cmd+Shift+S / Cmd+Shift+4 / Ctrl+Shift+S
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+      const isShift = e.shiftKey;
+      
+      if (isCmdOrCtrl && isShift && (e.key === 's' || e.key === 'S' || e.key === '4' || e.key === '3')) {
         setIsBlurred(true);
-        setTimeout(() => setIsBlurred(false), 2000);
+        // We let it stay blurred if it's a critical capture attempt, or auto-reset after 5s
+        setTimeout(() => setIsBlurred(false), 5000);
+      }
+
+      // Ctrl+S or Cmd+S (Save Page As)
+      if (isCmdOrCtrl && e.key === 's') {
+        e.preventDefault();
+        return;
+      }
+
+      // F12 or Cmd+Option+I (Inspect element) - also common for "print" via devtools
+      if (e.key === 'F12' || (isCmdOrCtrl && e.altKey && (e.key === 'i' || e.key === 'I'))) {
+        // Just deterrent
+        console.warn("DevTools access restricted for security.");
       }
     };
 

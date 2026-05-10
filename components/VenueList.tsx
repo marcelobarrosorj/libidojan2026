@@ -1,11 +1,15 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { MapPin, Users, Navigation, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react';
+import { MapPin, Users, Navigation, CheckCircle2, ChevronRight, Loader2, Plus } from 'lucide-react';
 import { Venue, CheckIn } from '../types';
 import { venueService } from '../services/venueService';
 import { haversineKm } from '../services/geoService';
-import { showNotification } from '../services/authUtils';
+import { showNotification, cache } from '../services/authUtils';
 import { motion, AnimatePresence } from 'motion/react';
+import { VenueDiscovery } from './VenueDiscovery';
+import { APIProvider } from '@vis.gl/react-google-maps';
+
+const API_KEY = process.env.GOOGLE_MAPS_PLATFORM_KEY || '';
 
 interface VenueListProps {
   userLocation: { lat: number; lon: number } | null;
@@ -16,36 +20,45 @@ export const VenueList: React.FC<VenueListProps> = ({ userLocation, userId }) =>
   const [venues, setVenues] = useState<Venue[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCheckIn, setActiveCheckIn] = useState<CheckIn | null>(null);
+  const [showDiscovery, setShowDiscovery] = useState(false);
+  const effectiveLocation = useMemo(() => {
+    if (userLocation) return userLocation;
+    const cacheLat = cache.userData?.lat;
+    const cacheLon = cache.userData?.lon;
+    if (cacheLat && cacheLon) return { lat: cacheLat, lon: cacheLon };
+    return null;
+  }, [userLocation, cache.userData?.lat, cache.userData?.lon]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      console.log('[VENUE_LIST] Carregando dados para localização:', effectiveLocation);
+      const data = await venueService.getVenues();
+      setVenues(data);
+      setActiveCheckIn(venueService.getCurrentCheckIn());
+    } catch (e) {
+      console.error('[VENUE_LIST_ERROR]', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        console.log('[VENUE_LIST] Carregando dados para localização:', userLocation);
-        const data = await venueService.getVenues();
-        setVenues(data);
-        setActiveCheckIn(venueService.getCurrentCheckIn());
-      } catch (e) {
-        console.error('[VENUE_LIST_ERROR]', e);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
-  }, [userLocation]); // Re-carrega se a localização mudar
+  }, [effectiveLocation]); // Re-carrega se a localização mudar
 
   const venuesWithDistance = useMemo(() => {
-    if (!userLocation) {
+    if (!effectiveLocation) {
         console.log('[VENUE_LIST] Sem localização, exibindo lista padrão');
         return venues;
     }
     const mapped = venues.map(v => ({
       ...v,
-      distance: haversineKm(userLocation.lat, userLocation.lon, v.lat, v.lon)
+      distance: haversineKm(effectiveLocation.lat, effectiveLocation.lon, v.lat, v.lon)
     })).sort((a, b) => (a.distance || 0) - (b.distance || 0));
     console.log('[VENUE_LIST] Locais ordenados por distância:', mapped.length);
     return mapped;
-  }, [venues, userLocation]);
+  }, [venues, effectiveLocation]);
 
   const handleCheckIn = async (venueId: string) => {
     try {
@@ -77,7 +90,54 @@ export const VenueList: React.FC<VenueListProps> = ({ userLocation, userId }) =>
   }
 
   return (
-    <div className="w-full space-y-6 animate-in fade-in duration-500">
+    <div className="w-full space-y-6 animate-in fade-in duration-500 pb-20">
+      <div className="flex items-center justify-between px-2">
+        <div>
+          <h2 className="text-xl font-black text-white uppercase italic tracking-tighter leading-none">Pontos Detectados</h2>
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1"> Infraestrutura ativa próxima</p>
+        </div>
+        <button 
+          onClick={() => setShowDiscovery(true)}
+          className="px-4 py-2 bg-amber-500 text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+        >
+          <Plus size={14} strokeWidth={3} /> Adicionar
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showDiscovery && (
+          <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-black/80 backdrop-blur-sm">
+            <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setShowDiscovery(false)}
+               className="absolute inset-0"
+            />
+            <motion.div 
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative h-[85vh] w-full"
+            >
+            <APIProvider apiKey={API_KEY} version="weekly">
+                <VenueDiscovery 
+                  userLocation={effectiveLocation}
+                  onClose={() => setShowDiscovery(false)}
+                  onSelect={async (v) => {
+                    await venueService.addVenue(v);
+                    showNotification('Novo ponto registrado na Matriz.', 'success');
+                    setShowDiscovery(false);
+                    loadData();
+                  }}
+                />
+              </APIProvider>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {activeCheckIn && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -168,11 +228,23 @@ export const VenueList: React.FC<VenueListProps> = ({ userLocation, userId }) =>
         })}
       </div>
 
-      {venues.length === 0 && (
-        <div className="p-12 text-center bg-slate-900/20 border border-white/5 rounded-3xl">
-          <MapPin size={32} className="text-slate-700 mx-auto mb-4" />
-          <h3 className="text-white font-black uppercase italic tracking-tight">Nenhum local próximo</h3>
-          <p className="text-slate-500 text-[10px] font-medium mt-1">A Matriz ainda não detectou infraestrutura nesta zona.</p>
+      {venuesWithDistance.length === 0 && (
+        <div className="p-10 text-center bg-slate-900/40 border border-white/5 rounded-[2.5rem] space-y-6">
+          <div className="w-16 h-16 bg-slate-950 rounded-3xl flex items-center justify-center text-slate-700 mx-auto border border-white/5 shadow-xl">
+            <MapPin size={32} />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-white font-black uppercase italic tracking-tight text-lg">Nenhum rastro detectado</h3>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed max-w-[200px] mx-auto text-center">
+              A Matriz ainda não mapeou a infraestrutura nesta frequência GPS.
+            </p>
+          </div>
+          <button 
+            onClick={() => setShowDiscovery(true)}
+            className="w-full py-4 bg-amber-500 text-black rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+          >
+            <Plus size={16} strokeWidth={3} /> Detectar Novos Pontos
+          </button>
         </div>
       )}
     </div>

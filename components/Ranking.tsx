@@ -123,7 +123,7 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                onClick={() => onSelectUser?.(user)}
+                onClick={() => onSelectUser?.(user.id)}
                 className="relative group bg-slate-900/40 border border-slate-800/50 rounded-3xl p-3 flex items-center gap-4 active:scale-95 transition-transform cursor-pointer overflow-hidden"
               >
                 {/* Indicador de Rank */}

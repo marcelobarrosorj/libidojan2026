@@ -8,7 +8,7 @@ import { MAX_RADIUS_KM, haversineKm, formatDistanceLabel } from './geo';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { Radio, Layers, Target, Loader2, Info, Search, ZoomIn, Crown, MapPin, CheckCircle2, ChevronRight, X } from 'lucide-react';
 import { cache, isPremiumUser } from '../services/authUtils';
-import { Plan, Venue } from '../types';
+import { Plan, Venue, User } from '../types';
 import { venueService } from '../services/venueService';
 
 export default function RadarPage({ 
@@ -34,11 +34,10 @@ export default function RadarPage({
   const [venues, setVenues] = useState<Venue[]>([]);
   const [currentCheckIn, setCurrentCheckIn] = useState(venueService.getCurrentCheckIn());
 
-  const MOCK_CENTER = { lat: -23.5505, lon: -46.6333 };
   const center = useMemo(() => ({
-    lat: location?.lat ?? MOCK_CENTER.lat,
-    lon: location?.lon ?? MOCK_CENTER.lon
-  }), [location]);
+    lat: location?.lat ?? cache.userData?.lat ?? -23.5505,
+    lon: location?.lon ?? cache.userData?.lon ?? -46.6333
+  }), [location, cache.userData?.lat, cache.userData?.lon]);
 
   useEffect(() => {
     const loadVenues = async () => {

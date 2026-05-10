@@ -82,6 +82,7 @@ export async function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: 
             categories: [], // Campo legado necessário para UserProfile
             avatar: p.avatar,
             bio: p.bio || '',
+            gallery: p.gallery || [],
             serialNumber: p.serialNumber
         }));
     }
@@ -101,6 +102,7 @@ export async function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: 
       categories: [],
       avatar: u.avatar,
       bio: u.bio,
+      gallery: u.gallery || [],
       serialNumber: u.serialNumber
   }));
 }
@@ -126,7 +128,27 @@ export async function searchProfiles(query: string): Promise<RadarProfile[]> {
         const { data, error } = await supabaseQuery.limit(20);
         if (error) throw error;
 
-        return processProfileData(data || []);
+        if (data && data.length > 0) {
+            return processProfileData(data);
+        }
+
+        // Fallback para busca nos mocks
+        const term = query.toLowerCase();
+        return MOCK_USERS.filter(u => 
+            u.nickname.toLowerCase().includes(term) || 
+            u.serialNumber?.includes(term)
+        ).map(u => ({
+            id: u.id,
+            name: u.nickname,
+            avatar: u.avatar,
+            category: u.type,
+            lat: u.lat,
+            lon: u.lon,
+            city: u.city || '',
+            neighborhood: u.neighborhood || '',
+            gallery: u.gallery || [],
+            serialNumber: u.serialNumber
+        }));
     } catch (e) {
         console.error('[REPO] Erro na busca:', e);
         return [];
@@ -188,21 +210,27 @@ export async function fetchLatestProfiles(limitCount: number = 20): Promise<Rada
         if (error) throw error;
         
         if (!data || data.length === 0) {
-            console.log('[REPO] Banco de dados vazio, usando fallback de mocks');
-            return MOCK_USERS.map(u => ({
+            console.log('[REPO] Banco de dados vazio, usando fallback de mocks combinados');
+            const combined = [
+                ...MOCK_USERS,
+                ...fullMocks.filter(m => !MOCK_USERS.find(mu => mu.id === m.id))
+            ].slice(0, limitCount);
+
+            return combined.map(u => ({
                 id: u.id,
-                name: u.nickname,
+                name: (u as any).nickname || (u as any).name,
                 lat: u.lat || 0,
                 lon: u.lon || 0,
-                city: 'Matriz (Mock)',
-                neighborhood: '',
-                category: u.type,
+                city: (u as any).city || 'Matriz (Mock)',
+                neighborhood: (u as any).neighborhood || '',
+                category: (u as any).type || (u as any).category,
                 avatar: u.avatar,
-                bio: u.bio,
+                bio: (u as any).bio || '',
+                gallery: (u as any).gallery || [],
                 serialNumber: u.serialNumber,
-                trustLevel: u.trustLevel || TrustLevel.BRONZE,
+                trustLevel: (u as any).trustLevel || TrustLevel.BRONZE,
                 isMock: true,
-                age: u.age
+                age: (u as any).age || 25
             })) as RadarProfile[];
         }
 
@@ -222,10 +250,11 @@ export async function fetchLatestProfiles(limitCount: number = 20): Promise<Rada
             category: u.type,
             avatar: u.avatar,
             bio: u.bio,
+            gallery: u.gallery || [],
             serialNumber: u.serialNumber,
             trustLevel: TrustLevel.BRONZE,
             isMock: true
-        }));
+        })) as any[];
     }
 }
 
@@ -268,48 +297,89 @@ function processProfileData(data: any[]): RadarProfile[] {
             category: u.type || 'Explorador',
             avatar: u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.id}`,
             bio: u.bio || '',
+            gallery: u.gallery || [],
             serialNumber: item.serial_number || u.serialNumber,
             trustLevel: u.trustLevel || TrustLevel.BRONZE,
             isMock: false,
             // Campo extra para o ranking usar se disponível
             age: u.age || 18
-        } as RadarProfile;
+        } as any; // Cast para any pois RadarProfile pode não ter gallery
     });
 }
 
 /**
- * Busca um perfil específico por ID
+ * Busca um perfil específico por ID com dados completos (User)
  */
-export async function getProfileById(id: string): Promise<RadarProfile | null> {
+export async function getProfileById(id: string): Promise<any | null> {
+    // Regex simples para validar formato UUID v4 (padrão Supabase/Postgres)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isValidUuid = uuidRegex.test(id);
+
     try {
+        if (!isValidUuid) {
+            // Se não for um UUID válido, assumimos que é um MOCK (ex: "m2", "me")
+            // Pulamos a chamada ao Supabase para evitar o erro "invalid input syntax for type uuid"
+            throw new Error(`ID ${id} não é um UUID válido, tentando fallback para MOCK.`);
+        }
+
+        console.log(`[REPO] getProfileById: Buscando ${id}`);
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', id)
             .single();
 
-        if (error || !data) throw error;
-
-        return processProfileData([data])[0];
-    } catch (e) {
-        console.error('[REPO] Erro ao buscar perfil por ID:', e);
-        // Fallback para mock
-        const mock = MOCK_USERS.find(u => u.id === id);
-        if (mock) {
-            return {
-                id: mock.id,
-                name: mock.nickname,
-                lat: mock.lat || 0,
-                lon: mock.lon || 0,
-                city: '',
-                neighborhood: '',
-                category: mock.type,
-                avatar: mock.avatar,
-                bio: mock.bio,
-                serialNumber: mock.serialNumber,
-                trustLevel: TrustLevel.BRONZE
-            };
+        if (error || !data) {
+            console.warn(`[REPO] Perfil ${id} não encontrado no DB.`);
+            throw error || new Error('Not found');
         }
+
+        // Processa o radar profile básico
+        const base = processProfileData([data])[0];
+        
+        // Extrai o JSON completo de data
+        let fullData: any = {};
+        try {
+            fullData = typeof data.data === 'string' ? JSON.parse(data.data) : (data.data || {});
+        } catch (e) {
+            console.error('Erro ao processar JSON data em getProfileById:', e);
+        }
+
+        // Tenta buscar o e-mail real se não estiver no JSON
+        const email = data.email || fullData.email;
+
+        return {
+            ...fullData,
+            ...base,
+            id: data.id,
+            email: email,
+            nickname: data.nickname || fullData.nickname || base.name,
+            serialNumber: data.serial_number || fullData.serialNumber || base.serialNumber
+        };
+    } catch (e) {
+        const errorMessage = (e as any).message || '';
+        
+        // Log discreto para IDs que sabemos ser MOCK ou erros de sintaxe esperados
+        if (!isValidUuid || errorMessage.includes('invalid input syntax for type uuid')) {
+            console.log(`[REPO] ID ${id} não é DB-UUID. Verificando MOCKS...`);
+        } else {
+            console.error(`[REPO] Falha real na busca do perfil ${id}:`, errorMessage);
+        }
+        
+        // Fallback para MOCKS: Se falhar ou for ID de mock, tentamos no registro local
+        // 1. Tenta no MOCK_USERS (Perfis de destaque/feed)
+        let mock: any = MOCK_USERS.find((u: any) => u.id === id || u.id === `mock-${id}`);
+        
+        // 2. Se não encontrou, tenta nos mocks do radar (fullMocks)
+        if (!mock) {
+            mock = fullMocks.find((u: any) => u.id === id || u.id === `mock-${id}`);
+        }
+
+        if (mock) {
+            console.log(`[REPO] Resolvido via MOCK: ${id}`);
+            return mock;
+        }
+
         return null;
     }
 }

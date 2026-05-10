@@ -28,11 +28,17 @@ async function startServer() {
     // 1. Health Check (Crítico: deve estar disponível imediatamente)
     app.get('/health', (_req, res) => res.status(200).send('OK'));
 
-    // 2. Proxy para Supabase (sb-api)
+    // 2. Proxy para Supabase (sb-api) com tratamento robusto de URL e Headers
     app.use('/api/sb-api', async (req, res) => {
+        const envUrl = (process.env.SUPABASE_URL || '').trim();
+        const supabaseUrl = envUrl !== '' ? envUrl : 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
+        
+        // Remove barras duplicadas na colagem da URL
+        const cleanPath = req.url.startsWith('/') ? req.url : `/${req.url}`;
+        const targetUrl = `${supabaseUrl.replace(/\/$/, '')}${cleanPath}`;
+        
         try {
-            const supabaseUrl = process.env.SUPABASE_URL || 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
-            const url = `${supabaseUrl}${req.url}`;
+            console.log(`[SB_PROXY] ${req.method} ${req.url} -> ${targetUrl}`);
             
             const fetchOptions: any = {
                 method: req.method,
@@ -45,24 +51,30 @@ async function startServer() {
                 }
             };
 
-            // Remove headers vazios
+            // Remove headers vazios ou "undefined" literais
             Object.keys(fetchOptions.headers).forEach(key => {
-                if (!fetchOptions.headers[key]) delete fetchOptions.headers[key];
+                const val = fetchOptions.headers[key];
+                if (!val || val === 'undefined' || val === 'null') {
+                    delete fetchOptions.headers[key];
+                }
             });
 
-            // Somente envia body se houver conteúdo e não for GET/HEAD
-            if (!['GET', 'HEAD'].includes(req.method) && req.body && Object.keys(req.body).length > 0) {
-                fetchOptions.body = JSON.stringify(req.body);
+            // Proxy do corpo da requisição
+            if (!['GET', 'HEAD'].includes(req.method)) {
+                // Garante que o body seja passado corretamente se existir
+                if (req.body && (typeof req.body === 'object' ? Object.keys(req.body).length > 0 : true)) {
+                    fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+                }
             }
 
-            const response = await fetch(url, fetchOptions);
+            const response = await fetch(targetUrl, fetchOptions);
             
             res.status(response.status);
             
             const contentType = response.headers.get('content-type');
             if (contentType) res.setHeader('Content-Type', contentType);
 
-            // Se for 204 ou corpo vazio, encerra sem tentar ler texto
+            // Resposta vazia (No Content)
             if (response.status === 204) {
                 return res.end();
             }
@@ -70,9 +82,12 @@ async function startServer() {
             const data = await response.text();
             res.send(data);
         } catch (error: any) {
-            console.error('[SB_PROXY_ERROR]', error.message);
-            // Retorna um JSON válido mesmo no erro para evitar quebras no frontend
-            res.status(500).json({ error: 'Erro de comunicação', message: error.message });
+            console.error(`[SB_PROXY_ERROR] Falha ao alcançar ${targetUrl}:`, error.message);
+            res.status(502).json({ 
+                error: 'Gateway Error: Falha na comunicação com a Matriz DB', 
+                message: error.message,
+                target: targetUrl 
+            });
         }
     });
 

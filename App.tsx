@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import LibidoIcon from './components/common/LibidoIcon';
 import Auth from './components/Auth';
 import Layout from './components/Layout';
 import Explore from './components/Explore';
@@ -12,6 +13,7 @@ import EventsPage from './components/EventsPage';
 import Ranking from './components/Ranking';
 import { soundService } from './services/soundService';
 import { TermsGate } from './components/TermsGate';
+import { CityGate } from './components/CityGate';
 import VerificationBanner from './components/VerificationBanner';
 import AdminReports from './components/AdminReports';
 import { GlobalSearch } from './components/GlobalSearch';
@@ -19,12 +21,12 @@ import { PhotoReminder } from './components/PhotoReminder';
 import { shouldShowTermsGate, recordTermsAcceptance } from './services/termsGate';
 import { AuthContext } from './hooks/useAuthContext';
 import { User, Gender, SexualOrientation, Biotype, Vibes, Plan, TrustLevel, UserType } from './types';
-import { MOCK_USERS } from './constants';
+import { MOCK_USERS, MOCK_POSTS } from './constants';
 import { useAntiPrint } from './hooks/useAntiPrint';
 import { Lock } from 'lucide-react';
-import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log, authEvents } from './services/authUtils';
+import { getAuthFlag, setAuthFlag, syncCaches, cache, getUserData, log, authEvents, showNotification } from './services/authUtils';
 import { isUnlockedWindowValid, clearUnlockedWindow } from './services/pinService';
-import { initSecurityLayer } from './services/securityService';
+import { initSecurityLayer, getWatermarkData } from './services/securityService';
 import { getProfileById } from './services/repo';
 
 export default function App() {
@@ -34,6 +36,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('feed'); 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [viewedProfile, setViewedProfile] = useState<User | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loadStep, setLoadStep] = useState('Iniciando Matriz...');
@@ -142,11 +145,55 @@ export default function App() {
   const [radarResetKey, setRadarResetKey] = useState(0);
   const [profileRegistry, setProfileRegistry] = useState<Record<string, User>>({});
 
+  // 1. POPULAÇÃO INICIAL DO REGISTRO (Garante que Mocks tenham dados completos)
+  useEffect(() => {
+    setProfileRegistry(prev => {
+        const next = { ...prev };
+        
+        // Adiciona Mocks Base
+        if (MOCK_USERS) {
+            MOCK_USERS.forEach(u => {
+                if (u.id) next[u.id] = u;
+            });
+        }
+
+        // Adiciona usuários dos Posts (se não existirem)
+        if (MOCK_POSTS) {
+            MOCK_POSTS.forEach(p => {
+                if (!p.userId) return;
+                if (!next[p.userId]) {
+                    next[p.userId] = {
+                        id: p.userId,
+                        nickname: p.user,
+                        avatar: p.avatar,
+                        age: p.age,
+                        type: UserType.HOMEM,
+                        gallery: []
+                    } as any;
+                }
+            });
+        }
+
+        return next;
+    });
+  }, []);
+
   const registerProfiles = React.useCallback((users: User[]) => {
     setProfileRegistry(prev => {
         const next = { ...prev };
         users.forEach(u => {
-            if (u.id) next[u.id] = u;
+            if (!u.id) return;
+            const existing = next[u.id];
+            
+            // Nunca destrua um cache com fotos usando um parcial sem fotos
+            const hasLib = (usr: any) => usr?.gallery && usr.gallery.length > 0;
+            
+            if (!existing || (hasLib(u) && !hasLib(existing))) {
+                next[u.id] = { ...existing, ...u };
+            } else if (!hasLib(existing)) {
+                // Sincroniza dados básicos se nenhum tem galeria
+                next[u.id] = { ...existing, ...u };
+            }
         });
         return next;
     });
@@ -183,113 +230,56 @@ export default function App() {
     setIsAuthenticated
   }), [logout, refreshSession]);
 
+  const lastRequestedProfileId = useRef<string | null>(null);
+
   const handleViewProfile = async (p: any) => {
     if (!p) return;
 
-    let targetProfile = typeof p === 'object' ? p : null;
-    const profileId = typeof p === 'string' ? p : p.id;
-
+    // 1. EXTRAÇÃO DE ID
+    const profileId = typeof p === 'string' ? p : (p.id || p.uid);
     if (!profileId) return;
 
-    // 1. Tenta buscar no registro global (mais atualizado)
-    if (profileRegistry[profileId]) {
-        targetProfile = profileRegistry[profileId];
-    } 
-    // 2. Se for um ID de mock conhecido que não está no registro
-    else if (profileId.startsWith('mock-')) {
-        targetProfile = MOCK_USERS.find(u => u.id === profileId) || null;
+    lastRequestedProfileId.current = profileId;
+    
+    // 2. BUSCA NO CACHE (Resposta Instantânea)
+    const cached = profileRegistry[profileId];
+    if (cached) {
+        setViewedProfile({ ...cached, gallery: cached.gallery || [] });
+        setActiveTab('view_profile');
+        setProfileLoading(false);
+    } else {
+        setProfileLoading(true);
+        setViewedProfile(null);
+        setActiveTab('view_profile');
     }
 
-    // 3. Se ainda não temos o perfil completo, buscamos no repo
-    if (!targetProfile || (!targetProfile.email && !targetProfile.serialNumber)) {
-        log('info', `[APP] Buscando perfil completo via Matriz DB: ${profileId}`);
-        try {
-            const real = await getProfileById(profileId);
-            if (real) {
-                targetProfile = real;
-                // Registra para futuras visualizações rápidas
-                registerProfiles([real as any]);
+    try {
+        // 3. SINCRONIZAÇÃO COM A MATRIZ
+        const real = await getProfileById(profileId);
+        
+        if (lastRequestedProfileId.current !== profileId) return;
+
+        if (real) {
+            const finalProfile = { ...real, gallery: real.gallery || [] } as User;
+            setViewedProfile(finalProfile);
+            setProfileRegistry(prev => ({ 
+                ...prev, 
+                [profileId]: finalProfile
+            }));
+        } else if (!cached) {
+            // Fallback para mock se nao temos nada
+            const mock = MOCK_USERS.find(u => u.id === profileId || u.id === `mock-${profileId}`);
+            if (mock) {
+                setViewedProfile({ ...mock, gallery: mock.gallery || [] } as User);
             }
-        } catch (e) {
-            log('error', `[APP] Erro crítico ao localizar usuário real: ${profileId}`, e);
+        }
+    } catch (e) {
+        console.warn('[APP] Sincronização falhou:', profileId);
+    } finally {
+        if (lastRequestedProfileId.current === profileId) {
+            setProfileLoading(false);
         }
     }
-
-    if (!targetProfile) {
-        log('warn', `[APP] Perfil ${profileId} não encontrado. Abortando navegação.`);
-        return;
-    }
-
-    // Conversão segura do RadarProfile/Any para User completo
-    const fullUser: User = {
-      id: targetProfile.id, 
-      nickname: targetProfile.nickname || targetProfile.name || 'Agente Anônimo', 
-      email: targetProfile.email || `${targetProfile.id}@libido.app`, 
-      age: targetProfile.age || 25, 
-      avatar: targetProfile.avatar, 
-      bio: targetProfile.bio || 'Sem biografia.',
-      type: targetProfile.type || targetProfile.category || UserType.HOMEM, 
-      birthDate: targetProfile.birthDate || '1995-01-01', 
-      biotype: targetProfile.biotype || Biotype.PADRAO,
-      gender: targetProfile.gender || Gender.MASCULINO, 
-      sexualOrientation: targetProfile.sexualOrientation || SexualOrientation.BISSEXUAL, 
-      vibes: targetProfile.vibes || [Vibes.LIBERAL],
-      location: targetProfile.location || targetProfile.city || 'Brasil', 
-      isOnline: true, 
-      verifiedAccount: targetProfile.verifiedAccount || targetProfile.trustLevel === TrustLevel.OURO || false, 
-      verificationScore: targetProfile.verificationScore || (targetProfile.trustLevel === TrustLevel.OURO ? 100 : 50), 
-      xp: targetProfile.xp || 100, 
-      level: targetProfile.level || 1,
-      plan: targetProfile.plan || Plan.FREE, 
-      matches: targetProfile.matches || [], 
-      bookmarks: targetProfile.bookmarks || [], 
-      blockedUsers: targetProfile.blockedUsers || [], 
-      badges: targetProfile.badges || [], 
-      boundaries: targetProfile.boundaries || [],
-      behaviors: targetProfile.behaviors || [], 
-      bodyMods: targetProfile.bodyMods || [], 
-      bodyHair: targetProfile.bodyHair || 'Aparado', 
-      bodyArt: targetProfile.bodyArt || [], 
-      bondageExp: targetProfile.bondageExp || 'Iniciante',
-      bucketList: targetProfile.bucketList || [], 
-      bestMoments: targetProfile.bestMoments || [], 
-      bestFeature: targetProfile.bestFeature || 'Olhar', 
-      beveragePref: targetProfile.beveragePref || 'Gin', 
-      bestTime: targetProfile.bestTime || 'Noite', 
-      braveryLevel: targetProfile.braveryLevel || 7,
-      busyMode: targetProfile.busyMode || false, 
-      bookingPolicy: targetProfile.bookingPolicy || 'A combinar', 
-      balance: targetProfile.balance || 0, 
-      boosts_active: targetProfile.boosts_active || 0, 
-      is_premium: targetProfile.is_premium || false, 
-      height: targetProfile.height || 170,
-      lat: targetProfile.lat || -23.5505, 
-      lon: targetProfile.lon || -46.6333, 
-      city: targetProfile.city || targetProfile.location || 'São Paulo', 
-      neighborhood: targetProfile.neighborhood || 'Centro', 
-      seenBy: targetProfile.seenBy || [],
-      gallery: targetProfile.gallery || (targetProfile.avatar ? [{ id: `${targetProfile.id}-default`, url: targetProfile.avatar, timestamp: new Date().toISOString() }] : []),
-      trustLevel: targetProfile.trustLevel || TrustLevel.BRONZE, 
-      isGhostMode: targetProfile.isGhostMode || false, 
-      hasBlurredGallery: targetProfile.hasBlurredGallery || (targetProfile.trustLevel === TrustLevel.OURO),
-      vouches: targetProfile.vouches || [],
-      following: targetProfile.following || [],
-      lookingFor: targetProfile.lookingFor || [UserType.HOMEM, UserType.MULHER, UserType.CASAIS],
-      rsvps: targetProfile.rsvps || [],
-      isSubscriber: targetProfile.isSubscriber || false,
-      dailyProfileViews: targetProfile.dailyProfileViews || 0,
-      consentMatrix: targetProfile.consentMatrix || [
-        { id: 'soft', label: 'Soft Swing', value: 'talvez' as any },
-        { id: 'total', label: 'Troca Total', value: 'nao' as any },
-        { id: 'menage', label: 'Ménage', value: 'sim' as any }
-      ],
-      vouchScore: targetProfile.vouchScore || 70,
-      isStealthMode: targetProfile.isStealthMode || false,
-      prefersBlurredPhotos: targetProfile.prefersBlurredPhotos || false,
-      serialNumber: targetProfile.serialNumber || '000000'
-    };
-    setViewedProfile(fullUser);
-    setActiveTab('view_profile');
   };
 
   const handleSearchSelect = async (profileId: string) => {
@@ -309,8 +299,20 @@ export default function App() {
       return <ChatDetail user={selectedUser} currentUser={currentUser} onBack={() => handleTabChange('chat')} />;
     }
 
-    if (activeTab === 'view_profile' && viewedProfile) {
-      return <Profile user={viewedProfile} isOwnProfile={false} onBack={() => handleTabChange('radar')} />;
+    if (activeTab === 'view_profile') {
+      if (viewedProfile && !profileLoading) {
+        return <Profile 
+          user={viewedProfile} 
+          isOwnProfile={viewedProfile?.id === currentUser?.id} 
+          onBack={() => handleTabChange('radar')} 
+        />;
+      }
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center bg-black">
+          <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] animate-pulse">Sincronizando com a Matriz...</p>
+        </div>
+      );
     }
 
     // Abas principais
@@ -357,12 +359,24 @@ export default function App() {
     );
   }
 
+  // City Gate - Obrigatório para todos os agentes logados sem registro de cidade
+  if (!showTerms && isAuthenticated && currentUser && (!currentUser.city || currentUser.city.trim().length < 2)) {
+    return (
+      <div className={isProtected ? 'blurred pointer-events-none' : ''}>
+        <CityGate 
+          user={currentUser} 
+          onComplete={(updatedUser) => setCurrentUser(updatedUser)} 
+        />
+      </div>
+    );
+  }
+
   if (isInitialLoading) {
       return (
           <div className={`min-h-screen bg-black flex flex-col items-center justify-center gap-6 transition-all ${isProtected ? 'blurred pointer-events-none' : ''}`}>
-              <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
+              <LibidoIcon size={64} glow />
               <div className="text-center">
-                  <p className="text-[14px] font-black text-amber-500 uppercase tracking-[0.5em] animate-pulse">LIBIDO 2026</p>
+                  <p className="text-[14px] font-black text-amber-500 uppercase tracking-[0.5em] mt-4">LIBIDO 2026</p>
                   <p className="text-[8px] text-slate-500 uppercase mt-4 tracking-widest">{loadStep}</p>
               </div>
           </div>
@@ -379,6 +393,8 @@ export default function App() {
     );
   }
 
+  const watermark = currentUser ? getWatermarkData(currentUser) : null;
+
   return (
     <AuthContext.Provider value={authContextValue}>
       <div className="relative w-full h-[100dvh] flex justify-center bg-black overflow-hidden">
@@ -392,6 +408,17 @@ export default function App() {
             {renderContent()}
           </Layout>
         </div>
+
+        {/* Watermark Forense */}
+        {isAuthenticated && watermark && !isProtected && (
+          <div className="fixed inset-0 z-[40] pointer-events-none opacity-[0.03] flex flex-wrap items-center justify-center gap-20 overflow-hidden rotate-[-25deg] scale-150">
+             {Array.from({ length: 24 }).map((_, i) => (
+               <span key={i} className="text-[12px] font-black tracking-[0.5em] whitespace-nowrap text-white">
+                 {watermark}
+               </span>
+             ))}
+          </div>
+        )}
 
         <GlobalSearch 
           isOpen={isSearchOpen} 

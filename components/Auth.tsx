@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import LibidoIcon from './common/LibidoIcon';
 import { useAuth } from '../hooks/useAuthContext';
 import { RegistrationFlow } from './RegistrationFlow';
 import { PinSetup } from './PinSetup';
@@ -362,7 +363,8 @@ export const Auth: React.FC = () => {
           height: isCouple ? data.partner1?.height || 170 : data.height || 170,
           partner1: isCouple ? data.partner1 : undefined,
           partner2: isCouple ? data.partner2 : undefined,
-          location: 'São Paulo, SP',
+          city: data.city || 'SÃO PAULO - SP',
+          location: data.city || 'SÃO PAULO - SP',
           xp: 100,
           level: 1,
           isOnline: true,
@@ -437,7 +439,8 @@ export const Auth: React.FC = () => {
   if (view === 'reset_password') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
-        <header className="mb-12 text-center">
+        <header className="mb-12 text-center flex flex-col items-center">
+            <LibidoIcon size={48} className="mb-4" />
             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">Nova Senha</h2>
             <p className="text-amber-500 uppercase tracking-widest text-[10px] mt-2 font-black">Redefinição de Matriz</p>
         </header>
@@ -486,7 +489,8 @@ export const Auth: React.FC = () => {
   if (view === 'login') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
-        <header className="mb-12 text-center">
+        <header className="mb-12 text-center flex flex-col items-center">
+            <LibidoIcon size={64} glow className="mb-6" />
             <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">Acessar Matriz</h2>
             <p className="text-amber-500 uppercase tracking-widest text-[10px] mt-2 font-black">Identificação Requerida</p>
         </header>
@@ -543,7 +547,8 @@ export const Auth: React.FC = () => {
   if (view === 'forgot_password') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
-        <header className="mb-12 text-center">
+        <header className="mb-12 text-center flex flex-col items-center">
+            <LibidoIcon size={48} className="mb-4" />
             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">Recuperar Acesso</h2>
             <p className="text-amber-500 uppercase tracking-widest text-[10px] mt-2 font-black">Fluxo de Segurança</p>
         </header>
@@ -584,9 +589,10 @@ export const Auth: React.FC = () => {
   if (view === 'landing') {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-700">
-        <div className="mb-12 relative group">
-          <div className="absolute inset-0 bg-amber-500/20 blur-[100px] rounded-full group-hover:bg-amber-500/30 transition-all duration-1000" />
-          <h1 className="text-8xl font-black text-white italic relative tracking-tighter leading-none select-none">
+        <div className="mb-12 relative group flex flex-col items-center">
+          <LibidoIcon size={120} glow className="mb-8" />
+          <div className="absolute top-[20%] inset-0 bg-amber-500/10 blur-[100px] rounded-full group-hover:bg-amber-500/20 transition-all duration-1000" />
+          <h1 className="text-7xl font-black text-white italic relative tracking-tighter leading-none select-none">
             LIBIDO
           </h1>
           <p className="text-amber-500 uppercase tracking-[0.5em] text-[10px] mt-4 font-black">Matriz Lifestyle 2026</p>

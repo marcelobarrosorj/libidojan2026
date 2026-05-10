@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { MOCK_MOMENTS } from '../constants';
 import { Moment } from '../types';
-import { X, ChevronLeft, ChevronRight, Zap, RefreshCw } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Zap, RefreshCw, Trash2 } from 'lucide-react';
 import { cache, saveUserData, showNotification } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 
@@ -149,7 +149,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
             </div>
           </div>
 
-          <div className="absolute top-16 left-6 right-6 z-[1010] flex items-center justify-between">
+            <div className="absolute top-16 left-6 right-6 z-[1010] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img src={activeMoment.avatar} className="w-10 h-10 rounded-full border border-white/20 object-cover" />
               <div>
@@ -157,9 +157,28 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
                 <p className="text-[9px] text-amber-500/80 font-bold uppercase tracking-widest">{activeMoment.timestamp}</p>
               </div>
             </div>
-            <button onClick={() => setActiveMoment(null)} className="p-2 bg-white/10 rounded-full text-white backdrop-blur-md">
-              <X size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+                {activeMoment.id === 'own' && (
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Excluir sua Vibe atual?')) {
+                                const updatedUser = { ...cache.userData, lastMoment: null };
+                                saveUserData(updatedUser);
+                                setActiveMoment(null);
+                                showNotification('Sua Vibe foi removida.', 'info');
+                            }
+                        }}
+                        className="p-2 bg-rose-500/20 text-rose-500 rounded-full border border-rose-500/30 backdrop-blur-md hover:bg-rose-500 hover:text-white transition-all"
+                        title="Excluir Vibe"
+                    >
+                        <Trash2 size={18} />
+                    </button>
+                )}
+                <button onClick={() => setActiveMoment(null)} className="p-2 bg-white/10 rounded-full text-white backdrop-blur-md">
+                <X size={20} />
+                </button>
+            </div>
           </div>
 
           <div className="flex-1 w-full flex items-center justify-center relative">

@@ -22,10 +22,13 @@ import {
   Users,
   Camera,
   Trash2,
-  Loader2
+  Loader2,
+  MapPin
 } from 'lucide-react';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+import { CityAutocomplete } from './common/CityAutocomplete';
 
 export const RegistrationFlow: React.FC<{ 
   onComplete: (payload: RegistrationPayload) => void; 
@@ -36,13 +39,13 @@ export const RegistrationFlow: React.FC<{
   const [error, setError] = useState<string | null>(null);
 
   const [singleData, setSingleData] = useState<ProfileData & { password?: string, avatar?: string }>({ 
-    nickname: '', email: '', biotype: Biotype.PADRAO, lookingFor: [], password: '', avatar: ''
+    nickname: '', email: '', biotype: Biotype.PADRAO, lookingFor: [], password: '', avatar: '', city: ''
   });
 
   const [coupleData, setCoupleData] = useState<CoupleProfileData & { password?: string, avatar?: string }>({
-    mainNickname: '', email: '', password: '', avatar: '',
-    partner1: { nickname: '', biotype: Biotype.PADRAO }, 
-    partner2: { nickname: '', biotype: Biotype.PADRAO },
+    mainNickname: '', email: '', password: '', avatar: '', city: '',
+    partner1: { nickname: '', biotype: Biotype.PADRAO, city: '' }, 
+    partner2: { nickname: '', biotype: Biotype.PADRAO, city: '' },
     lookingFor: [UserType.CASAIS]
   });
 
@@ -60,9 +63,15 @@ export const RegistrationFlow: React.FC<{
       const email = isCouple ? coupleData.email : (singleData.email || '');
       const nickname = isCouple ? coupleData.mainNickname : singleData.nickname;
       const password = isCouple ? coupleData.password : singleData.password;
+      const city = isCouple ? coupleData.city : singleData.city;
 
       if (!nickname || nickname.trim().length < 3) {
         setError('Nickname é obrigatório (mín. 3 caracteres).');
+        return;
+      }
+
+      if (!city || city.trim().length < 2) {
+        setError('A cidade onde você mora é obrigatória.');
         return;
       }
 
@@ -221,6 +230,22 @@ export const RegistrationFlow: React.FC<{
                   value={isCouple ? coupleData.mainNickname : singleData.nickname} 
                   onChange={(v) => isCouple ? setCoupleData({...coupleData, mainNickname: v}) : setSingleData({...singleData, nickname: v})} 
                   placeholder="EX: SAFIRA_SP" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-amber-500/60 uppercase ml-4 flex items-center gap-2">
+                  <MapPin size={12} className="animate-pulse" /> Cidade de Residência
+                </label>
+                <CityAutocomplete 
+                  value={isCouple ? coupleData.city : singleData.city} 
+                  onChange={(v) => {
+                    if (isCouple) {
+                      setCoupleData({...coupleData, city: v, partner1: {...coupleData.partner1, city: v}, partner2: {...coupleData.partner2, city: v}});
+                    } else {
+                      setSingleData({...singleData, city: v});
+                    }
+                  }} 
+                  placeholder="EX: SÃO PAULO, CURITIBA..." 
                 />
               </div>
               <div className="space-y-2">

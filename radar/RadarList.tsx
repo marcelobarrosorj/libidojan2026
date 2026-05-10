@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { RadarProfile } from './types';
 import { MapPin, Lock, Crown, Sparkles, ShieldAlert } from 'lucide-react';
 import { Plan } from '../types';
 import { cache } from '../services/authUtils';
 import { formatDistanceLabel } from './geo';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function RadarList({ profiles, loading, onSelectProfile, onUpgrade }: { 
   profiles: RadarProfile[]; 
@@ -12,6 +13,8 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
   onSelectProfile?: (p: RadarProfile) => void;
   onUpgrade?: () => void;
 }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   if (loading && profiles.length === 0) {
     return (
       <div className="py-20 flex flex-col items-center gap-4 animate-pulse">
@@ -21,21 +24,64 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
     );
   }
 
+  const handleProfilePress = (p: RadarProfile) => {
+    const isLocked = (p as any).isLocked;
+    if (isLocked) {
+        onUpgrade?.();
+        return;
+    }
+
+    setSelectedId(p.id);
+    // Delay navigation to allow selection animation to be visible
+    setTimeout(() => {
+        onSelectProfile?.(p);
+        setSelectedId(null);
+    }, 400);
+  };
+
   return (
-    <div className="grid gap-4 w-full">
+    <div className="grid gap-4 w-full relative">
+      {/* Background Dim Layer when something is selected */}
+      <AnimatePresence>
+        {selectedId && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       {profiles.map((p, idx) => {
         const isLocked = (p as any).isLocked;
+        const isSelected = selectedId === p.id;
+        const isHighlighted = !selectedId && idx === 0; // The first card is the "central focus" by default
         
         return (
-          <div 
+          <motion.div 
             key={p.id} 
-            onClick={() => isLocked ? onUpgrade?.() : onSelectProfile?.(p)}
+            layout
+            initial={false}
+            animate={{
+              scale: isSelected ? 1.05 : (selectedId ? 0.95 : (isHighlighted ? 1.02 : 1)),
+              opacity: isSelected ? 1 : (selectedId ? 0.3 : 1),
+              filter: (selectedId && !isSelected) ? 'blur(4px)' : 'blur(0px)',
+              zIndex: isSelected ? 50 : 10
+            }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            onClick={() => handleProfilePress(p)}
             className={`flex items-center gap-4 bg-slate-900/40 p-5 rounded-[2.5rem] border transition-all relative overflow-hidden group ${
               isLocked 
                 ? 'border-white/5 cursor-default' 
-                : 'border-white/5 hover:border-pink/20 cursor-pointer active:scale-[0.98]'
+                : `border-white/5 ${isHighlighted ? 'border-pink/30 shadow-[0_0_20px_rgba(255,20,147,0.1)]' : 'hover:border-pink/20'} cursor-pointer active:scale-[0.98]`
             }`}
           >
+            {/* Attraction Effect Glow for Central/Highlighted Card */}
+            {isHighlighted && !selectedId && (
+              <div className="absolute inset-0 bg-gradient-to-r from-pink/5 to-transparent animate-pulse pointer-events-none" />
+            )}
+
             <div className="relative shrink-0">
                 <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-slate-800 transition-all duration-700 relative ${isLocked ? 'blur-xl grayscale opacity-50' : ''}`}>
                     <img 
@@ -92,7 +138,7 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
                     <Crown size={14} />
                 </button>
             ) : (
-                <div className="text-slate-700 group-hover:text-pink transition-colors">
+                <div className={`transition-all duration-300 ${isSelected ? 'text-pink scale-125 rotate-12' : 'text-slate-700 group-hover:text-pink'}`}>
                     <Sparkles size={16} />
                 </div>
             )}
@@ -101,7 +147,7 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
             {isLocked && (
                 <div className="absolute inset-0 bg-slate-950/20 pointer-events-none" />
             )}
-          </div>
+          </motion.div>
         );
       })}
       
