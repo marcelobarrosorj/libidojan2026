@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
   const isPremium = isPremiumUser(user);
 
   return (
-    <div className="flex flex-col min-h-[100dvh] h-[100dvh] max-w-md mx-auto relative bg-[#050505] border-x border-slate-900/50 overflow-hidden">
+    <div className="flex flex-col min-h-[100dvh] w-full sm:max-w-lg mx-auto relative bg-[#050505] border-x border-slate-900/50 overflow-hidden">
       {/* Top Navigation Premium */}
       <header className="px-6 pt-6 pb-2 flex justify-between items-center z-10 glass-card border-none rounded-b-3xl shadow-xl">
         <div 
@@ -83,14 +83,14 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
       </main>
 
       {/* Bottom Navigation: Reorganized for 2026 Experience */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/5 px-2 pt-4 pb-10 flex justify-between items-center z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
-        <NavButton icon={<LayoutGrid size={22} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
-        <NavButton icon={<Radio size={22} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
-        <NavButton icon={<Trophy size={22} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
-        <NavButton icon={<MessageCircle size={22} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chats" />
-        <NavButton icon={<UserCircle size={22} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
+      <nav className="fixed bottom-0 left-0 right-0 w-full sm:max-w-lg mx-auto bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/5 px-1 pt-3 pb-8 flex justify-around items-center z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
+        <NavButton icon={<LayoutGrid size={20} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
+        <NavButton icon={<Radio size={20} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
+        <NavButton icon={<Trophy size={20} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
+        <NavButton icon={<MessageCircle size={20} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chat" />
+        <NavButton icon={<UserCircle size={20} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
         {isOwner(user) && (
-          <NavButton icon={<ShieldAlert size={22} />} isActive={activeTab === 'admin_moderation'} onClick={() => setActiveTab('admin_moderation')} label="Governo" />
+          <NavButton icon={<ShieldAlert size={20} />} isActive={activeTab === 'admin_moderation'} onClick={() => setActiveTab('admin_moderation')} label="Gov" />
         )}
       </nav>
     </div>
@@ -100,8 +100,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
 const NavButton: React.FC<{ icon: React.ReactNode, isActive: boolean, onClick: () => void, label: string }> = ({ 
   icon, isActive, onClick, label 
 }) => (
-  <button onClick={onClick} className="flex flex-col items-center gap-1.5 flex-1 relative transition-all active:scale-95">
-    <div className={`relative p-2.5 rounded-2xl transition-all duration-500 ${isActive ? 'text-amber-500' : 'text-slate-500 hover:text-slate-300'}`}>
+  <button onClick={onClick} className="flex flex-col items-center gap-1 flex-1 relative transition-all active:scale-95">
+    <div className={`relative p-2 rounded-2xl transition-all duration-500 ${isActive ? 'text-amber-500' : 'text-slate-500 hover:text-slate-300'}`}>
       {isActive && (
         <motion.div 
           layoutId="nav-glow"
@@ -113,7 +113,7 @@ const NavButton: React.FC<{ icon: React.ReactNode, isActive: boolean, onClick: (
         {icon}
       </div>
     </div>
-    <span className={`text-[8px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${isActive ? 'text-amber-500 opacity-100' : 'text-slate-600 opacity-60'}`}>
+    <span className={`text-[7px] font-black uppercase tracking-wider transition-all duration-300 ${isActive ? 'text-amber-500 opacity-100' : 'text-slate-600 opacity-60'}`}>
       {label}
     </span>
   </button>

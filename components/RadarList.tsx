@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, ChevronRight, Navigation, Loader2, Zap, ShieldCheck, Crown } from 'lucide-react';
+import { MapPin, ChevronRight, Navigation, Loader2, Zap, ShieldCheck, Crown, MessageCircle } from 'lucide-react';
 import { RadarProfile, RadarResultItem, TrustLevel } from '../types';
 import { formatDistanceLabel } from '../radar/geo';
 
@@ -8,9 +8,10 @@ interface RadarListProps {
   profiles: RadarProfile[];
   loading?: boolean;
   onSelectProfile?: (id: string) => void;
+  onChat?: (user: any) => void;
 }
 
-export function RadarList({ profiles, loading, onSelectProfile }: RadarListProps) {
+export function RadarList({ profiles, loading, onSelectProfile, onChat }: RadarListProps) {
   // Filtra usuários que estão em modo Ghost (a menos que já sejam matches ou o próprio sistema force a exibição)
   const visibleProfiles = profiles.filter(p => !p.isGhostMode);
 
@@ -98,8 +99,20 @@ export function RadarList({ profiles, loading, onSelectProfile }: RadarListProps
                   </div>
                 </div>
 
-                <div className={`p-2 transition-all translate-x-1 group-hover:translate-x-0 shrink-0 z-10 ${isOuro ? 'text-amber-500' : 'text-slate-800 group-hover:text-pink'}`}>
-                  <ChevronRight size={20} />
+                <div className="flex items-center gap-2 z-10">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onChat?.(p);
+                    }}
+                    className="p-3 bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-500 rounded-2xl transition-all active:scale-90"
+                    title="Conversar"
+                  >
+                    <MessageCircle size={18} />
+                  </button>
+                  <div className={`p-2 transition-all translate-x-1 group-hover:translate-x-0 shrink-0 ${isOuro ? 'text-amber-500' : 'text-slate-800 group-hover:text-pink'}`}>
+                    <ChevronRight size={20} />
+                  </div>
                 </div>
               </div>
             );

@@ -1,5 +1,5 @@
 
-import { User, UserType, Vibes, Plan, Post, Biotype, Gender, SexualOrientation, TrustLevel, Moment } from './types';
+import { User, UserType, Vibes, Plan, Post, Biotype, Gender, SexualOrientation, TrustLevel, Moment, PresenceStatus } from './types';
 
 export const MOCK_CURRENT_USER: User = {
   id: 'me',
@@ -22,10 +22,11 @@ export const MOCK_CURRENT_USER: User = {
   lookingFor: [UserType.MULHER, UserType.CASAIS],
   height: 182,
   vibes: [Vibes.LIBERAL, Vibes.SWING],
-  location: 'Rio de Janeiro, RJ',
+  location: 'Volta Redonda, RJ',
   xp: 1500,
   level: 3,
   isOnline: true,
+  status: PresenceStatus.ONLINE,
   verifiedAccount: true,
   verificationScore: 100,
   isGhostMode: false,
@@ -57,8 +58,8 @@ export const MOCK_CURRENT_USER: User = {
   braveryLevel: 8,
   busyMode: false,
   bookingPolicy: 'A combinar',
-  lat: -22.9068,
-  lon: -43.1729,
+  lat: -22.5231,
+  lon: -44.1042,
   isSubscriber: false,
   dailyProfileViews: 0,
   birthDate: '1995-01-01',
@@ -77,8 +78,9 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-1',
-    serialNumber: '000010',
-    nickname: 'Ana & Bruno',
+    serialNumber: '000002',
+    nickname: 'Casal X (Ana & Bruno)',
+    status: PresenceStatus.ONLINE,
     email: 'anaebruno@lifestyle.com',
     age: 26,
     type: UserType.CASAIS,
@@ -102,8 +104,9 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-2',
-    serialNumber: '000014',
+    serialNumber: '000003',
     nickname: 'Paola & Gui',
+    status: PresenceStatus.AWAY,
     email: 'paolaegui@vip.com',
     age: 31,
     type: UserType.CASAIS,
@@ -126,8 +129,9 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-3',
-    serialNumber: '000011',
+    serialNumber: '000004',
     nickname: 'Carla',
+    status: PresenceStatus.BUSY,
     email: 'carla.lib@gmail.com',
     age: 27,
     type: UserType.MULHER,
@@ -147,8 +151,9 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-4',
-    serialNumber: '000012',
+    serialNumber: '000005',
     nickname: 'Gabi',
+    status: PresenceStatus.OFFLINE,
     age: 24,
     type: UserType.MULHER,
     city: 'RIO DE JANEIRO - RJ',
@@ -167,8 +172,9 @@ export const MOCK_USERS: User[] = [
   {
     ...MOCK_CURRENT_USER,
     id: 'user-5',
-    serialNumber: '000013',
+    serialNumber: '000006',
     nickname: 'Lia & Dan',
+    status: PresenceStatus.ONLINE,
     age: 29,
     type: UserType.CASAIS,
     city: 'RIO DE JANEIRO - RJ',
@@ -190,7 +196,7 @@ export const MOCK_MOMENTS: Moment[] = [
   {
     id: 'm1',
     userId: 'user-1',
-    nickname: 'Ana & Bruno',
+    nickname: 'Casal X',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800',
     timestamp: '1h atrás',
@@ -220,7 +226,7 @@ export const MOCK_POSTS: Post[] = [
   {
     id: "post-1",
     userId: 'user-1',
-    user: 'Ana & Bruno',
+    user: 'Casal X',
     age: 26,
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800',

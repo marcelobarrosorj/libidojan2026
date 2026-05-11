@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { User } from '../types';
+import { User, PresenceStatus } from '../types';
 import VerificationGate from './VerificationGate';
 import { ReportModal } from './ReportModal';
+import { PresenceBadge } from './common/PresenceBadge';
 import { 
   ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert,
   Clock, Image as ImageIcon, EyeOff, Timer
@@ -27,9 +28,7 @@ interface Message {
 }
 
 const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "Olá! Vi seu perfil e senti que nossas vibes batem bastante. Topa conversar?", from: 'them', time: '14:20' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -56,19 +55,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
             setMessages(prev => [...prev, newMsg]);
             if (!image) setInputText('');
             
-            if (!isSelfDestruct) {
-              setIsTyping(true);
-              setTimeout(() => {
-                  setIsTyping(false);
-                  const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  soundService.play('MESSAGE');
-                  setMessages(prev => [...prev, { 
-                      text: "Com certeza! O que mais te chamou atenção?", 
-                      from: 'them', 
-                      time: replyTime 
-                  }]);
-              }, 2000);
-            }
             return true;
         },
         {
@@ -76,6 +62,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
             setLoading: setIsProcessing
         }
     );
+  };
+
+  const deleteMessage = (idx: number) => {
+    setMessages(prev => prev.filter((_, i) => i !== idx));
+    showNotification('Mensagem removida da matriz.', 'info');
   };
 
   const markAsViewed = (idx: number) => {
@@ -97,17 +88,31 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
     <div className="flex flex-col h-full bg-slate-950 absolute inset-0 z-[60] animate-in slide-in-from-right duration-300">
       <header className="px-4 py-3 flex items-center justify-between glass-card border-none relative">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-1 hover:bg-slate-800 rounded-full text-slate-400"><ChevronLeft size={24} /></button>
+          <button onClick={onBack} className="p-1 hover:bg-slate-800 rounded-full text-slate-400 active:scale-95 transition-transform"><ChevronLeft size={24} /></button>
           <div className="relative">
-            <img src={user.avatar} className="w-10 h-10 rounded-full object-cover" />
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-950" />
+            <div className="w-10 h-10 rounded-2xl overflow-hidden border border-white/5 shadow-lg">
+                <img src={user.avatar} className="w-full h-full object-cover" alt={user.nickname} />
+            </div>
+            <PresenceBadge 
+                status={user.status || PresenceStatus.OFFLINE} 
+                size="sm" 
+                className="absolute -top-1 -right-1 z-10 shadow-lg" 
+            />
           </div>
           <div>
-            <div className="flex items-center gap-1">
-              <h3 className="text-sm font-bold text-white leading-none">{user.nickname}</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-sm font-black text-white leading-none italic uppercase tracking-tight">{user.nickname}</h3>
+              <span className="text-[10px] font-black font-mono text-amber-500/60 leading-none">#{user.serialNumber || '000000'}</span>
               {user.verifiedAccount && <ShieldCheck size={12} className="text-blue-400" />}
             </div>
-            <span className="text-[10px] text-green-500 font-medium uppercase tracking-tighter">Sincronizado</span>
+            <div className="mt-1">
+                <PresenceBadge 
+                    status={user.status || PresenceStatus.OFFLINE} 
+                    size="sm" 
+                    showText 
+                    className="opacity-80" 
+                />
+            </div>
           </div>
         </div>
         <button onClick={() => setShowMenu(!showMenu)} className="p-2 text-slate-500 hover:text-white transition-colors"><MoreVertical size={20} /></button>
@@ -122,7 +127,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}>
+          <div key={idx} className={`flex group items-end gap-2 ${msg.from === 'me' ? 'flex-row-reverse' : 'flex-row'}`}>
             <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${msg.from === 'me' ? 'bg-purple-600 text-white rounded-br-none' : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'}`}>
               {msg.image ? (
                 <div className="space-y-2">
@@ -148,6 +153,16 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
               )}
               <span className="text-[10px] opacity-50 block text-right mt-1">{msg.time}</span>
             </div>
+            
+            {msg.from === 'me' && (
+              <button 
+                onClick={() => deleteMessage(idx)}
+                className="opacity-0 group-hover:opacity-100 p-1 text-slate-600 hover:text-rose-500 transition-opacity mb-2"
+                title="Excluir"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         ))}
         {isTyping && (

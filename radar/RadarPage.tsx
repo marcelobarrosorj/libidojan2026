@@ -14,10 +14,12 @@ import { venueService } from '../services/venueService';
 export default function RadarPage({ 
     onProfileClick, 
     onUpgrade,
+    onChat,
     registerProfiles
 }: { 
     onProfileClick?: (p: RadarProfile) => void;
     onUpgrade?: () => void;
+    onChat?: (p: RadarProfile) => void;
     registerProfiles?: (users: User[]) => void;
 }) {
   const { location } = useUserLocation();
@@ -108,7 +110,7 @@ export default function RadarPage({
   }, [center, userPlan]);
 
   return (
-    <div className="p-6 space-y-8 pb-32 max-w-lg mx-auto bg-[#050505] min-h-screen relative animate-in fade-in duration-500">
+    <div className="p-6 space-y-8 pb-32 bg-[#050505] min-h-full relative animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <h2 className="text-3xl font-black font-outfit text-white tracking-tighter italic flex items-center gap-2">
@@ -191,6 +193,7 @@ export default function RadarPage({
                     onProfileClick?.(p);
                 }} 
                 onUpgrade={onUpgrade}
+                onChat={onChat}
             />
           )}
       </div>

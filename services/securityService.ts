@@ -26,8 +26,8 @@ export const initSecurityLayer = () => {
 
 export const getWatermarkData = (user: any) => {
     if (!user) return "USER_NOT_SYNCED";
-    // Gera um código forense baseado no ID e nickname
-    const idFragment = user.id.split('-').pop()?.toUpperCase() || "ALPHA";
-    const nick = user.nickname.substring(0, 3).toUpperCase();
-    return `LIBIDO-PROTECT-${nick}-${idFragment}`;
+    const idFragment = user.serialNumber || user.id.slice(-6).toUpperCase();
+    const nick = user.nickname.toUpperCase();
+    const timestamp = new Date().getTime().toString().slice(-4);
+    return `${nick} • ID:${idFragment} • SEC:${timestamp}`;
 };

@@ -1,17 +1,19 @@
 
 import React, { useState } from 'react';
 import type { RadarProfile } from './types';
-import { MapPin, Lock, Crown, Sparkles, ShieldAlert } from 'lucide-react';
-import { Plan } from '../types';
+import { MapPin, Lock, Crown, Sparkles, ShieldAlert, MessageCircle } from 'lucide-react';
+import { Plan, PresenceStatus } from '../types';
+import { PresenceBadge } from '../components/common/PresenceBadge';
 import { cache } from '../services/authUtils';
 import { formatDistanceLabel } from './geo';
 import { motion, AnimatePresence } from 'motion/react';
 
-export default function RadarList({ profiles, loading, onSelectProfile, onUpgrade }: { 
+export default function RadarList({ profiles, loading, onSelectProfile, onUpgrade, onChat }: { 
   profiles: RadarProfile[]; 
   loading: boolean; 
   onSelectProfile?: (p: RadarProfile) => void;
   onUpgrade?: () => void;
+  onChat?: (p: RadarProfile) => void;
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -102,6 +104,13 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
                         <Lock size={16} className="drop-shadow-lg" />
                     </div>
                 )}
+                {!isLocked && (
+                    <PresenceBadge 
+                      status={p.status || PresenceStatus.OFFLINE} 
+                      size="sm" 
+                      className="absolute -top-1 -right-1 z-20" 
+                    />
+                )}
             </div>
             
             <div className="flex-1 min-w-0">
@@ -122,26 +131,37 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
               </div>
               
               {/* Conecte Style: Presence Indicator */}
-              {!isLocked && Math.random() > 0.7 && (
+              {!isLocked && p.status && p.status !== PresenceStatus.OFFLINE && (
                 <div className="flex items-center gap-1.5 mt-1.5">
-                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_5px_#10b981]" />
-                   <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest leading-none">Presente na Vibe</span>
+                   <PresenceBadge status={p.status} size="sm" showText className="opacity-80" />
                 </div>
               )}
             </div>
 
-            {isLocked ? (
+            <div className="flex items-center gap-2">
+              {!isLocked && (
                 <button 
-                  onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
-                  className="bg-pink/10 text-pink p-2.5 rounded-xl hover:bg-pink hover:text-white transition-all"
+                  onClick={(e) => { e.stopPropagation(); onChat?.(p); }}
+                  className="p-3 bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-500 rounded-2xl transition-all active:scale-90"
+                  title="Conversar"
                 >
-                    <Crown size={14} />
+                  <MessageCircle size={18} />
                 </button>
-            ) : (
-                <div className={`transition-all duration-300 ${isSelected ? 'text-pink scale-125 rotate-12' : 'text-slate-700 group-hover:text-pink'}`}>
-                    <Sparkles size={16} />
-                </div>
-            )}
+              )}
+
+              {isLocked ? (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
+                    className="bg-pink/10 text-pink p-2.5 rounded-xl hover:bg-pink hover:text-white transition-all"
+                  >
+                      <Crown size={14} />
+                  </button>
+              ) : (
+                  <div className={`transition-all duration-300 ${isSelected ? 'text-pink scale-125 rotate-12' : 'text-slate-700 group-hover:text-pink'}`}>
+                      <Sparkles size={16} />
+                  </div>
+              )}
+            </div>
 
             {/* Overlay de distorção para perfis bloqueados */}
             {isLocked && (

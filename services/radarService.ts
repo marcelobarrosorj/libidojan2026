@@ -37,7 +37,7 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
     const rawDistanceKm = haversineKm(viewerLat, viewerLon, p.lat, p.lon);
     if (rawDistanceKm > activeMaxKm) continue;
 
-    const distanceKm = Math.max(rawDistanceKm, MIN_KM);
+    const distanceKm = rawDistanceKm;
     const locationLabel = p.city === viewer.city ? (p.neighborhood || p.city) : p.city;
 
     out.push({
@@ -73,8 +73,8 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
       // Gera uma distância realista entre 0.5km e o raio máximo permitido para o plano
       const randomDist = 0.5 + Math.random() * (activeMaxKm * 0.8); 
       
-      const offsetLat = (randomDist / 111) * Math.cos(angle);
-      const offsetLon = (randomDist / (111 * Math.cos(viewerLat * Math.PI / 180))) * Math.sin(angle);
+      const offsetLat = (randomDist / 111.195) * Math.cos(angle);
+      const offsetLon = (randomDist / (111.195 * Math.cos(viewerLat * Math.PI / 180))) * Math.sin(angle);
 
       return {
         ...m,

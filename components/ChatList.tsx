@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { MOCK_USERS } from '../constants';
-import { User, Plan } from '../types';
+import { User, Plan, PresenceStatus } from '../types';
 import { MessageCircle, Heart, Search, Filter, Sparkles, ChevronRight, X, Check, Lock } from 'lucide-react';
 import { showNotification, cache, isPremiumUser } from '../services/authUtils';
+import { PresenceBadge } from './common/PresenceBadge';
 
 interface ChatListProps {
   onSelectUser: (user: User) => void;
@@ -34,7 +35,10 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscript
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Mensagens Recentes</h3>
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mensagens Recentes</h3>
+          <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-2 py-0.5 rounded-full">Matriz Ativa</span>
+        </div>
         <div className="space-y-3 pb-24">
           {matches.map((user, idx) => {
             // Paywall no Chat: Usuários free só acessam os 2 primeiros chats ativos
@@ -44,23 +48,40 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscript
               <div 
                 key={user.id} 
                 onClick={() => isChatLocked ? onNavigateToSubscription?.() : onSelectUser(user)}
-                className={`glass-card p-4 rounded-[2rem] flex items-center gap-4 transition-all relative overflow-hidden ${
-                  isChatLocked ? 'opacity-40 grayscale blur-[1px]' : 'hover:bg-slate-800/50 cursor-pointer'
+                className={`glass-card p-4 rounded-[2.5rem] flex items-center gap-4 transition-all relative overflow-hidden group ${
+                  isChatLocked ? 'opacity-40 grayscale blur-[1px]' : 'hover:bg-slate-800/50 cursor-pointer active:scale-[0.98]'
                 }`}
               >
-                <div className="relative">
-                  <img src={user.avatar} className="w-14 h-14 rounded-2xl object-cover" />
-                  {!isChatLocked && idx === 0 && <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-950" />}
+                <div className="relative shrink-0">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/5">
+                    <img src={user.avatar} className="w-full h-full object-cover" alt={user.nickname} />
+                  </div>
+                  {!isChatLocked && (
+                    <PresenceBadge 
+                      status={user.status || PresenceStatus.OFFLINE} 
+                      size="sm" 
+                      className="absolute -top-1 -right-1 z-10" 
+                    />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center mb-1">
-                    <h4 className="text-sm font-bold text-white truncate">{isChatLocked ? 'Chat Bloqueado' : user.nickname}</h4>
+                    <h4 className="text-sm font-bold text-white truncate italic">{isChatLocked ? 'Canal Encriptado' : user.nickname}</h4>
+                    {!isChatLocked && <span className="text-[7px] font-black text-slate-500 uppercase">2m</span>}
                   </div>
-                  <p className="text-xs text-slate-400 truncate italic">
-                    {isChatLocked ? "Sincronize sua matriz para ler" : "Olá! Adorei sua vibe no radar."}
+                  <p className="text-xs text-slate-400 truncate font-medium">
+                    {isChatLocked ? "Sincronize sua matriz para ler" : "Toque para abrir a matriz de chat."}
                   </p>
                 </div>
-                {isChatLocked ? <Lock size={16} className="text-pink" /> : <MessageCircle size={16} className="text-slate-700" />}
+                {isChatLocked ? (
+                  <div className="p-3 bg-pink/10 rounded-2xl text-pink">
+                    <Lock size={16} />
+                  </div>
+                ) : (
+                  <div className="p-3 bg-white/5 rounded-2xl text-slate-700 group-hover:text-amber-500 transition-colors">
+                    <MessageCircle size={16} />
+                  </div>
+                )}
               </div>
             );
           })}

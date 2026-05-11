@@ -99,7 +99,7 @@ const Subscription: React.FC<{ currentUser?: User | null }> = ({ currentUser }) 
 
   if (isPremium) {
     return (
-      <div className="p-6 space-y-12 pb-32 animate-in fade-in bg-[#050505] min-h-screen flex flex-col items-center justify-center text-center">
+      <div className="p-6 space-y-12 pb-32 animate-in fade-in bg-[#050505] min-h-full flex flex-col items-center justify-center text-center">
         <div className="relative">
           <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-[0_0_50px_rgba(245,158,11,0.2)] animate-pulse">
             <Crown size={48} />
@@ -132,7 +132,7 @@ const Subscription: React.FC<{ currentUser?: User | null }> = ({ currentUser }) 
   }
 
   return (
-    <div className="p-6 space-y-8 pb-32 animate-in fade-in bg-[#050505] min-h-screen relative">
+    <div className="p-6 space-y-8 pb-32 animate-in fade-in bg-[#050505] min-h-full relative">
       <div className="space-y-2 text-center">
         <h2 className="text-4xl font-black font-outfit text-white tracking-tighter italic uppercase flex items-center justify-center gap-3">
             🚀 SELECIONE SEU <span className="text-pink">PLANO</span>

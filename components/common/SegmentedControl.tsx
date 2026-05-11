@@ -43,8 +43,8 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
                 transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-20 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-              {(tab.icon as any) && React.cloneElement(tab.icon as React.ReactElement, { size: 14 } as any)}
+            <span className="relative z-20 flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider whitespace-nowrap">
+              {(tab.icon as any) && React.cloneElement(tab.icon as React.ReactElement, { size: 12 } as any)}
               {tab.label}
             </span>
           </button>

@@ -10,13 +10,15 @@ import ImageEditor from './ImageEditor';
 import VerificationPortal from './VerificationPortal';
 import VerificationModal from './VerificationModal';
 import { SegmentedControl } from './common/SegmentedControl';
+import { PresenceBadge } from './common/PresenceBadge';
+import { PresenceStatus } from '../types';
 import { 
   BadgeCheck, Settings, LogOut, ShieldCheck, 
   ChevronLeft, Ruler, Eye, Palette, Crown, 
   Fingerprint, Wind, X, Heart, Ghost,
   ImageIcon, Plus, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
   UserCheck, Globe, MapPin, Grid,
-  Zap
+  Zap, MessageCircle
 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { 
@@ -39,12 +41,13 @@ interface ProfileProps {
   user?: User;
   onBack?: () => void;
   onNavigate?: (tab: string) => void;
+  onChat?: (p: any) => void;
   isOwnProfile?: boolean;
   startEditing?: boolean;
 }
 
 const Profile: React.FC<ProfileProps> = ({ 
-    user: propUser, onBack, onNavigate, isOwnProfile = true, startEditing = false 
+    user: propUser, onBack, onNavigate, onChat, isOwnProfile = true, startEditing = false 
 }) => {
   const { logout, refreshSession } = useAuth();
   const { location: gpsLocation } = useUserLocation();
@@ -668,6 +671,13 @@ const Profile: React.FC<ProfileProps> = ({
                         <ShieldCheck size={20} />
                     </button>
                     <button 
+                      onClick={() => onChat?.(user)}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-amber-500 text-black font-black uppercase italic tracking-widest text-[11px] shadow-[0_0_20px_rgba(245,158,11,0.3)] active:scale-95 transition-all hover:bg-amber-400 group"
+                    >
+                        <MessageCircle size={16} className="group-hover:rotate-12 transition-transform" />
+                        Chat
+                    </button>
+                    <button 
                       onClick={() => setShowReportModal(true)}
                       className="p-3 rounded-2xl border bg-rose-500/10 text-rose-500 border-rose-500/20 transition-all active:scale-90 shadow-xl"
                       title="Denunciar Perfil"
@@ -704,6 +714,14 @@ const Profile: React.FC<ProfileProps> = ({
               className="w-full h-full rounded-[2.2rem] border-4 border-[#050505]"
             />
             
+            {!isOwnProfile && user.status && (
+              <PresenceBadge 
+                status={user.status as PresenceStatus} 
+                size="md" 
+                className="absolute top-2 right-2 z-30" 
+              />
+            )}
+            
             {isOwnProfile && (
               <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                 <Camera size={24} className="text-white" />
@@ -722,21 +740,37 @@ const Profile: React.FC<ProfileProps> = ({
                   const currentLat = gpsLocation?.lat ?? cache.userData?.lat;
                   const currentLon = gpsLocation?.lon ?? cache.userData?.lon;
                   
-                  if (currentLat && currentLon && user.lat && user.lon) {
+                  const hasCurrent = currentLat !== undefined && currentLon !== undefined && currentLat !== null && currentLon !== null;
+                  const hasTarget = user.lat !== undefined && user.lon !== undefined && user.lat !== null && user.lon !== null;
+
+                  if (hasCurrent && hasTarget) {
+                    const distKm = haversineKm(currentLat, currentLon, user.lat, user.lon);
                     return (
                       <div className="flex flex-col items-center">
                         <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none mb-1">
-                          {formatDistanceLabel(haversineKm(currentLat, currentLon, user.lat, user.lon))} de você
+                          {formatDistanceLabel(distKm)} de você
                         </span>
                         <div className="flex items-center gap-1">
                           <div className={`w-1 h-1 rounded-full ${user.isOnline ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-slate-600'}`} />
                           <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">
-                            {user.isOnline ? 'Localização em Tempo Real' : (user.updatedAt ? `Visto em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
+                            {user.isOnline ? 'Localização em Tempo Real' : (user.updatedAt ? `Sincronizado em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
                           </span>
                         </div>
                       </div>
                     );
                   }
+                  
+                  // Se não tem GPS mas o perfil veio do radar com label, usa o label original
+                  if ((user as any).distanceLabel) {
+                    return (
+                        <div className="flex flex-col items-center">
+                            <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none mb-1">
+                                {(user as any).distanceLabel} de você
+                            </span>
+                        </div>
+                    );
+                  }
+
                   return <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">Distância Indisponível</span>;
                 })()}
               </div>
@@ -911,6 +945,11 @@ const Profile: React.FC<ProfileProps> = ({
                 </div>
                 <div className="flex items-center justify-between px-2 gap-4">
                     <div className="flex-1 min-w-0">
+                        {user.status && user.status !== PresenceStatus.OFFLINE && (
+                           <div className="mb-2">
+                             <PresenceBadge status={user.status as PresenceStatus} size="sm" showText />
+                           </div>
+                        )}
                         {user.bio ? (
                             <p className="text-[10px] text-slate-300 italic leading-relaxed">"{user.bio}"</p>
                         ) : (

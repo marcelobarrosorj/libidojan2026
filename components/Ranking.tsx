@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Flame, TrendingUp, Award, Crown, User as UserIcon, MapPin, BadgeCheck, ShieldCheck } from 'lucide-react';
+import { Trophy, Flame, TrendingUp, Award, Crown, User as UserIcon, MapPin, BadgeCheck, ShieldCheck, MessageCircle } from 'lucide-react';
 import { User, TrustLevel } from '../types';
 import { cache } from '../services/authUtils';
 import { fetchLatestProfiles } from '../services/repo';
+import { MOCK_USERS } from '../constants';
 
 interface RankingProps {
   onSelectUser?: (user: any) => void;
+  onChat?: (user: any) => void;
 }
 
-const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
+const Ranking: React.FC<RankingProps> = ({ onSelectUser, onChat }) => {
   const [activeTab, setActiveTab ] = useState<'popular' | 'reputation' | 'new' | 'verified'>('popular');
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +33,7 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
             nickname: p.name,
             avatar: p.avatar,
             age: (p as any).age || 18,
-            totalLikes: Math.floor(Math.random() * 50), // Dados simulados para novatos
+            totalLikes: Math.floor(Math.random() * 50),
             totalViews: Math.floor(Math.random() * 200),
             trustLevel: p.trustLevel || TrustLevel.BRONZE,
             verifiedAccount: p.trustLevel === TrustLevel.OURO,
@@ -41,31 +43,39 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
             city: p.city || 'Matriz',
             neighborhood: p.neighborhood || '',
             bio: p.bio || '',
-            serialNumber: p.serialNumber
+            serialNumber: p.serialNumber || `000${100+i}`
           } as any));
           setUsers(mappedUsers);
         } catch (e) {
           console.error('[Ranking] Error loading new users:', e);
         }
       } else {
-        // Fallback para outros rankings (mock por enquanto)
+        // Fallback para outros rankings (mock por enquanto, incluindo MOCK_USERS reais para consistência)
         setTimeout(() => {
-          const mockUsers: User[] = Array.from({ length: 15 }).map((_, i) => ({
-            id: `user-${i}`,
-            nickname: `Destaque ${i + 1}`,
-            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 100}`,
+          const combinedMocks = [...MOCK_USERS].map((u, i) => ({
+            ...u,
+            totalLikes: 1000 - (i * 100),
+            totalViews: 5000 - (i * 500),
+            rank: i + 1
+          }));
+
+          const extraMocks = Array.from({ length: 10 }).map((_, i) => ({
+            id: `extra-${i}`,
+            nickname: `Agente ${i + 10}`,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 200}`,
             age: 20 + Math.floor(Math.random() * 20),
-            totalLikes: 1000 - (i * 50) + Math.floor(Math.random() * 20),
-            totalViews: 5000 - (i * 200),
-            trustLevel: i < 3 ? TrustLevel.OURO : i < 7 ? TrustLevel.PRATA : TrustLevel.BRONZE,
-            verifiedAccount: i % 3 === 0,
-            verificationScore: 70 + Math.floor(Math.random() * 30),
-            level: 25 - i,
-            rank: i + 1,
+            totalLikes: 500 - (i * 40),
+            totalViews: 2000 - (i * 150),
+            trustLevel: TrustLevel.BRONZE,
+            verifiedAccount: false,
+            verificationScore: 50,
+            level: 10,
+            rank: combinedMocks.length + i + 1,
+            serialNumber: `000${200+i}`,
             city: 'Rio de Janeiro',
-            neighborhood: 'Copacabana',
           } as any));
-          setUsers(mockUsers);
+
+          setUsers([...combinedMocks, ...extraMocks]);
         }, 800);
       }
       setLoading(false);
@@ -89,18 +99,18 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
           <Trophy className="text-amber-500" /> Rankings do Momento
         </h2>
         
-        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <div className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl whitespace-nowrap transition-all duration-300 font-bold text-xs uppercase tracking-widest ${
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded-xl whitespace-nowrap transition-all duration-300 font-black text-[9px] uppercase tracking-wider ${
                 activeTab === tab.id 
                   ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' 
                   : 'bg-slate-900/50 text-slate-400 border border-slate-800'
               }`}
             >
-              <tab.icon size={14} />
+              <tab.icon size={12} />
               {tab.label}
             </button>
           ))}
@@ -154,9 +164,10 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-bold text-white truncate">{user.nickname}</span>
-                    <span className="text-[10px] text-slate-500 font-mono">{user.age}y</span>
+                    <span className="text-[8px] font-black font-mono text-amber-500/60 tracking-wider">#{user.serialNumber || '000000'}</span>
+                    <span className="text-[10px] text-slate-500 font-mono italic">{user.age}y</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex items-center gap-1 text-[10px] text-slate-500 uppercase font-black tracking-tighter">
@@ -174,14 +185,27 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser }) => {
                 </div>
 
                 {/* Stats */}
-                <div className="text-right">
-                  <div className="flex items-center justify-end gap-1 text-pink font-black text-xs">
-                    <Flame size={12} fill="currentColor" />
-                    {user.totalLikes?.toLocaleString()}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="flex items-center justify-end gap-1 text-pink font-black text-xs">
+                      <Flame size={12} fill="currentColor" />
+                      {user.totalLikes?.toLocaleString()}
+                    </div>
+                    <div className="text-[9px] text-slate-600 font-mono mt-1 uppercase tracking-tighter">
+                      {user.totalViews?.toLocaleString()} visitas
+                    </div>
                   </div>
-                  <div className="text-[9px] text-slate-600 font-mono mt-1 uppercase tracking-tighter">
-                    {user.totalViews?.toLocaleString()} visitas
-                  </div>
+                  
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onChat?.(user);
+                    }}
+                    className="p-3 bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-500 rounded-2xl transition-all active:scale-90"
+                    title="Conversar"
+                  >
+                    <MessageCircle size={18} />
+                  </button>
                 </div>
 
                 {/* Efeito de destaque para o TOP 1 */}

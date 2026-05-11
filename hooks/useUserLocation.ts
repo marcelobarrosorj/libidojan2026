@@ -17,7 +17,7 @@ export function useUserLocation() {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
+    const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude });
         setError(null);
@@ -35,8 +35,10 @@ export function useUserLocation() {
         setError(errorMsg);
         setLoading(false);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
+
+    return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
   return { location, loading, error };

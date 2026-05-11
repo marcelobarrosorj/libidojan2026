@@ -293,6 +293,16 @@ export default function App() {
     }
   };
 
+  const handleChat = (profile: any) => {
+    const profileId = typeof profile === 'string' ? profile : (profile.id || profile.uid);
+    const target = profileRegistry[profileId] || profile;
+    if (target) {
+        setSelectedUser(target);
+        setActiveTab('chat_detail');
+        soundService.play('MESSAGE');
+    }
+  };
+
   const renderContent = () => {
     // Rotas de detalhe que sobrepõem abas principais
     if (activeTab === 'chat_detail' && selectedUser) {
@@ -305,6 +315,7 @@ export default function App() {
           user={viewedProfile} 
           isOwnProfile={viewedProfile?.id === currentUser?.id} 
           onBack={() => handleTabChange('radar')} 
+          onChat={handleChat}
         />;
       }
       return (
@@ -326,10 +337,11 @@ export default function App() {
           onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} 
           onProfileClick={handleViewProfile} 
           registerProfiles={registerProfiles}
+          onChat={handleChat}
         />;
-      case 'ranking': return <Ranking onSelectUser={handleViewProfile} />;
+      case 'ranking': return <Ranking onSelectUser={handleViewProfile} onChat={handleChat} />;
       case 'events': return <EventsPage />;
-      case 'feed': return <Feed onProfileClick={handleViewProfile} registerProfiles={registerProfiles} />;
+      case 'feed': return <Feed onProfileClick={handleViewProfile} registerProfiles={registerProfiles} onChat={handleChat} />;
       case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => handleTabChange('assinatura')} currentUser={currentUser} />;
       case 'admin_moderation': return <AdminReports />;
       case 'profile': 
@@ -397,8 +409,8 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authContextValue}>
-      <div className="relative w-full h-[100dvh] flex justify-center bg-black overflow-hidden">
-        <div className={`w-full h-full flex flex-col blur-on-focus-loss transition-all duration-500 ${isProtected ? 'blurred' : ''}`}>
+      <div className="relative w-full min-h-[100dvh] flex justify-center bg-black overflow-hidden">
+        <div className={`w-full flex flex-col blur-on-focus-loss transition-all duration-500 ${isProtected ? 'blurred pointer-events-none' : ''}`}>
           <Layout 
             activeTab={activeTab} 
             setActiveTab={handleTabChange} 
@@ -409,15 +421,16 @@ export default function App() {
           </Layout>
         </div>
 
-        {/* Watermark Forense */}
+        {/* Watermark Forense de Segurança Autoritária (SVG Pattern) */}
         {isAuthenticated && watermark && !isProtected && (
-          <div className="fixed inset-0 z-[40] pointer-events-none opacity-[0.03] flex flex-wrap items-center justify-center gap-20 overflow-hidden rotate-[-25deg] scale-150">
-             {Array.from({ length: 24 }).map((_, i) => (
-               <span key={i} className="text-[12px] font-black tracking-[0.5em] whitespace-nowrap text-white">
-                 {watermark}
-               </span>
-             ))}
-          </div>
+          <div 
+            id="matriz-security-watermark"
+            className="fixed inset-0 z-[9999] pointer-events-none opacity-[0.14] select-none forensic-watermark"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='160' viewBox='0 0 280 160'%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='900' font-size='10' transform='rotate(-25 140 80)' %3E${encodeURIComponent(watermark)}%3C/text%3E%3C/svg%3E")`,
+              backgroundRepeat: 'repeat'
+            }}
+          />
         )}
 
         <GlobalSearch 
@@ -438,26 +451,27 @@ export default function App() {
         
         {isProtected && (
           <div 
-            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/40 backdrop-blur-xl animate-in fade-in duration-500 cursor-pointer"
-            onClick={() => window.location.reload()} // Failsafe para resetar o estado se necessário ou apenas instrução
+            id="matriz-security-blocker"
+            className="fixed inset-0 z-[999999] flex flex-col items-center justify-center bg-black animate-in fade-in duration-150 cursor-none select-none"
+            onClick={(e) => { e.stopPropagation(); }}
           >
-             <div className="p-8 rounded-[3.5rem] bg-slate-900/80 border border-amber-500/30 flex flex-col items-center text-center space-y-4 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-               <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
-                 <Lock size={40} />
+             <div className="p-8 flex flex-col items-center text-center space-y-6">
+               <div className="w-24 h-24 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.2)] animate-pulse">
+                 <Lock size={48} />
                </div>
-               <div>
-                  <h2 className="text-xl font-black text-white uppercase italic tracking-tighter leading-none">Matriz Blindada</h2>
-                  <p className="text-[10px] text-amber-500 font-black uppercase tracking-[0.3em] mt-2">Protocolo Antiprint</p>
+               <div className="space-y-2">
+                  <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter leading-none">Matriz Blindada</h2>
+                  <p className="text-[11px] text-amber-500 font-black uppercase tracking-[0.4em]">Protocolo de Segurança Ativo</p>
                </div>
-               <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-[200px]">
-                 Privacidade é nosso ativo mais valioso. Capturas de tela e gravação são proibidas.
+               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed max-w-[280px]">
+                 Capturas de tela e gravações são estritamente proibidas para sua proteção e a de terceiros.
                </p>
-               <button 
-                  onClick={(e) => { e.stopPropagation(); window.location.reload(); }}
-                  className="mt-2 px-6 py-2 bg-amber-500 text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all"
-               >
-                 Tentar Novamente
-               </button>
+               
+               <div className="h-20" /> {/* Espaçador */}
+               
+               <p className="text-[8px] text-slate-700 font-black uppercase tracking-[0.5em] animate-pulse">
+                 Identidade Digital Monitorada
+               </p>
              </div>
           </div>
         )}

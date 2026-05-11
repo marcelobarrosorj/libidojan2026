@@ -1,10 +1,16 @@
 
+export const EARTH_RADIUS_KM = 6371.0088; // WGS84 mean earth radius
+export const KM_PER_LAT_DEGREE = 111.195; // EarthRadius * PI / 180
+
 /**
  * Calculates the Haversine distance between two points in kilometers.
+ * Uses a precise earth radius and checks for edge cases.
  */
 export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  if (lat1 === lat2 && lon1 === lon2) return 0; // Distância real zero se a posição for idêntica
-  const R = 6371; // km
+  if (!Number.isFinite(lat1) || !Number.isFinite(lon1) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return 9999;
+  
+  if (lat1 === lat2 && lon1 === lon2) return 0;
+  
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
 
@@ -16,7 +22,9 @@ export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: numb
       Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  const distance = EARTH_RADIUS_KM * c;
+  
+  return Number.isFinite(distance) ? distance : 9999;
 }
 
 /**
@@ -27,8 +35,8 @@ export function boundingBox(
   lon: number,
   radiusKm: number
 ): { minLat: number; maxLat: number; minLon: number; maxLon: number } {
-  const latDelta = radiusKm / 111.32;
-  const lonDelta = radiusKm / (111.32 * Math.cos((lat * Math.PI) / 180));
+  const latDelta = radiusKm / KM_PER_LAT_DEGREE;
+  const lonDelta = radiusKm / (KM_PER_LAT_DEGREE * Math.cos((lat * Math.PI) / 180));
 
   return {
     minLat: lat - latDelta,
@@ -39,18 +47,23 @@ export function boundingBox(
 }
 
 /**
- * Formats a distance in km for human reading.
+ * Formats a distance in km for human reading with high precision for short distances.
  */
 export function formatDistanceLabel(distanceKm: number): string {
-  if (distanceKm <= 0.005) return "Aqui agora"; // Menos de 5 metros
+  if (distanceKm === undefined || distanceKm >= 9999) return "Sinal fraco";
+  if (distanceKm <= 0.01) return "Aqui agora"; // Menos de 10 metros
   
   if (distanceKm < 1) {
     const meters = Math.round(distanceKm * 1000);
     if (meters < 50) return "Muito perto";
-    // Arredonda para os 50m mais próximos para manter alguma privacidade mas ser mais preciso que 100m
+    // Arredonda para os 50m mais próximos para manter equilíbrio entre precisão e privacidade
     const roundedMeters = Math.max(50, Math.ceil(meters / 50) * 50);
     return `${roundedMeters} m`;
   }
+  
+  if (distanceKm > 1000) return "+999 km";
+  
+  // Formata com 1 casa decimal usando vírgula como separador (padrão PT-BR)
   return `${distanceKm.toFixed(1).replace('.', ',')} km`;
 }
 

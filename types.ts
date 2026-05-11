@@ -92,6 +92,13 @@ export interface ConsentItem {
   value: MatrixValue;
 }
 
+export enum PresenceStatus { 
+  ONLINE = 'online', 
+  AWAY = 'away', 
+  BUSY = 'busy', 
+  OFFLINE = 'offline' 
+}
+
 export interface User {
   id: string;
   nickname: string;
@@ -116,6 +123,7 @@ export interface User {
   xp: number;
   level: number;
   isOnline: boolean;
+  status?: PresenceStatus;
   verifiedAccount: boolean;
   isGhostMode: boolean;
   gallery: GalleryPhoto[];
@@ -282,6 +290,7 @@ export interface RadarProfile {
   braveryLevel?: number;
   trustLevel?: TrustLevel;
   isGhostMode?: boolean;
+  status?: PresenceStatus;
   gallery?: GalleryPhoto[];
   currentShoutout?: {
     text: string;

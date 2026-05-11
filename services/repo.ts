@@ -111,48 +111,62 @@ export async function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: 
  * Busca perfis globalmente por serialNumber, nickname ou email
  */
 export async function searchProfiles(query: string): Promise<RadarProfile[]> {
-    if (!query || query.length < 2) return [];
+    if (!query || query.length < 1) return [];
 
+    const term = query.toLowerCase().trim();
+    const termNoSpaces = term.replace(/\s+/g, '');
+    const isNumeric = /^\d+$/.test(term);
+
+    let dbResults: RadarProfile[] = [];
     try {
-        const isNumeric = /^\d+$/.test(query);
         let supabaseQuery = supabase.from('profiles').select('*');
 
         if (isNumeric) {
-            // Busca exata por serialNumber se for numérico
-            supabaseQuery = supabaseQuery.or(`data->>serialNumber.eq.${query},data->>serialNumber.ilike.%${query}%`);
+            supabaseQuery = supabaseQuery.or(`serial_number.ilike.%${term}%,data->>serialNumber.ilike.%${term}%`);
         } else {
-            // Busca parcial por nickname ou email em colunas E dentro do JSON
-            supabaseQuery = supabaseQuery.or(`nickname.ilike.%${query}%,email.ilike.%${query}%,data->>nickname.ilike.%${query}%,data->>mainNickname.ilike.%${query}%`);
+            supabaseQuery = supabaseQuery.or(`nickname.ilike.%${term}%,email.ilike.%${term}%,data->>nickname.ilike.%${term}%,data->>mainNickname.ilike.%${term}%`);
         }
 
-        const { data, error } = await supabaseQuery.limit(20);
+        const { data, error } = await supabaseQuery.limit(10);
         if (error) throw error;
-
-        if (data && data.length > 0) {
-            return processProfileData(data);
-        }
-
-        // Fallback para busca nos mocks
-        const term = query.toLowerCase();
-        return MOCK_USERS.filter(u => 
-            u.nickname.toLowerCase().includes(term) || 
-            u.serialNumber?.includes(term)
-        ).map(u => ({
-            id: u.id,
-            name: u.nickname,
-            avatar: u.avatar,
-            category: u.type,
-            lat: u.lat,
-            lon: u.lon,
-            city: u.city || '',
-            neighborhood: u.neighborhood || '',
-            gallery: u.gallery || [],
-            serialNumber: u.serialNumber
-        }));
+        if (data) dbResults = processProfileData(data);
     } catch (e) {
-        console.error('[REPO] Erro na busca:', e);
-        return [];
+        console.warn('[REPO] Erro na busca Supabase:', e);
     }
+
+    // Busca nos MOCK_USERS
+    const mockResults = MOCK_USERS.filter(u => {
+        const uNick = u.nickname.toLowerCase();
+        const uNickNoSpaces = uNick.replace(/\s+/g, '');
+        const nickMatch = uNick.includes(term) || uNickNoSpaces.includes(termNoSpaces);
+        const serialMatch = u.serialNumber && (u.serialNumber.includes(term) || u.serialNumber.includes(termNoSpaces));
+        const idMatch = u.id.toLowerCase().includes(term);
+        return nickMatch || serialMatch || idMatch;
+    }).map(u => ({
+        id: u.id,
+        name: u.nickname,
+        avatar: u.avatar,
+        category: u.type,
+        lat: u.lat,
+        lon: u.lon,
+        city: u.city || '',
+        neighborhood: u.neighborhood || '',
+        gallery: u.gallery || [],
+        serialNumber: u.serialNumber,
+        isMock: true
+    }));
+
+    // Mescla removendo duplicados por ID
+    const merged = [...dbResults];
+    const existingIds = new Set(merged.map(r => r.id));
+
+    for (const m of mockResults) {
+        if (!existingIds.has(m.id)) {
+            merged.push(m as any);
+        }
+    }
+
+    return merged.slice(0, 15);
 }
 
 /**

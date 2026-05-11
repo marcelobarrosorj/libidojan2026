@@ -188,9 +188,9 @@ export const RegistrationFlow: React.FC<{
     <div className="w-full h-full bg-[#050505] flex flex-col p-4 animate-in fade-in duration-500 overflow-hidden">
       <main className="flex-1 overflow-y-auto pb-44 scrollbar-hide">
         {step === 'type' && (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4">
+          <div className="space-y-4 animate-in slide-in-from-bottom-4">
             <StepHeader title="Sua Identidade" subtitle="Escolha seu papel na rede" />
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {[
                 { id: 'couple_fxm', label: 'Casal', icon: <Users />, desc: 'Perfil para casais heterossexuais ou bi' },
                 { id: 'woman', label: 'Mulher', icon: <UserIcon />, desc: 'Perfil individual feminino' },
@@ -199,18 +199,18 @@ export const RegistrationFlow: React.FC<{
                 <button
                   key={type.id}
                   onClick={() => setProfileType(type.id as ProfileType)}
-                  className={`p-6 rounded-[2.5rem] border-2 transition-all flex items-center gap-5 ${
+                  className={`p-4 rounded-[2.2rem] border-2 transition-all flex items-center gap-4 ${
                     profileType === type.id 
-                    ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_30px_rgba(245,158,11,0.2)]' 
+                    ? 'bg-amber-500/10 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.15)]' 
                     : 'bg-slate-900 border-white/5 opacity-80 hover:opacity-100'
                   }`}
                 >
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${profileType === type.id ? 'bg-amber-500 text-black shadow-lg' : 'bg-slate-800 text-slate-400'}`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${profileType === type.id ? 'bg-amber-500 text-black shadow-lg' : 'bg-slate-800 text-slate-400'}`}>
                     {type.icon}
                   </div>
                   <div className="text-left">
-                    <h4 className="text-white font-black uppercase text-sm tracking-widest">{type.label}</h4>
-                    <p className="text-[10px] text-amber-500/70 uppercase tracking-tighter font-bold">{type.desc}</p>
+                    <h4 className="text-white font-black uppercase text-xs tracking-wider">{type.label}</h4>
+                    <p className="text-[9px] text-amber-500/70 uppercase tracking-tighter font-bold">{type.desc}</p>
                   </div>
                 </button>
               ))}
@@ -367,22 +367,22 @@ export const RegistrationFlow: React.FC<{
         )}
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 p-8 bg-[#0a0a0a] border-t-2 border-amber-500/40 z-50 shadow-[0_-20px_60px_rgba(0,0,0,1)] rounded-t-[3rem]">
+      <footer className="fixed bottom-0 left-0 right-0 p-6 bg-[#0a0a0a] border-t-2 border-amber-500/40 z-50 shadow-[0_-20px_60px_rgba(0,0,0,1)] rounded-t-[2.5rem]">
         {error && (
-          <div className="bg-rose-500/10 border-2 border-rose-500/20 p-3 rounded-2xl mb-4 animate-bounce">
-            <p className="text-[10px] text-rose-500 font-black uppercase text-center">{error}</p>
+          <div className="bg-rose-500/10 border-2 border-rose-500/20 p-2.5 rounded-2xl mb-3 animate-bounce">
+            <p className="text-[9px] text-rose-500 font-black uppercase text-center">{error}</p>
           </div>
         )}
-        <div className="flex gap-4 max-w-md mx-auto">
+        <div className="flex gap-3 max-w-md mx-auto">
           <button 
             onClick={handleBack} 
-            className="w-16 h-16 bg-slate-900 border-2 border-white/10 rounded-2xl flex items-center justify-center text-slate-300 hover:text-amber-500 hover:border-amber-500/50 transition-all active:scale-95 shadow-xl"
+            className="w-14 h-14 bg-slate-900 border-2 border-white/10 rounded-2xl flex items-center justify-center text-slate-300 hover:text-amber-500 hover:border-amber-500/50 transition-all active:scale-95 shadow-xl"
           >
-            <ChevronLeft size={28} />
+            <ChevronLeft size={24} />
           </button>
           <div className="flex-1">
             <Button onClick={handleNext}>
-              {step === 'confirm' ? <>Concluir Cadastro <Lock size={16} /></> : <>Avançar <ChevronRight size={16} /></>}
+              {step === 'confirm' ? <span className="flex items-center gap-2">Concluir <Lock size={14} /></span> : <span className="flex items-center gap-2">Avançar <ChevronRight size={14} /></span>}
             </Button>
           </div>
         </div>

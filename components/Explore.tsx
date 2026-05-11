@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MOCK_USERS, MOCK_CURRENT_USER } from '../constants';
 import { User, RadarProfile, UserType } from '../types';
-import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon, Building, MapPin } from 'lucide-react';
+import { X, Heart, Zap, Radio as RadioIcon, Target, Filter as FilterIcon, Building, MapPin, MessageCircle } from 'lucide-react';
 import { SegmentedControl } from './common/SegmentedControl';
 import { log, likeProfile, passProfile, showNotification, saveUserData, cache } from '../services/authUtils';
 import { soundService } from '../services/soundService';
@@ -16,12 +16,13 @@ import FilterModal, { FilterState } from './FilterModal';
 interface ExploreProps {
   onMatch?: (user: User) => void;
   onProfileClick?: (p: RadarProfile) => void;
+  onChat?: (p: RadarProfile) => void;
   registerProfiles?: (users: User[]) => void;
   currentUser: User | null;
   setCurrentUser: (u: User | null) => void;
 }
 
-const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProfiles, currentUser, setCurrentUser }) => {
+const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, onChat, registerProfiles, currentUser, setCurrentUser }) => {
   const [viewMode, setViewMode] = useState<'radar' | 'swipe' | 'venues'>('radar');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchModal, setShowMatchModal] = useState(false);
@@ -206,7 +207,13 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProf
       </div>
 
       <div className="w-full flex-1">
-        {viewMode === 'radar' && <RadarPage onProfileClick={handleProfileClick} registerProfiles={registerProfiles} />}
+        {viewMode === 'radar' && (
+          <RadarPage 
+            onProfileClick={handleProfileClick} 
+            registerProfiles={registerProfiles} 
+            onChat={onChat}
+          />
+        )}
         
         {viewMode === 'venues' && (
           <VenueList userLocation={userLocation} userId={currentUser?.id || 'anonymous'} />
@@ -242,6 +249,13 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, registerProf
               <div className="flex items-center justify-center gap-6">
                 <button onClick={handlePass} disabled={isProcessing} className="w-16 h-16 rounded-full bg-slate-900 border border-amber-500/10 text-slate-400 flex items-center justify-center hover:text-rose-500 transition-all hover:bg-rose-500/10 active:scale-90 shadow-xl"><X size={28} /></button>
                 <button onClick={handleLike} disabled={isProcessing} className="w-20 h-20 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-2xl shadow-amber-500/40 hover:scale-110 active:scale-95 transition-all"><Heart size={36} fill="black" /></button>
+                <button 
+                  onClick={() => currentSwipeUser && onChat?.(currentSwipeUser as any)} 
+                  className="w-16 h-16 rounded-full bg-slate-900 border border-amber-500/10 text-amber-500 flex items-center justify-center hover:bg-amber-500/10 active:scale-90 shadow-xl"
+                  title="Falar na Matriz"
+                >
+                  <MessageCircle size={28} />
+                </button>
                 <button onClick={handleSuperLike} disabled={isProcessing} className="w-16 h-16 rounded-full bg-slate-900 border border-amber-500/10 text-amber-500 flex items-center justify-center hover:bg-amber-500/10 active:scale-90 transition-all shadow-xl"><Zap size={28} fill="currentColor" /></button>
               </div>
             </div>

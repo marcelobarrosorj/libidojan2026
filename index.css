@@ -13,15 +13,62 @@
     -moz-user-select: none !important;
     -ms-user-select: none !important;
     -webkit-touch-callout: none !important; /* Prevent callout to save images/links on iOS */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Proteção contra Protocolos de Impressão (Navegador Desktop e Mobile) */
+@media print {
+    body, html, #root, * {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+}
+
+/* Proteção Global para Imagens na Matriz */
+img {
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+    user-drag: none !important;
+    -webkit-touch-callout: none !important; /* Impede menu de salvar imagem no iOS */
+    pointer-events: auto; /* Permite cliques mas dificulta arrastar/salvar */
+    -webkit-user-select: none !important;
+}
+
+/* Marca d'água forense dinâmica */
+.forensic-watermark {
+    pointer-events: none;
+    user-select: none !important;
+    z-index: 9999;
+}
+
+/* Proteção contra overlays e capturas */
+.security-overlay-active {
+    filter: blur(60px) grayscale(1) brightness(0.2) !important;
+    transition: filter 0.05s ease-in-out;
+}
+
+/* Camada extra de segurança via backdrop-filter para navegadores modernos */
+.security-overlay-active::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(30px) brightness(0.2);
+    z-index: 99999;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .blur-on-focus-loss {
-    transition: filter 0.3s ease;
+    transition: filter 0.2s ease;
 }
 
 .blurred {
-    filter: blur(25px) grayscale(1) brightness(0.5);
+    filter: blur(50px) grayscale(1) brightness(0.2);
     pointer-events: none;
+    z-index: 999999;
 }
 
 @theme {

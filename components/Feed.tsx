@@ -12,10 +12,11 @@ import { fetchLatestProfiles } from '../services/repo';
 
 interface FeedProps {
   onProfileClick?: (user: User) => void;
+  onChat?: (user: User) => void;
   registerProfiles?: (users: User[]) => void;
 }
 
-const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
+const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles }) => {
   const [feedMode, setFeedMode] = useState<'all' | 'following'>('all');
   const [newUsers, setNewUsers] = useState<RadarProfile[]>([]);
   
@@ -173,20 +174,34 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
                     }}
                     className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
                 >
-                    <div className="relative">
+                    <div className="relative group/avatar">
                         <div className={`w-16 h-16 rounded-2xl p-0.5 border-2 transition-all group-hover:scale-105 ${index < 3 ? 'border-amber-500 shadow-lg shadow-amber-500/20' : 'border-slate-800'}`}>
                             <img src={user.avatar} className="w-full h-full rounded-[0.8rem] object-cover" alt="" />
                         </div>
+                        {/* Chat Button - Indepentente */}
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onChat?.(user);
+                            }}
+                            className="absolute -top-1 -left-1 w-6 h-6 bg-slate-900 border border-amber-500/20 text-amber-500 flex items-center justify-center rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-all z-20 hover:bg-amber-500 hover:text-black"
+                            title="Chat Direto"
+                        >
+                            <MessageCircle size={14} />
+                        </button>
                         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-lg border border-slate-800 flex items-center justify-center shadow-lg">
                             <span className="text-[9px] font-black text-amber-500 italic">#{index + 1}</span>
                         </div>
                     </div>
-                    <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
-                        {user.nickname}
-                    </span>
-                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[100px]">
-                        {user.city || 'MATRIX'}
-                    </span>
+                    <div className="flex flex-col items-center">
+                        <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
+                            {user.nickname}
+                        </span>
+                        <span className="text-[7px] font-black text-amber-500/50 font-mono tracking-widest leading-none">#{user.serialNumber}</span>
+                        <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[100px] mt-0.5">
+                            {user.city || 'MATRIX'}
+                        </span>
+                    </div>
                 </div>
             ))}
         </div>
@@ -209,10 +224,21 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
                     }}
                     className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
                 >
-                    <div className="relative">
+                    <div className="relative group/avatar">
                         <div className="w-16 h-16 rounded-3xl p-0.5 border border-white/10 group-hover:border-amber-500 transition-all group-hover:scale-105 overflow-hidden">
                             <img src={user.avatar} className="w-full h-full rounded-[1.4rem] object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
                         </div>
+                        {/* Chat Button - Independente */}
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onChat?.(user as any);
+                            }}
+                            className="absolute -top-1 -left-1 w-6 h-6 bg-slate-900 border border-amber-500/20 text-amber-500 flex items-center justify-center rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-all z-20 hover:bg-amber-500 hover:text-black"
+                            title="Chat Direto"
+                        >
+                            <MessageCircle size={14} />
+                        </button>
                         <div className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-amber-500 rounded-md shadow-lg border border-black z-10">
                             <span className="text-[7px] font-black text-black uppercase tracking-tighter italic">NEW</span>
                         </div>
@@ -269,7 +295,10 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
                 }}>
                   <img src={post.avatar} className="w-10 h-10 rounded-full border-2 border-amber-500/30 object-cover group-hover:border-amber-500 transition-colors" />
                   <div>
-                    <h4 className="text-sm font-bold text-white group-hover:text-amber-500 transition-colors">{post.user}, {post.age}</h4>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-sm font-bold text-white group-hover:text-amber-500 transition-colors">{post.user}, {post.age}</h4>
+                      <span className="text-[9px] font-black font-mono text-amber-500/60 tracking-wider">#{(getUser(post.userId, post) as any)?.serialNumber || '000000'}</span>
+                    </div>
                     <div className="flex items-center gap-1 opacity-60">
                       <MapPin size={8} className="text-amber-500" />
                       <span className="text-[8px] text-slate-400 font-black uppercase tracking-widest">
@@ -302,6 +331,16 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, registerProfiles }) => {
                   <button onClick={() => setActiveModal({ type: 'comment', postId: post.id })} className="flex items-center gap-2 text-slate-400 hover:text-white transition-all group">
                      <div className="p-1 rounded-full group-hover:bg-white/5"><MessageCircle size={26} /></div>
                      <span className="text-xs font-black">{post.comments.length}</span>
+                  </button>
+                  <button 
+                    onClick={() => {
+                        const u = getUser(post.userId, post);
+                        if (u) onChat?.(u as any);
+                    }} 
+                    className="flex items-center gap-2 text-slate-400 hover:text-white transition-all group"
+                  >
+                     <div className="p-1 rounded-full group-hover:bg-white/5"><MessageCircle size={24} /></div>
+                     <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Falar</span>
                   </button>
                 </div>
                 <p className="text-sm text-slate-200 leading-relaxed"><span className="font-bold text-white mr-2">{post.user}</span>{post.description}</p>

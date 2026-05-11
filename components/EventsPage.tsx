@@ -159,7 +159,7 @@ export default function EventsPage() {
   const displayList = activeTab === 'events' ? events : MOCK_PARTNERS;
 
   return (
-    <div className="p-6 space-y-8 pb-32 animate-in fade-in bg-[#050505] min-h-screen">
+    <div className="p-6 space-y-8 pb-32 animate-in fade-in bg-[#050505] min-h-full">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
             <h2 className="text-3xl font-black font-outfit text-white tracking-tighter italic flex items-center gap-3">

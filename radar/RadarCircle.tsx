@@ -49,14 +49,14 @@ export default function RadarCircle(props: RadarCircleProps) {
   const handlePointClick = (p: RadarProfile) => {
     setActiveId(p.id);
     setTimeout(() => {
-        onProfileClick?.(p.id as any);
+        onProfileClick?.(p);
         setActiveId(null);
     }, 400);
   };
 
   return (
-    <div style={{
-      width: 'min(90vw, 420px)',
+    <div className="w-full flex justify-center mb-8" style={{
+      width: 'min(95vw, 480px)',
       aspectRatio: '1/1',
       borderRadius: '50%',
       border: '1px solid rgba(255, 20, 147, 0.2)',

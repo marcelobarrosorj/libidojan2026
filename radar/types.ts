@@ -1,5 +1,5 @@
 
-import { GalleryPhoto, TrustLevel } from '../types';
+import { GalleryPhoto, TrustLevel, PresenceStatus } from '../types';
 
 export interface RadarProfile {
   id: string;
@@ -14,6 +14,7 @@ export interface RadarProfile {
   locationLabel?: string;
   bio?: string;
   category?: string;
+  status?: PresenceStatus;
   isMock?: boolean;
   serialNumber?: string;
   braveryLevel?: number;
