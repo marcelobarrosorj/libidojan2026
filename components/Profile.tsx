@@ -141,9 +141,27 @@ const Profile: React.FC<ProfileProps> = ({
   const handlePhotoSave = async (newImageUrl: string) => {
     if (editingMode === 'avatar') {
         setUser(prev => {
-            const updatedUser = { ...prev, avatar: newImageUrl };
+            // Verifica se a imagem já existe na galeria para não duplicar
+            const gallery = prev.gallery || [];
+            const exists = gallery.some(item => item.url === newImageUrl);
+            
+            const updatedGallery = exists 
+                ? gallery 
+                : [{ 
+                    id: `gallery_avatar_${Date.now()}`, 
+                    url: newImageUrl, 
+                    timestamp: new Date().toISOString() 
+                  }, ...gallery];
+
+            const updatedUser = { 
+                ...prev, 
+                avatar: newImageUrl,
+                gallery: updatedGallery,
+                updatedAt: new Date().toISOString()
+            };
+            
             saveUserData(updatedUser);
-            showNotification('Foto de perfil atualizada!', 'success');
+            showNotification('Foto de perfil atualizada e adicionada à galeria!', 'success');
             return updatedUser;
         });
         setEditingImageUrl(null);

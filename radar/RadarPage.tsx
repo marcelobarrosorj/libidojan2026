@@ -33,10 +33,29 @@ export default function RadarPage({
   const [showVenueSelector, setShowVenueSelector] = useState(false);
   const [venues, setVenues] = useState<Venue[]>([]);
   const [currentCheckIn, setCurrentCheckIn] = useState(venueService.getCurrentCheckIn());
+  
+  // Sincroniza localização real com o perfil do usuário para garantir distâncias reais
+  useEffect(() => {
+    if (location && cache.userData) {
+        const hasChanged = location.lat !== cache.userData.lat || location.lon !== cache.userData.lon;
+        if (hasChanged) {
+                console.log('[RADAR_SEC] Sincronizando coordenadas reais:', location);
+                import('../services/authUtils').then(m => {
+                    const updated = { 
+                        ...cache.userData!, 
+                        lat: location.lat, 
+                        lon: location.lon,
+                        updatedAt: new Date().toISOString()
+                    };
+                    m.saveUserData(updated);
+                });
+        }
+    }
+  }, [location]);
 
   const center = useMemo(() => ({
-    lat: location?.lat ?? cache.userData?.lat ?? -23.5505,
-    lon: location?.lon ?? cache.userData?.lon ?? -46.6333
+    lat: location?.lat ?? cache.userData?.lat ?? -22.9068,
+    lon: location?.lon ?? cache.userData?.lon ?? -43.1729
   }), [location, cache.userData?.lat, cache.userData?.lon]);
 
   useEffect(() => {

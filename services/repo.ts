@@ -27,13 +27,13 @@ const viewers: Record<string, Viewer> = {
     id: 'viewer1', 
     preferredCategories: ['casais', 'mulher', 'mulheres', 'trisal', 'homem'], 
     lookingFor: [UserType.MULHER, UserType.CASAIS],
-    city: 'São Paulo' 
+    city: 'Rio de Janeiro' 
   },
   me: { 
     id: 'me', 
     preferredCategories: ['casais', 'mulher', 'mulheres', 'trisal', 'homem', 'homem trans', 'mulher trans'], 
     lookingFor: MOCK_CURRENT_USER.lookingFor,
-    city: 'São Paulo' 
+    city: 'Rio de Janeiro' 
   },
 };
 
@@ -44,7 +44,7 @@ export function loadViewer(viewerId: string): Viewer | null {
           id: cache.userData.id,
           preferredCategories: cache.userData.vibes || [],
           lookingFor: cache.userData.lookingFor || [UserType.MULHER, UserType.CASAIS, UserType.HOMEM],
-          city: cache.userData.city || 'São Paulo'
+          city: cache.userData.city || 'Rio de Janeiro'
       };
   }
   return viewers[viewerId] || viewers['me'];

@@ -182,6 +182,22 @@ export const saveUserData = (userData: Partial<User> | UserData) => {
 
     if (!updated.following) updated.following = [];
 
+    // Protocolo de Integridade: A foto do perfil DEVE estar na galeria (Obrigatório)
+    if (updated.avatar) {
+        const gallery = updated.gallery || [];
+        const avatarUrl = updated.avatar;
+        const exists = gallery.some(p => p.url === avatarUrl);
+        if (!exists) {
+            log('info', '[AUTH] Integridade de Mídia: Sincronizando avatar com galeria.');
+            const photoId = `gallery_sync_${Date.now()}`;
+            updated.gallery = [{
+                id: photoId,
+                url: avatarUrl,
+                timestamp: new Date().toISOString()
+            }, ...gallery];
+        }
+    }
+
     cache.userData = updated;
     if (isBrowser) {
         const encoded = safeBtoa(JSON.stringify(updated));

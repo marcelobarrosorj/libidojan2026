@@ -70,18 +70,20 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
 
     const injectedMocks = shuffledMocks.map((m, idx) => {
       const angle = (idx / shuffledMocks.length) * Math.PI * 2;
-      const randomDist = 2 + Math.random() * (activeMaxKm / 2); 
+      // Gera uma distância realista entre 0.5km e o raio máximo permitido para o plano
+      const randomDist = 0.5 + Math.random() * (activeMaxKm * 0.8); 
       
       const offsetLat = (randomDist / 111) * Math.cos(angle);
       const offsetLon = (randomDist / (111 * Math.cos(viewerLat * Math.PI / 180))) * Math.sin(angle);
 
       return {
         ...m,
+        id: `mock-${m.id}`,
         lat: viewerLat + offsetLat,
         lon: viewerLon + offsetLon,
         distanceKm: randomDist,
         distanceLabel: formatDistanceLabel(randomDist),
-        locationLabel: 'Sinal Matriz',
+        locationLabel: m.city || 'Sinal Matriz',
         isMock: true,
         trustLevel: m.trustLevel || TrustLevel.BRONZE
       };
