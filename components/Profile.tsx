@@ -56,9 +56,11 @@ const ProfileGallery: React.FC<{
   handleDeletePhoto: (photoId: string) => void;
   handleTogglePhotoPrivacy: (photoId: string) => void;
   setShowPhotoGrid: (show: boolean) => void;
+  setViewerPhotoIndex: (index: number | null) => void;
 }> = ({ 
   user, isOwnProfile, handleAddPhoto, handleEditPhoto, 
-  handleDeletePhoto, handleTogglePhotoPrivacy, setShowPhotoGrid 
+  handleDeletePhoto, handleTogglePhotoPrivacy, setShowPhotoGrid,
+  setViewerPhotoIndex
 }) => {
   const galleryRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -105,7 +107,10 @@ const ProfileGallery: React.FC<{
                 return (
                     <motion.div 
                         key={photo.id} 
-                        onClick={() => setShowPhotoGrid(true)}
+                        onClick={() => {
+                            setViewerPhotoIndex(i);
+                            setShowPhotoGrid(true);
+                        }}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -156,7 +161,10 @@ const ProfileGallery: React.FC<{
 
         {(user.gallery?.length || 0) > 12 && (
             <button 
-                onClick={() => setShowPhotoGrid(true)}
+                onClick={() => {
+                    setViewerPhotoIndex(null);
+                    setShowPhotoGrid(true);
+                }}
                 className="w-full py-4 bg-slate-900/50 border border-white/5 rounded-3xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-900 transition-colors"
             >
                 Ver todas ({user.gallery?.length})
@@ -1364,6 +1372,7 @@ const Profile: React.FC<ProfileProps> = ({
           handleDeletePhoto={handleDeletePhoto}
           handleTogglePhotoPrivacy={handleTogglePhotoPrivacy}
           setShowPhotoGrid={setShowPhotoGrid}
+          setViewerPhotoIndex={setViewerPhotoIndex}
         />
       )}
 
@@ -1421,12 +1430,16 @@ const Profile: React.FC<ProfileProps> = ({
         {showPhotoGrid && (
             <PhotoGridModal 
                 photos={user.gallery || []} 
-                onClose={() => setShowPhotoGrid(false)} 
+                onClose={() => {
+                    setShowPhotoGrid(false);
+                    setViewerPhotoIndex(null);
+                }} 
                 isBlurred={!isOwnProfile && !isOwner(cache.userData) && user.hasBlurredGallery}
                 canDelete={isOwnProfile}
                 onDeletePhoto={handleDeletePhoto}
                 onTogglePrivacy={handleTogglePhotoPrivacy}
                 onEditPhoto={handleEditPhoto}
+                initialIndex={viewerPhotoIndex}
             />
         )}
         {isOwnProfile && !isPremium && (

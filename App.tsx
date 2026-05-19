@@ -284,7 +284,40 @@ export default function App() {
     });
   }, []);
 
-  const handleTabChange = (tab: string) => {
+  // Marcello: HISTÓRICO REATIVO DO NAVEGADOR (Padrão SPA de Alta Discrição)
+  // Permite ao usuário utilizar o botão "voltar" nativo do browser de forma intuitiva
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state;
+      if (state && typeof state === 'object' && 'activeTab' in state) {
+        setActiveTab(state.activeTab || 'feed');
+        setViewedProfile(state.viewedProfile || null);
+        setSelectedUser(state.selectedUser || null);
+      } else {
+        // Fallback root
+        setActiveTab('feed');
+        setViewedProfile(null);
+        setSelectedUser(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Registra o estado raiz inicial se inexistente para o botão de voltar agir internamente
+    if (!window.history.state) {
+      window.history.replaceState({
+        activeTab: 'feed',
+        viewedProfile: null,
+        selectedUser: null
+      }, '');
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  const handleTabChange = (tab: string, push = true) => {
     // Limpa estados de detalhe de forma robusta ao trocar de aba principal
     if (typeof soundService?.play === 'function') soundService.play('TAP');
     
@@ -297,6 +330,14 @@ export default function App() {
     setSelectedUser(null);
     setViewedProfile(null);
     setActiveTab(tab);
+
+    if (push) {
+      window.history.pushState({
+        activeTab: tab,
+        viewedProfile: null,
+        selectedUser: null
+      }, '');
+    }
   };
 
   const handleAcceptTerms = () => {
@@ -319,7 +360,7 @@ export default function App() {
   const lastRequestedProfileId = useRef<string | null>(null);
 
     // Função Robusta para abrir perfis
-    const handleViewProfile = async (idOrObject: any) => {
+    const handleViewProfile = async (idOrObject: any, push = true) => {
         const profileId = typeof idOrObject === 'string' ? idOrObject : idOrObject.id;
         if (!profileId) return;
 
@@ -329,12 +370,15 @@ export default function App() {
         // 1. Tentar buscar no banco real (Supabase)
         const realProfile = await getProfileById(profileId);
         
+        let loadedProfile: User | null = null;
         if (realProfile) {
+            loadedProfile = realProfile;
             setViewedProfile(realProfile);
         } else {
             // 2. Se não for real, buscar nos Mocks (pode ser um usuário de teste)
             const mock = MOCK_USERS.find(u => u.id === profileId || u.id === `mock-${profileId}`);
             if (mock) {
+                loadedProfile = mock as User;
                 setViewedProfile(mock as User);
             } else {
                 console.warn("Perfil real não encontrado, verifique conexão ou ID.");
@@ -343,6 +387,14 @@ export default function App() {
         
         setActiveTab('view_profile');
         setProfileLoading(false);
+
+        if (push && loadedProfile) {
+          window.history.pushState({
+            activeTab: 'view_profile',
+            viewedProfile: loadedProfile,
+            selectedUser: null
+          }, '');
+        }
     };
 
   const handleSearchSelect = async (profileId: string) => {
@@ -356,7 +408,7 @@ export default function App() {
     }
   };
 
-  const handleChat = (profile: any) => {
+  const handleChat = (profile: any, push = true) => {
     const profileId = typeof profile === 'string' ? profile : profile.id;
     if (!profileId) return;
     const target = profileRegistry[profileId] || profile;
@@ -364,6 +416,14 @@ export default function App() {
         setSelectedUser(target);
         setActiveTab('chat_detail');
         soundService.play('MESSAGE');
+
+        if (push) {
+          window.history.pushState({
+            activeTab: 'chat_detail',
+            viewedProfile: null,
+            selectedUser: target
+          }, '');
+        }
     }
   };
 
@@ -398,14 +458,14 @@ export default function App() {
           key={`explore-radar-${radarResetKey}`} 
           currentUser={currentUser} 
           setCurrentUser={setCurrentUser} 
-          onMatch={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} 
+          onMatch={(u) => handleChat(u)} 
           onProfileClick={handleViewProfile} 
           onChat={handleChat}
         />;
       case 'ranking': return <Ranking onSelectUser={handleViewProfile} onChat={handleChat} />;
       case 'events': return <EventsPage />;
       case 'feed': return <Feed onProfileClick={handleViewProfile} onChat={handleChat} />;
-      case 'chat': return <ChatList onSelectUser={(u) => { setSelectedUser(u); setActiveTab('chat_detail'); }} onNavigateToSubscription={() => handleTabChange('assinatura')} currentUser={currentUser} />;
+      case 'chat': return <ChatList onSelectUser={(u) => handleChat(u)} onNavigateToSubscription={() => handleTabChange('assinatura')} currentUser={currentUser} />;
       case 'profile': 
       case 'profile_settings':
         return <Profile 
@@ -517,7 +577,7 @@ export default function App() {
             (!currentUser.avatar || currentUser.avatar.includes('picsum.photos/seed')) &&
             activeTab !== 'profile_settings'
           }
-          onUpdate={() => setActiveTab('profile_settings')}
+          onUpdate={() => handleTabChange('profile_settings')}
         />
         
         {isProtected && (

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Grid, Camera, ChevronLeft, ChevronRight, Maximize2, ShieldCheck, Eye, Trash2, Pencil } from 'lucide-react';
 import { GalleryPhoto } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
@@ -13,6 +13,7 @@ interface PhotoGridModalProps {
   onDeletePhoto?: (photoId: string) => void;
   onTogglePrivacy?: (photoId: string) => void;
   onEditPhoto?: (photo: GalleryPhoto) => void;
+  initialIndex?: number | null;
 }
 
 const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ 
@@ -22,9 +23,10 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
   canDelete,
   onDeletePhoto,
   onTogglePrivacy,
-  onEditPhoto
+  onEditPhoto,
+  initialIndex = null
 }) => {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(initialIndex);
   const [isPhotoBlurred, setIsPhotoBlurred] = useState(initialBlurred);
 
   const handleNext = (e: React.MouseEvent) => {
@@ -59,6 +61,24 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
     onEditPhoto?.(photo);
     onClose();
   };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedIndex === null) return;
+      
+      if (e.key === 'ArrowRight') {
+        setSelectedIndex((selectedIndex + 1) % photos.length);
+      } else if (e.key === 'ArrowLeft') {
+        setSelectedIndex((selectedIndex - 1 + photos.length) % photos.length);
+      } else if (e.key === 'Escape') {
+        setSelectedIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIndex, photos.length]);
 
   return (
     <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-3xl flex flex-col animate-in fade-in duration-300">
@@ -163,42 +183,49 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
             className="fixed inset-0 z-[3000] bg-black flex flex-col items-center justify-center p-4 sm:p-12"
             onClick={() => setSelectedIndex(null)}
           >
-            <div className="absolute top-8 right-8 flex items-center gap-3 z-[3001]">
-                {canDelete && (
-                  <>
+            <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between z-[3001] bg-gradient-to-b from-black/80 to-transparent">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 bg-white/5 backdrop-blur-md rounded-2xl flex items-center justify-center text-slate-400 border border-white/10">
+                      <p className="text-[10px] font-black">{selectedIndex + 1}/{photos.length}</p>
+                   </div>
+                </div>
+                <div className="flex items-center gap-3">
+                    {canDelete && (
+                      <>
+                        <button 
+                            className="p-3 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-2xl transition-all active:scale-90 border border-rose-500/20 backdrop-blur-md"
+                            onClick={(e) => handleDelete(e, photos[selectedIndex].id)}
+                            title="Excluir Mídia"
+                        >
+                            <Trash2 size={20} />
+                        </button>
+                        {onEditPhoto && (
+                          <button 
+                              className="p-3 bg-white/5 hover:bg-white/10 text-white rounded-2xl transition-all active:scale-90 border border-white/10 backdrop-blur-md"
+                              onClick={(e) => handleEdit(e, photos[selectedIndex])}
+                              title="Editar Mídia"
+                          >
+                              <Pencil size={20} />
+                          </button>
+                        )}
+                        {onTogglePrivacy && (
+                          <button 
+                              className={`p-3 rounded-2xl transition-all active:scale-90 border backdrop-blur-md ${photos[selectedIndex].isBlurred ? 'bg-amber-500 text-black border-amber-400/50' : 'bg-white/5 hover:bg-white/10 text-white border-white/10'}`}
+                              onClick={(e) => handleTogglePrivacy(e, photos[selectedIndex].id)}
+                              title={photos[selectedIndex].isBlurred ? "Remover Desfoque" : "Adicionar Desfoque"}
+                          >
+                              <Eye size={20} />
+                          </button>
+                        )}
+                      </>
+                    )}
                     <button 
-                        className="p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-full transition-all active:scale-90 border border-rose-500/20"
-                        onClick={(e) => handleDelete(e, photos[selectedIndex].id)}
-                        title="Excluir Mídia"
+                        className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-white border border-white/10 backdrop-blur-md"
+                        onClick={() => setSelectedIndex(null)}
                     >
-                        <Trash2 size={24} />
+                        <X size={24} />
                     </button>
-                    {onEditPhoto && (
-                      <button 
-                          className="p-4 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all active:scale-90 border border-white/10"
-                          onClick={(e) => handleEdit(e, photos[selectedIndex])}
-                          title="Editar Mídia"
-                      >
-                          <Pencil size={24} />
-                      </button>
-                    )}
-                    {onTogglePrivacy && (
-                      <button 
-                          className={`p-4 rounded-full transition-all active:scale-90 border ${photos[selectedIndex].isBlurred ? 'bg-amber-500 text-black border-amber-400/50' : 'bg-white/5 hover:bg-white/10 text-white border-white/10'}`}
-                          onClick={(e) => handleTogglePrivacy(e, photos[selectedIndex].id)}
-                          title={photos[selectedIndex].isBlurred ? "Remover Desfoque" : "Adicionar Desfoque"}
-                      >
-                          <Eye size={24} />
-                      </button>
-                    )}
-                  </>
-                )}
-                <button 
-                    className="p-4 bg-white/5 hover:bg-white/10 rounded-full text-white"
-                    onClick={() => setSelectedIndex(null)}
-                >
-                    <X size={32} />
-                </button>
+                </div>
             </div>
 
             <div className="relative w-full max-w-4xl aspect-[4/5] sm:aspect-square flex items-center justify-center group">

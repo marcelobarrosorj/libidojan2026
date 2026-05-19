@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Lock, Unlock, AlertCircle, ShieldAlert } from 'lucide-react';
 import LibidoIcon from './common/LibidoIcon';
-import { verifyUserPin, resetPinLocalOnly } from '../services/pinService';
+import { verifyUserPin, resetPinLocalOnly, isPinConfigured } from '../services/pinService';
 import { isValidPinFormat } from '../services/pinPolicy';
 import ActionButton from './common/ActionButton';
 
@@ -22,13 +22,9 @@ export function PinUnlock({ onUnlocked, onRequireStrongLogin }: Props) {
 
   useEffect(() => {
     // Se não houver PIN configurado, força login forte/redefinição
-    const checkConfig = async () => {
-      const configured = await verifyUserPin('0000'); // Tentativa dummy apenas para checar record
-      if (configured.ok === false && configured.reason === 'not_configured') {
-        onRequireStrongLogin();
-      }
-    };
-    checkConfig();
+    if (!isPinConfigured()) {
+      onRequireStrongLogin();
+    }
 
     const t = setTimeout(() => inputRef.current?.focus(), 300);
     return () => clearTimeout(t);
