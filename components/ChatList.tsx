@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
-import { MOCK_USERS } from '../constants';
+import React, { useState, useEffect } from 'react';
 import { User, Plan, PresenceStatus } from '../types';
 import { MessageCircle, Heart, Search, Filter, Sparkles, ChevronRight, X, Check, Lock } from 'lucide-react';
-import { showNotification, cache, isPremiumUser } from '../services/authUtils';
+import { showNotification, cache, isPremiumUser, isOwner } from '../services/authUtils';
 import { PresenceBadge } from './common/PresenceBadge';
+import { fetchLatestProfiles } from '../services/repo';
 
 interface ChatListProps {
   onSelectUser: (user: User) => void;
@@ -14,11 +14,23 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscription, currentUser }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [realUsers, setRealUsers] = useState<User[]>([]);
   
   const isPremium = isPremiumUser(currentUser);
+  const ownerMode = isOwner(currentUser);
 
-  const matches = MOCK_USERS.filter(u => {
-    return u.id !== 'me' && u.nickname.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    const loadUsers = async () => {
+      const latest = await fetchLatestProfiles(20);
+      setRealUsers(latest as any);
+    };
+    loadUsers();
+  }, []);
+
+  const matches = realUsers.filter(u => {
+    const nick = u.nickname || '';
+    const search = searchTerm || '';
+    return u.id !== currentUser?.id && nick.toLowerCase().includes(search.toLowerCase());
   });
 
   return (
@@ -42,7 +54,8 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscript
         <div className="space-y-3 pb-24">
           {matches.map((user, idx) => {
             // Paywall no Chat: Usuários free só acessam os 2 primeiros chats ativos
-            const isChatLocked = !isPremium && idx >= 2;
+            // Marcello: Bypass total para o proprietário auditor
+            const isChatLocked = !ownerMode && !isPremium && idx >= 2;
 
             return (
               <div 
@@ -54,7 +67,7 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectUser, onNavigateToSubscript
               >
                 <div className="relative shrink-0">
                   <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/5">
-                    <img src={user.avatar} className="w-full h-full object-cover" alt={user.nickname} />
+                    <img src={user.avatar || undefined} className="w-full h-full object-cover" alt={user.nickname} />
                   </div>
                   {!isChatLocked && (
                     <PresenceBadge 

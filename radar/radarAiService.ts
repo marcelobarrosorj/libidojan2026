@@ -1,27 +1,21 @@
-import { GoogleGenAI } from "@google/genai";
 import { RadarProfile } from "./types";
 import { log } from "../services/authUtils";
 
-const getAI = () => new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-
 export async function generateRadarSummary(profiles: RadarProfile[]) {
-  const ai = getAI();
-  const summaryData = profiles.slice(0, 5).map(p => ({
-    name: p.name,
-    category: p.category,
-    bio: p.bio,
-    dist: p.distanceLabel
-  }));
-
-  const prompt = `Analise esta lista de perfis próximos em uma rede social lifestyle (swing/liberal) e crie um resumo de 1 frase (máximo 15 palavras) sobre a "vibe" da área agora.
-  Seja instigante e sofisticado. Use português do Brasil.
-  Perfis: ${JSON.stringify(summaryData)}`;
-
+  if (!profiles || !Array.isArray(profiles) || profiles.length === 0) {
+    return "Conexões interessantes detectadas no seu radar agora.";
+  }
+  
   try {
-    const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await genModel.generateContent(prompt);
-    const response = await result.response;
-    return response.text()?.trim() || "Conexões interessantes detectadas no seu radar agora.";
+    const response = await fetch('/api/ai/radar-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profiles })
+    });
+
+    if (!response.ok) throw new Error('AI Radar Summary request failed');
+    const data = await response.json();
+    return data.summary || "Conexões interessantes detectadas no seu radar agora.";
   } catch (error: any) {
     log('error', 'Radar AI Summary failed', { error: error.message });
     return "O radar está agitado! Explore as conexões lifestyle ao seu redor.";
@@ -29,19 +23,16 @@ export async function generateRadarSummary(profiles: RadarProfile[]) {
 }
 
 export async function generateVibeCheck(profile: RadarProfile) {
-  const ai = getAI();
-  const prompt = `Crie uma "Vibe Check" tag super curta (máximo 2-3 palavras) para este perfil lifestyle:
-  Nome: ${profile.name}
-  Bio: ${profile.bio}
-  Categoria: ${profile.category}
-  
-  Exemplos: "Energia Magnética", "Mistério Total", "Vibe Sofisticada", "Pura Ousadia".`;
-
   try {
-    const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await genModel.generateContent(prompt);
-    const response = await result.response;
-    return response.text()?.trim().replace(/[".]/g, '') || "Conexão Ativa";
+    const response = await fetch('/api/ai/vibe-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile })
+    });
+
+    if (!response.ok) throw new Error('Vibe Check request failed');
+    const data = await response.json();
+    return data.tag || "Conexão Ativa";
   } catch (error) {
     return "High Compatibility";
   }

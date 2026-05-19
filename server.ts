@@ -10,6 +10,10 @@ import { createServer as createViteServer } from 'vite';
 // Rotas de API
 import radarRoutes from './routes/radar'; // Ajustado para caminhos relativos
 import paymentRoutes from './routes/payments';
+import aiRoutes from './routes/ai';
+
+// Marcello: Importação estática do repo para evitar problemas com import() dinâmico em rotas
+import { fetchLatestProfiles } from './services/repo';
 
 // Carrega variáveis do arquivo .env
 dotenv.config();
@@ -28,72 +32,25 @@ async function startServer() {
     // 1. Health Check (Crítico: deve estar disponível imediatamente)
     app.get('/health', (_req, res) => res.status(200).send('OK'));
 
-    // 2. Proxy para Supabase (sb-api) com tratamento robusto de URL e Headers
-    app.use('/api/sb-api', async (req, res) => {
-        const envUrl = (process.env.SUPABASE_URL || '').trim();
-        const supabaseUrl = envUrl !== '' ? envUrl : 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
-        
-        // Remove barras duplicadas na colagem da URL
-        const cleanPath = req.url.startsWith('/') ? req.url : `/${req.url}`;
-        const targetUrl = `${supabaseUrl.replace(/\/$/, '')}${cleanPath}`;
-        
-        try {
-            console.log(`[SB_PROXY] ${req.method} ${req.url} -> ${targetUrl}`);
-            
-            const fetchOptions: any = {
-                method: req.method,
-                headers: {
-                    'apikey': (req.headers['apikey'] as string) || (process.env.SUPABASE_ANON_KEY as string),
-                    'Authorization': req.headers['authorization'] as string,
-                    'Content-Type': 'application/json',
-                    'Prefer': req.headers['prefer'] as string,
-                    'X-Client-Info': req.headers['x-client-info'] as string
-                }
-            };
-
-            // Remove headers vazios ou "undefined" literais
-            Object.keys(fetchOptions.headers).forEach(key => {
-                const val = fetchOptions.headers[key];
-                if (!val || val === 'undefined' || val === 'null') {
-                    delete fetchOptions.headers[key];
-                }
-            });
-
-            // Proxy do corpo da requisição
-            if (!['GET', 'HEAD'].includes(req.method)) {
-                // Garante que o body seja passado corretamente se existir
-                if (req.body && (typeof req.body === 'object' ? Object.keys(req.body).length > 0 : true)) {
-                    fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-                }
-            }
-
-            const response = await fetch(targetUrl, fetchOptions);
-            
-            res.status(response.status);
-            
-            const contentType = response.headers.get('content-type');
-            if (contentType) res.setHeader('Content-Type', contentType);
-
-            // Resposta vazia (No Content)
-            if (response.status === 204) {
-                return res.end();
-            }
-
-            const data = await response.text();
-            res.send(data);
-        } catch (error: any) {
-            console.error(`[SB_PROXY_ERROR] Falha ao alcançar ${targetUrl}:`, error.message);
-            res.status(502).json({ 
-                error: 'Gateway Error: Falha na comunicação com a Matriz DB', 
-                message: error.message,
-                target: targetUrl 
-            });
-        }
-    });
-
     // 3. Registro de Rotas de API Internas
     app.use('/api', radarRoutes);
     app.use('/api/payments', paymentRoutes);
+    app.use('/api/ai', aiRoutes);
+
+    // Marcello: Rota de Proxy para Perfis (Bypass de Erros de Rede Client-side)
+    app.get('/api/profiles/latest', async (req, res) => {
+        try {
+            const limit = Number(req.query.limit) || 30;
+            const profiles = await fetchLatestProfiles(limit);
+            return res.json(profiles);
+        } catch (e: any) {
+            console.error('[SERVER_PROFILES_ERROR] Falha na Matriz Central:', e.message);
+            return res.status(500).json({ 
+                error: 'Erro ao buscar perfis na Matriz Central',
+                debug: e.message 
+            });
+        }
+    });
 
     // 3. Inicia a escuta da porta IMEDIATAMENTE (antes de inicializações lentas)
     const server = app.listen(PORT, '0.0.0.0', () => {

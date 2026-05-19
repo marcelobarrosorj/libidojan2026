@@ -239,7 +239,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ imageUrl, onSave, onCancel })
       {/* Fonte da Imagem (Invisível) */}
       <img 
         ref={imgRef} 
-        src={imageUrl} 
+        src={imageUrl || undefined} 
         onLoad={handleImageLoad}
         className="hidden" 
         alt="source"

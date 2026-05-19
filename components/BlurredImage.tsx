@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Lock, Eye } from 'lucide-react';
+import { Lock, Eye, ShieldAlert } from 'lucide-react';
+import { isOwner } from '../services/authUtils';
+import { useAuth } from '../hooks/useAuthContext';
 
 interface BlurredImageProps {
   src: string;
@@ -17,26 +19,41 @@ const BlurredImage: React.FC<BlurredImageProps> = ({
   canUnlock = false,
   className = "" 
 }) => {
+  const { currentUser } = useAuth();
   const [isBlurred, setIsBlurred] = useState(isInitiallyBlurred);
+  const ownerMode = isOwner(currentUser);
 
-  // Sincroniza estado se a prop mudar (importante para troca de perfil ou carregamento tardio)
+  // Sincroniza estado se a prop mudar
   useEffect(() => {
-    setIsBlurred(isInitiallyBlurred);
-  }, [isInitiallyBlurred]);
+    // Super usuário tem visão térmica (bypass blur)
+    if (ownerMode) {
+      setIsBlurred(false);
+    } else {
+      setIsBlurred(isInitiallyBlurred);
+    }
+  }, [isInitiallyBlurred, ownerMode]);
 
   return (
     <div className={`relative overflow-hidden group ${className}`}>
       {/* Imagem Principal */}
       <img
-        src={src}
+        src={src || undefined}
         alt={alt}
         referrerPolicy="no-referrer"
         className={`w-full h-full object-cover transition-all duration-700 ${isBlurred ? 'blur-2xl scale-110 grayscale brightness-50' : 'blur-0 scale-100'}`}
       />
 
-      {/* Overlay de Bloqueio */}
+      {/* Overlay de Auditoria (Visual para o Owner saber que está em modo God) */}
+      {ownerMode && isInitiallyBlurred && (
+        <div className="absolute top-2 left-2 px-2 py-1 bg-rose-500/80 backdrop-blur-md rounded-lg border border-white/10 flex items-center gap-1 z-20">
+          <ShieldAlert size={10} className="text-white animate-pulse" />
+          <span className="text-[7px] font-black text-white uppercase tracking-tighter">Bypass Auditor</span>
+        </div>
+      )}
+
+      {/* Overlay de Bloqueio (Não visível para o Owner) */}
       <AnimatePresence>
-        {isBlurred && (
+        {isBlurred && !ownerMode && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -65,7 +82,7 @@ const BlurredImage: React.FC<BlurredImageProps> = ({
       </AnimatePresence>
 
       {/* Indicador de Proteção Permanente */}
-      {isInitiallyBlurred && !isBlurred && (
+      {isInitiallyBlurred && !isBlurred && !ownerMode && (
         <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 backdrop-blur-md rounded-lg border border-white/10 flex items-center gap-1">
           <Eye size={10} className="text-emerald-500" />
           <span className="text-[7px] font-black text-emerald-500 uppercase tracking-tighter">Revelado</span>

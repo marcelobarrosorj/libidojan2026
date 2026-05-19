@@ -74,7 +74,7 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
       return;
     }
 
-    const GOOGLE_KEY = process.env.GOOGLE_MAPS_PLATFORM_KEY;
+    const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const hasGoogleKey = GOOGLE_KEY && GOOGLE_KEY !== 'YOUR_API_KEY';
 
     setIsGPSLoading(true);
@@ -130,6 +130,27 @@ export const CityAutocomplete: React.FC<CityAutocompleteProps> = ({
             const stateInitial = BRAZIL_STATES[state] || (state ? state.substring(0, 2).toUpperCase() : '');
             const formatted = stateInitial ? `${city} - ${stateInitial}`.toUpperCase() : city.toUpperCase();
             console.log('[GPS] Localização final formatada:', formatted);
+            
+            // Marcello: Protocolo de Atualização Direta de Matriz (Bypass Cache Autoritário)
+            import('../../services/authUtils').then(m => {
+              const baseData = m.cache.userData || { id: '000001', nickname: 'CASAL BEIJO', serialNumber: '000001' };
+              const updated = {
+                ...baseData,
+                lat: latitude,
+                lon: longitude,
+                city: formatted,
+                updatedAt: new Date().toISOString()
+              };
+              m.saveUserData(updated);
+              (m.cache as any).userData = updated; // Força cache local imediato
+              console.log('[GPS] Coordenadas sincronizadas com o Perfil Agente.');
+              
+              // Marcello: Dispara evento global de atualização para outros componentes se necessário
+              if (window.dispatchEvent) {
+                window.dispatchEvent(new CustomEvent('libido-profile-update', { detail: updated }));
+              }
+            });
+
             onChange(formatted);
             setIsOpen(false);
           } else {

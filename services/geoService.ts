@@ -1,22 +1,27 @@
 
 export const EARTH_RADIUS_KM = 6371.0088; // WGS84 mean earth radius
 export const KM_PER_LAT_DEGREE = 111.195; // EarthRadius * PI / 180
+export const BASE_LOCATION = { lat: -22.5231, lon: -44.1042 }; // Volta Redonda
 
 /**
  * Calculates the Haversine distance between two points in kilometers.
  * Uses a precise earth radius and checks for edge cases.
  */
 export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  if (!Number.isFinite(lat1) || !Number.isFinite(lon1) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return 9999;
+  // Marcello: Se a origem vier zerada ou nula, usamos Volta Redonda como âncora
+  const startLat = (lat1 && Math.abs(lat1) > 0.01) ? lat1 : BASE_LOCATION.lat;
+  const startLon = (lon1 && Math.abs(lon1) > 0.01) ? lon1 : BASE_LOCATION.lon;
+
+  if (!Number.isFinite(startLat) || !Number.isFinite(startLon) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return 9999;
   
-  if (lat1 === lat2 && lon1 === lon2) return 0;
+  if (startLat === lat2 && startLon === lon2) return 0;
   
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const dLat = ((lat2 - startLat) * Math.PI) / 180;
+  const dLon = ((lon2 - startLon) * Math.PI) / 180;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((startLat * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);

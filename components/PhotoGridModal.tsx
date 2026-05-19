@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Grid, Camera, ChevronLeft, ChevronRight, Maximize2, ShieldCheck, Eye, Trash2 } from 'lucide-react';
+import { X, Grid, Camera, ChevronLeft, ChevronRight, Maximize2, ShieldCheck, Eye, Trash2, Pencil } from 'lucide-react';
 import { GalleryPhoto } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -11,6 +11,8 @@ interface PhotoGridModalProps {
   isBlurred?: boolean;
   canDelete?: boolean;
   onDeletePhoto?: (photoId: string) => void;
+  onTogglePrivacy?: (photoId: string) => void;
+  onEditPhoto?: (photo: GalleryPhoto) => void;
 }
 
 const PhotoGridModal: React.FC<PhotoGridModalProps> = ({ 
@@ -18,7 +20,9 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
   onClose, 
   isBlurred: initialBlurred,
   canDelete,
-  onDeletePhoto
+  onDeletePhoto,
+  onTogglePrivacy,
+  onEditPhoto
 }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isPhotoBlurred, setIsPhotoBlurred] = useState(initialBlurred);
@@ -39,8 +43,21 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
 
   const handleDelete = (e: React.MouseEvent, photoId: string) => {
     e.stopPropagation();
-    onDeletePhoto?.(photoId);
-    if (selectedIndex !== null) setSelectedIndex(null);
+    if (window.confirm('Tem certeza que deseja excluir esta foto da Matriz?')) {
+      onDeletePhoto?.(photoId);
+      if (selectedIndex !== null) setSelectedIndex(null);
+    }
+  };
+
+  const handleTogglePrivacy = (e: React.MouseEvent, photoId: string) => {
+    e.stopPropagation();
+    onTogglePrivacy?.(photoId);
+  };
+
+  const handleEdit = (e: React.MouseEvent, photo: GalleryPhoto) => {
+    e.stopPropagation();
+    onEditPhoto?.(photo);
+    onClose();
   };
 
   return (
@@ -72,7 +89,7 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
                 className="aspect-square relative rounded-[32px] overflow-hidden group cursor-pointer border border-white/5 shadow-xl hover:scale-[1.02] transition-transform active:scale-95"
               >
                 <img 
-                  src={photo.url} 
+                  src={photo.url || undefined} 
                   alt={`Galeria ${index}`} 
                   className={`w-full h-full object-cover transition-all duration-700 ${initialBlurred ? 'blur-2xl scale-110 grayscale' : 'group-hover:scale-110'}`}
                 />
@@ -86,13 +103,33 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 {canDelete && (
-                  <button 
-                    onClick={(e) => handleDelete(e, photo.id)}
-                    className="absolute top-3 right-3 p-2.5 bg-rose-500 text-white rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-75 z-20 backdrop-blur-md border border-rose-400/20"
-                    title="Excluir"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="absolute top-3 right-3 flex flex-col gap-2 z-20">
+                    <button 
+                      onClick={(e) => handleDelete(e, photo.id)}
+                      className="p-2.5 bg-rose-500 text-white rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-75 backdrop-blur-md border border-rose-400/20"
+                      title="Excluir"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    {onEditPhoto && (
+                      <button 
+                        onClick={(e) => handleEdit(e, photo)}
+                        className="p-2.5 bg-slate-800 text-white rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-75 backdrop-blur-md border border-white/10"
+                        title="Editar Mídia"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                    )}
+                    {onTogglePrivacy && (
+                      <button 
+                        onClick={(e) => handleTogglePrivacy(e, photo.id)}
+                        className={`p-2.5 rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-75 backdrop-blur-md border ${photo.isBlurred ? 'bg-amber-500 text-black border-amber-400/50' : 'bg-slate-800 text-white border-white/10'}`}
+                        title={photo.isBlurred ? "Remover Desfoque" : "Adicionar Desfoque"}
+                      >
+                        <Eye size={16} className={photo.isBlurred ? 'opacity-100' : 'opacity-60'} />
+                      </button>
+                    )}
+                  </div>
                 )}
 
                 <div className="absolute bottom-4 left-4 p-2 bg-black/40 backdrop-blur-md rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
@@ -128,12 +165,33 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
           >
             <div className="absolute top-8 right-8 flex items-center gap-3 z-[3001]">
                 {canDelete && (
-                  <button 
-                      className="p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-full transition-all active:scale-90 border border-rose-500/20"
-                      onClick={(e) => handleDelete(e, photos[selectedIndex].id)}
-                  >
-                      <Trash2 size={24} />
-                  </button>
+                  <>
+                    <button 
+                        className="p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-full transition-all active:scale-90 border border-rose-500/20"
+                        onClick={(e) => handleDelete(e, photos[selectedIndex].id)}
+                        title="Excluir Mídia"
+                    >
+                        <Trash2 size={24} />
+                    </button>
+                    {onEditPhoto && (
+                      <button 
+                          className="p-4 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all active:scale-90 border border-white/10"
+                          onClick={(e) => handleEdit(e, photos[selectedIndex])}
+                          title="Editar Mídia"
+                      >
+                          <Pencil size={24} />
+                      </button>
+                    )}
+                    {onTogglePrivacy && (
+                      <button 
+                          className={`p-4 rounded-full transition-all active:scale-90 border ${photos[selectedIndex].isBlurred ? 'bg-amber-500 text-black border-amber-400/50' : 'bg-white/5 hover:bg-white/10 text-white border-white/10'}`}
+                          onClick={(e) => handleTogglePrivacy(e, photos[selectedIndex].id)}
+                          title={photos[selectedIndex].isBlurred ? "Remover Desfoque" : "Adicionar Desfoque"}
+                      >
+                          <Eye size={24} />
+                      </button>
+                    )}
+                  </>
                 )}
                 <button 
                     className="p-4 bg-white/5 hover:bg-white/10 rounded-full text-white"
@@ -146,7 +204,7 @@ const PhotoGridModal: React.FC<PhotoGridModalProps> = ({
             <div className="relative w-full max-w-4xl aspect-[4/5] sm:aspect-square flex items-center justify-center group">
                 <motion.img
                     layoutId={`photo-${photos[selectedIndex].id}`}
-                    src={photos[selectedIndex].url}
+                    src={photos[selectedIndex].url || undefined}
                     className={`max-w-full max-h-full object-contain rounded-3xl transition-all duration-500 ${isPhotoBlurred ? 'blur-3xl scale-110 brightness-50' : 'blur-0 scale-100'}`}
                     onClick={(e) => e.stopPropagation()}
                 />

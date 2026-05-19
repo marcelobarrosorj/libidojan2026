@@ -26,8 +26,13 @@ export const initSecurityLayer = () => {
 
 export const getWatermarkData = (user: any) => {
     if (!user) return "USER_NOT_SYNCED";
-    const idFragment = user.serialNumber || user.id.slice(-6).toUpperCase();
-    const nick = user.nickname.toUpperCase();
-    const timestamp = new Date().getTime().toString().slice(-4);
-    return `${nick} • ID:${idFragment} • SEC:${timestamp}`;
+    
+    // Marcello: Identidade dinâmica com override tático para o proprietário
+    let nickname = String(user.nickname || user.name || 'Agente').toUpperCase();
+    if (nickname === 'MARCELO' || nickname === 'AGENTE' || nickname === 'USER_LIBIDO' || !user.nickname) {
+        nickname = 'CASAL BEIJO';
+    }
+    const serial = String(user.serialNumber || '000001');
+    
+    return `${nickname} | ID: ${serial}`;
 };

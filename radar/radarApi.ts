@@ -11,19 +11,35 @@ export async function fetchRadarProfiles(params: {
   const { lat, lon, viewerId, signal } = params;
 
   try {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    if (signal?.aborted) return [];
-
-    const data = await queryRadar({ 
-      viewerId, 
-      viewerLat: lat, 
-      viewerLon: lon 
+    // Marcello: Usa API do servidor para garantir estabilidade e bypassar erros de rede client-side
+    const resp = await fetch(`/api/radar?lat=${lat}&lon=${lon}`, {
+        headers: {
+            'x-user-id': viewerId
+        },
+        signal
     });
 
+    if (!resp.ok) {
+        throw new Error('Falha na resposta da API Radar');
+    }
+
+    const data = await resp.json();
     return data as RadarProfile[];
   } catch (error) {
     if ((error as any).name === 'AbortError') return [];
-    throw error;
+    
+    // Fallback local se a API falhar
+    console.warn('[RADAR_API] Falha na API Central, tentando modo de redundância local...');
+    try {
+        const { queryRadar } = await import('../services/radarService');
+        const data = await queryRadar({ 
+          viewerId, 
+          viewerLat: lat, 
+          viewerLon: lon 
+        });
+        return data as RadarProfile[];
+    } catch (e) {
+        return [];
+    }
   }
 }

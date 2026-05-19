@@ -2,7 +2,7 @@
 import React from 'react';
 import { Lock, ShieldAlert } from 'lucide-react';
 import { User } from '../types';
-import { isOwner } from '../services/authUtils';
+import { saveUserData, showNotification, isOwner } from '../services/authUtils';
 
 interface VerificationGateProps {
   user: User | null;

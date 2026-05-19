@@ -186,7 +186,7 @@ export default function EventsPage() {
         {displayList.map((event) => (
           <div key={event.id} onClick={() => setSelectedEvent(event)} className="glass-card rounded-[2.5rem] overflow-hidden border-white/5 shadow-2xl relative group cursor-pointer">
             <div className="aspect-[16/9] relative">
-              <img src={event.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+              <img src={event.image || undefined} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
               
               {event.isVerifiedPartner && (
@@ -215,7 +215,7 @@ export default function EventsPage() {
             <div className="p-5 flex items-center justify-between bg-slate-900/40">
               <div className="flex -space-x-3 overflow-hidden">
                 {event.confirmedGuests?.map((g, i) => (
-                  <img key={i} src={g.avatar} className={`w-8 h-8 rounded-full border-2 border-slate-950 object-cover ${g.trust === TrustLevel.OURO ? 'border-amber-500' : ''}`} />
+                  <img key={i} src={g.avatar || undefined} className={`w-8 h-8 rounded-full border-2 border-slate-950 object-cover ${g.trust === TrustLevel.OURO ? 'border-amber-500' : ''}`} />
                 ))}
                 {event.confirmedGuests && event.confirmedGuests.length > 0 && (
                   <div className="w-8 h-8 rounded-full bg-slate-800 border-2 border-slate-950 flex items-center justify-center text-[8px] font-black text-slate-400">
@@ -235,7 +235,7 @@ export default function EventsPage() {
       {selectedEvent && !showTicket && (
         <div className="fixed inset-0 z-[150] bg-black/98 backdrop-blur-3xl flex flex-col animate-in slide-in-from-bottom duration-500 overflow-y-auto pb-10">
            <div className="relative aspect-video">
-              <img src={selectedEvent.image} className="w-full h-full object-cover" />
+              <img src={selectedEvent.image || undefined} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
               <button onClick={() => setSelectedEvent(null)} className="absolute top-6 right-6 p-3 bg-black/40 backdrop-blur-md rounded-full text-white border border-white/10"><X size={24} /></button>
            </div>
@@ -271,7 +271,7 @@ export default function EventsPage() {
                   <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                     {selectedEvent.confirmedGuests.map((g, i) => (
                       <div key={i} className="flex-shrink-0 relative">
-                        <img src={g.avatar} className={`w-12 h-12 rounded-2xl object-cover border-2 ${g.trust === TrustLevel.OURO ? 'border-amber-500' : 'border-slate-800'}`} />
+                        <img src={g.avatar || undefined} className={`w-12 h-12 rounded-2xl object-cover border-2 ${g.trust === TrustLevel.OURO ? 'border-amber-500' : 'border-slate-800'}`} />
                         {g.trust === TrustLevel.OURO && <Crown size={10} className="absolute -top-1 -right-1 text-amber-500 fill-amber-500" />}
                       </div>
                     ))}

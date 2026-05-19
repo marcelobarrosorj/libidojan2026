@@ -23,61 +23,38 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser, onChat }) => {
     const loadRankingData = async () => {
       setLoading(true);
       
-      if (activeTab === 'new') {
-        try {
-          const latest = await fetchLatestProfiles(20);
-          console.log(`[Ranking] Encontrados ${latest.filter(p => !p.isMock).length} usuários reais de ${latest.length} totais.`);
-          
-          const mappedUsers: User[] = latest.map((p, i) => ({
-            id: p.id,
-            nickname: p.name,
-            avatar: p.avatar,
-            age: (p as any).age || 18,
-            totalLikes: Math.floor(Math.random() * 50),
-            totalViews: Math.floor(Math.random() * 200),
-            trustLevel: p.trustLevel || TrustLevel.BRONZE,
-            verifiedAccount: p.trustLevel === TrustLevel.OURO,
-            verificationScore: p.trustLevel === TrustLevel.OURO ? 100 : 30,
-            level: 1,
-            rank: i + 1,
-            city: p.city || 'Matriz',
-            neighborhood: p.neighborhood || '',
-            bio: p.bio || '',
-            serialNumber: p.serialNumber || `000${100+i}`
-          } as any));
-          setUsers(mappedUsers);
-        } catch (e) {
-          console.error('[Ranking] Error loading new users:', e);
-        }
-      } else {
-        // Fallback para outros rankings (mock por enquanto, incluindo MOCK_USERS reais para consistência)
-        setTimeout(() => {
-          const combinedMocks = [...MOCK_USERS].map((u, i) => ({
-            ...u,
-            totalLikes: 1000 - (i * 100),
-            totalViews: 5000 - (i * 500),
-            rank: i + 1
-          }));
+      try {
+        const latest = await fetchLatestProfiles(50);
+        console.log(`[Ranking] Carregando ${latest.length} perfis reais para o ranking.`);
+        
+        // Em um app real, o ranking seria calculado no backend. 
+        // Aqui simulamos o ranking baseado nos dados reais vindos do Supabase.
+        const mappedUsers: User[] = latest.map((p, i) => ({
+          id: p.id,
+          nickname: p.name,
+          avatar: p.avatar,
+          age: (p as any).age || 18,
+          totalLikes: Math.floor(Math.random() * 500) + (latest.length - i) * 10,
+          totalViews: Math.floor(Math.random() * 2000) + (latest.length - i) * 50,
+          trustLevel: p.trustLevel || TrustLevel.BRONZE,
+          verifiedAccount: p.trustLevel === TrustLevel.OURO,
+          verificationScore: p.trustLevel === TrustLevel.OURO ? 100 : 30,
+          rank: i + 1,
+          city: p.city || 'Matriz'
+        } as any));
 
-          const extraMocks = Array.from({ length: 10 }).map((_, i) => ({
-            id: `extra-${i}`,
-            nickname: `Agente ${i + 10}`,
-            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 200}`,
-            age: 20 + Math.floor(Math.random() * 20),
-            totalLikes: 500 - (i * 40),
-            totalViews: 2000 - (i * 150),
-            trustLevel: TrustLevel.BRONZE,
-            verifiedAccount: false,
-            verificationScore: 50,
-            level: 10,
-            rank: combinedMocks.length + i + 1,
-            serialNumber: `000${200+i}`,
-            city: 'Rio de Janeiro',
-          } as any));
+        // Ordenação por abas (Simulada no client mas com dados reais)
+        let sorted = [...mappedUsers];
+        if (activeTab === 'popular') sorted.sort((a,b) => (b.totalLikes || 0) - (a.totalLikes || 0));
+        if (activeTab === 'reputation') sorted.sort((a,b) => (b.vouchScore || 0) - (a.vouchScore || 0));
+        if (activeTab === 'new') sorted = mappedUsers; // Já está por created_at descending
+        if (activeTab === 'verified') sorted = mappedUsers.filter(u => u.verifiedAccount);
 
-          setUsers([...combinedMocks, ...extraMocks]);
-        }, 800);
+        setUsers(sorted.map((u, i) => ({ ...u, rank: i + 1 })));
+      } catch (e) {
+        console.error('[Ranking] Error loading users:', e);
       }
+      
       setLoading(false);
     };
 
@@ -153,7 +130,7 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser, onChat }) => {
                   <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 ${
                     index === 0 ? 'border-amber-500' : 'border-slate-800'
                   }`}>
-                    <img src={user.avatar} className="w-full h-full object-cover" alt="" />
+                    <img src={user.avatar || undefined} className="w-full h-full object-cover" alt="" />
                   </div>
                   {user.verifiedAccount && (
                     <div className="absolute -bottom-1 -right-1 bg-amber-500 text-black rounded-full p-0.5 border-2 border-[#050505]">
@@ -166,7 +143,6 @@ const Ranking: React.FC<RankingProps> = ({ onSelectUser, onChat }) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-bold text-white truncate">{user.nickname}</span>
-                    <span className="text-[8px] font-black font-mono text-amber-500/60 tracking-wider">#{user.serialNumber || '000000'}</span>
                     <span className="text-[10px] text-slate-500 font-mono italic">{user.age}y</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">

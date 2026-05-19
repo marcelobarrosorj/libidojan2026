@@ -28,7 +28,12 @@ export enum Vibes {
   LIBERAL = 'Liberal', 
   SWING = 'Swing', 
   BDSM = 'BDSM', 
-  FETISH = 'Fetish' 
+  FETISH = 'Fetish',
+  VOYEUR = 'Voyeur',
+  EXIBICIONISMO = 'Exibicionismo',
+  CUCKOLD = 'Cuckold',
+  TROCA_TOTAL = 'Troca Total',
+  PONTO_G = 'Ponto G'
 }
 
 export interface GalleryPhoto { 
@@ -48,14 +53,6 @@ export interface Moment {
   viewed: boolean;
 }
 
-export interface HeatZone {
-  id: string;
-  x: number;
-  y: number;
-  intensity: number; // 0 to 1
-  color: 'amber' | 'pink';
-}
-
 export interface ProfileData {
   nickname: string;
   email?: string;
@@ -66,11 +63,11 @@ export interface ProfileData {
   sexualPreference?: SexualOrientation;
   gender?: Gender;
   lookingFor?: UserType[];
+  city: string;
   skinColor?: string;
   hairColor?: string;
   hairType?: string;
   eyeColor?: string;
-  city: string;
 }
 
 export interface Vouch {
@@ -100,60 +97,62 @@ export enum PresenceStatus {
 }
 
 export interface User {
-  id: string;
+  id: string; // Sempre UUID no banco ou ID fixo no Mock
   nickname: string;
-  email: string; 
+  email?: string;
   age: number;
   plan: Plan;
-  balance: number;
-  boosts_active: number;
-  trustLevel: TrustLevel;
   is_premium: boolean;
   avatar: string;
-  biotype: Biotype;
-  bio: string;
-  gender: Gender;
-  sexualOrientation: SexualOrientation;
   type: UserType;
-  lookingFor: UserType[];
-  height: number;
-  location: string;
   city: string;
-  neighborhood?: string;
-  xp: number;
-  level: number;
-  isOnline: boolean;
-  status?: PresenceStatus;
-  verifiedAccount: boolean;
-  isGhostMode: boolean;
-  gallery: GalleryPhoto[];
-  badges: string[];
-  boundaries: string[];
-  behaviors: string[];
-  braveryLevel: number;
-  updatedAt?: string;
-  vibes: Vibes[];
-  bucketList: string[];
   lat: number;
   lon: number;
-  birthDate: string;
-  rsvps: string[];
-  vouches: Vouch[];
-  bookmarks: string[];
-  blockedUsers: string[];
-  matches: string[];
-  following: string[]; // IDs dos usuários que este usuário segue
-  seenBy: string[];
-  bodyMods: string[];
-  bodyHair: string;
-  bodyArt: string[];
-  bondageExp: string;
-  bestMoments: string[];
-  bestFeature: string;
-  beveragePref: string;
-  bestTime: string;
-  busyMode: boolean;
-  bookingPolicy: string;
+  gallery: { id: string; url: string; timestamp: string; isBlurred?: boolean }[];
+  following?: string[];
+  isGhostMode?: boolean;
+  isOnline?: boolean;
+  vouchScore?: number;
+  bio?: string;
+  gender?: string | Gender;
+  sexualOrientation?: string | SexualOrientation;
+  height?: number;
+  biotype?: string | Biotype;
+  
+  // Backwards compatibility fields for components
+  balance?: number;
+  boosts_active?: number;
+  trustLevel?: TrustLevel;
+  lookingFor?: UserType[];
+  location?: string;
+  xp?: number;
+  level?: number;
+  verifiedAccount?: boolean;
+  badges?: string[];
+  boundaries?: string[];
+  behaviors?: string[];
+  braveryLevel?: number;
+  updatedAt?: string;
+  vibes?: Vibes[];
+  bucketList?: string[];
+  birthDate?: string;
+  rsvps?: string[];
+  vouches?: Vouch[];
+  bookmarks?: string[];
+  blockedUsers?: string[];
+  matches?: string[];
+  seenBy?: string[];
+  bodyMods?: string[];
+  bodyArt?: string[];
+  bodyHair?: string;
+  bondageExp?: string;
+  bestMoments?: any[];
+  bestFeature?: string;
+  beveragePref?: string;
+  bestTime?: string;
+  busyMode?: boolean;
+  bookingPolicy?: string;
+  dailyProfileViews?: number;
   verificationScore?: number;
   verificationLevels?: {
     identity: boolean;
@@ -161,26 +160,49 @@ export interface User {
     social: boolean;
     trust: boolean;
   };
-  hasBlurredGallery: boolean;
+  hasBlurredGallery?: boolean;
   totalLikes?: number;
   totalViews?: number;
-  rank?: number;
-  isSubscriber: boolean;
+  isSubscriber?: boolean;
   emailVerified?: boolean;
-  dailyProfileViews: number;
-  lastResetDate?: string;
-  // Novos campos estratégicos
-  consentMatrix: ConsentItem[];
-  vouchScore: number; // 0-100 refletindo respeito e presença
-  isStealthMode: boolean;
-  prefersBlurredPhotos: boolean;
-  partner1?: ProfileData;
-  partner2?: ProfileData;
+  consentMatrix?: ConsentItem[];
+  isStealthMode?: boolean;
+  prefersBlurredPhotos?: boolean;
+  partner1?: ProfileData | any;
+  partner2?: ProfileData | any;
   serialNumber?: string;
   lastMoment?: {
     imageUrl: string;
     timestamp: string;
   };
+  status?: PresenceStatus;
+  is_mock?: boolean;
+  environment?: string;
+  createdAt?: string;
+}
+
+export interface RadarProfile {
+  id: string;
+  name: string;
+  avatar: string;
+  lat: number;
+  lon: number;
+  city: string;
+  distanceKm?: number;
+  trustLevel?: TrustLevel;
+  
+  // Compatibility
+  neighborhood?: string;
+  bio?: string;
+  category?: string;
+  age?: number;
+  isMock?: boolean;
+  nickname?: string; // Some mocks use nickname
+  vouchScore?: number;
+  type?: UserType;
+  location?: string;
+  isGhostMode?: boolean;
+  braveryLevel?: number;
 }
 
 export type Step = 'type' | 'details' | 'physical' | 'photo' | 'confirm';
@@ -213,7 +235,6 @@ export interface Post {
   description: string;
   likes: number;
   comments: { user: string; text: string }[];
-  shares: number;
   liked: boolean;
   timestamp: string;
 }
@@ -225,10 +246,6 @@ export interface PartnerData {
   sexualPreference: SexualOrientation;
   biotype: Biotype;
   height: number;
-  skinColor: string;
-  hairColor: string;
-  hairType: string;
-  lookingFor: UserType[];
 }
 
 export interface Shoutout {
@@ -243,18 +260,16 @@ export interface RadarResultItem {
   id: string;
   name: string;
   avatar: string;
+  distanceKm: number;
+  trustLevel: TrustLevel;
+  locationLabel?: string;
   bio?: string;
   category?: string;
-  distanceKm: number;
-  distanceLabel: string;
-  locationLabel: string;
-  city: string;
-  neighborhood: string;
-  lat: number;
-  lon: number;
-  trustLevel: TrustLevel;
-  serialNumber?: string;
-  isLocked?: boolean;
+  distanceLabel?: string;
+  city?: string;
+  neighborhood?: string;
+  lat?: number;
+  lon?: number;
   isMock?: boolean;
 }
 
@@ -264,47 +279,11 @@ export interface UserProfile {
   lat: number;
   lon: number;
   city: string;
-  neighborhood: string;
-  category: string | UserType;
-  categories: string[];
   avatar: string;
-  bio: string;
-  serialNumber?: string;
-}
-
-export interface RadarProfile {
-  id: string;
-  name: string;
-  avatar: string;
-  lat: number;
-  lon: number;
-  city: string;
-  neighborhood: string;
-  distanceKm?: number;
-  distanceLabel?: string;
-  locationLabel?: string;
-  bio?: string;
+  categories?: string[];
   category?: string;
-  serialNumber?: string;
-  isMock?: boolean;
-  braveryLevel?: number;
-  trustLevel?: TrustLevel;
-  isGhostMode?: boolean;
-  status?: PresenceStatus;
-  gallery?: GalleryPhoto[];
-  currentShoutout?: {
-    text: string;
-    type: 'drink' | 'talk' | 'meet' | 'party';
-  };
-}
-
-export interface Transaction {
-  id: string;
-  userId: string;
-  amount: number;
-  type: TransactionType;
-  status: string;
-  timestamp: string;
+  neighborhood?: string;
+  bio?: string;
 }
 
 export interface EventItem {
@@ -318,24 +297,31 @@ export interface EventItem {
   description: string;
   confirmedGuests?: { id: string; avatar: string; trust: TrustLevel }[];
   dressCode?: string;
-  audience: string;
+  audience?: string;
   isVerifiedPartner?: boolean;
 }
 
 export interface Venue {
   id: string;
   name: string;
-  address: string;
-  category: string;
   image: string;
-  checkInCount: number;
   lat: number;
   lon: number;
+  address?: string;
+  checkInCount?: number;
+  category?: string;
 }
 
 export interface CheckIn {
   userId: string;
   venueId: string;
   timestamp: string;
-  status?: string;
+}
+
+export interface HeatZone {
+  id: string;
+  x: number;
+  y: number;
+  intensity: number;
+  color: 'pink' | 'amber';
 }

@@ -188,36 +188,34 @@ export const Auth: React.FC = () => {
           throw authError;
       }
 
-      if (data.user) {
-        // Busca perfil completo no banco - Tenta buscar colunas diretas se 'data' falhar
-        let { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
+        if (data.user) {
+          let { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
 
         if (profileError || !profile) {
-          log('info', 'Perfil não encontrado ou erro na busca, verificando fallback...');
-          // Tenta buscar apenas e-mail se o select * falhou (tabela pode estar vazia)
-          if (!profile) {
-              const { data: retryProfile } = await supabase.from('profiles').select('id, nickname, plan, type').eq('id', data.user.id).single();
-              if (retryProfile) profile = retryProfile as any;
+          // Marcello: Se houver erro de permissão ou proxy, não usamos fallback para evitar sobrescrever dados bons
+          if (profileError && profileError.code !== 'PGRST116') {
+             log('error', 'Erro crítico ao buscar perfil após login. Abortando para preservar integridade.', profileError);
+             throw new Error('Falha de sincronização. Tente entrar novamente em alguns instantes.');
           }
+          log('info', 'Perfil não encontrado (PGRST116), usuário pode ser novo ou sem perfil criado.');
         }
 
         // CONSTRUÇÃO ROBUSTA DO PERFIL: Priorizamos DATA (JSON), depois colunas do banco, depois fallback
-        const cloudDataSnapshot = (profile?.data || {}) as Partial<User>;
+        const rawCloudData = profile?.data || {};
+        const cloudDataSnapshot = (typeof rawCloudData === 'string' ? JSON.parse(rawCloudData) : rawCloudData) as Partial<User>;
         
         const userData: User = {
-            serialNumber: cloudDataSnapshot.serialNumber || profile?.serial_number || (profile?.data as any)?.serialNumber || '000000',
-            
-            // Campos de Perfil (Prioridade: JSON -> Coluna -> Cache Local (se existir) -> Default)
+            // Marcello: Toda a informação lida de DENTRO do JSON 'data' (cloudDataSnapshot)
             nickname: cloudDataSnapshot.nickname || profile?.nickname || email.split('@')[0],
-            age: cloudDataSnapshot.age || profile?.age || 18,
-            plan: profile?.plan || cloudDataSnapshot.plan || Plan.FREE,
-            is_premium: profile?.is_premium || cloudDataSnapshot.is_premium || false,
-            type: cloudDataSnapshot.type || profile?.type || UserType.HOMEM,
-            gender: cloudDataSnapshot.gender || profile?.gender || Gender.MASCULINO,
+            age: cloudDataSnapshot.age || 18,
+            plan: cloudDataSnapshot.plan || Plan.FREE,
+            is_premium: cloudDataSnapshot.is_premium || false,
+            type: cloudDataSnapshot.type || UserType.HOMEM,
+            gender: cloudDataSnapshot.gender || Gender.MASCULINO,
             
             // Resto dos dados vêm do snapshot ou fallback
             avatar: cloudDataSnapshot.avatar || `https://picsum.photos/seed/${data.user.id}/400`,
@@ -335,13 +333,9 @@ export const Auth: React.FC = () => {
 
         const userId = authData.user.id;
         
-        // 1.1 Gerar número de série sequencial
-        const serialNumber = await getNextSerialNumber({ id: userId, email });
-
         // 2. Preparar objeto de usuário completo
         const newUser: User = {
           id: userId,
-          serialNumber,
           nickname,
           email,
           age: isCouple ? data.partner1?.age || 18 : data.age || 18,

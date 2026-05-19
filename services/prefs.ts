@@ -13,7 +13,8 @@ export function matchesPreferences(profile: UserProfile, preferredCategories: st
 
   const preferred = new Set(preferredCategories.map(norm));
   const profileCats =
-    profile.categories && profile.categories.length > 0 ? profile.categories : [profile.category];
+    (profile.categories && profile.categories.length > 0 ? profile.categories : [profile.category])
+    .filter((c): c is string => !!c);
 
   return profileCats.map(norm).some((c) => preferred.has(c));
 }

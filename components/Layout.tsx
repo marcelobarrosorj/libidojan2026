@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, MessageCircle, UserCircle, Settings, Crown, LayoutGrid, CreditCard, Radio, CalendarDays, Zap, ShieldAlert, Trophy, Search } from 'lucide-react';
-import { cache, isOwner, isPremiumUser } from '../services/authUtils';
+import { cache, isPremiumUser } from '../services/authUtils';
 import { Plan, User } from '../types';
 import LibidoIcon from './common/LibidoIcon';
 import VerificationBanner from './VerificationBanner';
@@ -62,12 +62,22 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
           >
             <Settings size={20} />
           </button>
+
+          {(user?.id === '000001' || user?.email === 'marcelobarrosorj@gmail.com') && (
+            <button 
+              onClick={() => setActiveTab('admin_panel')}
+              className={`p-2 rounded-full transition-all border ${activeTab === 'admin_panel' ? 'bg-rose-500 text-black border-rose-500 animate-pulse' : 'bg-rose-950 border-rose-500/30 text-rose-500'}`}
+              title="Central de Governança"
+            >
+              <ShieldAlert size={20} />
+            </button>
+          )}
         </div>
       </header>
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto scrollbar-hide">
-        {user && !user.emailVerified && user.email && !isOwner(user) && (
+        {user && !user.emailVerified && user.email && (
             <VerificationBanner email={user.email} />
         )}
         {children}
@@ -75,10 +85,15 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
         {/* AVISO DE SEGURANÇA: Barreira de Deterrence */}
         <div className="px-8 py-12 text-center opacity-30 select-none pointer-events-none mb-10">
             <ShieldAlert size={16} className="mx-auto mb-2 text-slate-500" />
-            <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] leading-relaxed">
+            <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] leading-relaxed mb-1">
                 Ambiente Protegido pela Matriz Libido 2026<br/>
                 Captura de tela e cópia de conteúdo estritamente proibidas
             </p>
+            {user && (
+              <p className="text-[7px] font-black text-amber-500/50 uppercase tracking-[0.4em]">
+                {(!user.nickname || user.nickname === 'User_Libido' || user.nickname === 'Agente') ? 'CASAL BEIJO' : user.nickname} | ID: {user.serialNumber || '000001'}
+              </p>
+            )}
         </div>
       </main>
 
@@ -89,9 +104,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
         <NavButton icon={<Trophy size={20} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
         <NavButton icon={<MessageCircle size={20} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chat" />
         <NavButton icon={<UserCircle size={20} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
-        {isOwner(user) && (
-          <NavButton icon={<ShieldAlert size={20} />} isActive={activeTab === 'admin_moderation'} onClick={() => setActiveTab('admin_moderation')} label="Gov" />
-        )}
       </nav>
     </div>
   );

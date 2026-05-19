@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, UserCheck, Smartphone, Globe, X, Check, Lock, Info, Fingerprint, Camera, ShieldAlert } from 'lucide-react';
 import { User } from '../types';
-import { saveUserData, showNotification } from '../services/authUtils';
+import { saveUserData, showNotification, isOwner } from '../services/authUtils';
 
 interface VerificationModalProps {
   isOpen: boolean;
@@ -140,31 +140,32 @@ const VerificationModal: React.FC<VerificationModalProps> = ({ isOpen, onClose, 
                         : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl ${level.status ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-400'}`}>
-                        <level.icon size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h4 className={`font-bold transition-colors ${level.status ? 'text-green-500' : 'text-slate-200'}`}>
-                            {level.title}
-                          </h4>
-                          {level.status && <Check size={14} className="text-green-500" />}
-                        </div>
-                        <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                          {level.desc}
-                        </p>
-                      </div>
-                      
-                      {!level.status && !level.readOnly && (
-                        <button
-                          onClick={() => handleVerify(level.id)}
-                          disabled={loading}
-                          className="px-4 py-1.5 bg-white text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-transform disabled:opacity-50"
-                        >
-                          Verificar
-                        </button>
-                      )}
+                        <div className="flex flex-col sm:flex-row items-center gap-4">
+                          <div className={`p-3 rounded-2xl ${level.status ? 'bg-green-500/10 text-green-500' : 'bg-slate-800 text-slate-400'}`}>
+                            <level.icon size={20} />
+                          </div>
+                          <div className="flex-1 text-center sm:text-left">
+                            <div className="flex items-center justify-center sm:justify-start gap-2">
+                              <h4 className={`font-bold transition-colors ${level.status ? 'text-green-500' : 'text-slate-200'}`}>
+                                {level.title}
+                              </h4>
+                              {level.status && <Check size={14} className="text-green-500" />}
+                            </div>
+                            <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                              {level.desc}
+                            </p>
+                          </div>
+                          
+                          {!level.status && !level.readOnly && (
+                            <button
+                              onClick={() => handleVerify(level.id)}
+                              disabled={loading || (!isOwner(user) && !level.status)}
+                              className={`w-full sm:w-auto px-6 py-2 sm:px-4 sm:py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-transform disabled:opacity-30 ${isOwner(user) ? 'bg-amber-500 text-black' : 'bg-white text-black'}`}
+                              title={isOwner(user) ? "Bypass Proprietário Ativo" : "Bloqueado: Envie os arquivos primeiro"}
+                            >
+                              {isOwner(user) ? 'Bypass' : 'Verificar'}
+                            </button>
+                          )}
                       
                       {level.readOnly && !level.status && (
                         <div className="p-2 text-slate-600">

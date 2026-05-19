@@ -10,37 +10,38 @@ export const STORAGE_KEYS = {
   AUTH_FLAG_NEW: 'libido_auth_active',
 } as const;
 
-// ID do Proprietário para acesso irrestrito
-const OWNER_ID = 'me';
-const OWNER_EMAIL = 'marcelobarrosorj@gmail.com';
-
 export const cache: { userData: User | null } = {
     userData: null
 };
 
-const safeBtoa = (str: string) => btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
-const safeAtob = (str: string) => decodeURIComponent(Array.prototype.map.call(atob(str), (c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+// Decodificação segura para o LocalStorage
+const safeAtob = (str: string) => {
+    try { 
+        return decodeURIComponent(atob(str)); 
+    }
+    catch (e) { 
+        try { return atob(str); } catch (e2) { return null; }
+    }
+};
 
 export const log = (level: 'info' | 'warn' | 'error', message: string, data?: any) => {
     console[level](`[${level.toUpperCase()}] ${message}`, data || '');
 };
 
 /**
- * Verifica se o usuário logado é o proprietário para liberar acesso total
- */
-export const isOwner = (user: User | null): boolean => {
-    if (!user) return false;
-    return user.id === OWNER_ID || 
-           user.nickname === 'User_Libido' || 
-           user.email === OWNER_EMAIL;
-};
-
-/**
  * Verifica se um usuário possui status premium de forma consolidada
  */
 export const isPremiumUser = (user: User | null): boolean => {
+    if (isOwner(user)) return true; // Proprietário tem acesso total
+    return user?.is_premium || user?.plan === Plan.GOLD || user?.plan === Plan.PREMIUM || false;
+};
+
+/**
+ * Verifica privilégios de Proprietário (God Mode)
+ */
+export const isOwner = (user: User | null): boolean => {
     if (!user) return false;
-    return isOwner(user) || user.is_premium || user.plan === Plan.GOLD || user.plan === Plan.PREMIUM;
+    return user.id === '000001' || user.email === 'marcelobarrosorj@gmail.com';
 };
 
 export const syncWithCloud = async (user: User) => {
@@ -56,7 +57,6 @@ export const syncWithCloud = async (user: User) => {
                 id: user.id, 
                 nickname: user.nickname, 
                 data: user,
-                plan: user.plan,
                 updated_at: timestamp
             }, { onConflict: 'id' });
             
@@ -89,33 +89,13 @@ export const syncWithCloud = async (user: User) => {
 
 const isBrowser = typeof window !== 'undefined';
 
-export function getUserData(): User | null {
-  if (!isBrowser) return null;
-  const rawNew = localStorage.getItem(STORAGE_KEYS.USER_DATA_NEW);
-  if (rawNew) {
-    try {
-      let user = JSON.parse(safeAtob(rawNew)) as User;
-      // Injeção de privilégios de proprietário em tempo de execução
-      if (isOwner(user)) {
-          user.plan = Plan.GOLD;
-          user.is_premium = true;
-          user.trustLevel = TrustLevel.OURO;
-          user.emailVerified = true;
-          user.isSubscriber = true;
-          if (!user.serialNumber) user.serialNumber = '000001';
-      }
-      // Garantir que following existe
-      if (!user.following) user.following = [];
-      if (!user.verificationLevels) {
-          user.verificationLevels = { identity: false, photo: false, social: false, trust: false };
-      }
-      if (user.totalLikes === undefined) user.totalLikes = 0;
-      if (user.totalViews === undefined) user.totalViews = 0;
-      return user;
-    } catch (e) { return null; }
-  }
-  return null;
-}
+export const getUserData = (): User | null => {
+    if (typeof window === 'undefined') return null;
+    const raw = localStorage.getItem(STORAGE_KEYS.USER_DATA_NEW);
+    if (!raw) return null;
+    const data = safeAtob(raw);
+    return data ? JSON.parse(data) : null;
+};
 
 // Gerenciamento de eventos de atualização de cache
 type CacheListener = (user: User | null) => void;
@@ -131,80 +111,32 @@ export const authEvents = {
     }
 };
 
-import { dbGetNextSerialNumber } from "./repo";
-
-/**
- * Gera o próximo número de série sequencial
- */
-export const getNextSerialNumber = async (user: Partial<User>): Promise<string> => {
-    // Se for o proprietário, sempre retorna 000001
-    if (user.email === OWNER_EMAIL || user.id === OWNER_ID) {
-        return '000001';
-    }
-
-    try {
-        return await dbGetNextSerialNumber();
-    } catch (e) {
-        log('warn', 'Erro ao gerar número de série sequencial, usando fallback aleatório', e);
-        return Math.floor(Math.random() * 900000 + 100000).toString();
-    }
-};
-
-export const saveUserData = (userData: Partial<User> | UserData) => {
-    const current = cache.userData || {} as User;
-    let updated = { ...current, ...userData } as User;
+export const saveUserData = async (userData: Partial<User>) => {
+    const current = cache.userData || getUserData() || {} as User;
+    const timestamp = new Date().toISOString();
     
-    // Garante que o proprietário nunca perca o status GOLD por engano
-    if (isOwner(updated)) {
-        updated.plan = Plan.GOLD;
-        updated.is_premium = true;
-        updated.emailVerified = true;
-        updated.isSubscriber = true;
-        if (!updated.serialNumber) updated.serialNumber = '000001';
-        // Se mudou a idade manualmente, não deixa resetar
-        if (userData.age) updated.age = userData.age;
-    }
-
-    // Proteção Anti-Downgrade de Plano
-    if (cache.userData?.is_premium && !updated.is_premium && Object.keys(userData).length < 10) {
-        log('warn', '[AUTH] Bloqueado downgrade acidental de plano detectado em salvamento parcial.');
-        updated.is_premium = true;
-        updated.plan = cache.userData.plan;
-    }
-
-    const isSeed = (url?: string) => !url || url.includes('picsum.photos') || url.includes('dicebear.com') || url.includes('initials');
-
-    // Proteção Anti-Downgrade de Foto (Não permitir que um avatar real seja substituído por um seed em salvamento parcial)
-    if (!isSeed(cache.userData?.avatar) && isSeed(updated.avatar) && Object.keys(userData).length < 10) {
-        log('warn', '[AUTH] Bloqueado reset acidental de avatar real.');
-        updated.avatar = cache.userData?.avatar || updated.avatar;
-    }
-
-    if (!updated.following) updated.following = [];
-
-    // Protocolo de Integridade: A foto do perfil DEVE estar na galeria (Obrigatório)
-    if (updated.avatar) {
-        const gallery = updated.gallery || [];
-        const avatarUrl = updated.avatar;
-        const exists = gallery.some(p => p.url === avatarUrl);
-        if (!exists) {
-            log('info', '[AUTH] Integridade de Mídia: Sincronizando avatar com galeria.');
-            const photoId = `gallery_sync_${Date.now()}`;
-            updated.gallery = [{
-                id: photoId,
-                url: avatarUrl,
-                timestamp: new Date().toISOString()
-            }, ...gallery];
-        }
-    }
-
+    const updated = { ...current, ...userData, updatedAt: timestamp } as User;
     cache.userData = updated;
-    if (isBrowser) {
-        const encoded = safeBtoa(JSON.stringify(updated));
-        localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, encoded);
+    
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, btoa(encodeURIComponent(JSON.stringify(updated))));
     }
+
+    // Atualiza imediatamente o estado para evitar necessidade de refresh
     authEvents.notify(updated);
-    syncWithCloud(updated);
+
+    // Sincronização Silenciosa com Supabase
+    if (updated.id && updated.id !== 'me') {
+        const { error } = await supabase.from('profiles').upsert({
+            id: updated.id,
+            nickname: updated.nickname || (updated as any).name || 'Agente',
+            data: updated,
+            updated_at: timestamp,
+            last_seen: timestamp // Atualiza bolinha de status
+        }, { onConflict: 'id' });
+        
+        if (error) log('warn', 'Erro no Upsert Automático (saveUserData)', error);
+    }
 };
 
 /**
@@ -242,83 +174,41 @@ export const syncCaches = async () => {
         if (!local || !local.id) return;
 
         log('info', 'Sincronizando cache com Supabase...');
+        // Simplificado para 'select(*)' para evitar erro 400 se colunas não existirem
         const { data, error } = await supabase
             .from('profiles')
-            .select('data, plan, is_premium, trust_level, xp, level, type, nickname, age, serial_number')
+            .select('*')
             .eq('id', local.id)
             .single();
         
         if (error) {
-            log('warn', 'Falha ao sincronizar com servidor, operando em modo local');
+            log('warn', 'Falha ao sincronizar com servidor, operando em modo local', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code,
+                id: local.id
+            });
+            
+            // Marcello: Protocolo de Blindagem Autoritária - NUNCA resetamos o cache local por erro de rede/banco
             return;
         }
 
         if (data) {
             const { data: { user: supabaseUser } } = await supabase.auth.getUser();
-            const cloudData = (data.data || {}) as User;
+            const rawCloudData = data.data || {};
+            const cloudData = (typeof rawCloudData === 'string' ? JSON.parse(rawCloudData) : rawCloudData) as User;
             
             // Sincroniza status de verificação de e-mail do Supabase Auth
             if (supabaseUser) {
                 cloudData.emailVerified = !!supabaseUser.email_confirmed_at;
             }
             
-            // Prioriza colunas individuais do banco de dados sobre o JSON 'data'
-            // Isso garante que mudanças feitas por sistemas externos (Stripe/Webhooks) sejam respeitadas
-            if (data.plan) cloudData.plan = data.plan as Plan;
-            if (data.is_premium !== undefined) cloudData.is_premium = !!data.is_premium;
-            if (data.trust_level) cloudData.trustLevel = data.trust_level as TrustLevel;
-            if (data.xp !== undefined) cloudData.xp = data.xp;
-            if (data.level !== undefined) cloudData.level = data.level;
-            if (data.type) cloudData.type = data.type as UserType;
+            // Marcello: Toda a informação agora é lida estritamente de DENTRO do JSON 'data'
+            // conforme orientações de schema simplificado (id, nickname, data)
+            cloudData.id = data.id;
             if (data.nickname) cloudData.nickname = data.nickname;
-            if (data.age) cloudData.age = data.age;
-            if (data.serial_number) cloudData.serialNumber = data.serial_number;
             
-            // PROTEÇÃO DE INTEGRIDADE DE DADOS (IDADE e FOTO)
-            const localGallery = local.gallery || [];
-            const cloudGallery = cloudData.gallery || [];
-
-            // SMART MERGE: Se o local tem MENOS fotos e todas as fotos do local estão na nuvem, 
-            // assumimos que foi uma exclusão local intencional que ainda não sincronizou.
-            const isLocalDeletion = localGallery.length < cloudGallery.length && 
-                                   localGallery.every(lp => cloudGallery.some(cp => String(cp.id) === String(lp.id)));
-            
-            if (isLocalDeletion) {
-                log('info', `[AUTH] Smart Merge: Preservando exclusão local detectada (${localGallery.length} vs ${cloudGallery.length})`);
-                cloudData.gallery = localGallery;
-            } else if (cloudGallery.length > localGallery.length) {
-                log('info', `[AUTH] Sincronizando novas mídias da nuvem (${cloudGallery.length} vs ${localGallery.length})`);
-                // cloudData.gallery permanece como está
-            }
-
-            // Preservar Avatar e Nickname se a nuvem estiver com placeholders e o local tiver algo real
-            const isSeed = (url?: string) => !url || url.includes('picsum.photos') || url.includes('dicebear.com') || url.includes('initials');
-            const localAge = Number(local.age || 0);
-            const cloudAge = Number(cloudData.age || 0);
-
-            if (local.nickname && (!cloudData.nickname || cloudData.nickname === 'Anon')) {
-                log('info', '[AUTH] Integrity Gate: Protegendo nickname local');
-                cloudData.nickname = local.nickname;
-            }
-
-            // Se o local é um valor de "adulto" real e a nuvem está no default de reset ou vazia
-            if (localAge > 18 && (cloudAge <= 18)) {
-                log('info', `[AUTH] Integrity Gate: Protegendo idade local (${localAge}) contra reset da nuvem (${cloudAge})`);
-                cloudData.age = localAge;
-                // Força um novo push para a nuvem para corrigir o valor lá
-                syncWithCloud(cloudData);
-            } else if (localAge > 0 && cloudAge > 18 && cloudAge !== localAge) {
-                log('info', `[AUTH] Sincronizando idade da nuvem: ${cloudAge}`);
-            }
-
-            if (isOwner(cloudData)) {
-                cloudData.plan = Plan.GOLD;
-                cloudData.is_premium = true;
-                cloudData.emailVerified = true;
-                cloudData.isSubscriber = true;
-                cloudData.trustLevel = TrustLevel.OURO;
-                if (!cloudData.serialNumber) cloudData.serialNumber = '000001';
-            }
             if (!cloudData.following) cloudData.following = [];
 
             // Só atualiza se houver mudança real ou se for a primeira vez
@@ -326,12 +216,35 @@ export const syncCaches = async () => {
             const localStr = JSON.stringify(local);
 
             if (cloudStr !== localStr) {
-                log('info', 'Dados novos detectados na nuvem. Atualizando cache local.');
-                cache.userData = cloudData;
-                if (isBrowser) {
-                    localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, safeBtoa(cloudStr));
+                log('info', 'Dados novos detectados na nuvem. Sincronizando de forma segura.');
+                
+                // Marcello: Fusão Inteligente para prevenir perda de dados
+                // Priorizamos dados do local para campos críticos durante a sessão (como galeria recém alterada)
+                // Se a nuvem for mais nova (baseado em updatedAt), poderíamos confiar nela
+                const cloudTimestamp = cloudData.updatedAt ? new Date(cloudData.updatedAt).getTime() : 0;
+                const localTimestamp = local.updatedAt ? new Date(local.updatedAt).getTime() : 0;
+                
+                let mergedData: User;
+                if (localTimestamp > cloudTimestamp) {
+                    log('info', '[SYNC] Cache local é mais recente. Preservando estado local.');
+                    mergedData = { ...cloudData, ...local };
+                } else {
+                    log('info', '[SYNC] Dados da nuvem são mais recentes. Atualizando cache.');
+                    mergedData = { ...local, ...cloudData };
                 }
-                authEvents.notify(cloudData);
+
+                // Garante que campos essenciais nunca sumam
+                mergedData.id = data.id || local.id;
+                mergedData.nickname = data.nickname || mergedData.nickname || local.nickname;
+                
+                const mergedStr = JSON.stringify(mergedData);
+                if (mergedStr !== localStr) {
+                    cache.userData = mergedData;
+                    if (isBrowser) {
+                        localStorage.setItem(STORAGE_KEYS.USER_DATA_NEW, btoa(encodeURIComponent(mergedStr)));
+                    }
+                    authEvents.notify(mergedData);
+                }
             } else {
                 log('info', 'Cache local já está sincronizado.');
                 cache.userData = local;
@@ -383,7 +296,6 @@ export const retryWithBackoff = async <T>(operation: () => Promise<T>): Promise<
 
 export const validateIntegrity = (): boolean => {
     if (!isBrowser) return true;
-    // Added null check for CONFIG.APP_URL which might be missing in some environments
     if (CONFIG.APP_URL && !window.location.origin.includes(new URL(CONFIG.APP_URL).hostname)) {
         log('error', 'Integridade de origem violada.');
         return false;
@@ -391,10 +303,13 @@ export const validateIntegrity = (): boolean => {
     return true;
 };
 
+export const getNextSerialNumber = () => {
+    return `LX-${Math.floor(1000 + Math.random() * 9000)}`;
+};
+
 export const sanitizeInput = (i: string) => i.replace(/[<>]/g, '');
 export const postShoutout = async (t: string, type: any, u: any) => ({ success: true });
 export const likeProfile = async (id: string) => {
-    // Ao dar like, automaticamente segue o usuário conforme solicitação
     await toggleFollow(id);
     return { isMatch: Math.random() > 0.8 };
 };

@@ -1,7 +1,6 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Mic, Volume2, Sparkles, Loader2, StopCircle } from 'lucide-react';
-import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { log } from '../services/authUtils';
 
 interface VibeVoiceProps {
@@ -109,112 +108,15 @@ const VibeVoice: React.FC<VibeVoiceProps> = ({ onClose }) => {
         } 
       });
       streamRef.current = stream;
-
-      setVibeStatus("Abrindo túnel neural...");
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      setVibeStatus("Protocolo de voz requer Proxy Seguro...");
       
-      // 2. Inicializar contextos de áudio
-      const inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-      const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      // Marcello: O túnel de voz direto via browser foi desativado por segurança.
+      setIsConnecting(false);
+      setVibeStatus("Módulo Offline - Use o Chat");
       
-      // Crucial para navegadores mobile: resumir após interação
-      await inputCtx.resume();
-      await outputCtx.resume();
-
-      audioContextRef.current = inputCtx;
-      outputContextRef.current = outputCtx;
-
-      const outputNode = outputCtx.createGain();
-      outputNode.connect(outputCtx.destination);
-
-      const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-12-2025',
-        callbacks: {
-          onopen: () => {
-            log('info', 'Vibe Concierge session opened successfully');
-            setVibeStatus("Sincronizado. Pode falar.");
-            setIsActive(true);
-            setIsConnecting(false);
-
-            // Iniciar streaming do microfone
-            const source = inputCtx.createMediaStreamSource(stream);
-            const scriptProcessor = inputCtx.createScriptProcessor(4096, 1, 1);
-            
-            scriptProcessor.onaudioprocess = (e) => {
-              const inputData = e.inputBuffer.getChannelData(0);
-              const l = inputData.length;
-              const int16 = new Int16Array(l);
-              for (let i = 0; i < l; i++) {
-                int16[i] = inputData[i] * 32768;
-              }
-              const pcmBlob = {
-                data: encode(new Uint8Array(int16.buffer)),
-                mimeType: 'audio/pcm;rate=16000',
-              };
-              
-              // Solely rely on sessionPromise resolves and then call `session.sendRealtimeInput`, do not add other condition checks.
-              sessionPromise.then(session => {
-                session.sendRealtimeInput({ media: pcmBlob });
-              }).catch(() => {});
-            };
-            
-            source.connect(scriptProcessor);
-            scriptProcessor.connect(inputCtx.destination);
-          },
-          onmessage: async (message: LiveServerMessage) => {
-            const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (base64Audio && outputContextRef.current && outputContextRef.current.state !== 'closed') {
-              const ctx = outputContextRef.current;
-              nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
-              
-              try {
-                const audioBuffer = await decodeAudioData(
-                  decode(base64Audio),
-                  ctx,
-                  24000,
-                  1
-                );
-                const source = ctx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(outputNode);
-                source.addEventListener('ended', () => sourcesRef.current.delete(source));
-                source.start(nextStartTimeRef.current);
-                nextStartTimeRef.current += audioBuffer.duration;
-                // Fix: Access Set via .current property
-                sourcesRef.current.add(source);
-              } catch (e) {
-                log('error', 'Audio decoding error', e);
-              }
-            }
-
-            if (message.serverContent?.interrupted) {
-              sourcesRef.current.forEach(s => { try { s.stop(); } catch(e) {} });
-              sourcesRef.current.clear();
-              nextStartTimeRef.current = 0;
-            }
-          },
-          onerror: (e) => {
-            log('error', 'Vibe Concierge connection error', e);
-            setVibeStatus("Falha na Matriz B");
-            cleanup();
-          },
-          onclose: (e) => {
-            log('info', 'Vibe Concierge connection closed', e);
-            setVibeStatus("Sessão Encerrada");
-            cleanup();
-          }
-        },
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-          },
-          systemInstruction: 'Você é o Vibe Concierge da Libido, uma rede social premium de lifestyle liberal. Sua voz deve ser sedutora, sofisticada, discreta e acolhedora. Ajude os usuários a entender as regras da comunidade, dê dicas de etiqueta liberal e como melhorar o perfil para atrair mais matches. Respostas curtas e envolventes.',
-        }
-      });
-
-      sessionRef.current = await sessionPromise;
-
+      // Limpeza imediata do stream pois não vamos usar
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      return;
     } catch (error: any) {
       log('error', 'Microphone or Session Access Denied', error);
       setIsConnecting(false);

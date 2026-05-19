@@ -306,7 +306,7 @@ export const RegistrationFlow: React.FC<{
                        <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest animate-pulse">Sincronizando...</p>
                     </div>
                   ) : (isCouple ? coupleData.avatar : singleData.avatar) ? (
-                    <img src={isCouple ? coupleData.avatar : singleData.avatar} className="w-full h-full object-cover" alt="Profile" />
+                    <img src={(isCouple ? coupleData.avatar : singleData.avatar) || undefined} className="w-full h-full object-cover" alt="Profile" />
                   ) : (
                     <div className="text-center p-6">
                       <Camera size={40} className="text-slate-700 mx-auto mb-2" />
@@ -358,7 +358,7 @@ export const RegistrationFlow: React.FC<{
               <p className="text-slate-500 font-mono text-xs">{isCouple ? coupleData.email : singleData.email}</p>
             </div>
             <div className="w-20 h-20 rounded-2xl border border-white/10 mx-auto overflow-hidden grayscale">
-               <img src={isCouple ? coupleData.avatar : singleData.avatar} alt="" className="w-full h-full object-cover" />
+               <img src={(isCouple ? coupleData.avatar : singleData.avatar) || undefined} alt="" className="w-full h-full object-cover" />
             </div>
             <p className="text-xs text-slate-400 italic max-w-[250px] mx-auto leading-relaxed pt-4">
               Ao concluir, você confirma ser maior de 18 anos e aceita as políticas de privacidade da Matriz Libido.

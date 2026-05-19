@@ -8,7 +8,7 @@ export interface RadarProfile {
   lat: number;
   lon: number;
   city: string;
-  neighborhood: string;
+  neighborhood?: string;
   distanceKm?: number;
   distanceLabel?: string;
   locationLabel?: string;
@@ -16,7 +16,6 @@ export interface RadarProfile {
   category?: string;
   status?: PresenceStatus;
   isMock?: boolean;
-  serialNumber?: string;
   braveryLevel?: number;
   trustLevel?: TrustLevel;
   isGhostMode?: boolean;

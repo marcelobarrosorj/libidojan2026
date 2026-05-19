@@ -17,18 +17,19 @@ import {
   ChevronLeft, Ruler, Eye, Palette, Crown, 
   Fingerprint, Wind, X, Heart, Ghost,
   ImageIcon, Plus, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
-  UserCheck, Globe, MapPin, Grid,
+  UserCheck, Globe, MapPin, Grid, Trash2, Pencil,
   Zap, MessageCircle
 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { 
     saveUserData, sanitizeInput, simulateApiCall,
-    handleButtonAction, showNotification, cache, toggleFollow, isPremiumUser, log,
+    handleButtonAction, showNotification, cache, toggleFollow, isPremiumUser, isOwner, log,
     toggleGhostMode
 } from '../services/authUtils';
-import { haversineKm, formatDistanceLabel } from '../services/geoService';
+import { haversineKm, formatDistanceLabel, BASE_LOCATION } from '../services/geoService';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { soundService } from '../services/soundService';
+import { fetchFollowers, fetchFollowing } from '../services/repo';
 import ConsentMatrix from './ConsentMatrix';
 import StealthModeToggle from './StealthModeToggle';
 import BlurredImage from './BlurredImage';
@@ -46,29 +47,255 @@ interface ProfileProps {
   startEditing?: boolean;
 }
 
+// Protocolo de Profundidade: Parallax para a Galeria
+const ProfileGallery: React.FC<{
+  user: User;
+  isOwnProfile: boolean;
+  handleAddPhoto: (mode: 'avatar' | 'gallery') => void;
+  handleEditPhoto: (photo: GalleryPhoto) => void;
+  handleDeletePhoto: (photoId: string) => void;
+  handleTogglePhotoPrivacy: (photoId: string) => void;
+  setShowPhotoGrid: (show: boolean) => void;
+}> = ({ 
+  user, isOwnProfile, handleAddPhoto, handleEditPhoto, 
+  handleDeletePhoto, handleTogglePhotoPrivacy, setShowPhotoGrid 
+}) => {
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: galleryRef,
+    offset: ["start end", "end start"]
+  });
+
+  const yCol1 = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const yCol2 = useTransform(scrollYProgress, [0, 1], [0, 30]);
+  const yCol3 = useTransform(scrollYProgress, [0, 1], [0, -15]);
+
+  return (
+    <div className="space-y-6 animate-in slide-in-from-right-5">
+        <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-2">
+                <ImageIcon size={16} className="text-amber-500" />
+                <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Galeria Central</h3>
+            </div>
+            {isOwnProfile && (
+                <button 
+                    onClick={() => handleAddPhoto('gallery')}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-[9px] font-black text-amber-500 uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all"
+                >
+                    <Plus size={12} />
+                    Adicionar
+                </button>
+            )}
+        </div>
+        
+        <div ref={galleryRef} className="grid grid-cols-3 gap-3 px-1">
+            {isOwnProfile && (
+                <button 
+                    onClick={() => handleAddPhoto('gallery')}
+                    className="aspect-square bg-slate-900/40 rounded-3xl border-2 border-dashed border-amber-500/10 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-900/60 group hover:border-amber-500/30"
+                >
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+                        <Plus size={24} />
+                    </div>
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Postar</span>
+                </button>
+            )}
+            {(user.gallery || []).slice(0, 12).map((photo: any, i: number) => {
+                const parallaxY = [yCol1, yCol2, yCol3][i % 3];
+                return (
+                    <motion.div 
+                        key={photo.id} 
+                        onClick={() => setShowPhotoGrid(true)}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        style={{ y: parallaxY as any }}
+                        transition={{ duration: 0.5, delay: i * 0.05 }}
+                        className="aspect-square bg-slate-900 rounded-[2rem] overflow-hidden relative border border-white/5 active:scale-95 transition-all duration-300 group"
+                    >
+                        <img src={photo.url || undefined} className={`w-full h-full object-cover transition-all duration-500 hover:scale-110 ${photo.isBlurred ? 'blur-md grayscale brightness-50' : ''}`} alt="Galeria" />
+                        
+                        {isOwnProfile && (
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                <div className="flex gap-1.5">
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); handleEditPhoto(photo); }}
+                                        className="p-1.5 bg-slate-950/80 rounded-lg text-white border border-white/10 transition-all active:scale-75"
+                                        title="Editar Foto"
+                                    >
+                                        <Pencil size={10} className="text-white" />
+                                    </button>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); handleTogglePhotoPrivacy(photo.id); }}
+                                        className={`p-1.5 rounded-lg text-white border transition-all active:scale-75 ${photo.isBlurred ? 'bg-amber-500 border-amber-400' : 'bg-slate-950/80 border-white/10'}`}
+                                        title="Privacidade"
+                                    >
+                                        {photo.isBlurred ? <Eye size={10} className="text-black" /> : <Eye size={10} className="text-white/40" />}
+                                    </button>
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); if (window.confirm('Excluir esta foto?')) handleDeletePhoto(photo.id); }}
+                                        className="p-1.5 bg-rose-500 rounded-lg text-white border border-rose-400/20 transition-all active:scale-75"
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={10} />
+                                    </button>
+                                </div>
+                                <span className="text-[6px] font-black uppercase tracking-widest text-white/60">Configurar</span>
+                            </div>
+                        )}
+                        
+                        {photo.isBlurred && !isOwnProfile && (
+                            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                                <Eye size={12} className="text-white/40" />
+                            </div>
+                        )}
+                    </motion.div>
+                );
+            })}
+        </div>
+
+        {(user.gallery?.length || 0) > 12 && (
+            <button 
+                onClick={() => setShowPhotoGrid(true)}
+                className="w-full py-4 bg-slate-900/50 border border-white/5 rounded-3xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-900 transition-colors"
+            >
+                Ver todas ({user.gallery?.length})
+            </button>
+        )}
+    </div>
+  );
+};
+
+const ConnectionsModal: React.FC<{
+    type: 'followers' | 'following';
+    profiles: any[];
+    onClose: () => void;
+}> = ({ type, profiles, onClose }) => {
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="w-full max-w-md bg-slate-950 border border-white/5 rounded-[3rem] overflow-hidden max-h-[80vh] flex flex-col shadow-2xl">
+                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-slate-900/40">
+                    <div className="flex items-center gap-2">
+                        {type === 'followers' ? <Users size={18} className="text-amber-500" /> : <UserPlus size={18} className="text-amber-500" />}
+                        <h3 className="text-xs font-black text-white uppercase tracking-widest italic">
+                            {type === 'followers' ? 'Seguidores na Matriz' : 'Seguindo na Matriz'}
+                        </h3>
+                    </div>
+                    <button onClick={onClose} className="p-2 bg-white/5 rounded-2xl text-slate-400 hover:text-white transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {profiles.length === 0 ? (
+                        <div className="py-20 text-center space-y-4">
+                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto text-slate-700">
+                                <Users size={32} />
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Nenhuma conexão detectada</p>
+                        </div>
+                    ) : (
+                        profiles.map(p => (
+                            <div key={p.id} className="flex items-center justify-between p-3 bg-white/5 rounded-3xl border border-white/5 hover:bg-white/10 transition-colors group">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <img src={p.avatar} className="w-12 h-12 rounded-2xl object-cover border border-white/10" alt={p.name} />
+                                        <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-slate-950" style={{ backgroundColor: p.statusColor || '#64748b' }} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xs font-black text-white uppercase tracking-wider">{p.name}</h4>
+                                        <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{p.city}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck size={14} className={p.trustLevel === TrustLevel.OURO ? 'text-amber-500' : 'text-slate-500'} />
+                                    <ChevronLeft size={16} className="text-slate-500 group-hover:text-amber-500 rotate-180 transition-colors" />
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+                
+                <div className="p-6 bg-slate-900/40 border-t border-white/5">
+                    <p className="text-[8px] text-slate-500 text-center font-black uppercase tracking-[0.2em]">Sincronizado com a Matriz Central</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Profile: React.FC<ProfileProps> = ({ 
     user: propUser, onBack, onNavigate, onChat, isOwnProfile = true, startEditing = false 
 }) => {
   const { logout, refreshSession } = useAuth();
   const { location: gpsLocation } = useUserLocation();
   
-  const [user, setUser] = useState<User>(propUser || cache.userData || MOCK_CURRENT_USER);
+  const [localUser, setLocalUser] = useState<User>(propUser || cache.userData || MOCK_CURRENT_USER);
   const [isEditing, setIsEditing] = useState(startEditing);
+
+  // Marcello: ÚNICA FONTE DE VERDADE (SFT)
+  // Se for o próprio perfil e não estivermos editando, usamos o dado que vem do App (via cache/authEvents)
+  // Caso contrário (outro perfil ou editando), usamos o estado local.
+  const user = (isOwnProfile && !isEditing && propUser) ? propUser : localUser;
+
+  // Marcello: CÁLCULO DE ALTA PRECISÃO (useMemo)
+  // Reage instantaneamente a qualquer mudança no GPS ou coordenadas do alvo
+  const distance = useMemo(() => {
+    const myLat = Number(gpsLocation?.lat || BASE_LOCATION.lat);
+    const myLon = Number(gpsLocation?.lon || BASE_LOCATION.lon);
+    
+    // Fallback agressivo se os dados do usuário vierem corrompidos
+    const targetLat = Number(user?.lat || 0);
+    const targetLon = Number(user?.lon || 0);
+
+    if (targetLat === 0) return null;
+    
+    const dKm = haversineKm(myLat, myLon, targetLat, targetLon);
+    
+    // Log de auditoria para confirmar que não há [object Object]
+    console.log(`[PRECISÃO] Distância para ${user.nickname}: ${dKm.toFixed(2)}km | Eu: (${myLat}, ${myLon}) | Ele: (${targetLat}, ${targetLon})`);
+    
+    return dKm;
+  }, [gpsLocation, user.lat, user.lon, user.nickname]);
   
-  // Sincroniza estado de forma profunda ao mudar o propUser
+  // Sincroniza estado de forma profunda ao mudar o propUser (Somente para perfis de TERCEIROS)
   useEffect(() => {
     if (propUser) {
-        log('info', '[PROFILE] Deep Sync Reactivity Gate');
-        setUser(prev => {
-            // Se o ID mudou, resetamos a aba
-            if (prev.id !== propUser.id) {
-                setActiveTab('info');
-            }
-            return { ...propUser };
-        });
+        // Marcello: Reseta aba se o perfil sendo visualizado mudou (Protocolo Matrix)
+        if (localUser.id !== propUser.id) {
+            setActiveTab('info');
+            setLocalUser({ ...propUser });
+        }
+        
         setIsFollowing(cache.userData?.following?.includes(propUser.id) || false);
     }
-  }, [propUser]);
+  }, [propUser?.id]);
+
+  // Marcello: RASTREAMENTO ONLINE (Polling)
+  // Atualiza os dados do perfil a cada 30s se o usuário estiver online para capturar deslocamentos
+  useEffect(() => {
+    if (isOwnProfile || !user.id || user.id.startsWith('mock-')) return;
+    
+    let interval: any;
+    
+    const refreshData = async () => {
+        const { getProfileById } = await import('../services/repo');
+        const latestVersion = await getProfileById(user.id);
+        if (latestVersion) {
+            console.log(`[POLLING] Sincronizando deslocamento de ${user.nickname}`);
+            setLocalUser(prev => ({ ...prev, ...latestVersion }));
+        }
+    };
+
+    // Atualiza imediatamente se estiver online
+    if (user.isOnline) refreshData();
+
+    interval = setInterval(() => {
+        if (user.isOnline) refreshData();
+    }, 30000); // 30 segundos
+
+    return () => clearInterval(interval);
+  }, [user.id, user.isOnline, isOwnProfile]);
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -84,15 +311,34 @@ const Profile: React.FC<ProfileProps> = ({
   const [showNoFakeModal, setShowNoFakeModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-  
-  // Protocolo de Profundidade: Parallax para a Galeria
-  const { scrollYProgress } = useScroll();
-  const yCol1 = useTransform(scrollYProgress, [0, 1], [0, -40]);
-  const yCol2 = useTransform(scrollYProgress, [0, 1], [0, 20]);
-  const yCol3 = useTransform(scrollYProgress, [0, 1], [0, -20]);
+  const [followers, setFollowers] = useState<any[]>([]);
+  const [followingProfiles, setFollowingProfiles] = useState<any[]>([]);
+  const [showConnections, setShowConnections] = useState<'followers' | 'following' | null>(null);
+  const [isLoadingConnections, setIsLoadingConnections] = useState(false);
   
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Marcello: Sincronização de Conexões (Followers/Following)
+  useEffect(() => {
+    if (!user.id) return;
+
+    const loadConnections = async () => {
+        try {
+            const f = await fetchFollowers(user.id);
+            setFollowers(f);
+            
+            if (isOwnProfile && user.following && user.following.length > 0) {
+                const flw = await fetchFollowing(user.id, user.following);
+                setFollowingProfiles(flw);
+            }
+        } catch (e) {
+            log('warn', '[PROFILE] Erro ao carregar conexões', e);
+        }
+    };
+
+    loadConnections();
+  }, [user.id, user.following?.length]);
 
   const toggleSound = () => {
     const newState = !soundEnabled;
@@ -101,11 +347,66 @@ const Profile: React.FC<ProfileProps> = ({
     if (newState) soundService.play('MESSAGE');
   };
 
+  const handleDeletePhoto = async (photoId: string) => {
+    log('info', `[AUDIT][PHOTO_DELETE] Solicitando exclusão da mídia: ${photoId}`);
+    
+    const currentGallery = user.gallery || [];
+    const photoToDelete = currentGallery.find(p => String(p.id) === String(photoId));
+    
+    if (!photoToDelete) {
+        log('warn', `[AUDIT][PHOTO_DELETE] Foto não encontrada no estado local: ${photoId}`);
+        showNotification('Erro: Foto não encontrada', 'error');
+        return;
+    }
+
+    const updatedGallery = currentGallery.filter(p => String(p.id) !== String(photoId));
+    const updatedUser = { ...user, gallery: updatedGallery };
+    
+    // Atualização Síncrona se estivermos em modo edição ou se for perfil de terceiro
+    if (isEditing || !isOwnProfile) {
+        setLocalUser(updatedUser);
+    }
+    
+    // Persistência Atômica se for meu perfil
+    if (isOwnProfile) {
+        try {
+            await saveUserData(updatedUser);
+            log('info', `[AUDIT][PHOTO_DELETE] Persistência concluída com sucesso para ID: ${photoId}`);
+            showNotification('Mídia deletada da Matriz', 'success');
+        } catch (err: any) {
+            log('error', `[AUDIT][PHOTO_DELETE] Falha na persistência:`, err);
+            showNotification('Erro ao persistir exclusão', 'error');
+        }
+    }
+  };
+
+  const handleTogglePhotoPrivacy = async (photoId: string) => {
+    const updatedGallery = (user.gallery || []).map(p => 
+        String(p.id) === String(photoId) ? { ...p, isBlurred: !p.isBlurred } : p
+    );
+    const updatedUser = { ...user, gallery: updatedGallery };
+    
+    // Atualização Síncrona
+    if (isEditing || !isOwnProfile) {
+        setLocalUser(updatedUser);
+    }
+    
+    if (isOwnProfile) {
+        try {
+            await saveUserData(updatedUser);
+            showNotification('Configuração de privacidade atualizada', 'success');
+            soundService.play('MESSAGE');
+        } catch (err) {
+            log('error', '[PROFILE] Falha ao alternar privacidade', err);
+        }
+    }
+  };
+
   useEffect(() => {
     if (!propUser && isOwnProfile && cache.userData) {
-        setUser(cache.userData);
+        setLocalUser(cache.userData);
     }
-  }, [isOwnProfile, cache.userData]);
+  }, [isOwnProfile, cache.userData?.id]); // Marcello: Sincronia baseada em ID
 
   const handleFollow = async () => {
     if (isOwnProfile) return;
@@ -113,19 +414,26 @@ const Profile: React.FC<ProfileProps> = ({
     setIsFollowing(nowFollowing);
     soundService.play('LIKE');
     showNotification(nowFollowing ? `Você agora segue ${user.nickname}` : `Você deixou de seguir ${user.nickname}`, 'success');
-    refreshSession();
   };
 
   /**
    * Adiciona nova foto à galeria
    */
   const [editingMode, setEditingMode] = useState<'avatar' | 'gallery' | null>(null);
+  const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
 
   const handleAddPhoto = (mode: 'avatar' | 'gallery' = 'gallery') => {
     setEditingMode(mode);
+    setEditingPhotoId(null);
     if (fileInputRef.current) {
         fileInputRef.current.click();
     }
+  };
+
+  const handleEditPhoto = (photo: GalleryPhoto) => {
+    setEditingMode('gallery');
+    setEditingPhotoId(photo.id);
+    setEditingImageUrl(photo.url);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,34 +450,36 @@ const Profile: React.FC<ProfileProps> = ({
   };
 
   const handlePhotoSave = async (newImageUrl: string) => {
-    if (editingMode === 'avatar') {
-        setUser(prev => {
-            // Verifica se a imagem já existe na galeria para não duplicar
-            const gallery = prev.gallery || [];
-            const exists = gallery.some(item => item.url === newImageUrl);
-            
-            const updatedGallery = exists 
-                ? gallery 
-                : [{ 
-                    id: `gallery_avatar_${Date.now()}`, 
-                    url: newImageUrl, 
-                    timestamp: new Date().toISOString() 
-                  }, ...gallery];
+    let updatedUser: User | null = null;
 
-            const updatedUser = { 
-                ...prev, 
-                avatar: newImageUrl,
-                gallery: updatedGallery,
-                updatedAt: new Date().toISOString()
-            };
-            
-            saveUserData(updatedUser);
-            showNotification('Foto de perfil atualizada e adicionada à galeria!', 'success');
-            return updatedUser;
-        });
-        setEditingImageUrl(null);
-        setEditingMode(null);
+    if (editingMode === 'avatar') {
+        const gallery = user.gallery || [];
+        const exists = gallery.some(item => item.url === newImageUrl);
+        
+        const updatedGallery = exists 
+            ? gallery 
+            : [{ 
+                id: `gallery_avatar_${Date.now()}`, 
+                url: newImageUrl, 
+                timestamp: new Date().toISOString() 
+              }, ...gallery];
+
+        updatedUser = { 
+            ...user, 
+            avatar: newImageUrl,
+            gallery: updatedGallery,
+            updatedAt: new Date().toISOString()
+        };
+        showNotification('Foto de perfil atualizada!', 'success');
+    } else if (editingPhotoId) {
+        // Editando foto existente
+        const updatedGallery = (user.gallery || []).map(p => 
+            String(p.id) === String(editingPhotoId) ? { ...p, url: newImageUrl, updatedAt: new Date().toISOString() } : p
+        );
+        updatedUser = { ...user, gallery: updatedGallery };
+        showNotification('Mídia atualizada!', 'success');
     } else {
+        // Nova foto
         const photoId = `gallery_${Date.now()}`;
         const newPhoto: GalleryPhoto = {
             id: photoId,
@@ -177,19 +487,20 @@ const Profile: React.FC<ProfileProps> = ({
             timestamp: new Date().toISOString()
         };
         
-        setUser(prev => {
-            const updatedGallery = [...(prev.gallery || []), newPhoto];
-            const updatedUser = { ...prev, gallery: updatedGallery };
-            saveUserData(updatedUser);
-            showNotification('Foto adicionada à galeria!', 'success');
-            return updatedUser;
-        });
-        
-        setEditingImageUrl(null);
-        setEditingMode(null);
+        const updatedGallery = [...(user.gallery || []), newPhoto];
+        updatedUser = { ...user, gallery: updatedGallery };
+        showNotification('Foto adicionada à galeria!', 'success');
     }
+    
+    if (updatedUser) {
+        if (isEditing || !isOwnProfile) setLocalUser(updatedUser);
+        if (isOwnProfile) await saveUserData(updatedUser);
+    }
+    
+    setEditingImageUrl(null);
+    setEditingMode(null);
+    setEditingPhotoId(null);
     soundService.play('MATCH');
-    refreshSession();
   };
 
   // Efeito para sincronizar parceiros quando muda para tipo CASAL
@@ -220,7 +531,7 @@ const Profile: React.FC<ProfileProps> = ({
             city: user.city
           }
         };
-        setUser(updatedUser);
+        setLocalUser(updatedUser);
       }
     }
   }, [user.type, user.nickname, user.age]);
@@ -233,40 +544,38 @@ const Profile: React.FC<ProfileProps> = ({
     
     soundService.play('MATCH');
     
-    setUser(prev => {
-        const nextType = prev.type === UserType.CASAIS ? UserType.HOMEM : UserType.CASAIS;
-        let updatedUser = { ...prev, type: nextType };
-        
-        // Se mudou para casal e não tem dados de parceiros, inicializa com dados base
-        if (nextType === UserType.CASAIS) {
-          if (!updatedUser.partner1) {
-            updatedUser.partner1 = { 
-              nickname: `${prev.nickname} (P1)`, 
-              age: prev.age, 
-              gender: prev.gender,
-              biotype: prev.biotype,
-              height: prev.height,
-              sexualPreference: prev.sexualOrientation,
-              city: prev.city
-            };
-          }
-          if (!updatedUser.partner2) {
-            updatedUser.partner2 = { 
-              nickname: `${prev.nickname} (P2)`, 
-              age: prev.age, 
-              gender: prev.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
-              biotype: Biotype.PADRAO,
-              height: 165,
-              sexualPreference: SexualOrientation.BISSEXUAL,
-              city: prev.city
-            };
-          }
-        }
-        
-        saveUserData(updatedUser);
-        showNotification(`Status alterado para: ${nextType === UserType.CASAIS ? 'MODO CASAL' : 'MODO SOLTEIRO'}`, 'success');
-        return updatedUser;
-    });
+    const nextType = user.type === UserType.CASAIS ? UserType.HOMEM : UserType.CASAIS;
+    let updatedUser = { ...user, type: nextType };
+    
+    // Se mudou para casal e não tem dados de parceiros, inicializa com dados base
+    if (nextType === UserType.CASAIS) {
+      if (!updatedUser.partner1) {
+        updatedUser.partner1 = { 
+          nickname: `${user.nickname} (P1)`, 
+          age: user.age, 
+          gender: user.gender,
+          biotype: user.biotype,
+          height: user.height,
+          sexualPreference: user.sexualOrientation,
+          city: user.city
+        };
+      }
+      if (!updatedUser.partner2) {
+        updatedUser.partner2 = { 
+          nickname: `${user.nickname} (P2)`, 
+          age: user.age, 
+          gender: user.gender === Gender.MASCULINO ? Gender.FEMININO : Gender.MASCULINO,
+          biotype: Biotype.PADRAO,
+          height: 165,
+          sexualPreference: SexualOrientation.BISSEXUAL,
+          city: user.city
+        };
+      }
+    }
+    
+    if (isEditing) setLocalUser(updatedUser);
+    saveUserData(updatedUser);
+    showNotification(`Status alterado para: ${nextType === UserType.CASAIS ? 'MODO CASAL' : 'MODO SOLTEIRO'}`, 'success');
   };
 
   /**
@@ -298,13 +607,11 @@ const Profile: React.FC<ProfileProps> = ({
         await simulateApiCall('PROFILE_UPDATE', userToSave);
 
         // Persistência
-        setUser(userToSave);
-        saveUserData(userToSave);
+        await saveUserData(userToSave);
         setIsEditing(false);
         showNotification('Perfil atualizado com sucesso!', 'success');
         log('info', '[AUDIT][EDIT_PROFILE] Sucesso na persistência de dados');
         
-        refreshSession();
         soundService.play('MATCH');
     } catch (err: any) {
         log('error', '[AUDIT][EDIT_PROFILE] Falha na validação ou persistência', err);
@@ -352,7 +659,7 @@ const Profile: React.FC<ProfileProps> = ({
                 <div className="flex flex-col items-center gap-4 py-4 bg-slate-900/40 rounded-[2rem] border border-white/5">
                     <div className="relative group">
                         <img 
-                            src={user.avatar} 
+                            src={user.avatar || undefined} 
                             alt="Avatar" 
                             className="w-24 h-24 rounded-[1.8rem] object-cover border-2 border-amber-500/30 group-hover:border-amber-500 transition-all shadow-xl"
                         />
@@ -375,51 +682,35 @@ const Profile: React.FC<ProfileProps> = ({
             </div>
             
             <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Nickname</label>
+                            <Input 
+                                value={user.nickname}
+                                onChange={(val) => setLocalUser({...user, nickname: val})}
+                                placeholder="Nome de Exibição"
+                            />
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Status / Tipo</label>
-                        <Select 
-                            value={user.type || ''}
-                            onChange={(val) => {
-                                const nextType = val as UserType;
-                                log('info', `[PROFILE_EDIT] Alterando tipo para: ${nextType}`);
-                                setUser({ ...user, type: nextType });
-                            }}
-                            options={[
-                                { value: UserType.HOMEM, label: 'Homem (Solteiro)' },
-                                { value: UserType.MULHER, label: 'Mulher (Solteira)' },
-                                { value: UserType.CASAIS, label: 'Casal' },
-                            ]}
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Cidade de Residência</label>
+                        <CityAutocomplete 
+                            value={user.city || ''}
+                            onChange={(val) => setLocalUser({...user, city: val})}
+                            className="bg-slate-900 shadow-xl"
                         />
                     </div>
+
+                    {/* Bio sempre visível */}
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Nickname</label>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Bio / Recado</label>
                         <Input 
-                            value={user.nickname}
-                            onChange={(val) => setUser({...user, nickname: val})}
-                            placeholder="Nome de Exibição"
+                            value={user.bio || ''}
+                            onChange={(val) => setLocalUser({...user, bio: val})}
+                            placeholder="Uma breve frase sobre você..."
                         />
                     </div>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Cidade de Residência</label>
-                    <CityAutocomplete 
-                        value={user.city || ''}
-                        onChange={(val) => setUser({...user, city: val})}
-                        className="bg-slate-900 shadow-xl"
-                    />
-                </div>
-
-                {/* Bio sempre visível */}
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Bio / Recado</label>
-                    <Input 
-                        value={user.bio || ''}
-                        onChange={(val) => setUser({...user, bio: val})}
-                        placeholder="Uma breve frase sobre você..."
-                    />
-                </div>
 
                 {/* Campos Individuais - Só aparecem se NÃO for casal */}
                 {!(user.type === UserType.CASAIS || 
@@ -434,7 +725,7 @@ const Profile: React.FC<ProfileProps> = ({
                                 value={user.age === 0 ? '' : user.age.toString()}
                                 onChange={(val) => {
                                     const parsed = parseInt(val);
-                                    setUser({...user, age: isNaN(parsed) ? 0 : parsed});
+                                    setLocalUser({...user, age: isNaN(parsed) ? 0 : parsed});
                                 }}
                             />
                         </div>
@@ -442,7 +733,7 @@ const Profile: React.FC<ProfileProps> = ({
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Gênero</label>
                             <Select 
                                 value={user.gender || ''}
-                                onChange={(val) => setUser({...user, gender: val as Gender})}
+                                onChange={(val) => setLocalUser({...user, gender: val as Gender})}
                                 options={Object.values(Gender).map(g => ({ value: g, label: g }))}
                             />
                         </div>
@@ -453,7 +744,7 @@ const Profile: React.FC<ProfileProps> = ({
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Orientação</label>
                             <Select 
                                 value={user.sexualOrientation || ''}
-                                onChange={(val) => setUser({...user, sexualOrientation: val as SexualOrientation})}
+                                onChange={(val) => setLocalUser({...user, sexualOrientation: val as SexualOrientation})}
                                 options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
                             />
                         </div>
@@ -461,7 +752,7 @@ const Profile: React.FC<ProfileProps> = ({
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Biotipo</label>
                             <Select 
                                 value={user.biotype || ''}
-                                onChange={(val) => setUser({...user, biotype: val as Biotype})}
+                                onChange={(val) => setLocalUser({...user, biotype: val as Biotype})}
                                 options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
                             />
                         </div>
@@ -502,7 +793,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner1?.age ? user.partner1.age.toString() : user.age.toString()}
                                             onChange={(val) => {
                                                 const age = parseInt(val) || 0;
-                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), age }});
+                                                setLocalUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), age }});
                                             }}
                                             placeholder="Ex: 53"
                                         />
@@ -511,10 +802,10 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Altura</label>
                                         <Input 
                                             type="number"
-                                            value={user.partner1?.height ? user.partner1.height.toString() : user.height.toString()}
+                                            value={user.partner1?.height ? user.partner1.height.toString() : (user.height || 0).toString()}
                                             onChange={(val) => {
                                                 const height = parseInt(val) || 0;
-                                                setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), height }});
+                                                setLocalUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), height }});
                                             }}
                                             placeholder="Ex: 180"
                                         />
@@ -525,7 +816,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
                                         <Select 
                                             value={user.partner1?.biotype || user.biotype}
-                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), biotype: val as Biotype }})}
+                                            onChange={(val) => setLocalUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), biotype: val as Biotype }})}
                                             options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
                                         />
                                     </div>
@@ -533,7 +824,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Orientação</label>
                                         <Select 
                                             value={user.partner1?.sexualPreference || user.sexualOrientation}
-                                            onChange={(val) => setUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), sexualPreference: val as SexualOrientation }})}
+                                            onChange={(val) => setLocalUser({...user, partner1: { ...(user.partner1 || { biotype: user.biotype, nickname: user.nickname, age: user.age, gender: user.gender, height: user.height, sexualPreference: user.sexualOrientation, city: user.city }), sexualPreference: val as SexualOrientation }})}
                                             options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
                                         />
                                     </div>
@@ -558,7 +849,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner2?.age ? user.partner2.age.toString() : ''}
                                             onChange={(val) => {
                                                 const age = parseInt(val) || 0;
-                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), age }});
+                                                setLocalUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), age }});
                                             }}
                                             placeholder="Ex: 45"
                                         />
@@ -570,7 +861,7 @@ const Profile: React.FC<ProfileProps> = ({
                                             value={user.partner2?.height ? user.partner2.height.toString() : ''}
                                             onChange={(val) => {
                                                 const height = parseInt(val) || 0;
-                                                setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), height }});
+                                                setLocalUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), height }});
                                             }}
                                             placeholder="Ex: 165"
                                         />
@@ -581,7 +872,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Biotipo</label>
                                         <Select 
                                             value={user.partner2?.biotype || ''}
-                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), biotype: val as Biotype }})}
+                                            onChange={(val) => setLocalUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), biotype: val as Biotype }})}
                                             options={Object.values(Biotype).map(b => ({ value: b, label: b }))}
                                         />
                                     </div>
@@ -589,7 +880,7 @@ const Profile: React.FC<ProfileProps> = ({
                                         <label className="text-[8px] font-black text-slate-500 uppercase ml-3 tracking-[0.2em]">Orientação</label>
                                         <Select 
                                             value={user.partner2?.sexualPreference || ''}
-                                            onChange={(val) => setUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), sexualPreference: val as SexualOrientation }})}
+                                            onChange={(val) => setLocalUser({...user, partner2: { ...(user.partner2 || { biotype: Biotype.PADRAO, nickname: '', age: 0, gender: Gender.FEMININO, height: 165, sexualPreference: SexualOrientation.BISSEXUAL, city: user.city }), sexualPreference: val as SexualOrientation }})}
                                             options={Object.values(SexualOrientation).map(o => ({ value: o, label: o }))}
                                         />
                                     </div>
@@ -627,6 +918,13 @@ const Profile: React.FC<ProfileProps> = ({
       {editingImageUrl && <ImageEditor imageUrl={editingImageUrl} onSave={handlePhotoSave} onCancel={() => setEditingImageUrl(null)} />}
       {showVerification && <VerificationPortal onClose={() => setShowVerification(false)} onSuccess={() => refreshSession()} />}
       {showNoFakeModal && <VerificationModal isOpen={showNoFakeModal} onClose={() => setShowNoFakeModal(false)} user={user} />}
+      {showConnections && (
+          <ConnectionsModal 
+            type={showConnections}
+            profiles={showConnections === 'followers' ? followers : followingProfiles}
+            onClose={() => setShowConnections(null)}
+          />
+      )}
       
       <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
 
@@ -709,7 +1007,7 @@ const Profile: React.FC<ProfileProps> = ({
             <BlurredImage 
               src={user.avatar} 
               alt={user.nickname}
-              isInitiallyBlurred={isOwnProfile ? false : (user.type === UserType.CASAIS ? false : !!user.prefersBlurredPhotos)}
+              isInitiallyBlurred={isOwnProfile ? false : (isOwner(cache.userData) ? false : (user.type === UserType.CASAIS ? false : !!user.prefersBlurredPhotos))}
               canUnlock={!isOwnProfile}
               className="w-full h-full rounded-[2.2rem] border-4 border-[#050505]"
             />
@@ -737,23 +1035,19 @@ const Profile: React.FC<ProfileProps> = ({
                    </span>
                 </div>
                 {(() => {
-                  const currentLat = gpsLocation?.lat ?? cache.userData?.lat;
-                  const currentLon = gpsLocation?.lon ?? cache.userData?.lon;
-                  
-                  const hasCurrent = currentLat !== undefined && currentLon !== undefined && currentLat !== null && currentLon !== null;
-                  const hasTarget = user.lat !== undefined && user.lon !== undefined && user.lat !== null && user.lon !== null;
-
-                  if (hasCurrent && hasTarget) {
-                    const distKm = haversineKm(currentLat, currentLon, user.lat, user.lon);
+                  if (distance !== null) {
                     return (
                       <div className="flex flex-col items-center">
                         <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none mb-1">
-                          {formatDistanceLabel(distKm)} de você
+                          Distância
+                        </span>
+                        <span className="text-xl font-black text-white italic tracking-tighter leading-none mb-1">
+                          {formatDistanceLabel(distance)}
                         </span>
                         <div className="flex items-center gap-1">
-                          <div className={`w-1 h-1 rounded-full ${user.isOnline ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-slate-600'}`} />
+                          <PresenceBadge status={user.status || (user.isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE)} size="sm" />
                           <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">
-                            {user.isOnline ? 'Localização em Tempo Real' : (user.updatedAt ? `Sincronizado em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
+                            {user.isOnline ? 'Live: Movimento em Tempo Real' : (user.updatedAt ? `Sincronizado em ${new Date(user.updatedAt).toLocaleDateString()}` : 'Posição estimada')}
                           </span>
                         </div>
                       </div>
@@ -786,14 +1080,30 @@ const Profile: React.FC<ProfileProps> = ({
            animate={{ opacity: 1, y: 0 }}
            transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
         >
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-[9px] font-black font-mono text-amber-500/60 tracking-[0.4em] uppercase">ID: {user.serialNumber || '------'}</span>
-            <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>
-              {user.nickname}
-              {!(user.type === UserType.CASAIS || 
-                String(user.type).toLowerCase() === 'casais' || 
-                String(user.type).toLowerCase() === 'casal') && `, ${user.age}`}
-            </h2>
+            <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <h2 className={`text-3xl font-black font-outfit uppercase italic tracking-tighter ${isOuro ? 'text-amber-400' : 'text-white'}`}>
+                  {user.nickname}
+                  {!(user.type === UserType.CASAIS || 
+                    String(user.type).toLowerCase() === 'casais' || 
+                    String(user.type).toLowerCase() === 'casal') && `, ${user.age}`}
+                </h2>
+                {isOwner(user) && (
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500 rounded-lg text-black animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-400/50">
+                    <Ghost size={12} fill="currentColor" />
+                    <span className="text-[10px] font-black uppercase tracking-widest italic">Super</span>
+                  </div>
+                )}
+              </div>
+              {!isOwnProfile && (
+                <PresenceBadge 
+                  status={user.status || (user.isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE)} 
+                  size="sm" 
+                  className="mt-1"
+                />
+              )}
+            </div>
             <div 
               className={`flex items-center gap-1.5 justify-center mt-0.5 opacity-60 ${isOwnProfile ? 'cursor-pointer hover:opacity-100 group/loc' : ''}`}
               onClick={() => isOwnProfile && setIsEditing(true)}
@@ -836,16 +1146,22 @@ const Profile: React.FC<ProfileProps> = ({
             
             {/* NOVO: Contador de Conexões */}
             {isOwnProfile && (
-              <div className="flex items-center gap-4 bg-slate-900/50 px-6 py-2 rounded-full border border-white/5 mt-2">
-                <div className="text-center">
-                  <p className="text-white text-xs font-black leading-none">{user.following?.length || 0}</p>
+              <div className="flex items-center gap-4 bg-slate-900/50 px-6 py-2 rounded-full border border-white/5 mt-2 transition-all">
+                <button 
+                  onClick={() => setShowConnections('following')}
+                  className="text-center hover:scale-110 active:scale-95 transition-all group"
+                >
+                  <p className="text-white text-xs font-black leading-none group-hover:text-amber-500">{user.following?.length || 0}</p>
                   <p className="text-[7px] text-slate-500 uppercase font-black tracking-widest">Seguindo</p>
-                </div>
+                </button>
                 <div className="w-[1px] h-4 bg-white/10" />
-                <div className="text-center">
-                  <p className="text-white text-xs font-black leading-none">{Math.floor(Math.random() * 200)}</p>
+                <button 
+                  onClick={() => setShowConnections('followers')}
+                  className="text-center hover:scale-110 active:scale-95 transition-all group"
+                >
+                  <p className="text-white text-xs font-black leading-none group-hover:text-amber-500">{followers.length}</p>
                   <p className="text-[7px] text-slate-500 uppercase font-black tracking-widest">Seguidores</p>
-                </div>
+                </button>
               </div>
             )}
           </div>
@@ -905,10 +1221,10 @@ const Profile: React.FC<ProfileProps> = ({
                     <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Segurança Estratégica</h3>
                 </div>
                 <StealthModeToggle 
-                  isActive={user.isStealthMode} 
+                  isActive={user.isStealthMode || false} 
                   onToggle={() => {
                     const newValue = !user.isStealthMode;
-                    setUser(prev => ({ ...prev, isStealthMode: newValue }));
+                    setLocalUser(prev => ({ ...prev, isStealthMode: newValue }));
                     saveUserData({ ...user, isStealthMode: newValue });
                     showNotification(newValue ? 'Modo Stealth Ativado' : 'Modo Stealth Desativado', 'success');
                   }} 
@@ -917,7 +1233,7 @@ const Profile: React.FC<ProfileProps> = ({
                 <button 
                   onClick={() => {
                     const newValue = !user.prefersBlurredPhotos;
-                    setUser(prev => ({ ...prev, prefersBlurredPhotos: newValue }));
+                    setLocalUser(prev => ({ ...prev, prefersBlurredPhotos: newValue }));
                     saveUserData({ ...user, prefersBlurredPhotos: newValue });
                   }}
                   className={`w-full p-4 rounded-3xl border flex items-center justify-between transition-all ${user.prefersBlurredPhotos ? 'bg-amber-500/10 border-amber-500/30' : 'bg-slate-900/40 border-white/5'}`}
@@ -1014,7 +1330,7 @@ const Profile: React.FC<ProfileProps> = ({
                         <button 
                             onClick={async () => {
                                 const active = await toggleGhostMode();
-                                setUser(prev => ({ ...prev, isGhostMode: active }));
+                                setLocalUser(prev => ({ ...prev, isGhostMode: active }));
                                 soundService.play('MATCH');
                                 showNotification(active ? 'Modo Ghost Ativado' : 'Modo Ghost Desativado', 'info');
                             }}
@@ -1040,63 +1356,15 @@ const Profile: React.FC<ProfileProps> = ({
       )}
 
       {activeTab === 'gallery' && (
-        <div className="space-y-6 animate-in slide-in-from-right-5">
-            <div className="flex items-center justify-between px-2">
-                <div className="flex items-center gap-2">
-                    <ImageIcon size={16} className="text-amber-500" />
-                    <h3 className="text-[11px] font-black text-white uppercase tracking-widest">Galeria Central</h3>
-                </div>
-                {isOwnProfile && (
-                    <button 
-                        onClick={() => handleAddPhoto('gallery')}
-                        className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-[9px] font-black text-amber-500 uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all"
-                    >
-                        <Plus size={12} />
-                        Adicionar
-                    </button>
-                )}
-            </div>
-            
-            <div className="grid grid-cols-3 gap-3 px-1">
-                {isOwnProfile && (
-                    <button 
-                        onClick={() => handleAddPhoto('gallery')}
-                        className="aspect-square bg-slate-900/40 rounded-3xl border-2 border-dashed border-amber-500/10 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all hover:bg-slate-900/60 group hover:border-amber-500/30"
-                    >
-                        <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
-                            <Plus size={24} />
-                        </div>
-                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Postar</span>
-                    </button>
-                )}
-                {(user.gallery || []).slice(0, 12).map((photo, i) => {
-                    const parallaxY = [yCol1, yCol2, yCol3][i % 3];
-                    return (
-                        <motion.div 
-                            key={photo.id} 
-                            onClick={() => setShowPhotoGrid(true)}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            style={{ y: parallaxY }}
-                            transition={{ duration: 0.5, delay: i * 0.05 }}
-                            className="aspect-square bg-slate-900 rounded-[2rem] overflow-hidden relative border border-white/5 active:scale-95 transition-all duration-300"
-                        >
-                            <img src={photo.url} className="w-full h-full object-cover transition-all duration-500 hover:scale-110" alt="Galeria" />
-                        </motion.div>
-                    );
-                })}
-            </div>
-
-            {(user.gallery?.length || 0) > 12 && (
-                <button 
-                    onClick={() => setShowPhotoGrid(true)}
-                    className="w-full py-4 bg-slate-900/50 border border-white/5 rounded-3xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-900 transition-colors"
-                >
-                    Ver Galeria Completa
-                </button>
-            )}
-        </div>
+        <ProfileGallery 
+          user={user}
+          isOwnProfile={isOwnProfile}
+          handleAddPhoto={handleAddPhoto}
+          handleEditPhoto={handleEditPhoto}
+          handleDeletePhoto={handleDeletePhoto}
+          handleTogglePhotoPrivacy={handleTogglePhotoPrivacy}
+          setShowPhotoGrid={setShowPhotoGrid}
+        />
       )}
 
       {activeTab === 'trust' && (
@@ -1154,7 +1422,11 @@ const Profile: React.FC<ProfileProps> = ({
             <PhotoGridModal 
                 photos={user.gallery || []} 
                 onClose={() => setShowPhotoGrid(false)} 
-                isBlurred={!isOwnProfile && user.hasBlurredGallery}
+                isBlurred={!isOwnProfile && !isOwner(cache.userData) && user.hasBlurredGallery}
+                canDelete={isOwnProfile}
+                onDeletePhoto={handleDeletePhoto}
+                onTogglePrivacy={handleTogglePhotoPrivacy}
+                onEditPhoto={handleEditPhoto}
             />
         )}
         {isOwnProfile && !isPremium && (

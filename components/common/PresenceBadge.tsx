@@ -18,13 +18,12 @@ export const PresenceBadge: React.FC<PresenceBadgeProps> = ({
   const getStatusConfig = () => {
     switch (status) {
       case PresenceStatus.ONLINE:
-        return { color: 'bg-green-500', text: 'Disponível', shadow: 'shadow-[0_0_10px_rgba(34,197,94,0.6)]', animate: 'animate-pulse' };
+        return { color: 'bg-green-500', text: 'Online', shadow: 'shadow-[0_0_12px_rgba(34,197,94,0.8)]', animate: 'animate-pulse' };
       case PresenceStatus.AWAY:
-        return { color: 'bg-amber-500', text: 'Ausente', shadow: 'shadow-[0_0_8px_rgba(245,158,11,0.4)]', animate: '' };
+        return { color: 'bg-yellow-400', text: 'Ausente', shadow: 'shadow-[0_0_10px_rgba(250,204,21,0.6)]', animate: '' };
       case PresenceStatus.BUSY:
-        return { color: 'bg-red-500', text: 'Ocupado', shadow: 'shadow-[0_0_8px_rgba(239,68,68,0.4)]', animate: '' };
       case PresenceStatus.OFFLINE:
-        return { color: 'bg-slate-600', text: 'Offline', shadow: '', animate: '' };
+        return { color: 'bg-red-500', text: status === PresenceStatus.BUSY ? 'Ocupado' : 'Offline', shadow: 'shadow-[0_0_10px_rgba(239,68,68,0.6)]', animate: '' };
       default:
         return { color: 'bg-slate-600', text: 'Offline', shadow: '', animate: '' };
     }

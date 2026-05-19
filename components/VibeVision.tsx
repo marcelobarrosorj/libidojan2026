@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Sparkles, ImageIcon, Loader2, Wand2, Download, RefreshCw, Send } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { log, cache, saveUserData, showNotification } from '../services/authUtils';
 
 const VibeVision: React.FC = () => {
@@ -16,31 +15,24 @@ const VibeVision: React.FC = () => {
     log('info', 'Starting AI image generation', { prompt });
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: {
-            parts: [{ text: `A high-end, cinematic, aesthetic visual representation of a premium lifestyle fantasy: ${prompt}. Cinematic lighting, 8k resolution, photorealistic, luxurious atmosphere, deep shadows and neon highlights, sophisticated composition, adult lifestyle theme but tasteful and high-fashion.` }]
-        },
-        config: {
-          imageConfig: {
-            aspectRatio: "1:1"
-          }
-        }
+      const response = await fetch('/api/ai/vibe-vision', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
       });
 
-      const candidate = response.candidates?.[0];
-      if (candidate?.content?.parts) {
-        let imagePart = candidate.content.parts.find(p => p.inlineData);
-        if (imagePart?.inlineData) {
-          const base64Data = imagePart.inlineData.data;
-          setGeneratedContent(`data:image/png;base64,${base64Data}`);
-          log('info', 'AI image generated successfully');
-        } else {
-          throw new Error("API returned no image data");
-        }
+      if (!response.ok) throw new Error('AI Vision request failed');
+      
+      const data = await response.json();
+
+      if (data.imageData) {
+        setGeneratedContent(`data:image/png;base64,${data.imageData}`);
+        log('info', 'AI image generated successfully');
+      } else if (data.imageUrl) {
+        setGeneratedContent(data.imageUrl);
+        log('info', 'AI image fallback URL used');
       } else {
-          throw new Error("No response from AI model");
+        throw new Error("API returned no image data");
       }
     } catch (error: any) {
       log('error', "VibeVision AI Generation Error", { error: error.message });
@@ -96,7 +88,7 @@ const VibeVision: React.FC = () => {
       <div className="relative aspect-square w-full rounded-[3rem] overflow-hidden glass-card border-white/5 flex items-center justify-center group shadow-2xl transition-all duration-700">
         {generatedContent ? (
           <div className="relative w-full h-full animate-in zoom-in-95 duration-1000">
-            <img src={generatedContent} alt="AI Vision" className="w-full h-full object-cover" />
+            <img src={generatedContent || undefined} alt="AI Vision" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-8">
               <div className="flex gap-2">
                 <button 

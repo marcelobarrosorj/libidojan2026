@@ -7,21 +7,34 @@ export const EARTH_RADIUS_KM = 6371.0088; // WGS84 mean earth radius
 export const KM_PER_LAT_DEGREE = 111.195;
 
 /**
+ * Fallback Geográfico: Volta Redonda - RJ
+ */
+export const FALLBACK_LOCATION = {
+  lat: -22.5231,
+  lon: -44.1042,
+  city: 'Volta Redonda'
+};
+
+/**
  * Calcula a distância entre dois pontos usando a fórmula de Haversine.
  * Implementação resiliente a coordenadas zero e instabilidades de ponto flutuante.
  */
 export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  if (!Number.isFinite(lat1) || !Number.isFinite(lon1) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return 9999;
-  
-  if (lat1 === lat2 && lon1 === lon2) return 0;
+  // Marcello: Sanitização rigorosa das coordenadas de origem e destino
+  const safeLat1 = Number.isFinite(lat1) && lat1 !== 0 ? lat1 : FALLBACK_LOCATION.lat;
+  const safeLon1 = Number.isFinite(lon1) && lon1 !== 0 ? lon1 : FALLBACK_LOCATION.lon;
+  const safeLat2 = Number.isFinite(lat2) && lat2 !== 0 ? lat2 : safeLat1; // Se o destino for nulo, distância é 0
+  const safeLon2 = Number.isFinite(lon2) && lon2 !== 0 ? lon2 : safeLon1;
 
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
+  if (safeLat1 === safeLat2 && safeLon1 === safeLon2) return 0;
+
+  const dLat = (safeLat2 - safeLat1) * Math.PI / 180;
+  const dLon = (safeLon2 - safeLon1) * Math.PI / 180;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
+    Math.cos(safeLat1 * Math.PI / 180) *
+      Math.cos(safeLat2 * Math.PI / 180) *
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
@@ -55,10 +68,12 @@ export function formatDistanceLabel(km: number): string {
 
 export function computeLocationLabel(viewerCity: string, profileCity: string, neighborhood: string): string {
   if (!profileCity) return 'Localização Privada';
-  if (viewerCity.toLowerCase() === profileCity.toLowerCase()) {
-    return neighborhood || profileCity;
+  const vCity = viewerCity || '';
+  const pCity = profileCity || '';
+  if (vCity.toLowerCase() === pCity.toLowerCase()) {
+    return neighborhood || pCity;
   }
-  return profileCity;
+  return pCity;
 }
 
 export function clampMinDistanceKm(km: number): number {

@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
-import { MOCK_MOMENTS } from '../constants';
+import React, { useState, useEffect } from 'react';
 import { Moment } from '../types';
-import { X, ChevronLeft, ChevronRight, Zap, RefreshCw, Trash2 } from 'lucide-react';
+import { X, Zap, RefreshCw, Trash2 } from 'lucide-react';
 import { cache, saveUserData, showNotification } from '../services/authUtils';
 import { soundService } from '../services/soundService';
+import { fetchMoments } from '../services/repo';
 
 interface VibeMomentsProps {
   onMomentClick?: (moment: Moment) => void;
@@ -14,7 +14,16 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
   const [activeMoment, setActiveMoment] = useState<Moment | null>(null);
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [realMoments, setRealMoments] = useState<Moment[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const loadMoments = async () => {
+        const data = await fetchMoments(20);
+        setRealMoments(data);
+    };
+    loadMoments();
+  }, []);
 
   const openMoment = (moment: Moment) => {
     setActiveMoment(moment);
@@ -97,7 +106,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
             <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-amber-500 overflow-hidden">
                {currentUser?.lastMoment ? (
                    <img 
-                    src={currentUser.lastMoment.imageUrl} 
+                    src={currentUser.lastMoment.imageUrl || undefined} 
                     className="w-full h-full object-cover" 
                     onClick={(e) => {
                         e.stopPropagation();
@@ -123,7 +132,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
           </span>
         </div>
 
-        {MOCK_MOMENTS.map((moment) => (
+        {realMoments.map((moment) => (
           <div 
             key={moment.id} 
             onClick={() => openMoment(moment)}
@@ -131,7 +140,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
           >
             <div className="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-amber-500 via-amber-300 to-amber-600 animate-in zoom-in duration-500">
               <div className="w-full h-full rounded-full border-2 border-[#050505] overflow-hidden">
-                <img src={moment.avatar} className="w-full h-full object-cover group-hover:scale-110 transition-transform" alt={moment.nickname} />
+                <img src={moment.avatar || undefined} className="w-full h-full object-cover group-hover:scale-110 transition-transform" alt={moment.nickname} />
               </div>
             </div>
             <span className="text-[8px] font-black text-white uppercase tracking-widest truncate max-w-[64px]">{moment.nickname.split(' ')[0]}</span>
@@ -151,7 +160,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
 
             <div className="absolute top-16 left-6 right-6 z-[1010] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src={activeMoment.avatar} className="w-10 h-10 rounded-full border border-white/20 object-cover" />
+              <img src={activeMoment.avatar || undefined} className="w-10 h-10 rounded-full border border-white/20 object-cover" />
               <div>
                 <p className="text-white text-xs font-black uppercase tracking-widest">{activeMoment.nickname}</p>
                 <p className="text-[9px] text-amber-500/80 font-bold uppercase tracking-widest">{activeMoment.timestamp}</p>
@@ -163,7 +172,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             if (window.confirm('Excluir sua Vibe atual?')) {
-                                const updatedUser = { ...cache.userData, lastMoment: null };
+                                const updatedUser = { ...cache.userData, lastMoment: undefined };
                                 saveUserData(updatedUser);
                                 setActiveMoment(null);
                                 showNotification('Sua Vibe foi removida.', 'info');
@@ -182,7 +191,7 @@ const VibeMoments: React.FC<VibeMomentsProps> = ({ onMomentClick }) => {
           </div>
 
           <div className="flex-1 w-full flex items-center justify-center relative">
-            <img src={activeMoment.imageUrl} className="w-full h-full object-cover" alt="Moment Content" />
+            <img src={activeMoment.imageUrl || undefined} className="w-full h-full object-cover" alt="Moment Content" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
           </div>
 

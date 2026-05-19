@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { VenueDiscovery } from './VenueDiscovery';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
-const API_KEY = process.env.GOOGLE_MAPS_PLATFORM_KEY || '';
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
 interface VenueListProps {
   userLocation: { lat: number; lon: number } | null;
@@ -121,7 +121,6 @@ export const VenueList: React.FC<VenueListProps> = ({ userLocation, userId }) =>
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="relative h-[85vh] w-full"
             >
-            <APIProvider apiKey={API_KEY} version="weekly">
                 <VenueDiscovery 
                   userLocation={effectiveLocation}
                   onClose={() => setShowDiscovery(false)}
@@ -132,7 +131,6 @@ export const VenueList: React.FC<VenueListProps> = ({ userLocation, userId }) =>
                     loadData();
                   }}
                 />
-              </APIProvider>
             </motion.div>
           </div>
         )}
@@ -179,7 +177,7 @@ export const VenueList: React.FC<VenueListProps> = ({ userLocation, userId }) =>
             >
               <div className="flex gap-4 p-4">
                 <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-white/10">
-                  <img src={venue.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={venue.name} />
+                  <img src={venue.image || undefined} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={venue.name} />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-2 left-2 flex items-center gap-1 text-white">
                     <Users size={10} />

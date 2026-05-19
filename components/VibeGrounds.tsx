@@ -36,13 +36,19 @@ const MOCK_VENUES: Venue[] = [
 
 const VibeGrounds: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [venues, setVenues] = useState<Venue[]>(MOCK_VENUES);
+  const [venues, setVenues] = useState<Venue[]>(() => {
+    const saved = localStorage.getItem('libido_venues_cache');
+    return saved ? JSON.parse(saved) : MOCK_VENUES;
+  });
 
   const fetchGrounds = () => {
     setLoading(true);
-    // Simula carregamento offline
+    // Simula carregamento do Supabase com fallback para LocalStorage
     setTimeout(() => {
-      setVenues(MOCK_VENUES);
+      // Se houvesse uma chamada real do Supabase que falhasse, usaríamos o MOCK ou o Cache
+      const data = MOCK_VENUES; 
+      localStorage.setItem('libido_venues_cache', JSON.stringify(data));
+      setVenues(data);
       setLoading(false);
     }, 1500);
   };

@@ -160,7 +160,7 @@ const Store: React.FC = () => {
                 {step === 'awaiting_payment' && currentIntent && (
                     <div className="text-center space-y-8 animate-in zoom-in-95">
                         <div className="bg-white p-6 rounded-[3rem] inline-block mx-auto shadow-2xl border-4 border-pink/20">
-                            {currentIntent.qrCode && <img src={currentIntent.qrCode} className="w-52 h-52" alt="QR Code PIX" />}
+                            {currentIntent.qrCode && <img src={currentIntent.qrCode || undefined} className="w-52 h-52" alt="QR Code PIX" />}
                         </div>
                         <div className="space-y-4">
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">PIX Copia e Cola</p>

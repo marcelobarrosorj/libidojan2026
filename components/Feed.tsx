@@ -8,43 +8,49 @@ import { log, handleButtonAction, showNotification, cache } from '../services/au
 import { soundService } from '../services/soundService';
 import ProtectedImage from './common/ProtectedImage';
 import VibeMoments from './VibeMoments';
-import { fetchLatestProfiles } from '../services/repo';
+import { fetchLatestProfiles, fetchPosts } from '../services/repo';
 
 interface FeedProps {
-  onProfileClick?: (user: User) => void;
-  onChat?: (user: User) => void;
-  registerProfiles?: (users: User[]) => void;
+  onProfileClick?: (userId: string) => void;
+  onChat?: (user: any) => void;
 }
 
-const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles }) => {
+const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat }) => {
   const [feedMode, setFeedMode] = useState<'all' | 'following'>('all');
   const [newUsers, setNewUsers] = useState<RadarProfile[]>([]);
-  
-  // Highlighted Top Users
-  const topUsers = useMemo(() => {
-    return [...MOCK_USERS].sort(() => Math.random() - 0.5).slice(0, 8);
-  }, []);
+  const [topUsers, setTopUsers] = useState<RadarProfile[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    const loadNewUsers = async () => {
+    const loadFeedData = async () => {
       try {
-        console.log('[FEED] Carregando novatos...');
-        const data = await fetchLatestProfiles(12);
-        // Filtro rigoroso: remove qualquer dado sem ID ou id inválido
-        const validProfiles = data.filter(u => u.id && u.id !== 'undefined' && u.id !== 'null');
-        console.log('[FEED] Novatos carregados e validados:', validProfiles.length);
-        setNewUsers(validProfiles);
-        if (registerProfiles && validProfiles.length > 0) {
-            registerProfiles(validProfiles as any);
+        console.log('[FEED] Carregando dados reais da Matriz...');
+        let [profiles, feedPosts] = await Promise.all([
+          fetchLatestProfiles(30).catch(() => []),
+          fetchPosts(30).catch(() => [])
+        ]);
+
+        // Marcello: Proteção contra apagão de feed
+        if (profiles.length === 0) profiles = MOCK_USERS as any;
+        if (feedPosts.length === 0) {
+            // Se o feed estiver vazio, injetamos mocks básicos para teste
+            feedPosts = [
+                { id: 'p_mock1', user: 'Matriz Libido', userId: '000001', description: 'Bem-vindo à nova Matriz. Sua segurança é nossa obsessão.', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800', likes: 125, comments: [], liked: false, age: 30, avatar: 'https://picsum.photos/seed/libido/400/400' }
+            ] as any;
         }
+
+        setNewUsers(profiles.slice(0, 15));
+        setTopUsers([...profiles].sort(() => Math.random() - 0.5).slice(0, 8)); 
+        setPosts(feedPosts as any);
       } catch (e) {
-        console.error('[FEED] Erro ao carregar novatos:', e);
+        console.error('[FEED] Erro ao carregar dados:', e);
+        // Fallback total
+        setNewUsers(MOCK_USERS as any);
+        setPosts([]);
       }
     };
-    loadNewUsers();
-  }, [registerProfiles]);
-  
-  const [posts, setPosts] = useState<Post[]>(() => [...MOCK_POSTS].sort(() => Math.random() - 0.5));
+    loadFeedData();
+  }, []);
   const [activeModal, setActiveModal] = useState<{ type: 'comment' | 'share' | 'gallery' | 'menu'; postId?: string | number; userId?: string } | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<{ url: string; index: number; photos: GalleryPhoto[]; ownerNickname: string } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -128,15 +134,10 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
   };
 
   const getUser = (userId: string, post?: Post) => {
-    // 1. Tenta buscar nos usuários de radar reais (Novatos)
-    const realUser = newUsers.find(u => u.id === userId);
-    if (realUser) return realUser as any;
-    
-    // 2. Tenta buscar nos Mocks
-    const mockUser = MOCK_USERS.find(u => u.id === userId);
-    if (mockUser) return mockUser;
+    // 1. Tenta buscar nos usuários já carregados
+    const found = [...newUsers, ...topUsers].find(u => u.id === userId);
+    if (found) return found as any;
 
-    // 3. Fallback inteligente: se temos dados do post, construímos um usuário temporário (Ghost)
     if (post && post.userId === userId) {
         return {
             id: post.userId,
@@ -145,7 +146,6 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
             age: post.age,
             type: 'Explorador',
             isGhost: true,
-            bio: post.description,
             vouchScore: 70
         } as any;
     }
@@ -176,7 +176,7 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
                 >
                     <div className="relative group/avatar">
                         <div className={`w-16 h-16 rounded-2xl p-0.5 border-2 transition-all group-hover:scale-105 ${index < 3 ? 'border-amber-500 shadow-lg shadow-amber-500/20' : 'border-slate-800'}`}>
-                            <img src={user.avatar} className="w-full h-full rounded-[0.8rem] object-cover" alt="" />
+                            <img src={user.avatar || undefined} className="w-full h-full rounded-[0.8rem] object-cover" alt="" />
                         </div>
                         {/* Chat Button - Indepentente */}
                         <button 
@@ -197,7 +197,6 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
                         <span className="text-[9px] font-bold text-white group-hover:text-amber-500 transition-colors uppercase tracking-tighter truncate max-w-[64px]">
                             {user.nickname}
                         </span>
-                        <span className="text-[7px] font-black text-amber-500/50 font-mono tracking-widest leading-none">#{user.serialNumber}</span>
                         <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest truncate max-w-[100px] mt-0.5">
                             {user.city || 'MATRIX'}
                         </span>
@@ -226,7 +225,7 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
                 >
                     <div className="relative group/avatar">
                         <div className="w-16 h-16 rounded-3xl p-0.5 border border-white/10 group-hover:border-amber-500 transition-all group-hover:scale-105 overflow-hidden">
-                            <img src={user.avatar} className="w-full h-full rounded-[1.4rem] object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
+                            <img src={user.avatar || undefined} className="w-full h-full rounded-[1.4rem] object-cover grayscale group-hover:grayscale-0 transition-all" alt="" />
                         </div>
                         {/* Chat Button - Independente */}
                         <button 
@@ -250,7 +249,6 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
                       <span className="text-[7px] font-black text-slate-500 uppercase tracking-widest truncate max-w-[100px]">
                         {user.city || 'MATRIX'}
                       </span>
-                      <span className="text-[7px] font-black text-amber-500/50 font-mono tracking-widest">{user.serialNumber}</span>
                     </div>
                 </div>
             )) : (
@@ -293,11 +291,10 @@ const Feed: React.FC<FeedProps> = ({ onProfileClick, onChat, registerProfiles })
                   const u = getUser(post.userId, post);
                   if (u) onProfileClick?.(u.id);
                 }}>
-                  <img src={post.avatar} className="w-10 h-10 rounded-full border-2 border-amber-500/30 object-cover group-hover:border-amber-500 transition-colors" />
+                  <img src={post.avatar || undefined} className="w-10 h-10 rounded-full border-2 border-amber-500/30 object-cover group-hover:border-amber-500 transition-colors" />
                   <div>
                     <div className="flex items-center gap-1.5">
                       <h4 className="text-sm font-bold text-white group-hover:text-amber-500 transition-colors">{post.user}, {post.age}</h4>
-                      <span className="text-[9px] font-black font-mono text-amber-500/60 tracking-wider">#{(getUser(post.userId, post) as any)?.serialNumber || '000000'}</span>
                     </div>
                     <div className="flex items-center gap-1 opacity-60">
                       <MapPin size={8} className="text-amber-500" />

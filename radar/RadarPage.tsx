@@ -4,23 +4,30 @@ import RadarList from './RadarList';
 import RadarCircle from './RadarCircle';
 import { mockRadarProfiles } from './mockData';
 import type { RadarProfile } from './types';
-import { MAX_RADIUS_KM, haversineKm, formatDistanceLabel } from './geo';
+import { haversineKm, formatDistanceLabel, BASE_LOCATION } from '../services/geoService';
+import { MAX_RADIUS_KM } from './geo';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { Radio, Layers, Target, Loader2, Info, Search, ZoomIn, Crown, MapPin, CheckCircle2, ChevronRight, X } from 'lucide-react';
 import { cache, isPremiumUser } from '../services/authUtils';
 import { Plan, Venue, User } from '../types';
 import { venueService } from '../services/venueService';
 
+import { Tabs } from '../components/common/Tabs';
+
 export default function RadarPage({ 
     onProfileClick, 
     onUpgrade,
     onChat,
-    registerProfiles
+    registerProfiles,
+    profiles: externalProfiles,
+    isFetching: externalIsFetching
 }: { 
     onProfileClick?: (p: RadarProfile) => void;
     onUpgrade?: () => void;
     onChat?: (p: RadarProfile) => void;
     registerProfiles?: (users: User[]) => void;
+    profiles?: RadarProfile[];
+    isFetching?: boolean;
 }) {
   const { location } = useUserLocation();
   const userPlan = cache.userData?.plan || Plan.FREE;
@@ -29,7 +36,10 @@ export default function RadarPage({
   const [radiusKm, setRadiusKm] = useState<number>(isPremium ? 50 : 15); 
   const [viewMode, setViewMode] = useState<'circle' | 'list'>('circle');
   const [profiles, setProfiles] = useState<RadarProfile[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetchingLocal, setIsFetchingLocal] = useState(false);
+  
+  const isFetching = externalIsFetching ?? isFetchingLocal;
+  const displayProfiles = externalProfiles ?? profiles;
   
   // Check-in state
   const [showVenueSelector, setShowVenueSelector] = useState(false);
@@ -55,10 +65,17 @@ export default function RadarPage({
     }
   }, [location]);
 
-  const center = useMemo(() => ({
-    lat: location?.lat ?? cache.userData?.lat ?? -22.9068,
-    lon: location?.lon ?? cache.userData?.lon ?? -43.1729
-  }), [location, cache.userData?.lat, cache.userData?.lon]);
+  const center = useMemo(() => {
+    // Marcello: Protocolo de Origem Resiliente
+    const isGpsValid = location?.lat && Math.abs(location.lat) > 0.01;
+    const isProfileValid = cache.userData?.lat && Math.abs(cache.userData.lat) > 0.01;
+
+    if (isGpsValid) return { lat: location.lat, lon: location.lon };
+    if (isProfileValid) return { lat: cache.userData!.lat, lon: cache.userData!.lon };
+    
+    console.warn('[RADAR] GPS Falhou. Usando Ponto A: Volta Redonda.');
+    return { lat: -22.5231, lon: -44.1042 };
+  }, [location, cache.userData?.lat, cache.userData?.lon]);
 
   useEffect(() => {
     const loadVenues = async () => {
@@ -83,31 +100,35 @@ export default function RadarPage({
   const checkedVenue = venues.find(v => v.id === currentCheckIn?.venueId);
 
   useEffect(() => {
+    if (externalProfiles) return; // Se vier por props, não busca localmente
     const loadData = async () => {
-      setIsFetching(true);
+      setIsFetchingLocal(true);
       try {
-        const { queryRadar } = await import('../services/radarService');
-        const data = await queryRadar({ 
+        const { fetchRadarProfiles } = await import('./radarApi');
+        const data = await fetchRadarProfiles({ 
           viewerId: cache.userData?.id || 'me', 
-          viewerLat: center.lat, 
-          viewerLon: center.lon,
-          plan: userPlan
+          lat: center.lat, 
+          lon: center.lon 
         });
         
         console.log(`[RADAR] Encontrados ${data?.length || 0} perfis próximos`);
         const profileData = data as RadarProfile[];
-        setProfiles(profileData);
-        if (registerProfiles && profileData.length > 0) {
-            registerProfiles(profileData as any);
+        
+        // Marcello: Última trava de de-duplicação antes do render
+        const uniqueProfiles = Array.from(new Map(profileData.map(p => [String(p.id).trim(), p])).values());
+        
+        setProfiles(uniqueProfiles);
+        if (registerProfiles && uniqueProfiles.length > 0) {
+            registerProfiles(uniqueProfiles as any);
         }
       } catch (e) {
         console.error('Radar fetch failed', e);
       } finally {
-        setIsFetching(false);
+        setIsFetchingLocal(false);
       }
     };
     loadData();
-  }, [center, userPlan]);
+  }, [center, userPlan, externalProfiles]);
 
   return (
     <div className="p-6 space-y-8 pb-32 bg-[#050505] min-h-full relative animate-in fade-in duration-500">
@@ -120,22 +141,14 @@ export default function RadarPage({
             {isFetching ? 'Escaneando Matriz...' : 'Conexões Ativas'}
           </p>
         </div>
-        <div className="flex bg-slate-900/50 p-1 rounded-2xl border border-white/5">
-          <button 
-            onClick={() => setViewMode('circle')} 
-            className={`p-2 rounded-xl transition-all ${viewMode === 'circle' ? 'bg-pink text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
-            title="Visualização em Círculo"
-          >
-            <Target size={18} />
-          </button>
-          <button 
-            onClick={() => setViewMode('list')} 
-            className={`p-2 rounded-xl transition-all ${viewMode === 'list' ? 'bg-pink text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
-            title="Visualização em Lista"
-          >
-            <Layers size={18} />
-          </button>
-        </div>
+        <Tabs 
+          value={viewMode}
+          onValueChange={(val) => setViewMode(val as 'circle' | 'list')}
+          tabs={[
+            { id: 'circle', label: 'Círculo', icon: <Target size={18} /> },
+            { id: 'list', label: 'Lista', icon: <Layers size={18} /> }
+          ]}
+        />
       </div>
 
       {/* Profile Discovery Logic */}
@@ -181,13 +194,13 @@ export default function RadarPage({
       <div className="flex flex-col items-center w-full">
           {viewMode === 'circle' ? (
             <RadarCircle 
-                profiles={profiles} 
+                profiles={displayProfiles} 
                 radiusKm={radiusKm} 
                 onProfileClick={onProfileClick} 
             />
           ) : (
             <RadarList 
-                profiles={profiles} 
+                profiles={displayProfiles} 
                 loading={isFetching} 
                 onSelectProfile={(p) => {
                     onProfileClick?.(p);
@@ -260,7 +273,7 @@ export default function RadarPage({
                   onClick={() => handleCheckIn(venue.id)}
                   className="group relative flex items-center gap-4 p-4 rounded-3xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all cursor-pointer"
                 >
-                  <img src={venue.image} className="w-16 h-16 rounded-2xl object-cover shadow-lg" alt={venue.name} />
+                  <img src={venue.image || undefined} className="w-16 h-16 rounded-2xl object-cover shadow-lg" alt={venue.name} />
                   <div className="flex-1">
                     <h4 className="text-white font-bold text-sm">{venue.name}</h4>
                     <p className="text-[9px] text-slate-500 uppercase font-black">{venue.category}</p>

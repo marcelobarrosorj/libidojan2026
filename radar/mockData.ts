@@ -14,7 +14,6 @@ const generateGallery = (id: string, count: number) => {
 export const mockRadarProfiles: RadarProfile[] = [
   {
     id: 'm1', name: 'Ana & Bruno', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    serialNumber: '200001',
     lat: -22.9468, lon: -43.1829, city: 'Rio de Janeiro', neighborhood: 'Leblon',
     bio: 'Casal liberal em busca de novas experiências.', category: 'Casais',
     trustLevel: TrustLevel.OURO, braveryLevel: 9, status: PresenceStatus.ONLINE, gallery: generateGallery('m1', 4),
@@ -22,7 +21,6 @@ export const mockRadarProfiles: RadarProfile[] = [
   },
   {
     id: 'm2', name: 'Carla', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400',
-    serialNumber: '200002',
     lat: -22.9568, lon: -43.1929, city: 'Rio de Janeiro', neighborhood: 'Ipanema',
     bio: 'Discreta e decidida.', category: 'Mulher',
     trustLevel: TrustLevel.PRATA, braveryLevel: 7, status: PresenceStatus.AWAY, gallery: generateGallery('m2', 3),
@@ -30,14 +28,12 @@ export const mockRadarProfiles: RadarProfile[] = [
   },
   {
     id: 'm3', name: 'Marcos', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-    serialNumber: '200003',
     lat: -22.9668, lon: -43.1629, city: 'Rio de Janeiro', neighborhood: 'Copacabana',
     bio: 'Aproveitando o melhor do lifestyle.', category: 'Homem',
     trustLevel: TrustLevel.BRONZE, braveryLevel: 6, status: PresenceStatus.OFFLINE, gallery: generateGallery('m3', 2)
   },
   {
     id: 'm4', name: 'Lia & Dan', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400',
-    serialNumber: '200004',
     lat: -22.9768, lon: -43.1729, city: 'Rio de Janeiro', neighborhood: 'Barra',
     bio: 'Casal bi, amamos conhecer pessoas novas.', category: 'Casais',
     trustLevel: TrustLevel.OURO, braveryLevel: 10, status: PresenceStatus.ONLINE, gallery: generateGallery('m4', 5),
@@ -45,7 +41,6 @@ export const mockRadarProfiles: RadarProfile[] = [
   },
   {
     id: 'm5', name: 'Julia', avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400',
-    serialNumber: '200005',
     lat: -22.9268, lon: -43.2329, city: 'Rio de Janeiro', neighborhood: 'Botafogo',
     bio: 'Curiosa e autêntica.', category: 'Mulher',
     trustLevel: TrustLevel.PRATA, braveryLevel: 8, status: PresenceStatus.BUSY, gallery: generateGallery('m5', 3)

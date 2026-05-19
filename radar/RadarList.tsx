@@ -5,19 +5,37 @@ import { MapPin, Lock, Crown, Sparkles, ShieldAlert, MessageCircle } from 'lucid
 import { Plan, PresenceStatus } from '../types';
 import { PresenceBadge } from '../components/common/PresenceBadge';
 import { cache } from '../services/authUtils';
-import { formatDistanceLabel } from './geo';
+import { formatDistanceLabel, haversineKm } from './geo';
 import { motion, AnimatePresence } from 'motion/react';
 
-export default function RadarList({ profiles, loading, onSelectProfile, onUpgrade, onChat }: { 
-  profiles: RadarProfile[]; 
-  loading: boolean; 
+const RadarList: React.FC<{
+  profiles: RadarProfile[];
+  loading: boolean;
   onSelectProfile?: (p: RadarProfile) => void;
   onUpgrade?: () => void;
   onChat?: (p: RadarProfile) => void;
-}) {
+}> = ({ profiles, loading, onSelectProfile, onUpgrade, onChat }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  if (loading && profiles.length === 0) {
+  // Marcello: Interceptação de Dados Críticos na Listagem
+  const processedProfiles = profiles.map(p => {
+    const pName = String(p.name || (p as any).nickname || '').toLowerCase();
+    const pId = String(p.id || '');
+    
+    if (pName.includes('casalx') || pId === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
+        const viewerLat = cache.userData?.lat || -22.5231;
+        const viewerLon = cache.userData?.lon || -44.1042;
+        const dist = haversineKm(viewerLat, viewerLon, -22.9031, -43.5590);
+        return { 
+            ...p, 
+            distanceKm: dist, 
+            locationLabel: 'Campo Grande, RJ' 
+        };
+    }
+    return p;
+  });
+
+  if (loading && processedProfiles.length === 0) {
     return (
       <div className="py-20 flex flex-col items-center gap-4 animate-pulse">
         <div className="w-10 h-10 border-2 border-pink/20 border-t-pink rounded-full animate-spin" />
@@ -55,7 +73,7 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
         )}
       </AnimatePresence>
 
-      {profiles.map((p, idx) => {
+      {processedProfiles.map((p, idx) => {
         const isLocked = (p as any).isLocked;
         const isSelected = selectedId === p.id;
         const isHighlighted = !selectedId && idx === 0; // The first card is the "central focus" by default
@@ -87,7 +105,7 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
             <div className="relative shrink-0">
                 <div className={`w-14 h-14 rounded-2xl overflow-hidden border border-slate-800 transition-all duration-700 relative ${isLocked ? 'blur-xl grayscale opacity-50' : ''}`}>
                     <img 
-                        src={p.avatar} 
+                        src={p.avatar || undefined} 
                         className="w-full h-full object-cover" 
                         alt={isLocked ? 'Bloqueado' : p.name} 
                     />
@@ -115,7 +133,6 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
             
             <div className="flex-1 min-w-0">
               <div className="flex flex-col mb-1">
-                <span className="text-[7px] font-black font-mono text-amber-500/50 tracking-widest uppercase">{isLocked ? 'ID Oculto' : `ID: ${p.serialNumber || '------'}`}</span>
                 <h4 className={`text-sm font-bold text-white truncate italic ${isLocked ? 'opacity-30' : ''}`}>
                     {isLocked ? 'Sinal não sincronizado' : p.name}
                 </h4>
@@ -192,4 +209,6 @@ export default function RadarList({ profiles, loading, onSelectProfile, onUpgrad
       )}
     </div>
   );
-}
+};
+
+export default RadarList;

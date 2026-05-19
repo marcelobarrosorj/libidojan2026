@@ -8,7 +8,7 @@ import {
   ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert,
   Clock, Image as ImageIcon, EyeOff, Timer
 } from 'lucide-react';
-import { log, handleButtonAction, showNotification } from '../services/authUtils';
+import { log, handleButtonAction, showNotification, isOwner } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { CONFIG } from '../config';
 
@@ -91,7 +91,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
           <button onClick={onBack} className="p-1 hover:bg-slate-800 rounded-full text-slate-400 active:scale-95 transition-transform"><ChevronLeft size={24} /></button>
           <div className="relative">
             <div className="w-10 h-10 rounded-2xl overflow-hidden border border-white/5 shadow-lg">
-                <img src={user.avatar} className="w-full h-full object-cover" alt={user.nickname} />
+                <img src={user.avatar || undefined} className="w-full h-full object-cover" alt={user.nickname} />
             </div>
             <PresenceBadge 
                 status={user.status || PresenceStatus.OFFLINE} 
@@ -102,7 +102,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
           <div>
             <div className="flex items-center gap-1.5">
               <h3 className="text-sm font-black text-white leading-none italic uppercase tracking-tight">{user.nickname}</h3>
-              <span className="text-[10px] font-black font-mono text-amber-500/60 leading-none">#{user.serialNumber || '000000'}</span>
               {user.verifiedAccount && <ShieldCheck size={12} className="text-blue-400" />}
             </div>
             <div className="mt-1">
@@ -131,7 +130,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
             <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${msg.from === 'me' ? 'bg-purple-600 text-white rounded-br-none' : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'}`}>
               {msg.image ? (
                 <div className="space-y-2">
-                  {msg.isSelfDestruct && !msg.isViewed ? (
+                  {msg.isSelfDestruct && !msg.isViewed && !isOwner(currentUser) ? (
                     <button 
                       onClick={() => markAsViewed(idx)}
                       className="flex flex-col items-center gap-2 p-4 bg-black/20 rounded-xl border border-white/10"
@@ -139,13 +138,20 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
                       <Timer size={32} className="text-amber-500 animate-pulse" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-white">Foto Temporária (Clique para ver)</span>
                     </button>
-                  ) : msg.isViewed ? (
+                  ) : msg.isViewed && !isOwner(currentUser) ? (
                     <div className="flex flex-col items-center gap-2 p-4 bg-slate-800/40 rounded-xl blur-[1px] opacity-40">
                       <EyeOff size={32} className="text-slate-500" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Mídia Destruída</span>
                     </div>
                   ) : (
-                    <img src={msg.image} className="rounded-xl w-full max-h-60 object-cover" />
+                    <div className="relative group/auditor">
+                      <img src={msg.image || undefined} className="rounded-xl w-full max-h-60 object-cover" />
+                      {isOwner(currentUser) && msg.isSelfDestruct && (
+                        <div className="absolute top-2 right-2 bg-rose-500/90 text-[7px] font-black uppercase px-1.5 py-0.5 rounded italic text-white flex items-center gap-1">
+                          <ShieldAlert size={8} /> God Bypass
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               ) : (

@@ -99,7 +99,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onS
                     >
                       <div className="relative">
                         <img 
-                          src={profile.avatar} 
+                          src={profile.avatar || undefined} 
                           alt={profile.name}
                           className="w-14 h-14 rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all border border-white/10"
                         />
@@ -110,7 +110,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onS
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[9px] font-black font-mono text-amber-500 uppercase tracking-widest">#{profile.serialNumber || '000000'}</span>
                           <span className="text-[8px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 font-black uppercase tracking-tighter">{profile.category}</span>
                         </div>
                         <h4 className="text-base font-black text-white italic tracking-tight truncate uppercase">{profile.name}</h4>

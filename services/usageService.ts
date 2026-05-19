@@ -1,5 +1,6 @@
 
 import { User } from '../types';
+import { isOwner } from './authUtils';
 
 const DAILY_VIEW_LIMIT = 2;
 
@@ -32,7 +33,8 @@ export const usageService = {
 
   canViewProfile: (user: User | null) => {
     if (!user) return false;
-    if (user.isSubscriber) return true;
+    // Marcello: Super usuários e Assinantes têm acesso total
+    if (user.isSubscriber || isOwner(user)) return true;
     
     return usageService.getUsage() < DAILY_VIEW_LIMIT;
   },
