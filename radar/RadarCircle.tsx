@@ -195,7 +195,7 @@ export default function RadarCircle(props: RadarCircleProps) {
                disabled={isLocked}
                animate={{
                  scale: isSelected ? 4 : 1,
-                 zIndex: isSelected ? 30 : 15,
+                 zIndex: isSelected ? 50 : 35,
                  opacity: (activeId && !isSelected) ? 0.2 : 1
                }}
                transition={{ type: 'spring', stiffness: 300, damping: 25 }}

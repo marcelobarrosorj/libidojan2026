@@ -18,7 +18,7 @@ import {
   Fingerprint, Wind, X, Heart, Ghost,
   ImageIcon, Plus, Wallet, Camera, HelpCircle, Volume2, VolumeX, ShieldAlert, UserPlus, UserMinus, Users,
   UserCheck, Globe, MapPin, Grid, Trash2, Pencil,
-  Zap, MessageCircle
+  Zap, MessageCircle, Bell
 } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { 
@@ -948,9 +948,29 @@ const Profile: React.FC<ProfileProps> = ({
            </h3>
         </div>
         {isOwnProfile ? (
-           <button onClick={toggleSound} className="p-2 bg-slate-900/60 rounded-full text-amber-500 border border-white/5 transition-all active:scale-90">
-             {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} className="text-slate-500" />}
-           </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button 
+              onClick={toggleSound} 
+              className="p-2 bg-slate-900/60 rounded-xl text-amber-500 border border-white/5 transition-all active:scale-90"
+              title={soundEnabled ? "Mudar Som" : "Ativar Som"}
+            >
+              {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} className="text-slate-500" />}
+            </button>
+            <button 
+              onClick={() => setIsEditing(true)} 
+              className="px-3 py-2 bg-amber-500 text-black border border-amber-400 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-amber-400 transition-all active:scale-95 flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.25)]"
+            >
+              <Settings size={12} />
+              Configurar
+            </button>
+            <button 
+              onClick={() => logout()} 
+              className="p-2 bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-500 border border-rose-500/10 rounded-xl transition-all active:scale-95 flex items-center justify-center"
+              title="Encerrar Sessão"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
         ) : (
             <VerificationGate user={cache.userData}>
                 <div className="flex items-center gap-2">
@@ -1259,6 +1279,29 @@ const Profile: React.FC<ProfileProps> = ({
                     <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${user.prefersBlurredPhotos ? 'right-1' : 'left-1'}`} />
                   </div>
                 </button>
+
+                <button 
+                  onClick={() => {
+                    const newValue = !user.pushVerifiedRadar5k;
+                    setLocalUser(prev => ({ ...prev, pushVerifiedRadar5k: newValue }));
+                    saveUserData({ ...user, pushVerifiedRadar5k: newValue });
+                    showNotification(newValue ? 'Notificações da Matriz 5km Ativadas' : 'Notificações de Proximidade Desativadas', 'success');
+                  }}
+                  className={`w-full p-4 rounded-3xl border flex items-center justify-between transition-all ${user.pushVerifiedRadar5k ? 'bg-amber-500/10 border-amber-500/30' : 'bg-slate-900/40 border-white/5'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user.pushVerifiedRadar5k ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-500'}`}>
+                      <Bell size={20} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-white uppercase italic">Radar Verificado</h4>
+                      <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">Push silencioso se verificado entrar no raio de 5km</p>
+                    </div>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full relative transition-colors ${user.pushVerifiedRadar5k ? 'bg-amber-500' : 'bg-slate-800'}`}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${user.pushVerifiedRadar5k ? 'right-1' : 'left-1'}`} />
+                  </div>
+                </button>
               </section>
             )}
 
@@ -1482,8 +1525,6 @@ const Profile: React.FC<ProfileProps> = ({
             </div>
         )}
 
-        {isOwnProfile && <ActionButton label="Configuração" onClick={() => setIsEditing(true)} variant="amber" icon={<Settings size={20} />} />}
-        {isOwnProfile && <ActionButton label="Encerrar Sessão" onClick={() => logout()} variant="danger" icon={<LogOut size={20} />} />}
       </div>
       
       {!isOwnProfile && (

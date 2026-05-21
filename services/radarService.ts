@@ -1,5 +1,5 @@
 
-import { User, RadarResultItem, UserProfile, TrustLevel, Plan } from '../types';
+import { User, RadarResultItem, UserProfile, TrustLevel, Plan, PresenceStatus } from '../types';
 import { haversineKm, formatDistanceLabel, boundingBox } from './geoService';
 import { matchesPreferences } from './prefs';
 import { loadViewer, fetchProfilesByBoundingBox, mockRadarProfiles } from './repo';
@@ -25,62 +25,36 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
             console.error('[RADAR] Erro ao buscar perfis reais:', error);
         }
 
-        const realUsersFromSupabase = (data || []).map((item: any) => {
-            const u = item.data || {};
-            const itemLat = u.lat || 0;
-            const itemLon = u.lon || 0;
-            const dist = haversineKm(safeLat, safeLon, itemLat, itemLon);
-            
-            return {
-                id: item.id,
-                name: item.nickname || u.nickname || 'Agente',
-                avatar: u.avatar || '',
-                lat: itemLat,
-                lon: itemLon,
-                distanceKm: dist,
-                distanceLabel: formatDistanceLabel(dist),
-                city: u.city || 'Matriz',
-                isMock: item.is_mock || false, 
-                trustLevel: u.trustLevel || TrustLevel.BRONZE
-            } as RadarResultItem;
-        });
+        const realUsersFromSupabase = (data || [])
+            .filter((item: any) => item.id !== params.viewerId && !item.is_mock && !item.isMock)
+            .map((item: any) => {
+                const u = item.data || {};
+                const itemLat = u.lat || 0;
+                const itemLon = u.lon || 0;
+                const dist = haversineKm(safeLat, safeLon, itemLat, itemLon);
+                
+                const lastSeen = item.last_seen || item.updated_at;
+                const diffMinutes = lastSeen ? (new Date().getTime() - new Date(lastSeen).getTime()) / 60000 : 999;
+                const isOnline = diffMinutes < 5;
+                const status = isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE;
 
-        // HÍBRIDO: Injeção de Mocks para evitar "deserto"
-        // Marcello, aqui garantimos que os mocks fiquem espalhados perto de Volta Redonda (Raio de ~10km)
-        const mockResults = MOCK_USERS.map((m: any, idx: number) => {
-            // Marcello: Protocolo Casalx - Preservar coordenadas e ID para interceptor
-            if (m.nickname === 'casalx' || m.id === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
-                const dist = haversineKm(safeLat, safeLon, -22.9031, -43.5590);
-                return { 
-                    ...m, 
-                    name: m.nickname, 
-                    lat: -22.9031, 
-                    lon: -43.5590, 
+                return {
+                    id: item.id,
+                    name: item.nickname || u.nickname || 'Agente',
+                    avatar: u.avatar || '',
+                    lat: itemLat,
+                    lon: itemLon,
                     distanceKm: dist,
                     distanceLabel: formatDistanceLabel(dist),
-                    isMock: true,
-                    trustLevel: m.trustLevel || TrustLevel.BRONZE
+                    city: u.city || 'Matriz',
+                    isMock: false, 
+                    trustLevel: u.trustLevel || TrustLevel.BRONZE,
+                    isOnline,
+                    status
                 } as RadarResultItem;
-            }
-            const angle = (idx / MOCK_USERS.length) * Math.PI * 2;
-            const mLat = -22.5231 + (Math.cos(angle) * 0.05);
-            const mLon = -44.1042 + (Math.sin(angle) * 0.05);
-            const dist = haversineKm(safeLat, safeLon, mLat, mLon);
+            });
 
-            return {
-                ...m,
-                id: `mock-${m.id}`,
-                name: m.nickname,
-                lat: mLat,
-                lon: mLon,
-                distanceKm: dist,
-                distanceLabel: formatDistanceLabel(dist),
-                isMock: true,
-                trustLevel: m.trustLevel || TrustLevel.BRONZE
-            } as RadarResultItem;
-        });
-
-        const combined = [...realUsersFromSupabase, ...mockResults];
+        const combined = realUsersFromSupabase;
         
         // Marcello: De-duplicação agressiva por ID (Mantendo o primeiro encontrado)
         const uniqueData: RadarResultItem[] = [];
@@ -98,14 +72,7 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
         return finalData;
     } catch (e) {
         console.error('[RADAR] Falha na varredura total (Network Error?):', e);
-        // Fallback total para mocks se o fetch falhar
-        return MOCK_USERS.map((m, idx) => ({
-            ...m,
-            id: `err-fallback-${m.id}-${idx}`,
-            name: m.nickname,
-            distanceKm: 999,
-            distanceLabel: 'Offline',
-            isMock: true
-        } as RadarResultItem));
+        // Fallback para array vazio para obedecer a regra de somente usuários reais
+        return [];
     }
 }

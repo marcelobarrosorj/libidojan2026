@@ -1,5 +1,5 @@
 
-import { TrustLevel, UserType, Plan, type UserProfile, type RadarProfile } from '../types';
+import { TrustLevel, UserType, Plan, PresenceStatus, type UserProfile, type RadarProfile } from '../types';
 import { MOCK_USERS, MOCK_CURRENT_USER, MOCK_MOMENTS, MOCK_POSTS } from '../constants';
 import { mockRadarProfiles as fullMocks } from '../radar/mockData';
 import { supabase } from './supabase';
@@ -93,18 +93,41 @@ export async function fetchProfilesByBoundingBox(box: { minLat: number; maxLat: 
 export async function searchProfiles(query: string): Promise<RadarProfile[]> {
     if (!query || query.length < 1) return [];
     const term = query.trim();
+    const termLower = term.toLowerCase();
     try {
-        // Marcello: Protocolo de Busca Direta (Sintaxe Corrigida Supabase)
+        // Verifica se o termo parece um UUID válido para evitar erros de sintaxe SQL do campo ID
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(term);
+        
+        let orQuery = `nickname.ilike.%${term}%`;
+        if (isUUID) {
+            orQuery += `,id.eq.${term}`;
+        }
+
+        // Marcello: Busca Direta (Sintaxe Corrigida Supabase com fallback de busca no JSON)
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
-            .ilike('nickname', `%${term}%`)
-            .limit(20);
+            .or(orQuery)
+            .limit(100);
             
         if (error) throw error;
-        const realUsers = (data && data.length > 0) ? processProfileData(data) : [];
+        
+        let realUsers = (data && data.length > 0) ? processProfileData(data) : [];
+
+        // Filtro adicional no cliente para garantir que busca por ID ou Serial ocultos no JSONB também funcione
+        realUsers = realUsers.filter(p => {
+            const nickMatch = (p.name || '').toLowerCase().includes(termLower);
+            const idMatch = (p.id || '').toLowerCase().includes(termLower);
+            const serialMatch = (p as any).serialNumber === term || ((p as any).serial_number || '').includes(term);
+            return nickMatch || idMatch || serialMatch;
+        });
+
         const mockUsers = MOCK_USERS
-            .filter(u => (u.nickname || '').toLowerCase().includes(term.toLowerCase()))
+            .filter(u => 
+                (u.nickname || '').toLowerCase().includes(termLower) ||
+                (u.id || '').toLowerCase().includes(termLower) ||
+                (u.serialNumber || '').toLowerCase().includes(termLower)
+            )
             .map(u => ({ ...u, name: u.nickname } as any));
         
         // Marcello: Protocolo de Hibridização (Real + Mocks se necessário)
@@ -115,6 +138,7 @@ export async function searchProfiles(query: string): Promise<RadarProfile[]> {
         
         return combined.slice(0, 20);
     } catch (e) {
+        console.warn('[REPO] Falha na busca personalizada de perfis:', e);
         return [];
     }
 }
@@ -167,10 +191,18 @@ export async function getProfileById(id: string): Promise<any | null> {
                 }
             }
 
+            // Determinação de Status Online em tempo real absoluto
+            const lastSeen = data.last_seen || data.updated_at;
+            const diffMinutes = lastSeen ? (new Date().getTime() - new Date(lastSeen).getTime()) / 60000 : 999;
+            const isOnline = diffMinutes < 5;
+            const status = isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE;
+
             return {
                 ...profileData,
                 id: data.id,
-                nickname: data.nickname || profileData.nickname || 'Agente'
+                nickname: data.nickname || profileData.nickname || 'Agente',
+                isOnline,
+                status
             };
         }
     } catch (e) {
@@ -255,12 +287,14 @@ function processProfileData(data: any[]): RadarProfile[] {
         return {
             id: item.id,
             name: name,
+            nickname: name,
             lat: u.lat || 0,
             lon: u.lon || 0,
             city: u.city || 'Matriz',
             avatar: u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.id}`,
             trustLevel: u.trustLevel || TrustLevel.BRONZE,
             isOnline,
+            status: isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE,
             statusColor,
             plan: u.plan || Plan.FREE,
             xp: u.xp || 0,

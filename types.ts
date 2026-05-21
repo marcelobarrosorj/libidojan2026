@@ -168,6 +168,7 @@ export interface User {
   consentMatrix?: ConsentItem[];
   isStealthMode?: boolean;
   prefersBlurredPhotos?: boolean;
+  pushVerifiedRadar5k?: boolean;
   partner1?: ProfileData | any;
   partner2?: ProfileData | any;
   serialNumber?: string;

@@ -18,7 +18,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onS
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
-      if (query.length >= 2) {
+      if (query.trim().length >= 1) {
         setIsSearching(true);
         const data = await searchProfiles(query);
         setResults(data);
@@ -128,7 +128,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onS
                   ))}
                 </div>
               </div>
-            ) : query.length >= 2 ? (
+            ) : query.trim().length >= 1 ? (
               <div className="flex flex-col items-center justify-center h-60 text-center px-10">
                 <div className="w-16 h-16 rounded-full bg-slate-900 border border-white/5 flex items-center justify-center mb-4">
                   <Hash size={30} className="text-slate-800" />

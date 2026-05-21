@@ -2,7 +2,7 @@
 import { User } from '../types';
 import { isOwner } from './authUtils';
 
-const DAILY_VIEW_LIMIT = 2;
+const DAILY_VIEW_LIMIT = 100;
 
 export const usageService = {
   getUsage: () => {

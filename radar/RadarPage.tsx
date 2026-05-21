@@ -8,7 +8,7 @@ import { haversineKm, formatDistanceLabel, BASE_LOCATION } from '../services/geo
 import { MAX_RADIUS_KM } from './geo';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { Radio, Layers, Target, Loader2, Info, Search, ZoomIn, Crown, MapPin, CheckCircle2, ChevronRight, X } from 'lucide-react';
-import { cache, isPremiumUser } from '../services/authUtils';
+import { cache, isPremiumUser, showNotification } from '../services/authUtils';
 import { Plan, Venue, User } from '../types';
 import { venueService } from '../services/venueService';
 
@@ -196,13 +196,21 @@ export default function RadarPage({
             <RadarCircle 
                 profiles={displayProfiles} 
                 radiusKm={radiusKm} 
-                onProfileClick={onProfileClick} 
+                onProfileClick={(p) => {
+                    if (p && p.distanceLabel) {
+                        showNotification(`Distância até ${p.name || 'Usuário'}: ${p.distanceLabel}`, 'info');
+                    }
+                    onProfileClick?.(p);
+                }} 
             />
           ) : (
             <RadarList 
                 profiles={displayProfiles} 
                 loading={isFetching} 
                 onSelectProfile={(p) => {
+                    if (p && p.distanceLabel) {
+                        showNotification(`Distância até ${p.name || 'Usuário'}: ${p.distanceLabel}`, 'info');
+                    }
                     onProfileClick?.(p);
                 }} 
                 onUpgrade={onUpgrade}

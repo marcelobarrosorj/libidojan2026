@@ -32,9 +32,9 @@ export const PresenceBadge: React.FC<PresenceBadgeProps> = ({
   const config = getStatusConfig();
   
   const sizeClasses = {
-    sm: 'w-2 h-2',
-    md: 'w-3 h-3',
-    lg: 'w-4 h-4'
+    sm: 'w-4 h-4 border-[2px]',
+    md: 'w-5.5 h-5.5 border-[2.5px]',
+    lg: 'w-7 h-7 border-[3px]'
   };
 
   return (

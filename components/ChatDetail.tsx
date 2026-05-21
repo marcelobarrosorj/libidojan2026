@@ -11,6 +11,7 @@ import {
 import { log, handleButtonAction, showNotification, isOwner } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { CONFIG } from '../config';
+import { sendMessage, fetchMessages, updateMessageContent, deleteMessagePhysical, subscribeToMessages } from '../services/chatService';
 
 interface ChatDetailProps {
   user: User;
@@ -19,6 +20,7 @@ interface ChatDetailProps {
 }
 
 interface Message {
+  id: string;
   text?: string;
   image?: string;
   from: 'me' | 'them';
@@ -40,22 +42,87 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Sincronização em tempo real e busca de mensagens via banco de dados
+  useEffect(() => {
+    if (!currentUser || !user) return;
+
+    let active = true;
+
+    const load = async () => {
+      const fetched = await fetchMessages(currentUser.id, user.id);
+      if (active) {
+        setMessages(fetched as any);
+      }
+    };
+
+    load();
+
+    // 1. Inicia escuta em tempo real via canal Supabase
+    const unsubscribe = subscribeToMessages(currentUser.id, user.id, (newMsg) => {
+      if (!active) return;
+      setMessages(prev => {
+        const exists = prev.some(m => m.id === newMsg.id);
+        if (exists) {
+          return prev.map(m => m.id === newMsg.id ? (newMsg as any) : m);
+        }
+        // Se for mensagem de outro usuário, reproduz som imediático de recebido
+        if (newMsg.from === 'them') {
+          soundService.play('MESSAGE');
+        }
+        return [...prev, newMsg as any];
+      });
+    });
+
+    // 2. Busca reativa periódica segura (polling de segurança a cada 4 segundos)
+    const pollInterval = setInterval(async () => {
+      const fetched = await fetchMessages(currentUser.id, user.id);
+      if (active) {
+        setMessages(prev => {
+          // Toca som apenas se detectarmos nova mensagem na consulta que ainda não tínhamos em tela
+          const hasNewFromThem = fetched.some(f => f.from === 'them' && !prev.some(p => p.id === f.id));
+          if (hasNewFromThem) {
+            soundService.play('MESSAGE');
+          }
+
+          const merged = [...prev];
+          fetched.forEach(f => {
+            const index = merged.findIndex(m => m.id === f.id);
+            if (index !== -1) {
+              merged[index] = f as any;
+            } else {
+              merged.push(f as any);
+            }
+          });
+          return merged.sort((a, b) => new Date((a as any).created_at || 0).getTime() - new Date((b as any).created_at || 0).getTime());
+        });
+      }
+    }, 4000);
+
+    return () => {
+      active = false;
+      unsubscribe();
+      clearInterval(pollInterval);
+    };
+  }, [currentUser?.id, user?.id]);
+
   const handleSend = async (image?: string, isSelfDestruct: boolean = false) => {
     await handleButtonAction(
         'CHAT_SEND_MESSAGE',
         async () => {
+            if (!currentUser || !user) return false;
             const textToSend = inputText.trim();
-            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            await new Promise(r => setTimeout(r, 600));
+            const success = await sendMessage(currentUser.id, user.id, textToSend, image, isSelfDestruct);
             
-            const newMsg: Message = image 
-              ? { image, from: 'me', time: timestamp, isSelfDestruct, isViewed: false }
-              : { text: textToSend, from: 'me', time: timestamp };
-
-            setMessages(prev => [...prev, newMsg]);
-            if (!image) setInputText('');
-            
-            return true;
+            if (success) {
+              if (!image) setInputText('');
+              // Carregar imediatamente após enviar para atualizar a UI do usuário de forma ágil
+              const fetched = await fetchMessages(currentUser.id, user.id);
+              setMessages(fetched as any);
+              return true;
+            } else {
+              showNotification('Falha ao enviar mensagem na matriz.', 'error');
+              return false;
+            }
         },
         {
             validate: () => (inputText.trim().length > 0 || image) && !isProcessing,
@@ -64,14 +131,30 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
     );
   };
 
-  const deleteMessage = (idx: number) => {
-    setMessages(prev => prev.filter((_, i) => i !== idx));
-    showNotification('Mensagem removida da matriz.', 'info');
+  const deleteMessage = async (msgId: string) => {
+    if (!msgId) return;
+    const success = await deleteMessagePhysical(msgId);
+    if (success) {
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      showNotification('Mensagem removida da matriz.', 'info');
+    } else {
+      showNotification('Não foi possível excluir a mensagem.', 'error');
+    }
   };
 
-  const markAsViewed = (idx: number) => {
-    setMessages(prev => prev.map((m, i) => i === idx ? { ...m, isViewed: true } : m));
-    showNotification('Foto autodestruída com sucesso.', 'info');
+  const markAsViewed = async (msgId: string, text: string, image: string, isSelfDestruct: boolean) => {
+    if (!msgId) return;
+    const payload = {
+      text: text || '',
+      image: image || '',
+      isSelfDestruct: isSelfDestruct,
+      isViewed: true
+    };
+    const success = await updateMessageContent(msgId, JSON.stringify(payload));
+    if (success) {
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, isViewed: true } : m));
+      showNotification('Foto autodestruída com sucesso.', 'info');
+    }
   };
 
   const handleReport = () => {
@@ -94,7 +177,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
                 <img src={user.avatar || undefined} className="w-full h-full object-cover" alt={user.nickname} />
             </div>
             <PresenceBadge 
-                status={user.status || PresenceStatus.OFFLINE} 
+                status={user.status || (user.isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE)} 
                 size="sm" 
                 className="absolute -top-1 -right-1 z-10 shadow-lg" 
             />
@@ -106,7 +189,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
             </div>
             <div className="mt-1">
                 <PresenceBadge 
-                    status={user.status || PresenceStatus.OFFLINE} 
+                    status={user.status || (user.isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE)} 
                     size="sm" 
                     showText 
                     className="opacity-80" 
@@ -132,7 +215,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
                 <div className="space-y-2">
                   {msg.isSelfDestruct && !msg.isViewed && !isOwner(currentUser) ? (
                     <button 
-                      onClick={() => markAsViewed(idx)}
+                      onClick={() => markAsViewed(msg.id, msg.text || '', msg.image || '', msg.isSelfDestruct || false)}
                       className="flex flex-col items-center gap-2 p-4 bg-black/20 rounded-xl border border-white/10"
                     >
                       <Timer size={32} className="text-amber-500 animate-pulse" />
@@ -162,7 +245,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
             
             {msg.from === 'me' && (
               <button 
-                onClick={() => deleteMessage(idx)}
+                onClick={() => deleteMessage(msg.id)}
                 className="opacity-0 group-hover:opacity-100 p-1 text-slate-600 hover:text-rose-500 transition-opacity mb-2"
                 title="Excluir"
               >

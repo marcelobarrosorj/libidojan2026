@@ -21,7 +21,7 @@ router.post('/compatibility', async (req, res) => {
 
         const ai = getAI();
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-3.5-flash",
             contents: `Você é um Consultor de Lifestyle de Alta Performance especializado em Deep Matching para uma rede social lifestyle premium (Swing/Liberal/BDSM).
             Analise a compatibilidade profunda (Matriz B) entre estes dois perfis:
             
@@ -78,7 +78,7 @@ router.post('/radar-summary', async (req, res) => {
 
         const ai = getAI();
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-3.5-flash",
             contents: prompt
         });
         res.json({ summary: response.text?.trim() });
@@ -102,7 +102,7 @@ router.post('/vibe-check', async (req, res) => {
 
         const ai = getAI();
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-3.5-flash",
             contents: prompt
         });
         res.json({ tag: response.text?.trim().replace(/[".]/g, '') });
@@ -167,7 +167,7 @@ router.post('/starter', async (req, res) => {
         O tom deve ser instigante, focado no lifestyle liberal e condizente com o nível de audácia do alvo.`;
 
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-3.5-flash",
             contents: prompt
         });
         res.json({ text: response.text });

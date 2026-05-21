@@ -75,8 +75,17 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
         </div>
       </header>
 
+      {/* Navigation Reorganized at the TOP of the screen */}
+      <nav className="w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5 px-1 py-3 flex justify-around items-center z-20 shadow-md shrink-0">
+        <NavButton icon={<LayoutGrid size={24} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
+        <NavButton icon={<Radio size={24} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
+        <NavButton icon={<Trophy size={24} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
+        <NavButton icon={<MessageCircle size={24} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chat" />
+        <NavButton icon={<UserCircle size={24} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
+      </nav>
+
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto scrollbar-hide">
+      <main className="flex-1 overflow-y-auto scrollbar-hide pb-12">
         {user && !user.emailVerified && user.email && (
             <VerificationBanner email={user.email} />
         )}
@@ -96,15 +105,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
             )}
         </div>
       </main>
-
-      {/* Bottom Navigation: Reorganized for 2026 Experience */}
-      <nav className="fixed bottom-0 left-0 right-0 w-full sm:max-w-lg mx-auto bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/5 px-1 pt-3 pb-8 flex justify-around items-center z-50 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
-        <NavButton icon={<LayoutGrid size={20} />} isActive={activeTab === 'feed'} onClick={() => setActiveTab('feed')} label="Feed" />
-        <NavButton icon={<Radio size={20} />} isActive={activeTab === 'radar'} onClick={() => setActiveTab('radar')} label="Radar" />
-        <NavButton icon={<Trophy size={20} />} isActive={activeTab === 'ranking'} onClick={() => setActiveTab('ranking')} label="Top" />
-        <NavButton icon={<MessageCircle size={20} />} isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} label="Chat" />
-        <NavButton icon={<UserCircle size={20} />} isActive={activeTab === 'profile' || activeTab === 'profile_settings'} onClick={() => setActiveTab('profile')} label="Perfil" />
-      </nav>
     </div>
   );
 };
@@ -112,20 +112,20 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
 const NavButton: React.FC<{ icon: React.ReactNode, isActive: boolean, onClick: () => void, label: string }> = ({ 
   icon, isActive, onClick, label 
 }) => (
-  <button onClick={onClick} className="flex flex-col items-center gap-1 flex-1 relative transition-all active:scale-95">
-    <div className={`relative p-2 rounded-2xl transition-all duration-500 ${isActive ? 'text-amber-500' : 'text-slate-500 hover:text-slate-300'}`}>
+  <button onClick={onClick} className="flex flex-col items-center gap-1 flex-1 relative transition-all active:scale-95 py-1">
+    <div className={`relative p-2.5 rounded-2xl transition-all duration-300 ${isActive ? 'text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.25)]' : 'text-slate-400 hover:text-slate-200'}`}>
       {isActive && (
         <motion.div 
           layoutId="nav-glow"
-          className="absolute inset-0 bg-amber-500/10 rounded-2xl border border-amber-500/20 blur-[1px]"
+          className="absolute inset-0 bg-yellow-400/10 rounded-2xl border border-yellow-400/40 blur-[1px]"
           transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
         />
       )}
-      <div className="relative z-10 transition-transform duration-300" style={{ transform: isActive ? 'scale(1.1)' : 'scale(1)' }}>
+      <div className="relative z-10 transition-transform duration-300" style={{ transform: isActive ? 'scale(1.15)' : 'scale(1)' }}>
         {icon}
       </div>
     </div>
-    <span className={`text-[7px] font-black uppercase tracking-wider transition-all duration-300 ${isActive ? 'text-amber-500 opacity-100' : 'text-slate-600 opacity-60'}`}>
+    <span className={`text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${isActive ? 'text-yellow-400 opacity-100' : 'text-slate-500 opacity-60'}`}>
       {label}
     </span>
   </button>

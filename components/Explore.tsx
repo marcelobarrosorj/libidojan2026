@@ -35,6 +35,7 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, onChat, curr
   const [userLocation, setUserLocation] = useState<{ lat: number, lon: number } | null>(null);
   const [radarProfiles, setRadarProfiles] = useState<RadarProfile[]>([]);
   const [isRadarLoading, setIsRadarLoading] = useState(false);
+  const notifiedProfilesRef = React.useRef<Set<string>>(new Set());
   
   const { location: currentGeolocation, loading: isLocLoading } = useUserLocation();
   const [showPaywall, setShowPaywall] = useState(false);
@@ -163,6 +164,18 @@ const Explore: React.FC<ExploreProps> = ({ onMatch, onProfileClick, onChat, curr
             signal: abortController.signal
           });
           setRadarProfiles(data);
+          if (currentUser?.pushVerifiedRadar5k) {
+            data.forEach((p) => {
+              const dist = p.distanceKm ?? 999;
+              const isVerified = p.trustLevel === 'Ouro' || (p as any).verifiedAccount === true;
+              if (isVerified && dist <= 5) {
+                if (!notifiedProfilesRef.current.has(p.id)) {
+                  notifiedProfilesRef.current.add(p.id);
+                  showNotification(`[Radar 5km] ${p.name} (Verificado NoFake) está a ${dist.toFixed(1)}km de você`, 'info');
+                }
+              }
+            });
+          }
         } catch (err: any) {
           if (err.name !== 'AbortError') {
             console.error('[EXPLORE] Radar fetch failed', err);
