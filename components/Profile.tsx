@@ -29,6 +29,7 @@ import {
 import { haversineKm, formatDistanceLabel, BASE_LOCATION } from '../services/geoService';
 import { useUserLocation } from '../hooks/useUserLocation';
 import { soundService } from '../services/soundService';
+import { webAuthnService } from '../services/webAuthnService';
 import { fetchFollowers, fetchFollowing } from '../services/repo';
 import ConsentMatrix from './ConsentMatrix';
 import StealthModeToggle from './StealthModeToggle';
@@ -312,6 +313,7 @@ const Profile: React.FC<ProfileProps> = ({
   }, [startEditing]);
   
   const [activeTab, setActiveTab] = useState<'info' | 'gallery' | 'trust'>('info');
+  const [biometricsActive, setBiometricsActive] = useState(webAuthnService.isConfigured());
   const [viewerPhotoIndex, setViewerPhotoIndex] = useState<number | null>(null);
   const [showPhotoGrid, setShowPhotoGrid] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(soundService.isEnabled());
@@ -1300,6 +1302,47 @@ const Profile: React.FC<ProfileProps> = ({
                   </div>
                   <div className={`w-10 h-5 rounded-full relative transition-colors ${user.pushVerifiedRadar5k ? 'bg-amber-500' : 'bg-slate-800'}`}>
                     <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${user.pushVerifiedRadar5k ? 'right-1' : 'left-1'}`} />
+                  </div>
+                </button>
+
+                <button 
+                  onClick={async () => {
+                    if (biometricsActive) {
+                      webAuthnService.disableBiometrics();
+                      setBiometricsActive(false);
+                      showNotification('Biometria Desativada', 'success');
+                      if (typeof soundService?.play === 'function') soundService.play('TAP');
+                    } else {
+                      try {
+                        const res = await webAuthnService.registerBiometrics(user.nickname);
+                        if (res.success) {
+                          if (res.mode === 'visual_fallback') {
+                            await webAuthnService.enableVisualBiometrics();
+                            showNotification('Matrix Eye-Sensor Configurado', 'success');
+                          } else {
+                            showNotification('TouchID/FaceID Ativado com Sucesso', 'success');
+                          }
+                          setBiometricsActive(true);
+                          if (typeof soundService?.play === 'function') soundService.play('MATCH');
+                        }
+                      } catch (err: any) {
+                        showNotification(err.message || 'Erro ao registrar biometria', 'error');
+                      }
+                    }
+                  }}
+                  className={`w-full p-4 rounded-3xl border flex items-center justify-between transition-all ${biometricsActive ? 'bg-amber-500/10 border-amber-500/30' : 'bg-slate-900/40 border-white/5'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${biometricsActive ? 'bg-amber-500 text-black' : 'bg-slate-800 text-slate-500'}`}>
+                      <Fingerprint size={20} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-white uppercase italic">Acesso Biométrico</h4>
+                      <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">TouchID / FaceID para desbloquear</p>
+                    </div>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full relative transition-colors ${biometricsActive ? 'bg-amber-500' : 'bg-slate-800'}`}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${biometricsActive ? 'right-1' : 'left-1'}`} />
                   </div>
                 </button>
               </section>

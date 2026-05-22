@@ -115,6 +115,28 @@ export default function App() {
     };
   }, [refreshSession]);
 
+  // Heartbeat para manter o status online do usuário atual no Supabase e na Matriz Central
+  useEffect(() => {
+    if (!isAuthenticated || !currentUser || !currentUser.id) return;
+
+    const sendHeartbeat = async () => {
+      try {
+        const { saveUserData } = await import('./services/authUtils');
+        await saveUserData({});
+        console.log("[HEARTBEAT] Sinal de presença 'last_seen' sincronizado com a Matriz.");
+      } catch (e) {
+        console.warn("[HEARTBEAT] Falha silenciosa no envio do batimento de presença:", e);
+      }
+    };
+
+    // Envia o primeiro log/sinal de presença no boot do app
+    sendHeartbeat();
+
+    // Sincroniza periodicamente a cada 2 minutos (120.000 ms)
+    const interval = setInterval(sendHeartbeat, 120000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, currentUser?.id]);
+
   useEffect(() => {
     // Marcello: PROTOCOLO DE REPARO MANDATÁRIO - Executado na montagem do App
     const forceRepair = async () => {

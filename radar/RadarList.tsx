@@ -159,19 +159,19 @@ const RadarList: React.FC<{
               {!isLocked && (
                 <button 
                   onClick={(e) => { e.stopPropagation(); onChat?.(p); }}
-                  className="p-3 bg-white/5 hover:bg-amber-500/10 text-slate-400 hover:text-amber-500 rounded-2xl transition-all active:scale-90"
+                  className="w-12 h-12 flex items-center justify-center bg-white/5 hover:bg-amber-500/15 text-slate-400 hover:text-amber-500 rounded-2xl transition-all duration-300 scale-100 hover:scale-105 active:scale-95 shadow-md shadow-black/10 hover:shadow-amber-500/5 whitespace-nowrap"
                   title="Conversar"
                 >
-                  <MessageCircle size={18} />
+                  <MessageCircle size={20} className="transition-transform duration-300 group-hover:rotate-6" />
                 </button>
               )}
 
               {isLocked ? (
                   <button 
                     onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
-                    className="bg-pink/10 text-pink p-2.5 rounded-xl hover:bg-pink hover:text-white transition-all"
+                    className="w-10 h-10 flex items-center justify-center bg-pink/10 text-pink rounded-xl hover:bg-pink hover:text-white transition-all scale-100 hover:scale-105 active:scale-95 whitespace-nowrap"
                   >
-                      <Crown size={14} />
+                      <Crown size={16} />
                   </button>
               ) : (
                   <div className={`transition-all duration-300 ${isSelected ? 'text-pink scale-125 rotate-12' : 'text-slate-700 group-hover:text-pink'}`}>

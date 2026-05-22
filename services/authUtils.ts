@@ -5,6 +5,75 @@ import { CONFIG } from "../config";
 
 export type UserData = Record<string, any>;
 
+/**
+ * Converte um ID textual arbitrário (ex: "000001", "m1", "casalx") em um formato UUID válido para banco.
+ * Se já for um UUID válido, retorna-o como está.
+ */
+export function toDatabaseId(id: string): string {
+    if (!id) return id;
+    const s = String(id).trim();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (uuidRegex.test(s)) return s;
+
+    if (s === '000001') {
+        return '00000000-0000-0000-0000-000000000001';
+    }
+    if (s === 'me') {
+        return '00000000-0000-0000-0000-0000000000ee';
+    }
+    if (s === 'casalx') {
+        return '65a8d3a4-24b1-47d6-aec4-6819710abae8'; // CasalX da matriz
+    }
+
+    if (s.startsWith('m') && s.length > 1 && !isNaN(Number(s.substring(1)))) {
+        const num = s.substring(1).padStart(12, '0');
+        return `00000000-0000-0000-0000-${num}`;
+    }
+
+    // Hash determinístico simples em hex
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) {
+        hash = (hash << 5) - hash + s.charCodeAt(i);
+        hash |= 0;
+    }
+    const absHashHex = Math.abs(hash).toString(16).padEnd(12, '0').slice(0, 12);
+    return `00000000-0000-0000-0000-${absHashHex}`;
+}
+
+export function fromDatabaseId(id: string): string {
+    if (!id) return id;
+    const s = String(id).trim().toLowerCase();
+    if (s === '00000000-0000-0000-0000-000000000001') {
+        return '000001';
+    }
+    if (s === '00000000-0000-0000-0000-0000000000ee') {
+        return 'me';
+    }
+    if (s === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
+        return 'casalx';
+    }
+    if (s.startsWith('00000000-0000-0000-0000-')) {
+        const hex = s.substring(24);
+        const numStr = hex.replace(/^0+/, '');
+        if (numStr) {
+            return `m${numStr}`;
+        }
+        return hex;
+    }
+    return id;
+}
+
+export function parseUTC(dateStr: any): Date {
+    if (!dateStr) return new Date(0);
+    if (dateStr instanceof Date) return dateStr;
+    let str = String(dateStr).trim();
+    if (!str.includes('Z') && !str.includes('+') && !/-\d{2}:\d{2}$/.test(str)) {
+        str = str.replace(' ', 'T') + 'Z';
+    }
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? new Date(dateStr) : d;
+}
+
 export const STORAGE_KEYS = {
   USER_DATA_NEW: 'libido_user_data_v2',
   AUTH_FLAG_NEW: 'libido_auth_active',
@@ -49,12 +118,13 @@ export const syncWithCloud = async (user: User) => {
         if (!user || !user.id) return;
         
         const timestamp = new Date().toISOString();
+        const dbId = toDatabaseId(user.id);
         
         // Tentativa de upsert com colunas básicas que devem existir
         const { error } = await supabase
             .from('profiles')
             .upsert({ 
-                id: user.id, 
+                id: dbId, 
                 nickname: user.nickname, 
                 data: user,
                 updated_at: timestamp
@@ -64,7 +134,7 @@ export const syncWithCloud = async (user: User) => {
             log('warn', 'Cloud Sync Error (Tentando modo simplificado)', error);
             // Fallback simplificado garantindo id, data e updated_at
             const fallbackData: any = { 
-                id: user.id, 
+                id: dbId, 
                 data: user,
                 updated_at: timestamp
             };
@@ -76,7 +146,7 @@ export const syncWithCloud = async (user: User) => {
             if (secondError) {
                 // Última tentativa: apenas ID e DATA JSON + timestamp
                 await supabase.from('profiles').upsert({ 
-                    id: user.id, 
+                    id: dbId, 
                     data: user,
                     updated_at: timestamp
                 }, { onConflict: 'id' });
@@ -115,7 +185,7 @@ export const saveUserData = async (userData: Partial<User>) => {
     const current = cache.userData || getUserData() || {} as User;
     const timestamp = new Date().toISOString();
     
-    const updated = { ...current, ...userData, updatedAt: timestamp } as User;
+    const updated = { ...current, ...userData, updatedAt: timestamp, last_seen: timestamp, lastSeen: timestamp } as User;
     cache.userData = updated;
     
     if (typeof window !== 'undefined') {
@@ -127,15 +197,42 @@ export const saveUserData = async (userData: Partial<User>) => {
 
     // Sincronização Silenciosa com Supabase
     if (updated.id && updated.id !== 'me') {
-        const { error } = await supabase.from('profiles').upsert({
-            id: updated.id,
-            nickname: updated.nickname || (updated as any).name || 'Agente',
-            data: updated,
-            updated_at: timestamp,
-            last_seen: timestamp // Atualiza bolinha de status
-        }, { onConflict: 'id' });
-        
-        if (error) log('warn', 'Erro no Upsert Automático (saveUserData)', error);
+        try {
+            const dbId = toDatabaseId(updated.id);
+            const nickname = updated.nickname || (updated as any).name || 'Agente';
+            
+            // Tentativa 1: Upsert completo com last_seen (caso a coluna exista)
+            const { error } = await supabase.from('profiles').upsert({
+                id: dbId,
+                nickname: nickname,
+                data: updated,
+                updated_at: timestamp,
+                last_seen: timestamp
+            }, { onConflict: 'id' });
+            
+            if (error) {
+                log('warn', 'Erro no Upsert Automático Completo, tentando sem a coluna last_seen:', error);
+                // Tentativa 2: Sem a coluna last_seen (que pode não existir no postgres)
+                const { error: secondError } = await supabase.from('profiles').upsert({
+                    id: dbId,
+                    nickname: nickname,
+                    data: updated,
+                    updated_at: timestamp
+                }, { onConflict: 'id' });
+                
+                if (secondError) {
+                    log('warn', 'Erro no Segundo Upsert de saveUserData, tentando modo ultra simplificado:', secondError);
+                    // Tentativa 3: Ultra simplificado (apenas id e data)
+                    await supabase.from('profiles').upsert({
+                        id: dbId,
+                        data: updated,
+                        updated_at: timestamp
+                    }, { onConflict: 'id' });
+                }
+            }
+        } catch (dbErr) {
+            log('error', 'Falha crítica ao sincronizar saveUserData com o Supabase', dbErr);
+        }
     }
 };
 
@@ -255,19 +352,57 @@ export const syncCaches = async () => {
     }
 };
 
-export const showNotification = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
+export const showNotification = (message: any, type: 'info' | 'error' | 'success' = 'info') => {
     if (!isBrowser) {
         log('info', `[NOTIFICATION] ${message}`);
         return;
     }
+
+    let friendlyMessage = '';
+    
+    // Converte e higieniza a mensagem recebida de forma extremamente robusta
+    if (!message) {
+        friendlyMessage = 'CONEXÃO ATIVA COM A MATRIZ CENTRAL';
+    } else if (typeof message === 'string') {
+        friendlyMessage = message;
+    } else if (message.message) {
+        friendlyMessage = message.message;
+    } else {
+        try {
+            friendlyMessage = JSON.stringify(message);
+        } catch {
+            friendlyMessage = String(message);
+        }
+    }
+
+    // Tradutor de erros de baixo nível / de engenharia para UX High-End "Matriz"
+    const lowerMessage = friendlyMessage.toLowerCase();
+    if (
+        lowerMessage.includes('failed to fetch') || 
+        lowerMessage.includes('networkerror') || 
+        lowerMessage.includes('load failed') || 
+        lowerMessage.includes('network error') ||
+        lowerMessage.includes('consignor error') || 
+        lowerMessage.includes('connection aborted')
+    ) {
+        friendlyMessage = 'SINAL INSTÁVEL COM A MATRIZ. SINCRONIZANDO EM SEGUNDO PLANO...';
+    } else if (lowerMessage.includes('supabase') || lowerMessage.includes('database') || lowerMessage.includes('postgres')) {
+        friendlyMessage = 'RESILIÊNCIA DA BANCO DE DADOS ATIVA. OPERANDO CO-PROCESSAMENTO LOCAL.';
+    } else if (lowerMessage.includes('session') || lowerMessage.includes('auth') || lowerMessage.includes('unauthorized') || lowerMessage.includes('jwt')) {
+        friendlyMessage = 'SEGURANÇA RE-VALIDANDO CHAVES DE CRIPTOGRAFIA.';
+    }
+
     const notification = document.createElement('div');
-    notification.className = `notification ${type === 'error' ? 'bg-rose-600' : type === 'success' ? 'bg-green-600' : 'bg-slate-800'} text-white animate-in slide-in-from-top duration-300 shadow-2xl`;
-    notification.innerText = message;
+    notification.className = `notification ${type === 'error' ? 'bg-rose-600 border border-rose-500/30' : type === 'success' ? 'bg-emerald-600 border border-emerald-500/30' : 'bg-slate-900 border border-white/5'} text-white uppercase text-xs font-semibold tracking-wider p-4 rounded-xl shadow-2xl transition-all duration-300`;
+    
+    // Se preferir, podemos capitalizar a mensagem para seguir as diretivas visuais curtas do AGENTS.md
+    notification.innerText = friendlyMessage.toUpperCase();
+    
     document.body.appendChild(notification);
     setTimeout(() => {
         notification.classList.add('animate-out', 'fade-out');
         setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    }, 4000); // 4 segundos de exibição elegante
 };
 
 export const handleButtonAction = async <T>(

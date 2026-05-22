@@ -3,7 +3,7 @@ import { TrustLevel, UserType, Plan, PresenceStatus, type UserProfile, type Rada
 import { MOCK_USERS, MOCK_CURRENT_USER, MOCK_MOMENTS, MOCK_POSTS } from '../constants';
 import { mockRadarProfiles as fullMocks } from '../radar/mockData';
 import { supabase } from './supabase';
-import { cache, log } from './authUtils';
+import { cache, log, toDatabaseId, fromDatabaseId, parseUTC } from './authUtils';
 
 export type Viewer = {
   id: string;
@@ -145,11 +145,12 @@ export async function searchProfiles(query: string): Promise<RadarProfile[]> {
 
 export async function getProfileById(id: string): Promise<any | null> {
     try {
+        const dbId = toDatabaseId(id);
         // 1. Tentar banco real (Supabase)
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', id)
+            .eq('id', dbId)
             .single();
 
         if (error) {
@@ -158,14 +159,15 @@ export async function getProfileById(id: string): Promise<any | null> {
                 details: error.details,
                 hint: error.hint,
                 code: error.code,
-                id
+                id: dbId
             });
         }
 
         if (data) {
+            const profileId = fromDatabaseId(data.id);
             // Marcello: HARDCODE MANDATÁRIO CASALX (Correção Geográfica Instantânea)
             // Se o ID for o do casalx ou o nickname for casalx, forçamos Campo Grande
-            if (data.nickname === 'casalx' || id === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
+            if (data.nickname === 'casalx' || profileId === '65a8d3a4-24b1-47d6-aec4-6819710abae8' || id === 'casalx') {
                 const currentData = typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
                 console.log("[AUDITORIA] Forçando coordenadas Campo Grande para Casalx (getProfileById)");
                 const forcedData = {
@@ -175,14 +177,14 @@ export async function getProfileById(id: string): Promise<any | null> {
                     city: 'Rio de Janeiro',
                     location: 'Campo Grande'
                 };
-                return { ...forcedData, id: data.id, nickname: 'casalx' };
+                return { ...forcedData, id: profileId, nickname: 'casalx' };
             }
             
             const profileData = typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
             
             // Marcello: TRAVA DE SEGURANÇA CASALX (Teletransporte SP -> RJ)
             // Se o banco retornar coordenadas de São Paulo para o casalx, forçamos Campo Grande.
-            if (data.nickname === 'casalx' || id === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
+            if (data.nickname === 'casalx' || profileId === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
                 if (profileData.lat < -23 || !profileData.lat) {
                     console.log("[SEGURANÇA] Teletransportando Casalx: SP -> Campo Grande (RJ)");
                     profileData.lat = -22.9031;
@@ -192,14 +194,14 @@ export async function getProfileById(id: string): Promise<any | null> {
             }
 
             // Determinação de Status Online em tempo real absoluto
-            const lastSeen = data.last_seen || data.updated_at;
-            const diffMinutes = lastSeen ? (new Date().getTime() - new Date(lastSeen).getTime()) / 60000 : 999;
-            const isOnline = diffMinutes < 5;
+            const lastSeen = data.last_seen || profileData.last_seen || profileData.lastSeen || data.updated_at || profileData.updatedAt || profileData.updated_at;
+            const diffMinutes = lastSeen ? (new Date().getTime() - parseUTC(lastSeen).getTime()) / 60000 : 999;
+            const isOnline = lastSeen ? (Math.abs(diffMinutes) < 15) : false;
             const status = isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE;
 
             return {
                 ...profileData,
-                id: data.id,
+                id: profileId,
                 nickname: data.nickname || profileData.nickname || 'Agente',
                 isOnline,
                 status
@@ -261,15 +263,16 @@ export async function fetchLatestProfiles(limitCount: number = 30): Promise<Rada
 function processProfileData(data: any[]): RadarProfile[] {
     return data.map(item => {
         let u: any = typeof item.data === 'string' ? JSON.parse(item.data) : (item.data || {});
+        const profileId = fromDatabaseId(item.id);
         
         // Marcello: INTERCEPTAÇÃO DE DADOS (Protocolo Casalx e Bloqueio de Cache Antigo)
-        if (item.id === '000001' || item.nickname === 'marcelo') {
+        if (profileId === '000001' || item.nickname === 'marcelo') {
             item.nickname = 'CASAL BEIJO';
             u.nickname = 'CASAL BEIJO';
             item.serialNumber = '000001';
         }
 
-        if (item.nickname === 'casalx' || item.id === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
+        if (item.nickname === 'casalx' || profileId === '65a8d3a4-24b1-47d6-aec4-6819710abae8') {
             u.lat = -22.9031;
             u.lon = -43.5590;
             u.city = 'Rio de Janeiro';
@@ -277,21 +280,21 @@ function processProfileData(data: any[]): RadarProfile[] {
         }
 
         // Determinação de Status Online
-        const lastSeen = item.last_seen || item.updated_at;
-        const diffMinutes = lastSeen ? (new Date().getTime() - new Date(lastSeen).getTime()) / 60000 : 999;
-        const isOnline = diffMinutes < 5;
-        const isAway = diffMinutes >= 5 && diffMinutes < 30;
+        const lastSeen = item.last_seen || u.last_seen || u.lastSeen || item.updated_at || u.updatedAt || u.updated_at;
+        const diffMinutes = lastSeen ? (new Date().getTime() - parseUTC(lastSeen).getTime()) / 60000 : 999;
+        const isOnline = lastSeen ? (Math.abs(diffMinutes) < 15) : false;
+        const isAway = lastSeen ? (diffMinutes >= 15 && diffMinutes < 45) : false;
         const statusColor = isOnline ? '#22c55e' : (isAway ? '#eab308' : '#64748b');
 
         const name = item.nickname || u.nickname || u.name || 'Agente';
         return {
-            id: item.id,
+            id: profileId,
             name: name,
             nickname: name,
             lat: u.lat || 0,
             lon: u.lon || 0,
             city: u.city || 'Matriz',
-            avatar: u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.id}`,
+            avatar: u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileId}`,
             trustLevel: u.trustLevel || TrustLevel.BRONZE,
             isOnline,
             status: isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE,

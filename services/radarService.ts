@@ -5,6 +5,7 @@ import { matchesPreferences } from './prefs';
 import { loadViewer, fetchProfilesByBoundingBox, mockRadarProfiles } from './repo';
 import { MOCK_USERS } from '../constants';
 import { supabase } from './supabase';
+import { toDatabaseId, fromDatabaseId, parseUTC } from './authUtils';
 
 const MIN_KM = 0.1; 
 const MAX_KM_FREE = 15;
@@ -26,20 +27,20 @@ export async function queryRadar(params: { viewerId: string; viewerLat: number; 
         }
 
         const realUsersFromSupabase = (data || [])
-            .filter((item: any) => item.id !== params.viewerId && !item.is_mock && !item.isMock)
+            .filter((item: any) => fromDatabaseId(item.id) !== params.viewerId && !item.is_mock && !item.isMock)
             .map((item: any) => {
                 const u = item.data || {};
                 const itemLat = u.lat || 0;
                 const itemLon = u.lon || 0;
                 const dist = haversineKm(safeLat, safeLon, itemLat, itemLon);
                 
-                const lastSeen = item.last_seen || item.updated_at;
-                const diffMinutes = lastSeen ? (new Date().getTime() - new Date(lastSeen).getTime()) / 60000 : 999;
-                const isOnline = diffMinutes < 5;
+                const lastSeen = item.last_seen || u.last_seen || u.lastSeen || item.updated_at || u.updatedAt || u.updated_at;
+                const diffMinutes = lastSeen ? (new Date().getTime() - parseUTC(lastSeen).getTime()) / 60000 : 999;
+                const isOnline = lastSeen ? (Math.abs(diffMinutes) < 15) : false;
                 const status = isOnline ? PresenceStatus.ONLINE : PresenceStatus.OFFLINE;
 
                 return {
-                    id: item.id,
+                    id: fromDatabaseId(item.id),
                     name: item.nickname || u.nickname || 'Agente',
                     avatar: u.avatar || '',
                     lat: itemLat,

@@ -6,12 +6,12 @@ import { ReportModal } from './ReportModal';
 import { PresenceBadge } from './common/PresenceBadge';
 import { 
   ChevronLeft, Send, MoreVertical, ShieldCheck, Loader2, Flag, UserX, X, ShieldAlert,
-  Clock, Image as ImageIcon, EyeOff, Timer
+  Clock, Image as ImageIcon, EyeOff, Timer, Check, CheckCheck
 } from 'lucide-react';
 import { log, handleButtonAction, showNotification, isOwner } from '../services/authUtils';
 import { soundService } from '../services/soundService';
 import { CONFIG } from '../config';
-import { sendMessage, fetchMessages, updateMessageContent, deleteMessagePhysical, subscribeToMessages } from '../services/chatService';
+import { sendMessage, fetchMessages, updateMessageContent, deleteMessagePhysical, subscribeToMessages, markMessagesAsRead } from '../services/chatService';
 
 interface ChatDetailProps {
   user: User;
@@ -27,6 +27,7 @@ interface Message {
   time: string;
   isSelfDestruct?: boolean;
   isViewed?: boolean;
+  is_read?: boolean;
 }
 
 const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) => {
@@ -49,6 +50,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
     let active = true;
 
     const load = async () => {
+      await markMessagesAsRead(currentUser.id, user.id);
       const fetched = await fetchMessages(currentUser.id, user.id);
       if (active) {
         setMessages(fetched as any);
@@ -65,9 +67,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
         if (exists) {
           return prev.map(m => m.id === newMsg.id ? (newMsg as any) : m);
         }
-        // Se for mensagem de outro usuário, reproduz som imediático de recebido
+        // Se for mensagem de outro usuário, reproduz som imediático de recebido e marca como lida
         if (newMsg.from === 'them') {
           soundService.play('MESSAGE');
+          markMessagesAsRead(currentUser.id, user.id);
         }
         return [...prev, newMsg as any];
       });
@@ -82,6 +85,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
           const hasNewFromThem = fetched.some(f => f.from === 'them' && !prev.some(p => p.id === f.id));
           if (hasNewFromThem) {
             soundService.play('MESSAGE');
+            markMessagesAsRead(currentUser.id, user.id);
           }
 
           const merged = [...prev];
@@ -240,7 +244,21 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ user, currentUser, onBack }) =>
               ) : (
                 <p>{msg.text}</p>
               )}
-              <span className="text-[10px] opacity-50 block text-right mt-1">{msg.time}</span>
+              
+              <div className="flex items-center justify-end gap-1 mt-1">
+                <span className="text-[10px] opacity-50 font-medium tracking-tight">{msg.time}</span>
+                {msg.from === 'me' && (
+                  <span className="flex items-center ml-0.5" title={msg.is_read ? 'Lida' : (msg.id.startsWith('local_') ? 'Enviando...' : 'Entregue')}>
+                    {msg.id.startsWith('local_') ? (
+                      <Check size={12} className="text-slate-400" />
+                    ) : msg.is_read ? (
+                      <CheckCheck size={12} className="text-green-400" />
+                    ) : (
+                      <CheckCheck size={12} className="text-slate-400" />
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
             
             {msg.from === 'me' && (

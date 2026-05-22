@@ -204,21 +204,21 @@ export default function RadarCircle(props: RadarCircleProps) {
                  position: 'absolute', 
                  left: `${x}%`, 
                  top: `${y}%`, 
-                 width: 32, 
-                 height: 32, 
-                 marginLeft: -16, 
-                 marginTop: -16, 
+                 width: 44, 
+                 height: 44, 
+                 marginLeft: -22, 
+                 marginTop: -22, 
                }}
             >
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full flex items-center justify-center">
                 <div className={`
-                  w-full h-full rounded-full border-2 flex items-center justify-center transition-all overflow-hidden
+                  w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all overflow-hidden
                   ${isLocked 
                     ? 'border-white/5 bg-slate-900/50' 
                     : (isOuro ? 'border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)]' : 'border-pink bg-slate-900')}
                 `}>
                   {isLocked ? (
-                    <Lock size={10} className="text-slate-700" />
+                    <Lock size={12} className="text-slate-700" />
                   ) : (
                     <img src={p.avatar || undefined} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                   )}
@@ -228,13 +228,13 @@ export default function RadarCircle(props: RadarCircleProps) {
                   <PresenceBadge 
                     status={p.status || PresenceStatus.OFFLINE} 
                     size="sm" 
-                    className="absolute -top-1 -right-1 z-20 pointer-events-none" 
+                    className="absolute top-0 right-0 z-20 pointer-events-none" 
                   />
                 )}
                 
                 {!isLocked && (
                   <div className={`
-                    absolute inset-0 rounded-full animate-ping opacity-0 group-hover:opacity-30
+                    absolute inset-1 rounded-full animate-ping opacity-0 group-hover:opacity-30
                     ${isOuro ? 'bg-amber-500' : 'bg-pink'}
                   `} />
                 )}
