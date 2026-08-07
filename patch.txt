@@ -1,0 +1,32 @@
+--- src/App.tsx
++++ src/App.tsx
+@@ -201,6 +201,28 @@
+        return <Onboarding userId={user.uid} onComplete={handleOnboardingComplete} />;
+     }
+ 
++    if (supabaseUser.isBanned) {
++      return (
++        <div className="flex flex-col justify-center items-center px-6 gap-6 w-full h-screen text-center bg-[#0a0a0f] text-white">
++          <h1 className="text-2xl font-black uppercase tracking-wider italic text-red-500">Conta Banida</h1>
++          <p className="text-white/40 text-xs">Sua conta foi suspensa por violar os termos de uso.</p>
++          <button onClick={logout} className="text-white/30 text-xs font-bold uppercase tracking-widest mt-6 hover:text-white">
++            Sair
++          </button>
++        </div>
++      );
++    }
++
++    if (supabaseUser.isDeleted) {
++      return (
++        <div className="flex flex-col justify-center items-center px-6 gap-6 w-full h-screen text-center bg-[#0a0a0f] text-white">
++          <h1 className="text-2xl font-black uppercase tracking-wider italic text-red-500">Conta Excluída</h1>
++          <p className="text-white/40 text-xs">Esta conta foi excluída.</p>
++          <button onClick={logout} className="text-white/30 text-xs font-bold uppercase tracking-widest mt-6 hover:text-white">
++            Sair
++          </button>
++        </div>
++      );
++    }
++
+     if (supabaseUser && !pinVerified) {
+       const hasPin = supabaseUser.pin && supabaseUser.pin.length === 4 && supabaseUser.pin !== 'premium';

@@ -1,0 +1,8 @@
+{
+  "name": "Libido App",
+  "description": "Premium social networking application with a unique social sonar radar feature to find connections nearby in real time.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

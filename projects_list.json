@@ -1,0 +1,19 @@
+[
+  {
+    "created_at": "2026-02-12T19:09:20.007226Z",
+    "database": {
+      "host": "db.hkuwlazwtxwfffnpgfdd.supabase.co",
+      "postgres_engine": "17",
+      "release_channel": "ga",
+      "version": "17.6.1.063"
+    },
+    "id": "hkuwlazwtxwfffnpgfdd",
+    "linked": false,
+    "name": "libido2026",
+    "organization_id": "vjneyxtdxgehtkdzssxw",
+    "organization_slug": "vjneyxtdxgehtkdzssxw",
+    "ref": "hkuwlazwtxwfffnpgfdd",
+    "region": "us-east-1",
+    "status": "ACTIVE_HEALTHY"
+  }
+]
