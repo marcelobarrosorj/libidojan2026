@@ -20,7 +20,6 @@ export function AppCore({
   userId,
   onLogout,
   showNav = true,
-  children,
   currentUser
 }: AppCoreProps) {
 
@@ -55,15 +54,6 @@ export function AppCore({
         onNotificationsClick={() => navigate('invites')}
       />
 
-      {showNav && (
-        <div className="flex-shrink-0 bg-[var(--libido-bg)] border-b border-[var(--libido-border)] relative z-50">
-          <BottomNavGlobal
-            activeTab={activeTab}
-            onTabChange={(tab) => navigate(tab)}
-            isAdmin={isAdmin}
-          />
-        </div>
-      )}
 
       <ContentRouter
         activeTab={activeTab}
@@ -77,14 +67,33 @@ export function AppCore({
         currentUser={currentUser}
       />
 
+
+      {showNav && (
+        <div className="flex-shrink-0 bg-[var(--libido-bg)] border-t border-[var(--libido-border)] relative z-50">
+
+          <BottomNavGlobal
+            activeTab={activeTab}
+            onTabChange={(tab) => navigate(tab)}
+            isAdmin={isAdmin}
+          />
+
+        </div>
+      )}
+
+
       <PixCheckout
         isOpen={showPixModal}
         onClose={() => setShowPixModal(false)}
         onUpgrade={async () => {
+
           if (currentUser?.id) {
-            await updateUserProfile(currentUser.id, {
-              plan: 'premium'
-            });
+
+            await updateUserProfile(
+              currentUser.id,
+              {
+                plan: 'premium'
+              }
+            );
 
             window.location.reload();
           }
