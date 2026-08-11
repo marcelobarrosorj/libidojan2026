@@ -40,17 +40,37 @@ interface ContentRouterProps {
   currentUser?: User | null;
 }
 
-export function ContentRouter({ activeTab, navParams, navigate, isPremium, isAdmin, onShowPremiumModal, userId, onLogout, currentUser }: ContentRouterProps) {
+export function ContentRouter({
+  activeTab,
+  navParams,
+  navigate,
+  isPremium,
+  isAdmin,
+  onShowPremiumModal,
+  userId,
+  onLogout,
+  currentUser,
+}: ContentRouterProps) {
   const Component = routes[activeTab];
 
   if (!Component) {
-    return <div className="text-[var(--libido-text)] p-4">Not found: {activeTab}</div>;
+    return (
+      <div className="text-[var(--libido-text)] p-4">
+        Not found: {activeTab}
+      </div>
+    );
   }
 
   return (
-    <main className={`flex-1 flex flex-col w-full overflow-x-hidden relative z-0 bg-[var(--libido-bg)] min-h-0 ${activeTab === 'chat' ? 'overflow-y-hidden' : 'overflow-y-auto no-scrollbar'}`}>
-      <Component 
-        isPremium={isPremium} 
+    <main
+      className={`flex-1 flex flex-col w-full max-w-full overflow-x-hidden relative z-0 bg-[var(--libido-bg)] min-h-0 ${
+        activeTab === "chat"
+          ? "overflow-y-hidden"
+          : "overflow-y-auto no-scrollbar"
+      }`}
+    >
+      <Component
+        isPremium={isPremium}
         isAdmin={isAdmin}
         onShowPremiumModal={onShowPremiumModal}
         userId={userId}
