@@ -20,18 +20,24 @@ const notifyListeners = (msgs: Message[]) => {
 
 export const sendMessage = async (message: Omit<Message, 'id'>) => {
   message.status = message.status || 'sending';
+
   if (isDemoId(message.from) || isDemoId(message.to)) {
-    const newMsg: Message = { ...message, id: 'demo:msg:' + Date.now() };
+    const newMsg: Message = {
+      ...message,
+      id: 'demo:msg:' + Date.now()
+    };
+
     demoMessages.push(newMsg);
+    fetchAndNotifyAll();
+
     setTimeout(() => {
       newMsg.status = 'read';
       fetchAndNotifyAll();
     }, 1500);
-    // Trigger an update
-    fetchAndNotifyAll();
+
     return;
   }
-  
+
   try {
     const { error } = await supabase.from('messages').insert({
       sender_id: message.from,
@@ -39,11 +45,18 @@ export const sendMessage = async (message: Omit<Message, 'id'>) => {
       content: message.text,
       created_at: new Date(message.createdAt).toISOString()
     });
+
     if (error) throw error;
+
   } catch (err: any) {
     console.error('Error sending message:', err.message || err);
-    // Fallback to local state if Supabase fails (e.g. table missing or RLS error)
-    const newMsg: Message = { ...message, id: 'fallback:msg:' + Date.now(), status: 'sent' };
+
+    const newMsg: Message = {
+      ...message,
+      id: 'fallback:msg:' + Date.now(),
+      status: 'sent'
+    };
+
     demoMessages.push(newMsg);
     fetchAndNotifyAll();
   }
@@ -53,11 +66,16 @@ let lastUserId = '';
 
 const fetchAndNotifyAll = async () => {
   if (!lastUserId) return;
+
   if (isDemoId(lastUserId)) {
-    const relevantDemo = demoMessages.filter(m => m.from === lastUserId || m.to === lastUserId);
+    const relevantDemo = demoMessages.filter(
+      m => m.from === lastUserId || m.to === lastUserId
+    );
+
     notifyListeners(relevantDemo);
     return;
   }
+
   try {
     const { data, error } = await supabase
       .from('messages')
@@ -65,32 +83,65 @@ const fetchAndNotifyAll = async () => {
       .or(`sender_id.eq.${lastUserId},receiver_id.eq.${lastUserId}`)
       .order('created_at', { ascending: false })
       .limit(100);
+
     if (error) throw error;
-        
+
     if (data) {
       let msgs = data.map(mapSupabaseToMessage).reverse();
-      const relevantDemo = demoMessages.filter(m => m.from === lastUserId || m.to === lastUserId);
+
+      const relevantDemo = demoMessages.filter(
+        m => m.from === lastUserId || m.to === lastUserId
+      );
+
       msgs = [...msgs, ...relevantDemo];
+
       notifyListeners(msgs);
     }
+
   } catch (err: any) {
-    console.error('Error fetching all user messages from supabase:', err.message || err);
-    // Fallback
-    const relevantDemo = demoMessages.filter(m => m.from === lastUserId || m.to === lastUserId);
+    console.error(
+      'Error fetching all user messages from supabase:',
+      err.message || err
+    );
+
+    const relevantDemo = demoMessages.filter(
+      m => m.from === lastUserId || m.to === lastUserId
+    );
+
     notifyListeners(relevantDemo);
   }
 };
 
-export const listenAllUserMessages = (userId: string, callback: (messages: Message[]) => void) => {
+export const listenAllUserMessages = (
+  userId: string,
+  callback: (messages: Message[]) => void
+) => {
   lastUserId = userId;
   listeners.push(callback);
-  
+
   fetchAndNotifyAll();
 
-  const channel = supabase.channel(`all_messages_${userId}`)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${userId}` }, () => {
-      fetchAndNotifyAll();
-    })
+  const channel = supabase
+    .channel(`all_messages_${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages'
+      },
+      (payload) => {
+        if (
+          payload.new &&
+          (
+            payload.new.sender_id === userId ||
+            payload.new.receiver_id === userId
+          )
+        ) {
+          fetchAndNotifyAll();
+        }
+      }
+    )
     .subscribe();
 
   return () => {
@@ -99,7 +150,10 @@ export const listenAllUserMessages = (userId: string, callback: (messages: Messa
   };
 };
 
-export const listenMessages = (userId1: string, userId2: string, callback: (messages: Message[]) => void) => {
-  // We can just reuse logic or mock it, but Chat.tsx only uses listenAllUserMessages.
+export const listenMessages = (
+  userId1: string,
+  userId2: string,
+  callback: (messages: Message[]) => void
+) => {
   return () => {};
 };
