@@ -1,4 +1,3 @@
-import { isDemoId } from "../demo";
 import { useState, useEffect, useRef } from "react";
 import {
   Search,
@@ -12,9 +11,9 @@ import {
   Phone,
   MoreVertical,
 } from "lucide-react";
+
 import { User, Message } from "../types";
 import { ProtectedImage } from "./ProtectedImage";
-import { formatUserNumber } from "../utils/formatUserNumber";
 import { listenAllUserMessages, sendMessage } from "../services/chat";
 import { getUsersByIds } from "../services/users";
 
@@ -27,8 +26,8 @@ interface ChatProps {
 }
 
 interface ChatContact {
-  userNumber?: number;
   id: string;
+  userNumber?: number;
   name: string;
   avatar: string;
   lastMessage: string;
@@ -47,33 +46,37 @@ interface ChatMessage {
 }
 
 function MessageStatus({ status }: { status: string }) {
-  if (status === "sending")
-    return <Check size={14} className="text-[var(--libido-muted)] opacity-50" />;
+  if (status === "sending") {
+    return <Check size={14} className="opacity-50" />;
+  }
 
-  if (status === "sent")
-    return <Check size={14} className="text-[var(--libido-muted)] opacity-60" />;
+  if (status === "sent") {
+    return <Check size={14} className="opacity-60" />;
+  }
 
-  if (status === "delivered")
-    return <CheckCheck size={14} className="text-[var(--libido-muted)] opacity-60" />;
+  if (status === "delivered") {
+    return <CheckCheck size={14} className="opacity-60" />;
+  }
 
-  if (status === "read")
+  if (status === "read") {
     return <CheckCheck size={14} className="text-[#53bdeb]" />;
+  }
 
   return null;
 }
 
 export function Chat({
   userId,
-  isPremium,
   currentUser,
-  navigate,
   user,
 }: ChatProps) {
+
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [allMessages, setAllMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,108 +85,118 @@ export function Chat({
     }
   }, [user]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [allMessages, activeChat]);
-
   useEffect(() => {
     if (!userId) return;
 
-    const unsubscribe = listenAllUserMessages(userId, async (messages) => {
-      setAllMessages(messages);
+    const unsubscribe = listenAllUserMessages(
+      userId,
+      async (messages) => {
+        setAllMessages(messages);
 
-      const uniqueUserIds = new Set<string>();
+        const ids = new Set<string>();
 
-      messages.forEach((m) => {
-        if (m.from !== userId) uniqueUserIds.add(m.from);
-        if (m.to !== userId) uniqueUserIds.add(m.to);
-      });
+        messages.forEach((m) => {
+          if (m.from !== userId) ids.add(m.from);
+          if (m.to !== userId) ids.add(m.to);
+        });
 
-      const newUsers = await getUsersByIds(Array.from(uniqueUserIds));
-      setUsers(newUsers);
-    });
+        const loadedUsers = await getUsersByIds(Array.from(ids));
+
+        setUsers(loadedUsers);
+      }
+    );
 
     return () => unsubscribe();
+
   }, [userId]);
-  const otherUsers = users.filter((u) => (u.user_id || u.id) !== userId);
 
-  const contacts: ChatContact[] = otherUsers
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [allMessages, activeChat]);
+
+
+  const contacts: ChatContact[] = users
+    .filter((u) => (u.id || u.user_id) !== userId)
     .map((u) => {
-      const id = u.user_id || u.id || "";
 
-      const userMsgs = allMessages.filter(
+      const id = u.id || u.user_id || "";
+
+      const msgs = allMessages.filter(
         (m) =>
           (m.from === id && m.to === userId) ||
-          (m.to === id && m.from === userId),
+          (m.to === id && m.from === userId)
       );
 
-      const lastMsg =
-        userMsgs.length > 0 ? userMsgs[userMsgs.length - 1] : null;
+      const last = msgs[msgs.length - 1];
 
       return {
         id,
-        name: u.nickname || u.name || "User",
         userNumber: u.userNumber,
+        name: u.nickname || u.name || "Usuário",
         avatar:
           u.photo_url ||
-          "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
-        lastMessage: lastMsg ? lastMsg.text : "Iniciar conversa",
-        time: lastMsg
-          ? new Date(lastMsg.createdAt).toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
+        lastMessage: last?.text || "Iniciar conversa",
+        time: last
+          ? new Date(last.createdAt).toLocaleTimeString(
+              "pt-BR",
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            )
           : "",
         unread: 0,
         online: !!u.isOnline,
-        lastMessageTime: lastMsg ? lastMsg.createdAt : 0,
+        lastMessageTime: last?.createdAt || 0,
       };
-    })
-    .filter((c) => c.lastMessageTime > 0 || searchQuery.trim() !== "");
+    });
 
-  contacts.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
 
   const filteredContacts = contacts.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  let activeChatContact = contacts.find((c) => c.id === activeChat);
 
-  if (!activeChatContact && user && activeChat === (user.user_id || user.id)) {
-    activeChatContact = {
-      id: user.user_id || user.id,
-      name: user.nickname || user.name || "User",
-      avatar:
-        user.photo_url ||
-        "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
-      lastMessage: "",
-      time: "",
-      unread: 0,
-      online: !!user.isOnline,
-      lastMessageTime: Date.now(),
-    };
-  }
+  const activeContact =
+    contacts.find((c) => c.id === activeChat) ||
+    (user && activeChat === (user.user_id || user.id)
+      ? {
+          id: user.user_id || user.id,
+          name: user.nickname || user.name || "Usuário",
+          avatar:
+            user.photo_url ||
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=user",
+          lastMessage: "",
+          time: "",
+          unread: 0,
+          online: !!user.isOnline,
+          lastMessageTime: Date.now(),
+        }
+      : null);
 
-  const activeChatMessages: ChatMessage[] = allMessages
+  const activeMessages: ChatMessage[] = allMessages
     .filter(
       (m) =>
         (m.from === activeChat && m.to === userId) ||
-        (m.to === activeChat && m.from === userId),
+        (m.to === activeChat && m.from === userId)
     )
     .map((m) => ({
       id: m.id,
       text: m.text,
-      time: new Date(m.createdAt).toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      time: new Date(m.createdAt).toLocaleTimeString(
+        "pt-BR",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ),
       fromMe: m.from === userId,
       status: (m.status as any) || "sent",
     }));
+
 
   const handleSend = async () => {
     if (!messageInput.trim() || !activeChat || !userId) return;
@@ -200,119 +213,124 @@ export function Chat({
     });
   };
 
-  if (activeChat && activeChatContact) {
-    return (
-      <div className="flex-1 flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] min-h-0 w-full max-w-full overflow-hidden">
 
-        <div className="flex items-center gap-3 px-3 py-3 bg-[var(--libido-surface-2)] border-b border-[var(--libido-border)] flex-shrink-0 w-full">
+  if (activeChat && activeContact) {
+
+    return (
+      <div className="flex flex-col w-full h-full min-h-0 overflow-hidden bg-[var(--libido-bg)] text-[var(--libido-text)]">
+
+        <div className="flex items-center gap-3 px-3 py-3 flex-shrink-0 border-b border-[var(--libido-border)] bg-[var(--libido-surface-2)]">
 
           <button
             onClick={() => setActiveChat(null)}
-            className="text-[var(--libido-muted)] opacity-70 hover:text-[var(--libido-text)] p-1 flex-shrink-0"
+            className="flex-shrink-0"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20}/>
           </button>
 
-          <div className="relative flex-shrink-0">
-            <ProtectedImage
-              currentUser={currentUser}
-              src={activeChatContact.avatar}
-              className="w-10 h-10 rounded-full border border-[var(--libido-border)]"
-              alt=""
-            />
 
-            {activeChatContact.online && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#12121a]" />
-            )}
-          </div>
+          <ProtectedImage
+            currentUser={currentUser}
+            src={activeContact.avatar}
+            className="w-10 h-10 rounded-full flex-shrink-0"
+            alt=""
+          />
+
 
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-[var(--libido-text)] truncate">
-              {activeChatContact.name}
+            <h3 className="truncate font-bold text-sm">
+              {activeContact.name}
             </h3>
 
-            <p className="text-[10px] text-[var(--libido-muted)] opacity-60">
-              {activeChatContact.online
+            <p className="text-xs opacity-60">
+              {activeContact.online
                 ? "online"
-                : "visto por último recentemente"}
+                : "visto recentemente"}
             </p>
           </div>
 
-          <button className="p-1 flex-shrink-0">
-            <Phone size={18} />
-          </button>
 
-          <button className="p-1 flex-shrink-0">
-            <MoreVertical size={18} />
-          </button>
+          <Phone size={18}/>
+          <MoreVertical size={18}/>
 
         </div>
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-3 min-h-0">
-          {activeChatMessages.map((msg) => (
+
+
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
+
+          {activeMessages.map((msg)=>(
             <div
               key={msg.id}
-              className={`flex w-full ${
-                msg.fromMe ? "justify-end" : "justify-start"
+              className={`flex ${
+                msg.fromMe
+                ? "justify-end"
+                : "justify-start"
               }`}
             >
+
               <div
-                className={`max-w-[78%] rounded-2xl px-3 py-2 min-w-0 ${
+                className={`max-w-[80%] rounded-2xl px-3 py-2 break-all whitespace-pre-wrap ${
                   msg.fromMe
-                    ? "bg-[var(--libido-primary)] text-white"
-                    : "bg-[var(--libido-surface-2)] text-[var(--libido-text)]"
+                  ? "bg-[var(--libido-primary)] text-white"
+                  : "bg-[var(--libido-surface-2)]"
                 }`}
               >
-                <p className="text-sm break-words break-all whitespace-pre-wrap">
+
+                <p className="text-sm">
                   {msg.text}
                 </p>
 
-                <div className="flex justify-end items-center gap-1 mt-1">
-                  <span className="text-[10px] opacity-60">
-                    {msg.time}
-                  </span>
+                <div className="flex justify-end items-center gap-1 text-[10px] opacity-70">
+
+                  {msg.time}
 
                   {msg.fromMe && (
-                    <MessageStatus status={msg.status} />
+                    <MessageStatus status={msg.status}/>
                   )}
+
                 </div>
+
               </div>
+
             </div>
           ))}
 
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef}/>
+
         </div>
 
-        <div className="flex items-center gap-2 p-3 border-t border-[var(--libido-border)] bg-[var(--libido-surface-2)] flex-shrink-0 w-full">
 
-          <button className="p-2 flex-shrink-0">
-            <Smile size={20} />
-          </button>
+        <div className="flex items-center gap-2 p-3 flex-shrink-0 border-t border-[var(--libido-border)] bg-[var(--libido-surface-2)]">
 
-          <button className="p-2 flex-shrink-0">
-            <Camera size={20} />
-          </button>
+          <Smile size={20}/>
+
+          <Camera size={20}/>
+
 
           <input
             value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSend();
+            onChange={(e)=>setMessageInput(e.target.value)}
+            onKeyDown={(e)=>{
+              if(e.key==="Enter") handleSend();
             }}
             placeholder="Digite uma mensagem..."
-            className="flex-1 min-w-0 bg-transparent text-sm text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20"
+            className="flex-1 min-w-0 bg-transparent outline-none text-sm"
           />
 
-          {messageInput.trim() ? (
+
+          {messageInput.trim()
+          ?
+          (
             <button
               onClick={handleSend}
-              className="p-2 flex-shrink-0 rounded-full bg-[var(--libido-primary)] text-white"
+              className="flex-shrink-0"
             >
-              <Send size={18} />
+              <Send size={20}/>
             </button>
-          ) : (
-            <button className="p-2 flex-shrink-0">
-              <Mic size={20} />
-            </button>
+          )
+          :
+          (
+            <Mic size={20}/>
           )}
 
         </div>
@@ -321,30 +339,39 @@ export function Chat({
     );
   }
 
-  return (
-    <div className="flex-1 flex flex-col w-full max-w-full overflow-hidden min-h-0">
 
-      <div className="p-3 border-b border-[var(--libido-border)] flex-shrink-0">
+  return (
+
+    <div className="flex flex-col w-full h-full min-h-0 overflow-hidden">
+
+      <div className="p-3 flex-shrink-0 border-b border-[var(--libido-border)]">
+
         <div className="flex items-center gap-2 bg-[var(--libido-surface-2)] rounded-xl px-3 py-2">
-          <Search size={18} className="flex-shrink-0" />
+
+          <Search size={18}/>
 
           <input
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e)=>setSearchQuery(e.target.value)}
             placeholder="Buscar conversas..."
             className="flex-1 min-w-0 bg-transparent outline-none text-sm"
           />
+
         </div>
+
       </div>
 
-      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
 
-        {filteredContacts.map((contact) => (
+      <div className="flex-1 min-h-0 overflow-y-auto">
+
+        {filteredContacts.map((contact)=>(
+
           <button
             key={contact.id}
-            onClick={() => setActiveChat(contact.id)}
-            className="w-full flex items-center gap-3 p-3 hover:bg-[var(--libido-surface-2)]"
+            onClick={()=>setActiveChat(contact.id)}
+            className="w-full flex items-center gap-3 p-3"
           >
+
             <ProtectedImage
               currentUser={currentUser}
               src={contact.avatar}
@@ -352,26 +379,38 @@ export function Chat({
               alt=""
             />
 
+
             <div className="flex-1 min-w-0 text-left">
-              <div className="flex justify-between gap-2">
-                <span className="font-semibold truncate">
+
+              <div className="flex justify-between">
+
+                <span className="truncate font-semibold">
                   {contact.name}
                 </span>
 
-                <span className="text-xs opacity-60 flex-shrink-0">
+                <span className="text-xs opacity-60">
                   {contact.time}
                 </span>
+
               </div>
 
-              <p className="text-sm opacity-60 truncate">
+
+              <p className="truncate text-sm opacity-60">
                 {contact.lastMessage}
               </p>
+
+
             </div>
+
           </button>
+
         ))}
 
       </div>
 
+
     </div>
+
   );
+
 }
