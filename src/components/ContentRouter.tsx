@@ -51,6 +51,7 @@ export function ContentRouter({
   onLogout,
   currentUser,
 }: ContentRouterProps) {
+
   const Component = routes[activeTab];
 
   if (!Component) {
@@ -63,11 +64,7 @@ export function ContentRouter({
 
   return (
     <main
-      className={`flex-1 flex flex-col w-full max-w-full overflow-x-hidden relative z-0 bg-[var(--libido-bg)] min-h-0 ${
-        activeTab === "chat"
-          ? "overflow-y-hidden"
-          : "overflow-y-auto no-scrollbar"
-      }`}
+      className="flex-1 flex flex-col w-full min-w-0 max-w-full overflow-hidden relative z-0 bg-[var(--libido-bg)] min-h-0"
     >
       <Component
         isPremium={isPremium}
