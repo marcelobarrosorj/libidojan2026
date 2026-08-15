@@ -13,14 +13,14 @@ interface AppCoreProps {
   onLogout?: () => void;
   showNav?: boolean;
   children?: ReactNode;
-  currentUser?: User | null;
+  currentUser?: User | null; 
 }
 
-export function AppCore({
-  userId,
-  onLogout,
-  showNav = true,
-  currentUser
+export function AppCore({ 
+  userId, 
+  onLogout, 
+  showNav = true, 
+  currentUser 
 }: AppCoreProps) {
 
   const [activeTab, setActiveTab] = useState("feed");
@@ -45,7 +45,10 @@ export function AppCore({
   return (
     <AppShell>
 
-      <SecurityWatermark currentUser={currentUser} local={false} />
+      <SecurityWatermark 
+        currentUser={currentUser} 
+        local={false} 
+      />
 
       <HeaderGlobal
         onSearchClick={() => navigate('radar')}
@@ -53,7 +56,6 @@ export function AppCore({
         onSettingsClick={() => navigate('settings')}
         onNotificationsClick={() => navigate('invites')}
       />
-
 
       <ContentRouter
         activeTab={activeTab}
@@ -67,9 +69,8 @@ export function AppCore({
         currentUser={currentUser}
       />
 
-
-      {showNav && (
-        <div className="flex-shrink-0 bg-[var(--libido-bg)] border-t border-[var(--libido-border)] relative z-50">
+      {showNav && activeTab !== 'chat' && (
+        <div className="flex-none bg-[var(--libido-bg)] border-t border-[var(--libido-border)] relative z-50">
 
           <BottomNavGlobal
             activeTab={activeTab}
@@ -80,7 +81,6 @@ export function AppCore({
         </div>
       )}
 
-
       <PixCheckout
         isOpen={showPixModal}
         onClose={() => setShowPixModal(false)}
@@ -90,8 +90,8 @@ export function AppCore({
 
             await updateUserProfile(
               currentUser.id,
-              {
-                plan: 'premium'
+              { 
+                plan: 'premium' 
               }
             );
 
