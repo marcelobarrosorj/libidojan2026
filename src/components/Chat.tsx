@@ -48,17 +48,11 @@ interface ChatMessage {
 
 function MessageStatus({ status }: { status: string }) {
   if (status === "sending")
-    return (
-      <Check size={14} className="text-[var(--libido-muted)] opacity-50" />
-    );
+    return <Check size={14} className="text-[var(--libido-muted)] opacity-50" />;
   if (status === "sent")
-    return (
-      <Check size={14} className="text-[var(--libido-muted)] opacity-60" />
-    );
+    return <Check size={14} className="text-[var(--libido-muted)] opacity-60" />;
   if (status === "delivered")
-    return (
-      <CheckCheck size={14} className="text-[var(--libido-muted)] opacity-60" />
-    );
+    return <CheckCheck size={14} className="text-[var(--libido-muted)] opacity-60" />;
   if (status === "read")
     return <CheckCheck size={14} className="text-[#53bdeb]" />;
   return null;
@@ -76,7 +70,6 @@ export function Chat({
   const [searchQuery, setSearchQuery] = useState("");
   const [allMessages, setAllMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,7 +79,12 @@ export function Chat({
   }, [user]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTo({
+        top: messagesEndRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   };
 
   useEffect(() => {
@@ -99,7 +97,6 @@ export function Chat({
     const unsubscribe = listenAllUserMessages(userId, async (messages) => {
       setAllMessages(messages);
 
-      // Get unique users from messages
       const uniqueUserIds = new Set<string>();
       messages.forEach((m) => {
         if (m.from !== userId) uniqueUserIds.add(m.from);
@@ -123,9 +120,7 @@ export function Chat({
           (m.from === id && m.to === userId) ||
           (m.to === id && m.from === userId),
       );
-
-      const lastMsg =
-        userMsgs.length > 0 ? userMsgs[userMsgs.length - 1] : null;
+      const lastMsg = userMsgs.length > 0 ? userMsgs[userMsgs.length - 1] : null;
 
       return {
         id: id,
@@ -155,7 +150,6 @@ export function Chat({
   );
 
   let activeChatContact = contacts.find((c) => c.id === activeChat);
-
   if (!activeChatContact && user && activeChat === (user.user_id || user.id)) {
     activeChatContact = {
       id: user.user_id || user.id,
@@ -204,14 +198,17 @@ export function Chat({
 
   if (activeChat && activeChatContact) {
     return (
-      <div className="absolute inset-0 flex flex-col h-full w-full bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+      <div className="fixed inset-0 z-[100] flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+        
+        {/* HEADER DA CONVERSA */}
         <div className="flex-none flex items-center gap-3 px-3 py-3 bg-[var(--libido-surface-2)] border-b border-[var(--libido-border)] w-full">
           <button
             onClick={() => setActiveChat(null)}
-            className="text-[var(--libido-muted)] opacity-70 hover:text-[var(--libido-text)] p-1"
+            className="text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] p-1 flex-shrink-0"
           >
             <ArrowLeft size={20} />
           </button>
+
           <div className="relative flex-shrink-0">
             <ProtectedImage
               currentUser={currentUser}
@@ -228,9 +225,7 @@ export function Chat({
               {activeChatContact.name}
             </h3>
             <p className="text-[10px] text-[var(--libido-muted)] opacity-60">
-              {activeChatContact.online
-                ? "online"
-                : "visto por último recentemente"}
+              {activeChatContact.online ? "online" : "visto por último recentemente"}
             </p>
           </div>
           <button className="text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] p-1 flex-shrink-0">
@@ -241,20 +236,18 @@ export function Chat({
           </button>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar px-3 py-4 space-y-1.5"
+        {/* ÁREA DE MENSAGENS */}
+        <div 
+          ref={messagesEndRef}
+          className="flex-1 overflow-y-auto no-scrollbar px-3 py-4 space-y-1.5"
           style={{
-            backgroundImage:
-              "radial-gradient(circle at 50% 50%, rgba(255,179,0,0.02) 0%, transparent 70%)",
+            backgroundImage: "radial-gradient(circle at 50% 50%, rgba(255,179,0,0.02) 0%, transparent 70%)",
           }}
         >
           {isDemoId(activeChat) && (
             <div className="bg-orange-500/20 text-orange-400 text-[10px] font-bold text-center py-2 px-4 rounded-xl border border-orange-500/30 mb-4 mt-2">
-              <p className="uppercase tracking-widest">
-                Conversa de Demonstração
-              </p>
-              <p className="opacity-70 mt-1 font-semibold">
-                Respostas automáticas não estão ativas.
-              </p>
+              <p className="uppercase tracking-widest">Conversa de Demonstração</p>
+              <p className="opacity-70 mt-1 font-semibold">Respostas automáticas não estão ativas.</p>
             </div>
           )}
 
@@ -279,24 +272,21 @@ export function Chat({
                 <p className="text-[13px] text-[var(--libido-text)]/90 leading-relaxed break-words break-all whitespace-pre-wrap">
                   {msg.text}
                 </p>
-                <div
-                  className={`flex items-center gap-1 mt-1 ${msg.fromMe ? "justify-end" : "justify-start"}`}
-                >
-                  <span className="text-[10px] text-[var(--libido-muted)] opacity-50">
-                    {msg.time}
-                  </span>
+                <div className={`flex items-center gap-1 mt-1 ${msg.fromMe ? "justify-end" : "justify-start"}`}>
+                  <span className="text-[10px] text-[var(--libido-muted)] opacity-50">{msg.time}</span>
                   {msg.fromMe && <MessageStatus status={msg.status} />}
                 </div>
               </div>
             </div>
           ))}
-          <div ref={messagesEndRef} />
         </div>
 
+        {/* CAMPO DE ENVIO */}
         <div className="flex-none flex items-center gap-2 px-2 py-2 bg-[var(--libido-bg)] border-t border-[var(--libido-border)] w-full">
           <button className="text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] p-2 flex-shrink-0">
             <Smile size={22} />
           </button>
+          
           <div className="flex-1 flex items-center bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl px-4 py-2.5 gap-2 min-w-0">
             <input
               type="text"
@@ -304,12 +294,13 @@ export function Chat({
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="Mensagem"
-              className="flex-1 bg-transparent text-sm text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20 min-w-0"
+              className="flex-1 bg-transparent text-[16px] text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20 min-w-0"
             />
             <button className="text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] flex-shrink-0">
               <Camera size={18} />
             </button>
           </div>
+
           {messageInput.trim() ? (
             <button
               onClick={handleSend}
@@ -323,38 +314,36 @@ export function Chat({
             </button>
           )}
         </div>
+
       </div>
     );
   }
 
+  // TELA DE LISTA DE CONTATOS
   return (
-    <div className="absolute inset-0 flex flex-col h-full w-full bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+    <div className="flex-1 flex flex-col w-full h-full min-h-0 bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+      
+      {/* HEADER LISTA */}
       <div className="flex-none px-5 pt-5 pb-3 w-full">
-        <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">
-          Conversas
-        </h1>
-        <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold uppercase tracking-widest mt-0.5">
-          Criptografia Ponta-a-Ponta
-        </p>
+        <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">Conversas</h1>
+        <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold uppercase tracking-widest mt-0.5">Criptografia Ponta-a-Ponta</p>
       </div>
 
       <div className="flex-none px-4 pb-3 w-full">
         <div className="flex items-center gap-2 bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-2xl px-4 py-2.5">
-          <Search
-            size={14}
-            className="text-[var(--libido-muted)] opacity-50 flex-shrink-0"
-          />
+          <Search size={14} className="text-[var(--libido-muted)] opacity-50 flex-shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Pesquisar conversas..."
-            className="flex-1 bg-transparent text-xs text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20"
+            className="flex-1 bg-transparent text-[16px] text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20"
           />
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar w-full">
+      {/* ÁREA DE LISTA CONTATOS */}
+      <div className="flex-1 overflow-y-auto no-scrollbar w-full">
         {filteredContacts.map((contact) => (
           <button
             key={contact.id}
@@ -372,23 +361,20 @@ export function Chat({
                 <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[var(--libido-bg)]" />
               )}
             </div>
-
+            
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between min-w-0">
                 <h3 className="text-[13px] font-bold text-[var(--libido-text)] truncate">
                   {contact.name}{" "}
                   {contact.userNumber ? (
-                    <span className="text-[10px] text-[var(--libido-muted)] opacity-50 ml-1">
-                      #{formatUserNumber(contact.userNumber)}
-                    </span>
+                    <span className="text-[10px] text-[var(--libido-muted)] opacity-50 ml-1">#{formatUserNumber(contact.userNumber)}</span>
                   ) : null}
                 </h3>
-                <span
-                  className={`text-[10px] flex-shrink-0 ml-2 ${contact.unread > 0 ? "text-[var(--libido-accent)] font-bold" : "text-[var(--libido-muted)] opacity-50"}`}
-                >
+                <span className={`text-[10px] flex-shrink-0 ml-2 ${contact.unread > 0 ? "text-[var(--libido-accent)] font-bold" : "text-[var(--libido-muted)] opacity-50"}`}>
                   {contact.time}
                 </span>
               </div>
+              
               <div className="flex items-center justify-between mt-0.5 min-w-0">
                 <p className="text-[11px] text-[var(--libido-muted)] opacity-60 truncate flex-1 mr-2 min-w-0">
                   {contact.lastMessage}
@@ -403,6 +389,7 @@ export function Chat({
           </button>
         ))}
       </div>
+
     </div>
   );
 }
