@@ -14,6 +14,7 @@ export const mapSupabaseToUser = (data: any): User => {
     nickname: data.nickname || data.name || '',
     name: data.nickname || data.name || '',
     username: data.nickname || data.name || '',
+    pin: data.pin,
     sexualOrientation: data.sexual_orientation || data.sexualOrientation,
     sexual_orientation: data.sexual_orientation || data.sexualOrientation,
     coupleProfile: data.couple_profile || data.coupleProfile,
