@@ -370,11 +370,10 @@ export default function App() {
     
     if (!pinVerified) {
       return (
-        <PinScreen 
-          savedPin={supabaseUser.pin} 
-          onSuccess={() => setPinVerified(true)} 
-          userId={supabaseUser.id}
-          onLogout={logout}
+        <PinScreen
+          userId={supabaseUser.id || ''}
+          mode={supabaseUser.pin ? 'verify' : 'create'}
+          onSuccess={() => setPinVerified(true)}
         />
       );
     }
