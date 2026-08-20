@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { submitPartnerRequest } from '../services/partners';
-import { Briefcase, Send, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Briefcase, Send, CheckCircle2, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 
-export function Partners() {
+export function Partners({ onBack }: { onBack?: () => void }) {
   const [formData, setFormData] = useState({
     name_business: '',
     responsible_name: '',
@@ -38,7 +38,7 @@ export function Partners() {
 
   if (success) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-[var(--libido-bg)] min-h-full">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-[var(--libido-bg)] min-h-screen">
         <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
         <h2 className="text-2xl font-fraunces font-medium text-[var(--libido-text)] mb-2">Solicitação Enviada!</h2>
         <p className="text-[var(--libido-muted)] text-sm mb-6">
@@ -49,17 +49,28 @@ export function Partners() {
             setSuccess(false); 
             setFormData({ name_business: '', responsible_name: '', whatsapp: '', instagram: '', city: '', event_type: '', message: '' }); 
           }}
-          className="bg-white/10 px-6 py-3 rounded-xl text-[var(--libido-text)] text-sm font-bold hover:bg-white/20 transition-colors"
+          className="bg-white/10 px-6 py-3 rounded-xl text-[var(--libido-text)] text-sm font-bold hover:bg-white/20 transition-colors mb-4"
         >
           Enviar nova solicitação
         </button>
+        {onBack && (
+          <button onClick={onBack} className="text-[var(--libido-muted)] hover:text-white transition-colors text-sm">
+            Voltar para página inicial
+          </button>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-y-auto no-scrollbar pb-20">
+    <div className="flex-1 flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-y-auto no-scrollbar min-h-screen pb-20">
       <div className="px-5 pt-8 pb-4">
+        {onBack && (
+          <button onClick={onBack} className="flex items-center gap-2 text-[var(--libido-muted)] hover:text-white transition-colors mb-6">
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm font-bold uppercase tracking-wider">Voltar</span>
+          </button>
+        )}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 bg-[var(--libido-surface-2)] border border-[var(--libido-accent)]/30 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(216,107,63,0.2)]">
             <Briefcase className="w-6 h-6 text-[var(--libido-accent)]" />

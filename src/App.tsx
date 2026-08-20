@@ -1,4 +1,5 @@
 import { LandingPage } from './components/LandingPage';
+import { Partners } from './components/Partners';
 import React, { useState, useEffect, useRef } from 'react';
 import { getUserById, updateUserProfile } from './services/users';
 import { supabase } from './services/supabase';
@@ -13,6 +14,7 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [showLanding, setShowLanding] = useState(true);
+  const [showPartners, setShowPartners] = useState(false);
   
   const [user, setUser] = useState<any>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
@@ -82,6 +84,7 @@ export default function App() {
         if (currentUser.emailVerified) {
           setUser(currentUser);
           setPendingEmailVerification(false);
+
           // Only load profile if email is verified to avoid useless queries
           setSupabaseLoading(true);
           try {
@@ -250,8 +253,8 @@ export default function App() {
     setMsg("");
     try {
       await resetPasswordForEmail(email);
-      setMsg("Link de recuperação enviado para seu e-mail.");
-    } catch(err: any) {
+      setMsg("Verifique sua caixa de entrada para o link de redefinição de senha.");
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setAuthLoading(false);
@@ -262,14 +265,12 @@ export default function App() {
     e.preventDefault();
     setAuthLoading(true);
     setError("");
-    setMsg("");
     try {
       await updatePassword(password);
-      setMsg("Senha atualizada com sucesso! Faça login.");
+      setMsg("Senha atualizada com sucesso. Conecte-se com sua nova senha.");
       setRecoveryMode(null);
       setIsLogin(true);
-      setPassword("");
-    } catch(err: any) {
+    } catch (err: any) {
       setError(err.message);
     } finally {
       setAuthLoading(false);
@@ -278,90 +279,118 @@ export default function App() {
 
   if (loading || supabaseLoading) {
     return (
-      <div className="w-full h-screen bg-[var(--libido-bg)] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[var(--libido-border)] border-t-[var(--libido-accent)] rounded-full animate-spin"></div>
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-[var(--libido-bg)] text-[var(--libido-text)]">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="font-fraunces font-bold text-3xl tracking-[0.2em] mb-4">
+            LIBIDO<span className="text-[var(--libido-accent)] leading-none text-4xl -ml-1">.</span>
+          </div>
+          <div className="text-[10px] text-[var(--libido-muted)] tracking-widest uppercase mt-4">
+            Iniciando Conexão Segura
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Handle email verification screen
-  if (pendingEmailVerification || (user && !user.emailVerified)) {
+  if (pendingEmailVerification) {
     return (
-      <div className="flex flex-col justify-center items-center px-6 gap-6 w-full h-screen text-center bg-[var(--libido-bg)] text-[var(--libido-text)]">
-        <div className="w-16 h-16 bg-[var(--libido-accent)]/10 rounded-[1.8rem] flex items-center justify-center border border-[var(--libido-accent)]/20 shadow-[0_0_20px_rgba(255,179,0,0.1)]">
-          <svg className="w-8 h-8 text-[var(--libido-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-        </div>
-        <h1 className="text-2xl font-fraunces font-medium uppercase tracking-wider italic">Confirme seu E-mail</h1>
-        <p className="text-[var(--libido-muted)] opacity-60 text-xs max-w-sm px-4 leading-relaxed font-semibold">
-          Enviamos um link de verificação para <strong className="text-[var(--libido-text)]">{email || (user?.email)}</strong>. 
-          Verifique sua caixa de entrada, clique no link e então confirme abaixo.
-        </p>
-        
-        {msg && <p className="text-[var(--libido-accent)] text-xs text-center font-medium bg-[var(--libido-accent)]/10 py-3 px-4 rounded-xl border border-[var(--libido-accent)]/20">{msg}</p>}
-        {error && <p className="text-red-400 text-xs text-center font-medium bg-red-950/30 py-3 px-4 rounded-xl border border-red-900/50">{error}</p>}
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-[var(--libido-bg)] text-[var(--libido-text)] px-6">
+        <div className="max-w-md w-full bg-[var(--libido-surface-2)] p-8 rounded-3xl border border-[var(--libido-border)] text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)]">
+          <div className="font-fraunces font-bold text-2xl tracking-[0.2em] mb-8 text-[var(--libido-text)]">
+            LIBIDO<span className="text-[var(--libido-accent)] leading-none text-3xl -ml-1">.</span>
+          </div>
+          
+          <h2 className="text-xl font-medium mb-3 text-[var(--libido-text)]">Confirme seu E-mail</h2>
+          
+          <p className="text-sm text-[var(--libido-muted)] mb-6 leading-relaxed">
+            Enviamos um link de confirmação para:<br/>
+            <strong className="text-[var(--libido-accent)] font-mono text-xs mt-2 block">{email || (user && user.email)}</strong>
+          </p>
+          
+          <p className="text-xs text-[var(--libido-muted)] mb-8 bg-black/20 p-4 rounded-xl border border-[var(--libido-border)]/50">
+            Acesse sua caixa de entrada, clique no link de confirmação e volte aqui.
+          </p>
+          
+          {error && <p className="text-red-400 text-xs mb-4 font-medium">{error}</p>}
+          {msg && <p className="text-[var(--libido-accent)] text-xs mb-4 font-medium">{msg}</p>}
 
-        <div className="flex flex-col gap-3 mt-6 w-full max-w-xs">
-          <button 
-            onClick={handleConfirmCheck}
-            disabled={authLoading}
-            className="bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black py-4 rounded-2xl text-xs uppercase tracking-widest hover:opacity-90 transition-opacity shadow-lg shadow-[var(--libido-accent)]/10 active:scale-95 disabled:opacity-50"
-          >
-            {authLoading ? 'Verificando...' : 'Já confirmei'}
-          </button>
-          <button 
-            onClick={handleResendVerificationAction}
-            disabled={isResending || resendCooldown > 0}
-            className="bg-white/5 text-[var(--libido-text)] border border-[var(--libido-border)] font-black py-4 rounded-2xl text-xs uppercase tracking-widest hover:bg-white/10 transition-colors disabled:opacity-50"
-          >
-            {isResending ? 'Enviando...' : resendCooldown > 0 ? `Aguarde ${resendCooldown}s` : 'Reenviar e-mail'}
-          </button>
-          <button onClick={logout} className="text-[var(--libido-muted)] opacity-50 text-xs font-bold uppercase tracking-widest mt-6 hover:text-[var(--libido-text)]">
-            Sair ou usar outra conta
-          </button>
+          <div className="flex flex-col gap-3">
+             <button 
+               onClick={handleConfirmCheck}
+               disabled={authLoading}
+               className="w-full bg-[var(--libido-accent)] text-black font-bold py-4 rounded-xl text-xs tracking-wider transition-all hover:bg-[var(--libido-accent-hover)] shadow-[0_0_20px_rgba(216,107,63,0.2)] disabled:opacity-50"
+             >
+               {authLoading ? 'VERIFICANDO...' : 'JÁ CONFIRMEI O E-MAIL'}
+             </button>
+
+             <button 
+               onClick={handleResendVerificationAction}
+               disabled={isResending || resendCooldown > 0}
+               className="w-full bg-transparent border border-[var(--libido-border)] text-[var(--libido-text)] font-bold py-4 rounded-xl text-xs tracking-wider transition-all hover:bg-[var(--libido-surface)] disabled:opacity-50"
+             >
+               {isResending ? 'REENVIANDO...' : resendCooldown > 0 ? `AGUARDE ${resendCooldown}S` : 'REENVIAR E-MAIL'}
+             </button>
+             
+             <button 
+               onClick={() => { setPendingEmailVerification(false); logout(); }}
+               className="mt-4 text-[10px] uppercase tracking-widest text-[var(--libido-muted)] hover:text-[var(--libido-text)] transition-colors"
+             >
+               Tentar outra conta
+             </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Handle normal app flow
   if (user) {
-    if (supabaseUser && supabaseUser.is_banned) {
+    if (!supabaseUser) {
+       return <Onboarding userId={user.id} onComplete={handleOnboardingComplete} />;
+    }
+    
+    if (supabaseUser.status === 'banned') {
       return (
-        <div className="flex flex-col justify-center items-center px-6 gap-6 w-full h-screen text-center bg-[var(--libido-bg)] text-[var(--libido-text)]">
-           <h1 className="text-2xl font-fraunces text-red-500">Conta Suspensa</h1>
-           <p className="text-[var(--libido-muted)]">Esta conta foi suspensa por violação das Regras da Comunidade.</p>
-           <button onClick={logout} className="bg-white/10 text-white px-6 py-3 rounded-xl mt-4">Sair</button>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[var(--libido-bg)] min-h-screen">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+             <span className="text-red-500 text-2xl font-black">X</span>
+          </div>
+          <h2 className="text-2xl font-black uppercase text-red-500 tracking-wider mb-2">Acesso Restrito</h2>
+          <p className="text-sm text-[var(--libido-muted)] text-center max-w-sm mb-8 leading-relaxed">
+            Esta conta foi suspensa permanentemente por violação grave das Regras da Comunidade.
+          </p>
+          <button 
+             onClick={logout}
+             className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-white font-bold py-3 px-8 rounded-xl text-sm"
+          >
+            Sair
+          </button>
         </div>
       );
     }
-    if (supabaseUser && supabaseUser.is_deleted) {
+    
+    if (!pinVerified) {
       return (
-        <div className="flex flex-col justify-center items-center px-6 gap-6 w-full h-screen text-center bg-[var(--libido-bg)] text-[var(--libido-text)]">
-           <h1 className="text-2xl font-fraunces">Conta Excluída</h1>
-           <button onClick={logout} className="bg-white/10 text-white px-6 py-3 rounded-xl mt-4">Sair</button>
-        </div>
-      );
-    }
-    if (supabaseUser === null || !supabaseUser.nickname) { 
-      return <Onboarding userId={user.id} onComplete={handleOnboardingComplete} />;
-    }
-    if (supabaseUser && !pinVerified) {
-      const hasPin = supabaseUser.pin && supabaseUser.pin.length === 4 && supabaseUser.pin !== 'premium';
-      return (
-        <PinScreen
-          userId={user.id}
-          mode={hasPin ? 'verify' : 'create'}
-          onSuccess={() => setPinVerified(true)}
+        <PinScreen 
+          savedPin={supabaseUser.security_pin} 
+          onSuccess={() => setPinVerified(true)} 
+          userId={supabaseUser.id}
+          onLogout={logout}
         />
       );
     }
+
     return <AppCore onLogout={logout} userId={user.id} currentUser={supabaseUser} />;
+  }
+
+  if (showPartners) {
+    return <Partners onBack={() => setShowPartners(false)} />;
   }
 
   if (showLanding && !recoveryMode) {
     return <LandingPage 
       onLoginClick={() => { setIsLogin(true); setShowLanding(false); setRecoveryMode(null); }} 
       onRegisterClick={() => { setIsLogin(false); setShowLanding(false); setRecoveryMode(null); }} 
+      onPartnersClick={() => setShowPartners(true)}
     />;
   }
 

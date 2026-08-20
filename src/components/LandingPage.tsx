@@ -1,7 +1,7 @@
-import { Shield, Eye, Lock, ArrowRight, CheckCircle2, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { ChevronDown, Lock, EyeOff, Shield, CheckCircle2 } from 'lucide-react';
 
-export function LandingPage({ onLoginClick, onRegisterClick }: { onLoginClick: () => void, onRegisterClick: () => void }) {
+export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: { onLoginClick: () => void, onRegisterClick: () => void, onPartnersClick?: () => void }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const faqs = [
@@ -32,10 +32,6 @@ export function LandingPage({ onLoginClick, onRegisterClick }: { onLoginClick: (
     {
       q: "O Libido é gratuito?",
       a: "O cadastro e parte da experiência podem ser acessados gratuitamente. Recursos adicionais estão disponíveis por meio do Libido Premium."
-    },
-    {
-      q: "O Libido garante que todos os usuários são seguros?",
-      a: "Nenhuma plataforma de encontros pode oferecer garantia absoluta sobre as pessoas que a utilizam. Por isso, recomendamos preservar informações pessoais, manter as primeiras conversas dentro da plataforma e denunciar qualquer comportamento suspeito."
     }
   ];
 
@@ -66,203 +62,71 @@ export function LandingPage({ onLoginClick, onRegisterClick }: { onLoginClick: (
           Conexões adultas.<br/>
           <span className="text-[var(--libido-muted)]">Privacidade levada a sério.</span>
         </h1>
-
+        
         <p className="text-sm md:text-lg text-[var(--libido-muted)] mb-12 max-w-2xl mx-auto leading-relaxed">
           Um espaço para maiores de 18 anos que desejam conhecer pessoas, conversar e explorar novas possibilidades com liberdade, respeito e discrição.<br/><br/>
           Você escolhe o que mostrar, com quem conversar e até onde deseja ir.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto z-10">
           <button 
             onClick={onRegisterClick}
-            className="w-full sm:w-auto bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm tracking-wide transition-all shadow-[0_4px_20px_rgba(216,107,63,0.15)] hover:shadow-[0_4px_25px_rgba(216,107,63,0.25)] hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center gap-2 whitespace-nowrap"
+            className="bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-bold py-4 px-10 rounded-[16px] text-sm tracking-wide transition-all shadow-[0_4px_20px_rgba(216,107,63,0.15)] hover:shadow-[0_4px_25px_rgba(216,107,63,0.25)] hover:scale-[1.01] active:scale-[0.99]"
           >
-            Criar meu perfil <ArrowRight size={16} />
+            Criar conta gratuita
           </button>
           <button 
             onClick={onLoginClick}
-            className="w-full sm:w-auto bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm tracking-wide transition-all hover:bg-[var(--libido-surface)] flex justify-center items-center whitespace-nowrap"
+            className="bg-[var(--libido-surface-2)] text-[var(--libido-text)] border border-[var(--libido-border)] font-bold py-4 px-10 rounded-[16px] text-sm tracking-wide transition-all hover:bg-[var(--libido-surface)]"
           >
-            Já tenho uma conta
+            Fazer login
           </button>
         </div>
-        <p className="text-[10px] md:text-xs text-[var(--libido-muted)] opacity-60 mt-6 max-w-xs mx-auto">
-          Cadastro destinado exclusivamente a pessoas maiores de 18 anos.
-        </p>
       </section>
 
-      {/* Security & Privacy */}
-      <section id="seguranca" className="py-24 px-6 relative bg-[var(--libido-surface)]">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center text-center mb-16">
-            <div className="w-16 h-16 bg-[var(--libido-surface-2)] rounded-full flex items-center justify-center border border-[var(--libido-border)] mb-6 shadow-[0_0_30px_rgba(216,107,63,0.05)]">
-              <Shield className="w-8 h-8 text-[var(--libido-accent)]" />
+      {/* Pilares */}
+      <section className="py-24 px-6 bg-[var(--libido-bg)] relative">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+          <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-8 rounded-[24px] hover:border-[var(--libido-accent)]/30 transition-colors">
+            <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6">
+              <EyeOff size={24} className="text-[var(--libido-accent)]" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-fraunces font-medium mb-4">Seu desejo não precisa abrir mão da segurança.</h2>
-            <p className="text-sm md:text-base text-[var(--libido-muted)] max-w-2xl">
-              No Libido, privacidade não é uma frase escondida no rodapé. Ela faz parte da experiência desde o primeiro acesso.
+            <h3 className="text-lg font-bold mb-3">Controle total</h3>
+            <p className="text-sm text-[var(--libido-muted)] leading-relaxed">
+              Oculte seu rosto no feed público, restrinja o acesso às suas fotos sensíveis com PIN de segurança e revele apenas para quem você escolher.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { t: "Você mantém o controle", d: "Escolha quais informações deseja apresentar em seu perfil e compartilhe apenas aquilo com que se sentir confortável." },
-              { t: "Ferramentas contra abusos", d: "Bloqueie ou denuncie comportamentos inadequados diretamente pela plataforma." },
-              { t: "Menos exposição desnecessária", d: "Informações sensíveis não devem ser exibidas publicamente sem necessidade. Você decide quando e com quem deseja compartilhar detalhes pessoais." },
-              { t: "Uma comunidade adulta e responsável", d: "Perfis de menores, assédio, ameaças, golpes, divulgação não autorizada de conteúdo e exploração comercial não são permitidos." }
-            ].map((item, i) => (
-              <div key={i} className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-8 rounded-[24px]">
-                <h3 className="text-lg font-fraunces font-medium mb-3 text-[var(--libido-gold)]">{item.t}</h3>
-                <p className="text-sm text-[var(--libido-muted)] leading-relaxed">{item.d}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <a href="#lgpd" className="inline-flex items-center gap-2 text-sm font-bold text-[var(--libido-accent)] hover:text-[var(--libido-accent-hover)] transition-colors border-b border-transparent hover:border-[var(--libido-accent-hover)] pb-1">
-              Conheça nossas práticas de segurança <ArrowRight size={16} />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* LGPD */}
-      <section id="lgpd" className="py-24 px-6 relative border-y border-[var(--libido-border)]/50">
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--libido-bg)] to-[var(--libido-surface)] pointer-events-none"></div>
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-full text-[10px] font-bold uppercase tracking-widest text-[var(--libido-gold)] mb-6">
-              <Lock size={12} /> Privacidade e proteção de dados
+          <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-8 rounded-[24px] hover:border-[var(--libido-accent)]/30 transition-colors">
+            <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6">
+              <Shield size={24} className="text-[var(--libido-accent)]" />
             </div>
-            <h2 className="text-3xl md:text-5xl font-fraunces font-medium mb-6 leading-tight">
-              Seus dados. Seus direitos. Suas escolhas.
-            </h2>
-            <p className="text-sm md:text-base text-[var(--libido-muted)] max-w-2xl leading-relaxed mb-6">
-              O Libido adota princípios de transparência, necessidade, segurança e respeito aos direitos dos titulares de dados pessoais.
-            </p>
-            <p className="text-sm md:text-base text-[var(--libido-muted)] max-w-2xl leading-relaxed">
-              Nosso compromisso com a Lei Geral de Proteção de Dados Pessoais, a LGPD, faz parte da maneira como desenvolvemos e operamos a plataforma.
+            <h3 className="text-lg font-bold mb-3">Segurança em foco</h3>
+            <p className="text-sm text-[var(--libido-muted)] leading-relaxed">
+              Marca d'água invisível com rastreabilidade ativa para prevenir vazamentos e ambiente bloqueado contra capturas de tela.
             </p>
           </div>
-
-          <h3 className="text-xl font-fraunces font-medium mb-8 text-[var(--libido-text)]">
-            Você deve saber como seus dados são utilizados.
-          </h3>
-
-          <div className="grid sm:grid-cols-2 gap-8 mb-12">
-            {[
-              { t: "Transparência", d: "Explicamos quais informações são coletadas e para quais finalidades são utilizadas." },
-              { t: "Coleta necessária", d: "Buscamos solicitar apenas os dados necessários para o funcionamento, a segurança e a evolução da plataforma." },
-              { t: "Controle do titular", d: "Você pode solicitar acesso, correção ou exclusão dos seus dados, respeitadas as hipóteses legais de conservação." },
-              { t: "Consentimento e escolhas", d: "Quando o tratamento depender de consentimento, você deve receber informações claras e ter meios para rever sua decisão." },
-              { t: "Proteção e segurança", d: "Adotamos medidas voltadas à proteção dos dados pessoais e à redução de acessos indevidos." }
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <h4 className="text-sm font-bold text-[var(--libido-accent)] tracking-wide">{item.t}</h4>
-                <p className="text-sm text-[var(--libido-muted)] leading-relaxed">{item.d}</p>
-              </div>
-            ))}
-          </div>
-
-          <button className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm transition-all hover:bg-[var(--libido-surface)] inline-flex items-center gap-2">
-            Entender como tratamos seus dados
-          </button>
-        </div>
-      </section>
-
-      {/* Posicionamento */}
-      <section className="py-24 px-6 text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-fraunces font-medium mb-8 leading-tight">
-            Liberdade para desejar.<br/>Espaço para respeitar.
-          </h2>
-          <div className="space-y-6 text-sm md:text-lg text-[var(--libido-muted)] leading-relaxed">
-            <p>O Libido foi criado para adultos que valorizam conversas honestas, limites claros e conexões sem julgamentos.</p>
-            <p>Aqui, não existe obrigação de seguir um único tipo de relacionamento.</p>
-            <p>Você pode procurar uma conversa, uma experiência, uma conexão casual, novas amizades ou algo que ainda nem sabe definir.</p>
-            <p className="text-[var(--libido-text)] font-fraunces italic text-xl mt-8">O ritmo é seu.</p>
+          <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-8 rounded-[24px] hover:border-[var(--libido-accent)]/30 transition-colors">
+            <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6">
+              <Lock size={24} className="text-[var(--libido-accent)]" />
+            </div>
+            <h3 className="text-lg font-bold mb-3">Falso Fim</h3>
+            <p className="text-sm text-[var(--libido-muted)] leading-relaxed">
+              Acesso protegido por PIN e tela de pânico "Modo Ghost" ativada instantaneamente, garantindo a sua discrição em qualquer lugar.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Como Funciona */}
-      <section className="py-24 px-6 bg-[var(--libido-surface)] border-y border-[var(--libido-border)]/50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-fraunces font-medium mb-16 text-center">
-            Simples para começar.<br/>Seu para conduzir.
-          </h2>
-          <div className="grid md:grid-cols-2 gap-12 relative">
-            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[var(--libido-bg)] via-[var(--libido-border)] to-[var(--libido-bg)] -translate-x-1/2"></div>
-            {[
-              { n: "1", t: "Crie seu perfil", d: "Apresente-se do seu jeito, escolhendo as informações que deseja compartilhar." },
-              { n: "2", t: "Descubra novas conexões", d: "Encontre pessoas, comunidades, conversas e experiências que tenham afinidade com você." },
-              { n: "3", t: "Converse no seu ritmo", d: "Comece uma conversa quando se sentir confortável. Interesse nunca significa obrigação." },
-              { n: "4", t: "Decida o próximo passo", d: "Você controla seus limites, suas escolhas e o momento de avançar." }
-            ].map((item, i) => (
-              <div key={i} className="flex gap-6">
-                <div className="w-12 h-12 rounded-full bg-[var(--libido-surface-2)] border border-[var(--libido-border)] flex items-center justify-center font-fraunces text-xl text-[var(--libido-accent)] shrink-0">
-                  {item.n}
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold mb-2 text-[var(--libido-text)]">{item.t}</h3>
-                  <p className="text-sm text-[var(--libido-muted)] leading-relaxed">{item.d}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Consentimento */}
-      <section className="py-24 px-6 relative overflow-hidden">
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[500px] h-[500px] bg-[var(--libido-accent)]/5 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="max-w-3xl mx-auto relative z-10 text-center">
-          <h2 className="text-3xl md:text-5xl font-fraunces font-medium mb-8">
-            Consentimento sempre.<br/>Respeito em cada interação.
-          </h2>
-          <div className="space-y-6 text-sm md:text-base text-[var(--libido-muted)] leading-relaxed mb-10">
-            <p>No Libido, desejo e respeito caminham juntos.</p>
-            <p>Um “sim” deve ser livre, consciente e pode mudar a qualquer momento.</p>
-            <p>Pressão, insistência, chantagem, ameaça, exposição de imagens ou qualquer forma de assédio não fazem parte desta comunidade.</p>
-          </div>
-          <button className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm transition-all hover:bg-[var(--libido-surface)] inline-flex items-center gap-2">
-            Ver Regras da Comunidade
-          </button>
-        </div>
-      </section>
-
-      {/* Diferenciais */}
-      <section className="py-24 px-6 bg-[var(--libido-surface)] border-y border-[var(--libido-border)]/50">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-fraunces font-medium mb-6">Um ambiente adulto sem parecer vulgar.</h2>
-          <p className="text-sm md:text-base text-[var(--libido-muted)] max-w-2xl mx-auto mb-16 leading-relaxed">
-            Sensualidade não precisa significar exposição.<br/><br/>O Libido combina uma experiência visual elegante com recursos sociais criados para aproximar pessoas adultas que valorizam discrição, conversa e liberdade.
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-            {[
-              { t: "Privacidade em primeiro lugar", d: "Menos exposição. Mais controle sobre sua presença.", i: Eye },
-              { t: "Experiência sem julgamentos", d: "Espaço para diferentes desejos, identidades e formas de conexão entre adultos.", i: CheckCircle2 },
-              { t: "Segurança ativa", d: "Ferramentas de denúncia, bloqueio e moderação para lidar com comportamentos inadequados.", i: Shield },
-              { t: "Comunidade, não apenas perfis", d: "Conversas, grupos, eventos e espaços de interação para criar conexões além de uma simples curtida.", i: ArrowRight }
-            ].map((item, i) => (
-              <div key={i} className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-6 rounded-[20px] flex flex-col gap-4">
-                <item.i className="w-6 h-6 text-[var(--libido-accent)]" />
-                <h3 className="text-sm font-bold text-[var(--libido-text)]">{item.t}</h3>
-                <p className="text-xs text-[var(--libido-muted)] leading-relaxed">{item.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Premium */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-[32px] p-8 md:p-12 text-center relative overflow-hidden shadow-2xl">
+      {/* Premium Banner */}
+      <section className="py-24 px-6 relative flex justify-center">
+        <div className="max-w-4xl w-full bg-[var(--libido-surface-2)] border border-[var(--libido-accent)]/20 p-10 md:p-16 rounded-[32px] text-center relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--libido-accent)] to-transparent"></div>
+          
           <h2 className="text-3xl md:text-4xl font-fraunces font-medium mb-4">Mais possibilidades.<br/>A mesma discrição.</h2>
           <p className="text-sm text-[var(--libido-muted)] mb-8">
             Tenha acesso à experiência Premium do Libido e aproveite recursos adicionais dentro da plataforma.
           </p>
+
           <div className="bg-[var(--libido-bg)] border border-[var(--libido-border)] rounded-2xl p-6 md:p-8 mb-8 inline-block text-left mx-auto w-full max-w-sm">
             <h3 className="text-lg font-bold text-[var(--libido-text)] mb-2 text-center">Libido Premium</h3>
             <div className="text-4xl font-fraunces font-medium text-[var(--libido-accent)] mb-4 text-center">R$ 19,90</div>
@@ -273,9 +137,11 @@ export function LandingPage({ onLoginClick, onRegisterClick }: { onLoginClick: (
               <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-[var(--libido-gold)]" /> Conteúdo sem paywall</li>
             </ul>
           </div>
+
           <button className="bg-[var(--libido-bg)] border border-[var(--libido-accent)]/50 text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm transition-all hover:bg-[var(--libido-surface)] inline-flex items-center gap-2">
             Conhecer o Premium
           </button>
+
           <p className="text-[10px] text-[var(--libido-muted)] opacity-60 mt-6 max-w-sm mx-auto">
             O pagamento não altera seus limites, sua privacidade nem suas escolhas dentro da comunidade.
           </p>
@@ -371,6 +237,7 @@ export function LandingPage({ onLoginClick, onRegisterClick }: { onLoginClick: (
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Regras da Comunidade</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Ajuda e suporte</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Contato</a>
+            <button onClick={onPartnersClick} className="mt-2 text-[var(--libido-accent)] font-bold hover:text-[var(--libido-accent-hover)] transition-colors uppercase tracking-wider text-[10px]">Parceiros (B2B)</button>
             <a href="#" className="mt-4 opacity-50 hover:opacity-100 transition-opacity">Excluir minha conta</a>
           </div>
         </div>
