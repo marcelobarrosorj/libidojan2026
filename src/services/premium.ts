@@ -6,22 +6,32 @@ export interface PremiumState {
   expiresAt?: number;
 }
 
-export const getPremiumState = async (userId?: string): Promise<PremiumState> => {
-  if (userId) {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('premium, plan')
-        .eq('user_id', userId)
-        .single();
-        
-      if (!error && data) {
-        const isPremium = data.plan === 'premium' || data.premium === true;
-        return { isPremium, plan: isPremium ? "premium" : "free" };
-      }
-    } catch (e) {
-      console.error('Error fetching premium state from supabase', e);
+export const checkUserPremium = async (userId?: string): Promise<boolean> => {
+  if (!userId) return false;
+
+  try {
+    const { data, error } = await supabase.rpc('check_user_premium', {
+      uid: userId
+    });
+
+    if (error) {
+      console.error('Erro ao verificar Premium:', error);
+      return false;
     }
+
+    return data === true;
+
+  } catch (e) {
+    console.error('Erro ao consultar Premium:', e);
+    return false;
   }
-  return { isPremium: false, plan: "free" };
+};
+
+export const getPremiumState = async (userId?: string): Promise<PremiumState> => {
+  const isPremium = await checkUserPremium(userId);
+
+  return {
+    isPremium,
+    plan: isPremium ? "premium" : "free"
+  };
 };

@@ -1,5 +1,6 @@
+import { useEffect, useState, ReactNode } from "react";
 import { updateUserProfile } from '../services/users';
-import { useState, ReactNode } from "react";
+import { checkUserPremium } from '../services/premium';
 import { AppShell } from "./AppShell";
 import { HeaderGlobal } from "./HeaderGlobal";
 import { BottomNavGlobal } from "./BottomNavGlobal";
@@ -13,29 +14,47 @@ interface AppCoreProps {
   onLogout?: () => void;
   showNav?: boolean;
   children?: ReactNode;
-  currentUser?: User | null; 
+  currentUser?: User | null;
 }
 
-export function AppCore({ 
-  userId, 
-  onLogout, 
-  showNav = true, 
-  currentUser 
+export function AppCore({
+  userId,
+  onLogout,
+  showNav = true,
+  currentUser
 }: AppCoreProps) {
 
   const [activeTab, setActiveTab] = useState("feed");
   const [navParams, setNavParams] = useState<Record<string, unknown> | null>(null);
   const [showPixModal, setShowPixModal] = useState(false);
-
-  const isPremium =
-    currentUser?.plan === 'premium' ||
-    currentUser?.plan === 'admin' ||
-    currentUser?.plan === 'owner';
+  const [isPremium, setIsPremium] = useState(false);
 
   const isAdmin =
     currentUser?.plan === 'admin' ||
     currentUser?.plan === 'owner' ||
     currentUser?.plan === 'moderator';
+
+  useEffect(() => {
+    async function loadPremium() {
+      if (!userId) {
+        setIsPremium(false);
+        return;
+      }
+
+      if (isAdmin) {
+        setIsPremium(true);
+        return;
+      }
+
+      const premium = await checkUserPremium(userId);
+
+      console.log("PREMIUM CHECK:", userId, premium);
+
+      setIsPremium(premium);
+    }
+
+    loadPremium();
+  }, [userId, isAdmin]);
 
   const navigate = (tab: string, params?: any) => {
     setActiveTab(tab);
@@ -45,9 +64,9 @@ export function AppCore({
   return (
     <AppShell>
 
-      <SecurityWatermark 
-        currentUser={currentUser} 
-        local={false} 
+      <SecurityWatermark
+        currentUser={currentUser}
+        local={false}
       />
 
       <HeaderGlobal
@@ -90,8 +109,8 @@ export function AppCore({
 
             await updateUserProfile(
               currentUser.id,
-              { 
-                plan: 'premium' 
+              {
+                plan: 'premium'
               }
             );
 
