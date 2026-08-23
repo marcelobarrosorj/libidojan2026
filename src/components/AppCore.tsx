@@ -1,5 +1,5 @@
 import { useEffect, useState, ReactNode } from "react";
-import { updateUserProfile } from '../services/users';
+import { supabase } from '../services/supabase';
 import { checkUserPremium } from '../services/premium';
 import { AppShell } from "./AppShell";
 import { HeaderGlobal } from "./HeaderGlobal";
@@ -61,6 +61,30 @@ export function AppCore({
     setNavParams(params || null);
   };
 
+  const activatePremium = async () => {
+    if (!userId) return;
+
+    const planId = '29105ff8-818b-4876-b6da-f1039e752f6c';
+
+    const { error } = await supabase
+      .from('user_subscriptions')
+      .insert({
+        user_id: userId,
+        plan_id: planId,
+        status: 'active',
+        expires_at: new Date(
+          Date.now() + 24 * 60 * 60 * 1000
+        ).toISOString()
+      });
+
+    if (error) {
+      console.error("Erro ao ativar Premium:", error);
+      return;
+    }
+
+    window.location.reload();
+  };
+
   return (
     <AppShell>
 
@@ -104,19 +128,7 @@ export function AppCore({
         isOpen={showPixModal}
         onClose={() => setShowPixModal(false)}
         onUpgrade={async () => {
-
-          if (currentUser?.id) {
-
-            await updateUserProfile(
-              currentUser.id,
-              {
-                plan: 'premium'
-              }
-            );
-
-            window.location.reload();
-          }
-
+          await activatePremium();
           setShowPixModal(false);
         }}
         userId={userId}
