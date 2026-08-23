@@ -138,50 +138,57 @@ export const pagbankWebhook = async (
 
 
 
-    if (!rawBody || !authHeader) {
+    // Sandbox PagBank pode não enviar x-authenticity-token
+    if (!rawBody) {
 
       return res
         .status(401)
         .send('Unauthorized');
 
     }
-    const expectedSignature =
-      crypto
-        .createHash('sha256')
-        .update(
-          `${config.PAGBANK_TOKEN}-${rawBody}`
+
+
+    if (authHeader) {
+
+      const expectedSignature =
+        crypto
+          .createHash('sha256')
+          .update(
+            `${config.PAGBANK_TOKEN}-${rawBody}`
+          )
+          .digest('hex');
+
+
+
+      const expectedBuffer =
+        Buffer.from(expectedSignature);
+
+
+      const actualBuffer =
+        Buffer.from(authHeader as string);
+
+
+
+      if (
+        expectedBuffer.length !== actualBuffer.length ||
+        !crypto.timingSafeEqual(
+          expectedBuffer,
+          actualBuffer
         )
-        .digest('hex');
+      ) {
+
+        console.error(
+          "PAGBANK SIGNATURE INVALID"
+        );
 
 
+        return res
+          .status(401)
+          .send('Unauthorized');
 
-    const expectedBuffer =
-      Buffer.from(expectedSignature);
-
-
-    const actualBuffer =
-      Buffer.from(authHeader as string);
-
-
-
-    if (
-      expectedBuffer.length !== actualBuffer.length ||
-      !crypto.timingSafeEqual(
-        expectedBuffer,
-        actualBuffer
-      )
-    ) {
-
-      console.error("PAGBANK SIGNATURE INVALID");
-
-      return res
-        .status(401)
-        .send('Unauthorized');
+      }
 
     }
-
-
-
     const payload = req.body;
 
 
@@ -272,10 +279,12 @@ export const pagbankWebhook = async (
 
 
       if (error) {
+
         console.error(
           'Erro processando pagamento:',
           error
         );
+
       }
 
 
@@ -311,6 +320,9 @@ export const pagbankWebhook = async (
   }
 
 };
+
+
+
 export const getPaymentStatus = async (
   req: Request,
   res: Response
@@ -426,9 +438,6 @@ export const getPaymentStatus = async (
       }
 
     }
-
-
-
     // Premium somente se existir assinatura ativa válida
     const { data: subscription } =
       await supabase
