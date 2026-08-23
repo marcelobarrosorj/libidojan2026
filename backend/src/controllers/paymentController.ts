@@ -130,14 +130,6 @@ export const pagbankWebhook = async (
       (req as any).rawBody;
 
 
-    console.log("PAGBANK DEBUG:", {
-      headers: Object.keys(req.headers),
-      hasRawBody: !!rawBody,
-      hasAuthHeader: !!authHeader
-    });
-
-
-
     // Sandbox PagBank pode não enviar x-authenticity-token
     if (!rawBody) {
 
@@ -157,7 +149,6 @@ export const pagbankWebhook = async (
             `${config.PAGBANK_TOKEN}-${rawBody}`
           )
           .digest('hex');
-
 
 
       const expectedBuffer =
@@ -189,6 +180,8 @@ export const pagbankWebhook = async (
       }
 
     }
+
+
     const payload = req.body;
 
 
@@ -225,9 +218,6 @@ export const pagbankWebhook = async (
     const status =
       orderData.charges?.[0]?.status ||
       orderData.status;
-
-
-
     if (status === 'PAID') {
 
 
@@ -320,6 +310,8 @@ export const pagbankWebhook = async (
   }
 
 };
+
+
 
 
 
@@ -438,6 +430,8 @@ export const getPaymentStatus = async (
       }
 
     }
+
+
     // Premium somente se existir assinatura ativa válida
     const { data: subscription } =
       await supabase
