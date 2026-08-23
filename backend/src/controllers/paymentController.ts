@@ -130,6 +130,13 @@ export const pagbankWebhook = async (
       (req as any).rawBody;
 
 
+    console.log("PAGBANK DEBUG:", {
+      headers: Object.keys(req.headers),
+      hasRawBody: !!rawBody,
+      hasAuthHeader: !!authHeader
+    });
+
+
 
     if (!rawBody || !authHeader) {
 
@@ -138,9 +145,6 @@ export const pagbankWebhook = async (
         .send('Unauthorized');
 
     }
-
-
-
     const expectedSignature =
       crypto
         .createHash('sha256')
@@ -167,6 +171,8 @@ export const pagbankWebhook = async (
         actualBuffer
       )
     ) {
+
+      console.error("PAGBANK SIGNATURE INVALID");
 
       return res
         .status(401)
@@ -252,16 +258,25 @@ export const pagbankWebhook = async (
 
 
 
-      await supabase.rpc(
-        'process_payment',
-        {
-          p_user_id: userId,
-          p_payment_id: orderId,
-          p_provider: 'pagbank',
-          p_status: 'PAID',
-          p_amount: amountPaid
-        }
-      );
+      const { error } =
+        await supabase.rpc(
+          'process_payment',
+          {
+            p_user_id: userId,
+            p_payment_id: orderId,
+            p_provider: 'pagbank',
+            p_status: 'PAID',
+            p_amount: amountPaid
+          }
+        );
+
+
+      if (error) {
+        console.error(
+          'Erro processando pagamento:',
+          error
+        );
+      }
 
 
       console.log(
@@ -414,7 +429,7 @@ export const getPaymentStatus = async (
 
 
 
-    // Verificação real da assinatura Premium
+    // Premium somente se existir assinatura ativa válida
     const { data: subscription } =
       await supabase
         .from('user_subscriptions')
@@ -448,7 +463,6 @@ export const getPaymentStatus = async (
 
       status: finalStatus,
 
-      // Premium somente pelo banco
       isPremium,
 
       expirationDate:
