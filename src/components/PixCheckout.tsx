@@ -271,23 +271,15 @@ export function PixCheckout({
             });
 
 
-            setTimeout(async () => {
+            setTimeout(() => {
 
-              const activated =
-                await activateSubscription();
+  sessionStorage.removeItem(
+    'libido_pix_checkout'
+  );
 
+  onUpgrade();
 
-              if (activated) {
-
-                sessionStorage.removeItem(
-                  'libido_pix_checkout'
-                );
-
-                onUpgrade();
-
-              }
-
-            }, 1500);
+}, 1500);
 
 
           } else if (
