@@ -2,8 +2,6 @@ import { supabase } from './supabase';
 import { User } from '../types';
 import { isDemoEnabled, demoProfiles, isDemoId } from '../demo/index';
 
-
-
 export const mapSupabaseToUser = (data: any): User => {
   return {
     ...data,
@@ -14,7 +12,6 @@ export const mapSupabaseToUser = (data: any): User => {
     nickname: data.nickname || data.name || '',
     name: data.nickname || data.name || '',
     username: data.nickname || data.name || '',
-    pin: data.pin,
     sexualOrientation: data.sexual_orientation || data.sexualOrientation,
     sexual_orientation: data.sexual_orientation || data.sexualOrientation,
     coupleProfile: data.couple_profile || data.coupleProfile,
@@ -34,6 +31,7 @@ export const mapSupabaseToUser = (data: any): User => {
     location: data.location || { x: 0, y: 0 },
     radarUsedToday: data.radar_used_today || data.radarUsedToday || 0,
     visibilityScore: data.visibility_score || data.visibilityScore || 100,
+    role: data.role || undefined,
   } as User;
 };
 
@@ -49,6 +47,7 @@ export const mapUserToSupabase = (user: Partial<User>): any => {
   if (user.isDeleted !== undefined) result.is_deleted = user.isDeleted;
   if (user.createdAt !== undefined) result.created_at = new Date(user.createdAt).toISOString();
   if (user.isOnline !== undefined) result.is_online = user.isOnline;
+  
   delete result.id;
   delete result.userNumber;
   delete result.user_number;
@@ -61,6 +60,7 @@ export const mapUserToSupabase = (user: Partial<User>): any => {
   delete result.isDeleted;
   delete result.createdAt;
   delete result.isOnline;
+  
   return result;
 };
 
@@ -79,18 +79,44 @@ export const getUserById = async (userId: string): Promise<User | null> => {
   if (isDemoId(userId)) {
     return demoProfiles.find(u => u.id === userId) as unknown as User || null;
   }
+  
   const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('user_id', userId)
     .single();
+    
   if (error) {
     if (error.code !== 'PGRST116') {
       console.error('Error fetching user by id:', error);
     }
     return null;
   }
+  
   if (!data) return null;
+  
+  try {
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+      
+    if (!roleError && roleData && roleData.role) {
+      data.role = roleData.role;
+      
+      if (
+        roleData.role === 'owner' ||
+        roleData.role === 'admin' ||
+        roleData.role === 'moderator'
+      ) {
+        data.plan = roleData.role;
+      }
+    }
+  } catch (err) {
+    // Continuar normalmente
+  }
+  
   return mapSupabaseToUser(data);
 };
 
@@ -117,6 +143,7 @@ export const getAllUsers = async (): Promise<User[]> => {
   }
   const realUsers = (data || []).map(mapSupabaseToUser);
   if (!isDemoEnabled) return realUsers;
+  
   const validDemos = (demoProfiles as unknown as User[]).filter(u => isDemoId(u.id || ''));
   const map = new Map<string, User>();
   realUsers.forEach(u => { if (u.id) map.set(u.id, u); });
@@ -136,6 +163,7 @@ export const getActiveUsers = async (currentUserId: string): Promise<User[]> => 
   }
   const realUsers = (data || []).map(mapSupabaseToUser);
   if (!isDemoEnabled) return realUsers;
+  
   const validDemos = (demoProfiles as unknown as User[]).filter(u => isDemoId(u.id || ''));
   const map = new Map<string, User>();
   realUsers.forEach(u => { if (u.id) map.set(u.id, u); });

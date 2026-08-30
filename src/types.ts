@@ -1,3 +1,6 @@
+**codeTypeScript**
+
+```
 export interface CoupleProfileData {
   // Campos reais Supabase
   maleNickname?: string;
@@ -10,7 +13,7 @@ export interface CoupleProfileData {
   femaleOrientation?: string;
   femaleBiotype?: string;
   femaleHeight?: number | string;
-
+  
   // Campos legados temporários
   maleName?: string;
   maleCharacteristics?: string;
@@ -36,9 +39,10 @@ export interface CoupleProfile {
 export interface User {
   userNumber?: number;
   user_number?: number;
+  
   // Campos reais Supabase
-  user_id?: string;
-      nickname?: string;
+  user_id?: string;    
+  nickname?: string;
   age?: string;
   gender?: string;
   relationship_status?: string;
@@ -51,8 +55,9 @@ export interface User {
   status?: string;
   pin?: string;
   plan?: string;
+  role?: string;
   couple_profile?: CoupleProfileData | any;
-
+  
   // Campos legados temporários
   id?: string;
   name?: string;
@@ -72,7 +77,8 @@ export interface User {
   radarUsedToday?: number;
   lastRadarReset?: number;
   visibilityScore?: number;
-    isBanned?: boolean;
+  
+  isBanned?: boolean;
   isDeleted?: boolean;
   is_banned?: boolean;
   is_deleted?: boolean;
@@ -114,3 +120,4 @@ export interface AdminLog {
   targetId: string;
   timestamp: number;
 }
+```
