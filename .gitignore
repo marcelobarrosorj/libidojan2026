@@ -7,3 +7,10 @@ coverage/
 .env*
 !.env.example
 .vercel
+
+# Arquivos locais de backup e documentação
+historico_git.txt
+libidojan2026_backup.zip
+projeto_documentacao.txt
+projeto_estrutura.txt
+projeto_git_historico.txt
