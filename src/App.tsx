@@ -1,4 +1,4 @@
-import { LandingPage } from './components/LandingPage';
+﻿import { LandingPage } from './components/LandingPage';
 import { Partners } from './components/Partners';
 import React, { useState, useEffect, useRef } from 'react';
 import { getUserById, updateUserProfile } from './services/users';
@@ -13,6 +13,7 @@ import {
   resetPasswordForEmail,
   updatePassword
 } from './services/auth';
+import { Logo } from './components/Logo';
 import { PinScreen } from './components/PinScreen';
 import { AppCore } from './components/AppCore';
 import { Onboarding } from './components/Onboarding';
@@ -165,7 +166,7 @@ export default function App() {
         const profile = await getUserById(user.id);
         setSupabaseUser(profile);
       } catch (err) {
-        console.error("Erro ao recarregar perfil pós onboarding:", err);
+        console.error("Erro ao recarregar perfil pÃ³s onboarding:", err);
       } finally {
         setSupabaseLoading(false);
       }
@@ -216,7 +217,7 @@ export default function App() {
 
       setPendingEmailVerification(false);
     } catch (err: any) {
-      setError("Não foi possível entrar com estas credenciais. Se acredita que isso é um engano, entre em contato com o suporte: libidoapp@gmail.com.");
+      setError("NÃ£o foi possÃ­vel entrar com estas credenciais. Se acredita que isso Ã© um engano, entre em contato com o suporte: libidoapp@gmail.com.");
     } finally {
       setAuthLoading(false);
     }
@@ -240,13 +241,13 @@ export default function App() {
 
           setPendingEmailVerification(false);
         } else {
-          setMsg("O e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
+          setMsg("O e-mail ainda nÃ£o foi confirmado. Verifique sua caixa de entrada.");
         }
       } catch (err: any) {
         if (err.message.includes('Invalid login credentials')) {
           setError("E-mail ou senha incorretos.");
         } else if (err.message.includes('Email not confirmed')) {
-          setMsg("O e-mail ainda não foi confirmado. Verifique sua caixa de entrada.");
+          setMsg("O e-mail ainda nÃ£o foi confirmado. Verifique sua caixa de entrada.");
         } else {
           setError(err.message);
         }
@@ -284,7 +285,7 @@ export default function App() {
       try {
         await updateUserProfile(user.id, { status: 'inactive' });
       } catch (err) {
-        console.error('Erro ao atualizar status de saída:', err);
+        console.error('Erro ao atualizar status de saÃ­da:', err);
       }
     }
 
@@ -306,7 +307,7 @@ export default function App() {
 
     try {
       await resetPasswordForEmail(email);
-      setMsg("Verifique sua caixa de entrada para o link de redefinição de senha.");
+      setMsg("Verifique sua caixa de entrada para o link de redefiniÃ§Ã£o de senha.");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -336,12 +337,10 @@ export default function App() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-[var(--libido-bg)] text-[var(--libido-text)]">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="font-fraunces font-bold text-3xl tracking-[0.2em] mb-4">
-            LIBIDO<span className="text-[var(--libido-accent)] leading-none text-4xl -ml-1">.</span>
-          </div>
+          <div className="mb-4"><Logo size="lg" /></div>
 
           <div className="text-[10px] text-[var(--libido-muted)] tracking-widest uppercase mt-4">
-            Iniciando Conexão Segura
+            Iniciando ConexÃ£o Segura
           </div>
         </div>
       </div>
@@ -352,16 +351,14 @@ export default function App() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-[var(--libido-bg)] text-[var(--libido-text)] px-6">
         <div className="max-w-md w-full bg-[var(--libido-surface-2)] p-8 rounded-3xl border border-[var(--libido-border)] text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)]">
-          <div className="font-fraunces font-bold text-2xl tracking-[0.2em] mb-8 text-[var(--libido-text)]">
-            LIBIDO<span className="text-[var(--libido-accent)] leading-none text-3xl -ml-1">.</span>
-          </div>
+          <div className="mb-8"><Logo size="lg" /></div>
 
           <h2 className="text-xl font-medium mb-3 text-[var(--libido-text)]">
             Confirme seu E-mail
           </h2>
 
           <p className="text-sm text-[var(--libido-muted)] mb-6 leading-relaxed">
-            Enviamos um link de confirmação para:
+            Enviamos um link de confirmaÃ§Ã£o para:
             <br />
             <strong className="text-[var(--libido-accent)] font-mono text-xs mt-2 block">
               {email || (user && user.email)}
@@ -369,7 +366,7 @@ export default function App() {
           </p>
 
           <p className="text-xs text-[var(--libido-muted)] mb-8 bg-black/20 p-4 rounded-xl border border-[var(--libido-border)]/50">
-            Acesse sua caixa de entrada, clique no link de confirmação e volte aqui.
+            Acesse sua caixa de entrada, clique no link de confirmaÃ§Ã£o e volte aqui.
           </p>
 
           {error && (
@@ -388,7 +385,7 @@ export default function App() {
               disabled={authLoading}
               className="w-full bg-[var(--libido-accent)] text-black font-bold py-4 rounded-xl text-xs tracking-wider transition-all hover:bg-[var(--libido-accent-hover)] shadow-[0_0_20px_rgba(216,107,63,0.2)] disabled:opacity-50"
             >
-              {authLoading ? 'VERIFICANDO...' : 'JÁ CONFIRMEI O E-MAIL'}
+              {authLoading ? 'VERIFICANDO...' : 'JÃ CONFIRMEI O E-MAIL'}
             </button>
 
             <button
@@ -450,8 +447,8 @@ export default function App() {
 
           <p className="text-sm text-[var(--libido-muted)] text-center max-w-sm mb-8 leading-relaxed">
             {accountDeleted
-              ? 'Esta conta foi removida e não está mais disponível para acesso.'
-              : 'Esta conta foi suspensa por violação das Regras da Comunidade.'}
+              ? 'Esta conta foi removida e nÃ£o estÃ¡ mais disponÃ­vel para acesso.'
+              : 'Esta conta foi suspensa por violaÃ§Ã£o das Regras da Comunidade.'}
           </p>
 
           <button
@@ -512,15 +509,13 @@ export default function App() {
           className="mb-12 mt-4 cursor-pointer"
           onClick={() => setShowLanding(true)}
         >
-          <div className="font-fraunces font-bold text-xl tracking-[0.2em] text-[var(--libido-text)] flex items-center select-none">
-            LIBIDO<span className="text-[var(--libido-accent)] leading-none text-3xl -ml-1">.</span>
-          </div>
+          <Logo size="md" />
         </div>
 
         {recoveryMode === 'request' ? (
           <div className="flex flex-col mb-10">
             <div className="text-[var(--libido-accent)] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">
-              Recuperação
+              RecuperaÃ§Ã£o
             </div>
 
             <h1 className="text-3xl font-fraunces font-medium text-[var(--libido-text)] leading-[1.1] mb-4">
@@ -528,13 +523,13 @@ export default function App() {
             </h1>
 
             <p className="text-[var(--libido-muted)] text-sm">
-              Informe seu e-mail para receber um link de redefinição.
+              Informe seu e-mail para receber um link de redefiniÃ§Ã£o.
             </p>
           </div>
         ) : recoveryMode === 'update' ? (
           <div className="flex flex-col mb-10">
             <div className="text-[var(--libido-accent)] text-[10px] font-bold tracking-[0.2em] uppercase mb-4">
-              Segurança
+              SeguranÃ§a
             </div>
 
             <h1 className="text-3xl font-fraunces font-medium text-[var(--libido-text)] leading-[1.1] mb-4">
@@ -553,13 +548,13 @@ export default function App() {
 
             <h1 className="text-4xl font-fraunces font-medium text-[var(--libido-text)] leading-[1.1] mb-4">
               {isLogin
-                ? 'Conecte-se ao que desperta você.'
+                ? 'Conecte-se ao que desperta vocÃª.'
                 : 'Comece sua jornada discreta.'}
             </h1>
 
             <p className="text-[var(--libido-muted)] text-sm">
               {isLogin
-                ? 'Seu espaço privado para descobrir, conversar e permanecer.'
+                ? 'Seu espaÃ§o privado para descobrir, conversar e permanecer.'
                 : 'Crie sua conta para acessar o ambiente.'}
             </p>
           </div>
@@ -601,7 +596,7 @@ export default function App() {
               disabled={authLoading}
               className="w-full bg-[var(--libido-surface-2)] text-[var(--libido-text)] border border-[var(--libido-border)] font-bold py-4 mt-2 rounded-[16px] text-sm tracking-wide transition-all hover:bg-[var(--libido-surface)]"
             >
-              {authLoading ? 'Enviando...' : 'Enviar link de recuperação'}
+              {authLoading ? 'Enviando...' : 'Enviar link de recuperaÃ§Ã£o'}
             </button>
 
             <div className="text-center mt-4">
@@ -626,7 +621,7 @@ export default function App() {
 
               <input
                 type="password"
-                placeholder="•••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-[var(--libido-accent)] transition-colors"
@@ -679,7 +674,7 @@ export default function App() {
 
               <input
                 type="password"
-                placeholder="•••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-[var(--libido-accent)] transition-colors"
@@ -694,8 +689,8 @@ export default function App() {
               {authLoading
                 ? 'AGUARDE...'
                 : isLogin
-                  ? 'ENTRAR AGORA →'
-                  : 'CRIAR CONTA →'}
+                  ? 'ENTRAR AGORA â†’'
+                  : 'CRIAR CONTA â†’'}
             </button>
           </form>
         )}
@@ -712,7 +707,7 @@ export default function App() {
             >
               {isLogin
                 ? 'CRIAR UMA CONTA DISCRETA'
-                : 'JÁ TENHO UMA CONTA'}
+                : 'JÃ TENHO UMA CONTA'}
             </button>
           </div>
         )}
@@ -720,3 +715,4 @@ export default function App() {
     </div>
   );
 }
+
