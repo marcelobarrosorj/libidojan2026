@@ -1,4 +1,4 @@
-import { parseApiResponse } from '../utils/api';
+﻿import { parseApiResponse } from '../utils/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { Crown, Copy, CheckCircle2, X, Loader2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -89,41 +89,6 @@ export function PixCheckout({
   };
 
 
-  const activateSubscription = async () => {
-
-    if (!userId) return false;
-
-
-    const planId =
-      '29105ff8-818b-4876-b6da-f1039e752f6c';
-
-
-    const { error } = await supabase
-      .from('user_subscriptions')
-      .insert({
-        user_id: userId,
-        plan_id: planId,
-        status: 'active',
-        expires_at: new Date(
-          Date.now() + 24 * 60 * 60 * 1000
-        ).toISOString()
-      });
-
-
-    if (error) {
-
-      console.error(
-        'Erro criando assinatura:',
-        error
-      );
-
-      return false;
-    }
-
-
-    return true;
-
-  };
   const handleGeneratePix = async () => {
 
     if (!isCpfValid) return;
@@ -136,7 +101,7 @@ export function PixCheckout({
       const session = await supabase.auth.getSession();
 
       if (!session.data.session) {
-        setErrorMsg('Usuário não autenticado.');
+        setErrorMsg('UsuÃ¡rio nÃ£o autenticado.');
         return;
       }
 
@@ -163,7 +128,7 @@ export function PixCheckout({
 
       if (!res.ok) {
         throw new Error(
-          data.error || 'Erro ao gerar cobrança.'
+          data.error || 'Erro ao gerar cobranÃ§a.'
         );
       }
 
@@ -192,7 +157,7 @@ export function PixCheckout({
 
       setErrorMsg(
         error.message ||
-        'Falha temporária. Tente novamente.'
+        'Falha temporÃ¡ria. Tente novamente.'
       );
 
     } finally {
@@ -472,7 +437,7 @@ export function PixCheckout({
 
                   {cpf.length > 13 && !isCpfValid && (
                     <p className="text-xs text-red-500 mt-1">
-                      CPF inválido
+                      CPF invÃ¡lido
                     </p>
                   )}
 
@@ -550,8 +515,8 @@ export function PixCheckout({
 
 
                       {copied
-                        ? 'Código Pix copiado'
-                        : 'Copiar código Pix'
+                        ? 'CÃ³digo Pix copiado'
+                        : 'Copiar cÃ³digo Pix'
                       }
 
                     </button>
