@@ -1,4 +1,4 @@
-﻿import { updateUserProfile } from '../services/users';
+import { updateUserProfile } from '../services/users';
 import { useEffect, useState, ReactNode } from "react";
 import { AppShell } from "./AppShell";
 import { HeaderGlobal } from "./HeaderGlobal";
@@ -89,14 +89,14 @@ export function AppCore({
   }, [userId, isOwner]);
 
   useEffect(() => {
-    // ProteÃ§Ã£o extra: caso seja Owner, fecha imediatamente qualquer checkout aberto.
+    // Proteção extra: caso seja Owner, fecha imediatamente qualquer checkout aberto.
     if (isOwner) {
       setShowPixModal(false);
     }
   }, [isOwner]);
 
   const openPremiumCheckout = () => {
-    // Owner, admin e usuÃ¡rios Premium nÃ£o podem abrir cobranÃ§a.
+    // Owner, admin e usuários Premium não podem abrir cobrança.
     if (isOwner || isPremium || !premiumChecked) {
       return;
     }
@@ -155,4 +155,3 @@ export function AppCore({
     </AppShell>
   );
 }
-

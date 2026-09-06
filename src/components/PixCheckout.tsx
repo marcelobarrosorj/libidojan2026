@@ -1,4 +1,4 @@
-﻿import { parseApiResponse } from '../utils/api';
+import { parseApiResponse } from '../utils/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { Crown, Copy, CheckCircle2, X, Loader2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -101,7 +101,7 @@ export function PixCheckout({
       const session = await supabase.auth.getSession();
 
       if (!session.data.session) {
-        setErrorMsg('UsuÃ¡rio nÃ£o autenticado.');
+        setErrorMsg('Usuário não autenticado.');
         return;
       }
 
@@ -128,7 +128,7 @@ export function PixCheckout({
 
       if (!res.ok) {
         throw new Error(
-          data.error || 'Erro ao gerar cobranÃ§a.'
+          data.error || 'Erro ao gerar cobrança.'
         );
       }
 
@@ -157,7 +157,7 @@ export function PixCheckout({
 
       setErrorMsg(
         error.message ||
-        'Falha temporÃ¡ria. Tente novamente.'
+        'Falha temporária. Tente novamente.'
       );
 
     } finally {
@@ -437,7 +437,7 @@ export function PixCheckout({
 
                   {cpf.length > 13 && !isCpfValid && (
                     <p className="text-xs text-red-500 mt-1">
-                      CPF invÃ¡lido
+                      CPF inválido
                     </p>
                   )}
 
@@ -515,8 +515,8 @@ export function PixCheckout({
 
 
                       {copied
-                        ? 'CÃ³digo Pix copiado'
-                        : 'Copiar cÃ³digo Pix'
+                        ? 'Código Pix copiado'
+                        : 'Copiar código Pix'
                       }
 
                     </button>

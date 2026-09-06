@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Logo } from './Logo';
 import { ChevronDown, Lock, EyeOff, Shield, CheckCircle2 } from 'lucide-react';
 
@@ -8,31 +8,31 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
   const faqs = [
     {
       q: "Quem pode utilizar o Libido?",
-      a: "Somente pessoas com 18 anos ou mais. Perfis pertencentes ou atribuÃ­dos a menores de idade serÃ£o removidos."
+      a: "Somente pessoas com 18 anos ou mais. Perfis pertencentes ou atribuídos a menores de idade serão removidos."
     },
     {
-      q: "O Libido Ã© um site de acompanhantes?",
-      a: "NÃ£o. O Libido Ã© uma plataforma de conexÃµes e interaÃ§Ã£o entre adultos. NÃ£o permitimos a oferta, solicitaÃ§Ã£o ou intermediaÃ§Ã£o de serviÃ§os sexuais pagos."
+      q: "O Libido é um site de acompanhantes?",
+      a: "Não. O Libido é uma plataforma de conexões e interação entre adultos. Não permitimos a oferta, solicitação ou intermediação de serviços sexuais pagos."
     },
     {
-      q: "Preciso mostrar todas as minhas informaÃ§Ãµes?",
-      a: "NÃ£o. Compartilhe apenas as informaÃ§Ãµes necessÃ¡rias para utilizar a plataforma e aquilo que se sentir confortÃ¡vel em tornar visÃ­vel no perfil."
+      q: "Preciso mostrar todas as minhas informações?",
+      a: "Não. Compartilhe apenas as informações necessárias para utilizar a plataforma e aquilo que se sentir confortável em tornar visível no perfil."
     },
     {
       q: "Como o Libido trata meus dados pessoais?",
-      a: "O tratamento de dados pessoais Ã© orientado por nossa PolÃ­tica de Privacidade e pelo compromisso com a LGPD. Nela vocÃª poderÃ¡ entender quais informaÃ§Ãµes sÃ£o utilizadas, suas finalidades e como exercer seus direitos."
+      a: "O tratamento de dados pessoais é orientado por nossa Política de Privacidade e pelo compromisso com a LGPD. Nela você poderá entender quais informações são utilizadas, suas finalidades e como exercer seus direitos."
     },
     {
       q: "Quais direitos tenho sobre meus dados?",
-      a: "A LGPD prevÃª direitos relacionados aos dados pessoais, incluindo solicitaÃ§Ãµes de acesso, correÃ§Ã£o e eliminaÃ§Ã£o em situaÃ§Ãµes previstas na legislaÃ§Ã£o. Consulte a PolÃ­tica de Privacidade para conhecer os canais e procedimentos disponÃ­veis."
+      a: "A LGPD prevê direitos relacionados aos dados pessoais, incluindo solicitações de acesso, correção e eliminação em situações previstas na legislação. Consulte a Política de Privacidade para conhecer os canais e procedimentos disponíveis."
     },
     {
       q: "Posso denunciar outro perfil?",
-      a: "Sim. Comportamentos suspeitos, abusivos ou contrÃ¡rios Ã s Regras da Comunidade podem ser denunciados dentro da plataforma."
+      a: "Sim. Comportamentos suspeitos, abusivos ou contrários às Regras da Comunidade podem ser denunciados dentro da plataforma."
     },
     {
-      q: "O Libido Ã© gratuito?",
-      a: "O cadastro e parte da experiÃªncia podem ser acessados gratuitamente. Recursos adicionais estÃ£o disponÃ­veis por meio do Libido Premium."
+      q: "O Libido é gratuito?",
+      a: "O cadastro e parte da experiência podem ser acessados gratuitamente. Recursos adicionais estão disponíveis por meio do Libido Premium."
     }
   ];
 
@@ -41,10 +41,10 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
       {/* Age Bar */}
       <div className="bg-[var(--libido-surface-2)] border-b border-[var(--libido-border)]/50 text-center py-3 px-4 relative z-50">
         <p className="text-xs md:text-sm font-bold text-[var(--libido-muted)]">
-          ðŸ”ž Uso exclusivo para maiores de 18 anos.
+          🔞 Uso exclusivo para maiores de 18 anos.
         </p>
         <p className="text-[10px] md:text-xs text-[var(--libido-muted)] opacity-70 mt-1 max-w-2xl mx-auto">
-          Ao continuar, vocÃª confirma que tem 18 anos ou mais e concorda com nossos Termos de Uso, PolÃ­tica de Privacidade e Regras da Comunidade.
+          Ao continuar, você confirma que tem 18 anos ou mais e concorda com nossos Termos de Uso, Política de Privacidade e Regras da Comunidade.
         </p>
       </div>
 
@@ -56,13 +56,13 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="mb-12"><Logo size="lg" /></div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-fraunces font-medium leading-[1.1] mb-6 max-w-4xl mx-auto">
-          ConexÃµes adultas.<br/>
-          <span className="text-[var(--libido-muted)]">Privacidade levada a sÃ©rio.</span>
+          Conexões adultas.<br/>
+          <span className="text-[var(--libido-muted)]">Privacidade levada a sério.</span>
         </h1>
         
         <p className="text-sm md:text-lg text-[var(--libido-muted)] mb-12 max-w-2xl mx-auto leading-relaxed">
-          Um espaÃ§o para maiores de 18 anos que desejam conhecer pessoas, conversar e explorar novas possibilidades com liberdade, respeito e discriÃ§Ã£o.<br/><br/>
-          VocÃª escolhe o que mostrar, com quem conversar e atÃ© onde deseja ir.
+          Um espaço para maiores de 18 anos que desejam conhecer pessoas, conversar e explorar novas possibilidades com liberdade, respeito e discrição.<br/><br/>
+          Você escolhe o que mostrar, com quem conversar e até onde deseja ir.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto z-10">
@@ -90,16 +90,16 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             </div>
             <h3 className="text-lg font-bold mb-3">Controle total</h3>
             <p className="text-sm text-[var(--libido-muted)] leading-relaxed">
-              Oculte seu rosto no feed pÃºblico, restrinja o acesso Ã s suas fotos sensÃ­veis com PIN de seguranÃ§a e revele apenas para quem vocÃª escolher.
+              Oculte seu rosto no feed público, restrinja o acesso às suas fotos sensíveis com PIN de segurança e revele apenas para quem você escolher.
             </p>
           </div>
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-8 rounded-[24px] hover:border-[var(--libido-accent)]/30 transition-colors">
             <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6">
               <Shield size={24} className="text-[var(--libido-accent)]" />
             </div>
-            <h3 className="text-lg font-bold mb-3">SeguranÃ§a em foco</h3>
+            <h3 className="text-lg font-bold mb-3">Segurança em foco</h3>
             <p className="text-sm text-[var(--libido-muted)] leading-relaxed">
-              Marca d'Ã¡gua invisÃ­vel com rastreabilidade ativa para prevenir vazamentos e ambiente bloqueado contra capturas de tela.
+              Marca d'água invisível com rastreabilidade ativa para prevenir vazamentos e ambiente bloqueado contra capturas de tela.
             </p>
           </div>
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] p-8 rounded-[24px] hover:border-[var(--libido-accent)]/30 transition-colors">
@@ -108,7 +108,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             </div>
             <h3 className="text-lg font-bold mb-3">Falso Fim</h3>
             <p className="text-sm text-[var(--libido-muted)] leading-relaxed">
-              Acesso protegido por PIN e tela de pÃ¢nico "Modo Ghost" ativada instantaneamente, garantindo a sua discriÃ§Ã£o em qualquer lugar.
+              Acesso protegido por PIN e tela de pânico "Modo Ghost" ativada instantaneamente, garantindo a sua discrição em qualquer lugar.
             </p>
           </div>
         </div>
@@ -119,9 +119,9 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="max-w-4xl w-full bg-[var(--libido-surface-2)] border border-[var(--libido-accent)]/20 p-10 md:p-16 rounded-[32px] text-center relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--libido-accent)] to-transparent"></div>
           
-          <h2 className="text-3xl md:text-4xl font-fraunces font-medium mb-4">Mais possibilidades.<br/>A mesma discriÃ§Ã£o.</h2>
+          <h2 className="text-3xl md:text-4xl font-fraunces font-medium mb-4">Mais possibilidades.<br/>A mesma discrição.</h2>
           <p className="text-sm text-[var(--libido-muted)] mb-8">
-            Tenha acesso Ã  experiÃªncia Premium do Libido e aproveite recursos adicionais dentro da plataforma.
+            Tenha acesso à experiência Premium do Libido e aproveite recursos adicionais dentro da plataforma.
           </p>
 
           <div className="bg-[var(--libido-bg)] border border-[var(--libido-border)] rounded-2xl p-6 md:p-8 mb-8 inline-block text-left mx-auto w-full max-w-sm">
@@ -131,7 +131,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             <ul className="mt-4 space-y-3 text-xs text-[var(--libido-muted)]">
               <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-[var(--libido-gold)]" /> Radar exclusivo</li>
               <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-[var(--libido-gold)]" /> Grupos privados</li>
-              <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-[var(--libido-gold)]" /> ConteÃºdo sem paywall</li>
+              <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-[var(--libido-gold)]" /> Conteúdo sem paywall</li>
             </ul>
           </div>
 
@@ -140,23 +140,23 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
           </button>
 
           <p className="text-[10px] text-[var(--libido-muted)] opacity-60 mt-6 max-w-sm mx-auto">
-            O pagamento nÃ£o altera seus limites, sua privacidade nem suas escolhas dentro da comunidade.
+            O pagamento não altera seus limites, sua privacidade nem suas escolhas dentro da comunidade.
           </p>
         </div>
       </section>
 
-      {/* Bloco de ConfianÃ§a */}
+      {/* Bloco de Confiança */}
       <section className="py-24 px-6 bg-[var(--libido-surface)] border-y border-[var(--libido-border)]/50 text-center">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-fraunces font-medium mb-12">Entre porque ficou curioso.<br/>PermaneÃ§a porque se sente respeitado.</h2>
+          <h2 className="text-3xl font-fraunces font-medium mb-12">Entre porque ficou curioso.<br/>Permaneça porque se sente respeitado.</h2>
           <div className="flex flex-wrap justify-center gap-3">
             {[
               "Exclusivo para maiores de 18 anos",
-              "Ferramentas de bloqueio e denÃºncia",
-              "ModeraÃ§Ã£o de comportamentos inadequados",
-              "Controle sobre informaÃ§Ãµes do perfil",
+              "Ferramentas de bloqueio e denúncia",
+              "Moderação de comportamentos inadequados",
+              "Controle sobre informações do perfil",
               "Compromisso com a LGPD",
-              "Regras claras contra assÃ©dio e golpes",
+              "Regras claras contra assédio e golpes",
               "Ambiente inclusivo e sem julgamentos"
             ].map((badge, i) => (
               <span key={i} className="px-4 py-2 rounded-full border border-[var(--libido-border)] bg-[var(--libido-bg)] text-xs text-[var(--libido-muted)]">
@@ -198,10 +198,10 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[var(--libido-accent)]/5 rounded-t-[100%] blur-[100px] pointer-events-none"></div>
         <div className="max-w-2xl mx-auto relative z-10">
           <h2 className="text-4xl md:text-6xl font-fraunces font-medium mb-6 leading-tight">
-            Seu desejo.<br/>Seu espaÃ§o.<br/>Suas escolhas.
+            Seu desejo.<br/>Seu espaço.<br/>Suas escolhas.
           </h2>
           <p className="text-sm md:text-lg text-[var(--libido-muted)] mb-10 leading-relaxed">
-            Descubra conexÃµes adultas em um ambiente criado para valorizar privacidade, liberdade e respeito.
+            Descubra conexões adultas em um ambiente criado para valorizar privacidade, liberdade e respeito.
           </p>
           <button 
             onClick={onRegisterClick}
@@ -210,7 +210,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             Tenho 18 anos ou mais. Quero entrar.
           </button>
           <p className="text-[10px] md:text-xs text-[var(--libido-muted)] opacity-60 mt-8 max-w-sm mx-auto leading-relaxed">
-            Ao entrar, vocÃª declara ter pelo menos 18 anos e concorda com os Termos de Uso, a PolÃ­tica de Privacidade e as Regras da Comunidade.
+            Ao entrar, você declara ter pelo menos 18 anos e concorda com os Termos de Uso, a Política de Privacidade e as Regras da Comunidade.
           </p>
         </div>
       </section>
@@ -220,15 +220,15 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
           <div>
             <div className="mb-4"><Logo size="md" /></div>
-            <p className="mb-2">ConexÃµes adultas com privacidade, liberdade e respeito.</p>
+            <p className="mb-2">Conexões adultas com privacidade, liberdade e respeito.</p>
             <p className="mb-2 font-bold text-[var(--libido-text)]">Uso exclusivo para maiores de 18 anos.</p>
-            <p className="mb-6 opacity-70">O Libido nÃ£o oferece, vende ou intermedeia serviÃ§os sexuais.</p>
-            <p className="opacity-70 max-w-sm">Compromisso com a proteÃ§Ã£o de dados pessoais e com os princÃ­pios da LGPD.</p>
+            <p className="mb-6 opacity-70">O Libido não oferece, vende ou intermedeia serviços sexuais.</p>
+            <p className="opacity-70 max-w-sm">Compromisso com a proteção de dados pessoais e com os princípios da LGPD.</p>
           </div>
           <div className="flex flex-col gap-3 md:items-end">
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Termos de Uso</a>
-            <a href="#" className="hover:text-[var(--libido-text)] transition-colors">PolÃ­tica de Privacidade</a>
-            <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Central de SeguranÃ§a</a>
+            <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Política de Privacidade</a>
+            <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Central de Segurança</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Regras da Comunidade</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Ajuda e suporte</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Contato</a>
