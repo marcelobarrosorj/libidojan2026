@@ -100,7 +100,7 @@ export const getUserById = async (userId: string): Promise<User | null> => {
       .from('user_roles')
       .select('role')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
       
     if (!roleError && roleData && roleData.role) {
       data.role = roleData.role;
