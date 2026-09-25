@@ -1,4 +1,6 @@
-﻿import { resolvePagBankCustomerTaxId } from '../services/pagbank.js';
+﻿
+===== C:\libidojan2026\backend\src\tests\payment.test.ts =====
+import { resolvePagBankCustomerTaxId } from '../services/pagbank.js';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
@@ -10,9 +12,6 @@ const {
   mockSelect,
   mockEq,
   mockSingle,
-  mockPlanSelect,
-  mockPlanEq,
-  mockPlanSingle,
   mockGetUser,
   mockCreatePixPayment,
   mockVerifyPayment
@@ -23,9 +22,6 @@ const {
     mockSelect: vi.fn(),
     mockEq: vi.fn(),
     mockSingle: vi.fn(),
-    mockPlanSelect: vi.fn(),
-    mockPlanEq: vi.fn(),
-    mockPlanSingle: vi.fn(),
     mockGetUser: vi.fn(),
     mockCreatePixPayment: vi.fn(),
     mockVerifyPayment: vi.fn()
@@ -49,11 +45,6 @@ vi.mock('../config/supabase', () => {
           select: mockSelect,
         };
       }
-      if (table === 'subscription_plans') {
-        return {
-          select: mockPlanSelect,
-        };
-      }
       return {};
     })
   };
@@ -71,24 +62,20 @@ vi.mock('../services/pagbank', async (importOriginal) => {
 
 import app from '../app.js';
 
-const PLANO_DAY_USE = {
-  id: 'plan-dayuse-1',
-  name: 'Acesso 24 horas',
-  price: 19.90,
-  duration_days: 1,
-  active: true
-};
 
 describe('resolvePagBankCustomerTaxId', () => {
   it('Sandbox uses 12345678909', () => {
     expect(resolvePagBankCustomerTaxId('https://sandbox.api.pagseguro.com')).toBe('12345678909');
   });
+
   it('Sandbox uses 12345678909 even if 00000000000 is provided', () => {
     expect(resolvePagBankCustomerTaxId('https://sandbox.api.pagseguro.com', '00000000000')).toBe('12345678909');
   });
+
   it('Production removes non-numeric chars from valid taxId', () => {
     expect(resolvePagBankCustomerTaxId('https://api.pagseguro.com', '123.456.789-09')).toBe('12345678909');
   });
+
   it('Production without taxId throws PAGBANK_CUSTOMER_TAX_ID_REQUIRED', () => {
     expect(() => resolvePagBankCustomerTaxId('https://api.pagseguro.com', '')).toThrow('PAGBANK_CUSTOMER_TAX_ID_REQUIRED');
     expect(() => resolvePagBankCustomerTaxId('https://api.pagseguro.com', undefined)).toThrow('PAGBANK_CUSTOMER_TAX_ID_REQUIRED');
@@ -96,13 +83,11 @@ describe('resolvePagBankCustomerTaxId', () => {
 });
 
 describe('Payment API Tests', () => {
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockSelect.mockReturnValue({ eq: mockEq });
     mockEq.mockReturnValue({ eq: mockEq, single: mockSingle });
-    mockPlanSelect.mockReturnValue({ eq: mockPlanEq });
-    mockPlanEq.mockReturnValue({ eq: mockPlanEq, single: mockPlanSingle });
-    mockPlanSingle.mockResolvedValue({ data: PLANO_DAY_USE, error: null });
   });
 
   describe('POST /api/payment/create', () => {
@@ -113,128 +98,34 @@ describe('Payment API Tests', () => {
       expect(mockInsert).not.toHaveBeenCalled();
     });
 
-    it('Fails if no CPF is provided', async () => {
-      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const res = await request(app)
-        .post('/api/payment/create')
-        .set('Authorization', 'Bearer valid-token')
-        .send({});
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe('CPF inválido.');
-    });
-
-    it('Fails if invalid CPF is provided', async () => {
-      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const res = await request(app)
-        .post('/api/payment/create')
-        .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '11111111111' });
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe('CPF inválido.');
-    });
-
-    it('Fails if no plan is provided', async () => {
-      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const res = await request(app)
-        .post('/api/payment/create')
-        .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725' });
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe('Escolha um plano antes de gerar o PIX.');
-      expect(mockCreatePixPayment).not.toHaveBeenCalled();
-      expect(mockInsert).not.toHaveBeenCalled();
-    });
-
-    it('Fails if plan is invalid or inactive', async () => {
-      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      mockPlanSingle.mockResolvedValue({ data: null, error: { message: 'not found' } });
-      const res = await request(app)
-        .post('/api/payment/create')
-        .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-inexistente' });
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe('Plano inválido ou indisponível.');
-      expect(mockCreatePixPayment).not.toHaveBeenCalled();
-      expect(mockInsert).not.toHaveBeenCalled();
-    });
-
-    it('2 & 3. Authenticated user creates payment successfully (day use)', async () => {
+    it('2 & 3. Authenticated user creates payment successfully', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       const mockedPixData = {
         paymentId: 'pag-123',
         amount: 19.90,
-        qrCodeText: 'pix-copia-cola',
-        qrCodeImage: '',
-        status: 'WAITING',
-        planId: 'plan-dayuse-1'
+        qrCode: 'qr-code-str',
+        qrCodeText: 'pix-copia-cola'
       };
       mockCreatePixPayment.mockResolvedValue(mockedPixData);
       mockInsert.mockResolvedValue({ error: null });
+
       const res = await request(app)
         .post('/api/payment/create')
         .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-dayuse-1' });
+        .send({ customerTaxId: '52998224725' });
+
       expect(res.status).toBe(200);
-      expect(mockCreatePixPayment).toHaveBeenCalledWith('user-123', '52998224725', {
-        id: 'plan-dayuse-1',
-        name: 'Acesso 24 horas',
-        price: 19.90,
-        durationDays: 1
-      });
+      expect(mockCreatePixPayment).toHaveBeenCalledWith('user-123', '52998224725');
       expect(mockCreatePixPayment).toHaveBeenCalledTimes(1);
       expect(mockInsert).toHaveBeenCalledWith({
         user_id: 'user-123',
         payment_id: 'pag-123',
         provider: 'pagbank',
         status: 'WAITING',
-        amount: 19.90,
-        plan_id: 'plan-dayuse-1'
+        amount: 19.90
       });
       expect(res.body.paymentId).toBe('pag-123');
       expect(res.body.qrCodeText).toBe('pix-copia-cola');
-    });
-
-    it('Creates payment for monthly plan with price from subscription_plans', async () => {
-      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      mockPlanSingle.mockResolvedValue({
-        data: { id: 'plan-mensal-1', name: 'Plano Mensal', price: 49.90, duration_days: 30, active: true },
-        error: null
-      });
-      mockCreatePixPayment.mockResolvedValue({
-        paymentId: 'pag-456',
-        amount: 49.90,
-        qrCodeText: 'pix-mensal',
-        qrCodeImage: '',
-        status: 'WAITING',
-        planId: 'plan-mensal-1'
-      });
-      mockInsert.mockResolvedValue({ error: null });
-      const res = await request(app)
-        .post('/api/payment/create')
-        .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-mensal-1' });
-      expect(res.status).toBe(200);
-      expect(mockCreatePixPayment).toHaveBeenCalledWith('user-123', '52998224725', {
-        id: 'plan-mensal-1',
-        name: 'Plano Mensal',
-        price: 49.90,
-        durationDays: 30
-      });
-      expect(mockInsert).toHaveBeenCalledWith(
-        expect.objectContaining({ plan_id: 'plan-mensal-1', amount: 49.90 })
-      );
-    });
-
-    it('Creates payment if valid CPF is provided', async () => {
-      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const mockedPixData = { paymentId: 'pag-123', amount: 19.90, planId: 'plan-dayuse-1' };
-      mockCreatePixPayment.mockResolvedValue(mockedPixData);
-      mockInsert.mockResolvedValue({ error: null });
-      const res = await request(app)
-        .post('/api/payment/create')
-        .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-dayuse-1' });
-      expect(res.status).toBe(200);
     });
 
     it('PagBank HTTP 400 generates sanitized log without exposing token', async () => {
@@ -260,13 +151,17 @@ describe('Payment API Tests', () => {
         }
       };
       mockCreatePixPayment.mockRejectedValue(mockError);
+      
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       const res = await request(app)
         .post('/api/payment/create')
         .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-dayuse-1' });
+        .send({ customerTaxId: '52998224725' });
+        
       expect(res.status).toBe(500);
       expect(res.body).toEqual({ error: 'Erro interno ao criar pagamento.' });
+      
       expect(consoleSpy).toHaveBeenCalledWith('PAGBANK_REQUEST_ERROR', {
         status: 400,
         errors: [
@@ -278,36 +173,80 @@ describe('Payment API Tests', () => {
           }
         ]
       });
+      
       const allCalls = consoleSpy.mock.calls.map(call => JSON.stringify(call)).join(' ');
       expect(allCalls).not.toContain('SENSITIVE_TOKEN_123');
       expect(allCalls).not.toContain('Authorization');
       expect(allCalls).not.toContain('full_payload');
+      
       consoleSpy.mockRestore();
     });
 
     it('4. PagBank returns response without QR Code', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       mockCreatePixPayment.mockRejectedValue(new Error('PagBank error'));
+      
       const res = await request(app)
         .post('/api/payment/create')
         .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-dayuse-1' });
+        .send({ customerTaxId: '52998224725' });
+        
       expect(res.status).toBe(500);
       expect(mockInsert).not.toHaveBeenCalled();
     });
 
     it('5. Fails to save transaction', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const mockedPixData = { paymentId: 'pag-123', amount: 19.90, planId: 'plan-dayuse-1' };
+      const mockedPixData = { paymentId: 'pag-123', amount: 19.90 };
       mockCreatePixPayment.mockResolvedValue(mockedPixData);
       mockInsert.mockResolvedValue({ error: { message: 'DB Error' } });
+
       const res = await request(app)
         .post('/api/payment/create')
         .set('Authorization', 'Bearer valid-token')
-        .send({ customerTaxId: '52998224725', planId: 'plan-dayuse-1' });
+        .send({ customerTaxId: '52998224725' });
+        
       expect(res.status).toBe(500);
     });
   });
+
+  
+    it('Fails if no CPF is provided', async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
+      const res = await request(app)
+        .post('/api/payment/create')
+        .set('Authorization', 'Bearer valid-token')
+        .send({});
+        
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('CPF inválido.');
+    });
+
+    it('Fails if invalid CPF is provided', async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
+      const res = await request(app)
+        .post('/api/payment/create')
+        .set('Authorization', 'Bearer valid-token')
+        .send({ customerTaxId: '11111111111' });
+        
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('CPF inválido.');
+    });
+    
+    it('Creates payment if valid CPF is provided', async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
+      const mockedPixData = { paymentId: 'pag-123', amount: 19.90 };
+      mockCreatePixPayment.mockResolvedValue(mockedPixData);
+      mockInsert.mockResolvedValue({ error: null });
+      
+      const res = await request(app)
+        .post('/api/payment/create')
+        .set('Authorization', 'Bearer valid-token')
+        .send({ customerTaxId: '52998224725' });
+        
+      expect(res.status).toBe(200);
+    });
+
 
   describe('POST /api/webhook/pagbank', () => {
     it('1. Header missing', async () => {
@@ -322,6 +261,7 @@ describe('Payment API Tests', () => {
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', 'invalid-signature')
         .send(payload);
+
       expect(res.status).toBe(401);
     });
 
@@ -329,18 +269,20 @@ describe('Payment API Tests', () => {
       const payload = { id: 'ord-123' };
       const rawBody = JSON.stringify(payload);
       const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
+
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'PAID', amount: { value: 1990 } }]
       });
-      mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
       mockRpc.mockResolvedValue({ data: true, error: null });
+
       const res = await request(app)
         .post('/api/webhook/pagbank')
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', signature)
         .send(payload);
+
       expect(res.status).toBe(200);
       expect(mockRpc).toHaveBeenCalledWith('process_payment', {
         p_user_id: 'user-123',
@@ -355,68 +297,34 @@ describe('Payment API Tests', () => {
       const payload = { id: 'ord-123' };
       const rawBody = JSON.stringify(payload);
       const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
+
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'PAID', amount: { value: 1990 } }]
       });
-      mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
       mockRpc.mockResolvedValue({ data: false, error: null });
-      const res = await request(app)
-        .post('/api/webhook/pagbank')
-        .set('Content-Type', 'application/json')
-        .set('x-authenticity-token', signature)
-        .send(payload);
-      expect(res.status).toBe(200);
-    });
 
-    it('Valor divergente da transacao nao ativa Premium', async () => {
-      const payload = { id: 'ord-123' };
-      const rawBody = JSON.stringify(payload);
-      const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
-      mockVerifyPayment.mockResolvedValue({
-        id: 'ord-123',
-        reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'PAID', amount: { value: 1990 } }]
-      });
-      mockSingle.mockResolvedValue({ data: { amount: 49.90, status: 'WAITING' }, error: null });
       const res = await request(app)
         .post('/api/webhook/pagbank')
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', signature)
         .send(payload);
-      expect(res.status).toBe(200);
-      expect(mockRpc).not.toHaveBeenCalled();
-    });
 
-    it('Transacao inexistente nao ativa Premium', async () => {
-      const payload = { id: 'ord-123' };
-      const rawBody = JSON.stringify(payload);
-      const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
-      mockVerifyPayment.mockResolvedValue({
-        id: 'ord-123',
-        reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'PAID', amount: { value: 1990 } }]
-      });
-      mockSingle.mockResolvedValue({ data: null, error: { message: 'not found' } });
-      const res = await request(app)
-        .post('/api/webhook/pagbank')
-        .set('Content-Type', 'application/json')
-        .set('x-authenticity-token', signature)
-        .send(payload);
       expect(res.status).toBe(200);
-      expect(mockRpc).not.toHaveBeenCalled();
     });
 
     it('4. Re-formatted payload fails signature', async () => {
       const rawBodyOriginal = '{"id":"ord-123"}';
       const rawBodyReformatted = '{\n  "id": "ord-123"\n}';
       const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBodyOriginal}`).digest('hex');
+
       const res = await request(app)
         .post('/api/webhook/pagbank')
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', signature)
         .send(rawBodyReformatted);
+
       expect(res.status).toBe(401);
     });
 
@@ -424,12 +332,15 @@ describe('Payment API Tests', () => {
       const payload = { id: 'ord-123' };
       const rawBody = JSON.stringify(payload);
       const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
+
       mockVerifyPayment.mockResolvedValue(null);
+
       const res = await request(app)
         .post('/api/webhook/pagbank')
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', signature)
         .send(payload);
+
       expect(res.status).toBe(200);
     });
 
@@ -437,34 +348,40 @@ describe('Payment API Tests', () => {
       const payload = { id: 'ord-123' };
       const rawBody = JSON.stringify(payload);
       const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
+
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'WAITING', amount: { value: 1990 } }]
       });
+
       const res = await request(app)
         .post('/api/webhook/pagbank')
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', signature)
         .send(payload);
+
       expect(res.status).toBe(200);
       expect(mockRpc).not.toHaveBeenCalled();
     });
-
+    
     it('CANCELED status', async () => {
       const payload = { id: 'ord-123' };
       const rawBody = JSON.stringify(payload);
       const signature = crypto.createHash('sha256').update(`mock-pagbank-token-${rawBody}`).digest('hex');
+
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'CANCELED', amount: { value: 1990 } }]
       });
+
       const res = await request(app)
         .post('/api/webhook/pagbank')
         .set('Content-Type', 'application/json')
         .set('x-authenticity-token', signature)
         .send(payload);
+
       expect(res.status).toBe(200);
       expect(mockRpc).not.toHaveBeenCalled();
     });
@@ -479,20 +396,24 @@ describe('Payment API Tests', () => {
     it('2. Fails when transaction belongs to another user', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       mockSingle.mockResolvedValue({ data: { status: 'WAITING', user_id: 'user-456' }, error: null });
+
       const res = await request(app)
         .get('/api/payment/status/pag-123')
         .set('Authorization', 'Bearer valid-token')
         .send();
+
       expect(res.status).toBe(403);
     });
 
     it('3 & 4. Returns WAITING status', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       mockSingle.mockResolvedValue({ data: { status: 'WAITING', user_id: 'user-123' }, error: null });
+
       const res = await request(app)
         .get('/api/payment/status/pag-123')
         .set('Authorization', 'Bearer valid-token')
         .send();
+
       expect(res.status).toBe(200);
       expect(res.body.status).toBe('WAITING');
       expect(res.body.isPremium).toBe(false);
@@ -501,22 +422,26 @@ describe('Payment API Tests', () => {
     it('5. Returns PAID status', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       mockSingle.mockResolvedValue({ data: { status: 'PAID', user_id: 'user-123' }, error: null });
+
       const res = await request(app)
         .get('/api/payment/status/pag-123')
         .set('Authorization', 'Bearer valid-token')
         .send();
+
       expect(res.status).toBe(200);
       expect(res.body.status).toBe('PAID');
       expect(res.body.isPremium).toBe(true);
     });
-
+    
     it('6. Returns EXPIRED status', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       mockSingle.mockResolvedValue({ data: { status: 'EXPIRED', user_id: 'user-123' }, error: null });
+
       const res = await request(app)
         .get('/api/payment/status/pag-123')
         .set('Authorization', 'Bearer valid-token')
         .send();
+
       expect(res.status).toBe(200);
     });
   });
@@ -529,4 +454,281 @@ describe('Health Check API Test', () => {
     expect(res.body.status).toBe('ok');
     expect(res.body.service).toBe('libido-api');
   });
+});
+
+
+===== C:\libidojan2026\src\tests\PixCheckout.test.tsx =====
+import { render, screen, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { PixCheckout } from '../components/PixCheckout';
+
+vi.mock('../services/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(),
+    },
+    from: vi.fn(() => ({
+      insert: vi.fn(() => Promise.resolve({
+        error: null
+      }))
+    }))
+  }
+}));
+
+import { supabase } from '../services/supabase';
+
+const originalFetch = global.fetch;
+
+describe('PixCheckout Component', () => {
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    vi.useRealTimers();
+  });
+
+
+  it('Requires valid CPF before creating payment', async () => {
+
+    const onUpgradeMock = vi.fn();
+    const onCloseMock = vi.fn();
+
+    (supabase.auth.getSession as any).mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'fake-access-token'
+        }
+      }
+    });
+
+
+    render(
+      <PixCheckout
+        isOpen={true}
+        onClose={onCloseMock}
+        onUpgrade={onUpgradeMock}
+        userId="user-123"
+      />
+    );
+
+
+    expect(screen.getByText('Ative o Premium')).toBeTruthy();
+
+
+    const generateBtn = screen.getByText('Gerar Pix');
+
+
+    expect(
+      (generateBtn as HTMLButtonElement).disabled
+    ).toBe(true);
+
+
+    const input =
+      screen.getByPlaceholderText('000.000.000-00');
+
+
+    await userEvent.type(
+      input,
+      '11111111111'
+    );
+
+
+    expect(
+      (generateBtn as HTMLButtonElement).disabled
+    ).toBe(true);
+
+
+    await userEvent.clear(input);
+
+
+    await userEvent.type(
+      input,
+      '52998224725'
+    );
+
+
+    expect(
+      (generateBtn as HTMLButtonElement).disabled
+    ).toBe(false);
+
+  });
+
+
+
+  it('Renders and successfully loads Pix info, updates to PAID, and reloads Premium', async () => {
+
+    const onUpgradeMock = vi.fn();
+    const onCloseMock = vi.fn();
+
+
+    (supabase.auth.getSession as any).mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'fake-access-token'
+        }
+      }
+    });
+
+
+
+    let fetchCallCount = 0;
+
+
+    (global.fetch as any).mockImplementation(
+      (url: string) => {
+
+        fetchCallCount++;
+
+
+        if (
+          url.includes('/api/payment/create')
+        ) {
+
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve({
+                paymentId: 'pag-123',
+                amount: 19.90,
+                qrCodeImage: 'base64-image-string',
+                qrCodeText: 'pix-code-str',
+                status: 'WAITING'
+              })
+          });
+
+        }
+
+
+        if (
+          url.includes('/api/payment/status')
+        ) {
+
+          if (fetchCallCount === 2) {
+
+            return Promise.resolve({
+              ok: true,
+              json: () =>
+                Promise.resolve({
+                  status: 'WAITING'
+                })
+            });
+
+          }
+
+
+          return Promise.resolve({
+            ok: true,
+            json: () =>
+              Promise.resolve({
+                status: 'PAID'
+              })
+          });
+
+        }
+
+
+        return Promise.reject(
+          new Error('Unknown url')
+        );
+
+      }
+    );
+
+
+
+    Object.assign(
+      navigator,
+      {
+        clipboard: {
+          writeText: vi.fn()
+        }
+      }
+    );
+
+
+
+    render(
+      <PixCheckout
+        isOpen={true}
+        onClose={onCloseMock}
+        onUpgrade={onUpgradeMock}
+        userId="user-123"
+      />
+    );
+
+
+
+    const input =
+      screen.getByPlaceholderText('000.000.000-00');
+
+
+    await userEvent.type(
+      input,
+      '52998224725'
+    );
+
+
+    await userEvent.click(
+      screen.getByText('Gerar Pix')
+    );
+
+
+
+    await waitFor(() => {
+
+      expect(global.fetch)
+        .toHaveBeenCalledWith(
+          '/api/payment/create',
+          expect.objectContaining({
+            method: 'POST'
+          })
+        );
+
+    });
+
+
+
+    expect(
+      await screen.findByText('R$ 19,90')
+    ).toBeTruthy();
+
+
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10000);
+    });
+
+
+
+    expect(
+      await screen.findByText(
+        'Pagamento confirmado. Premium ativado.'
+      )
+    ).toBeTruthy();
+
+
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
+
+
+
+    expect(
+      onUpgradeMock
+    ).toHaveBeenCalledTimes(1);
+
+
+
+    // A recarga do Premium acontece no AppCore via onUpgrade; o webhook ativa no banco.
+
+  });
+
 });

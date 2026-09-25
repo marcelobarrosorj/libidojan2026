@@ -1,0 +1,77 @@
+﻿
+> react-example@0.0.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mC:/libidojan2026[39m
+
+ [32mÔ£ô[39m src/tests/SecurityWatermark.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 384[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders watermark with username and userNumber [33m 318[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/ProtectedImage.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 939[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m prevents drag and context menu and has security css [33m 931[2mms[22m[39m
+node.exe : [90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/payment/create[2m > [22m[2m4. PagBank returns response without QR Code
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\marce\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([90mstderr[2m...without QR Code:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[22m[39mErro em createPayment: PagBank error
+
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/payment/create[2m > [22m[2m5. Fails to save transaction
+[22m[39mErro ao registrar transa├º├úo: { message: [32m'DB Error'[39m }
+
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/webhook/pagbank[2m > [22m[2m1. Header missing
+[22m[39mPAGBANK SIGNATURE MISSING
+
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/webhook/pagbank[2m > [22m[2m2. Invalid signature
+[22m[39mPAGBANK SIGNATURE INVALID
+
+[90mstdout[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST /api/webhook/pagbank[2m > [22m[2m3, 8 & 9. Valid signature -> PAID
+[22m[39mPagamento confirmado pelo webhook: ord-123
+
+[90mstdout[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST /api/webhook/pagbank[2m > [22m[2m3 & 9. Webhook idempotency
+[22m[39mPagamento ignorado ou duplicado: ord-123
+
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/webhook/pagbank[2m > [22m[2mValor divergente da transacao nao ativa Premium
+[22m[39mPAGBANK FRAUD_ALERT: valor divergente ord-123 pago=19.9
+
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/webhook/pagbank[2m > [22m[2mTransacao inexistente nao ativa Premium
+[22m[39mPAGBANK FRAUD_ALERT: transacao nao encontrada ord-123
+
+ [32mÔ£ô[39m backend/src/tests/webhook.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 383[2mms[22m[39m
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/webhook/pagbank[2m > [22m[2m4. Re-formatted payload fails signature
+[22m[39mPAGBANK SIGNATURE INVALID
+
+[90mstderr[2m | backend/src/tests/payment.test.ts[2m > [22m[2mPayment API Tests[2m > [22m[2mPOST 
+/api/webhook/pagbank[2m > [22m[2m5. Unknown order
+[22m[39mPAGBANK FRAUD_ALERT: ordem nao encontrada ord-123
+
+ [32mÔ£ô[39m backend/src/tests/payment.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 497[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/Funnel.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1046[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m cadastro sem sess├úo [33m 407[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m retorno pelo link de confirma├º├úo [33m 322[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/AppCoreWatermark.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 2194[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders watermark for all user roles using currentUser [33m 2183[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/migration.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/formatUserNumber.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32mÔ£ô[39m backend/src/tests/premium.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/PixCheckout.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 3488[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m Requires valid CPF before creating payment [33m 1688[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m Loads plans, creates Pix for day use with planId, updates to PAID and reloads Premium [33m 915[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m Permite escolher o Plano Mensal e gera PIX de R$ 49,90 [33m 876[2mms[22m[39m
+ [32mÔ£ô[39m backend/src/tests/polling.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 77[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/mapUserToSupabase.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[32m65 passed[39m[22m[90m (65)[39m
+[2m   Start at [22m 17:25:41
+[2m   Duration [22m 14.57s[2m (transform 10.96s, setup 0ms, import 27.45s, tests 9.06s, environment 46.15s)[22m
+

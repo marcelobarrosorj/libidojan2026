@@ -13,6 +13,13 @@ function applyCpfMask(value: string) {
   return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
 }
 
+interface PlanoDisponivel {
+  id: string;
+  name: string;
+  price: number;
+  duration_days: number;
+}
+
 interface PixCheckoutProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,9 +33,7 @@ export function PixCheckout({
   onUpgrade,
   userId
 }: PixCheckoutProps) {
-
   const [copied, setCopied] = useState(false);
-
   const [pixData, setPixData] = useState<{
     paymentId: string;
     qrCodeImage: string;
@@ -36,22 +41,20 @@ export function PixCheckout({
     amount: number;
     status: string;
   } | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [cpf, setCpf] = useState('');
   const [isCpfValid, setIsCpfValid] = useState(false);
+  const [plans, setPlans] = useState<PlanoDisponivel[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('payment-active');
-
       const saved = sessionStorage.getItem('libido_pix_checkout');
-
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-
           if (
             parsed.status === 'WAITING' ||
             parsed.status === 'ACTIVE'
@@ -60,82 +63,79 @@ export function PixCheckout({
           } else {
             sessionStorage.removeItem('libido_pix_checkout');
           }
-
         } catch {}
       }
-
     } else {
       document.body.classList.remove('payment-active');
       setCpf('');
       setErrorMsg('');
     }
-
     return () => {
       document.body.classList.remove('payment-active');
     };
-
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    let ativo = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/payment/plans');
+        if (res.ok) {
+          const data = await parseApiResponse(res);
+          if (
+            ativo &&
+            Array.isArray(data.plans) &&
+            data.plans.length > 0
+          ) {
+            setPlans(data.plans);
+            setSelectedPlanId((atual) => atual || data.plans[0].id);
+          }
+        }
+      } catch {}
+    })();
+    return () => {
+      ativo = false;
+    };
+  }, [isOpen]);
 
   const handleCpfChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-
     const masked = applyCpfMask(e.target.value);
-
     setCpf(masked);
     setIsCpfValid(isValidCPF(masked));
-
   };
 
-
   const handleGeneratePix = async () => {
-
-    if (!isCpfValid) return;
-
+    if (!isCpfValid || !selectedPlanId) return;
     setLoading(true);
     setErrorMsg('');
-
     try {
-
       const session = await supabase.auth.getSession();
-
       if (!session.data.session) {
         setErrorMsg('Usuário não autenticado.');
         return;
       }
-
-
       const res = await fetch('/api/payment/create', {
-
         method: 'POST',
-
         headers: {
           'Content-Type': 'application/json',
           'Authorization':
             `Bearer ${session.data.session.access_token}`
         },
-
         body: JSON.stringify({
-          customerTaxId: normalizeCPF(cpf)
+          customerTaxId: normalizeCPF(cpf),
+          planId: selectedPlanId
         })
-
       });
-
-
       const data = await parseApiResponse(res);
-
-
       if (!res.ok) {
         throw new Error(
           data.error || 'Erro ao gerar cobrança.'
         );
       }
-
-
       setPixData(data);
-
-
       sessionStorage.setItem(
         'libido_pix_checkout',
         JSON.stringify({
@@ -143,34 +143,22 @@ export function PixCheckout({
           status: data.status
         })
       );
-
-
       setCpf('');
-
-
     } catch (error: any) {
-
       console.error(
         'Falha ao gerar PIX:',
         error
       );
-
       setErrorMsg(
         error.message ||
         'Falha temporária. Tente novamente.'
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-
   useEffect(() => {
-
     if (
       !isOpen ||
       !pixData ||
@@ -178,19 +166,11 @@ export function PixCheckout({
     ) {
       return;
     }
-
-
     const checkStatus = async () => {
-
       try {
-
         const session =
           await supabase.auth.getSession();
-
-
         if (!session.data.session) return;
-
-
         const res = await fetch(
           `/api/payment/status/${pixData.paymentId}`,
           {
@@ -200,28 +180,16 @@ export function PixCheckout({
             }
           }
         );
-
-
         if (res.ok) {
-
           const data =
             await parseApiResponse(res);
-
-
           if (data.status === 'PAID') {
-
-
             setPixData(prev => {
-
               if (!prev) return null;
-
-
               const updated = {
                 ...prev,
                 status: 'PAID'
               };
-
-
               sessionStorage.setItem(
                 'libido_pix_checkout',
                 JSON.stringify({
@@ -229,112 +197,68 @@ export function PixCheckout({
                   status: 'PAID'
                 })
               );
-
-
               return updated;
-
             });
-
-
             setTimeout(() => {
-
-  sessionStorage.removeItem(
-    'libido_pix_checkout'
-  );
-
-  onUpgrade();
-
-}, 1500);
-
-
+              sessionStorage.removeItem(
+                'libido_pix_checkout'
+              );
+              onUpgrade();
+            }, 1500);
           } else if (
             data.status === 'CANCELED' ||
             data.status === 'EXPIRED'
           ) {
-
-
             setPixData(prev => {
-
               if (!prev) return null;
-
               sessionStorage.removeItem(
                 'libido_pix_checkout'
               );
-
               return {
                 ...prev,
                 status: data.status
               };
-
             });
-
-
             setErrorMsg(
               'Pagamento expirado ou cancelado.'
             );
-
           }
-
         }
-
-
       } catch (error) {
-
         console.error(
           'Erro ao verificar PIX:',
           error
         );
-
       }
-
     };
-
-
     const interval =
       setInterval(checkStatus, 5000);
-
-
     return () =>
       clearInterval(interval);
-
-
   }, [
     isOpen,
     pixData,
     onUpgrade
   ]);
 
-
   const handleCopy = () => {
-
     if (pixData) {
-
       navigator.clipboard.writeText(
         pixData.qrCodeText
       );
-
-
       setCopied(true);
-
-
       setTimeout(
         () => setCopied(false),
         2000
       );
-
     }
-
   };
-
 
   if (!isOpen) return null;
 
-
   return (
     <AnimatePresence>
-
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md">
-
         <motion.div
           initial={{
             opacity: 0,
@@ -353,7 +277,6 @@ export function PixCheckout({
           }}
           className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative"
         >
-
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-[var(--libido-muted)] bg-[var(--libido-surface-2)] p-2 rounded-full z-10"
@@ -361,46 +284,26 @@ export function PixCheckout({
             <X className="w-5 h-5" />
           </button>
           <div className="p-6 relative">
-
             <div className="text-center mb-6 mt-4">
-
               <div className="w-16 h-16 bg-[var(--libido-surface-2)] border border-[var(--libido-accent)]/30 rounded-full flex items-center justify-center mx-auto mb-4">
-
                 <Crown className="w-8 h-8 text-[var(--libido-text)]" />
-
               </div>
-
-
               <h2 className="text-2xl font-fraunces font-medium text-[var(--libido-text)] mb-2">
                 Ative o Premium
               </h2>
-
-
               <p className="text-[var(--libido-muted)] text-sm">
                 Desbloqueie todo o poder do app
               </p>
-
             </div>
-
-
             {loading ? (
-
               <div className="flex justify-center items-center py-8">
-
                 <Loader2 className="w-8 h-8 animate-spin text-[var(--libido-accent)]" />
-
               </div>
-
-
             ) : errorMsg ? (
-
               <div className="text-center py-8">
-
                 <p className="text-red-500 font-bold mb-4">
                   {errorMsg}
                 </p>
-
-
                 <button
                   onClick={() => {
                     setErrorMsg('');
@@ -410,21 +313,36 @@ export function PixCheckout({
                 >
                   Tentar novamente
                 </button>
-
               </div>
-
-
             ) : !pixData ? (
-
               <div className="flex flex-col gap-4">
-
+                <div className="flex flex-col gap-2">
+                  <label className="block text-sm font-medium text-[var(--libido-text)]">
+                    Escolha seu plano
+                  </label>
+                  {plans.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setSelectedPlanId(p.id)}
+                      className={`flex items-center justify-between w-full px-4 py-3 rounded-xl border text-left ${
+                        selectedPlanId === p.id
+                          ? 'border-[var(--libido-accent)] bg-[var(--libido-accent)]/10'
+                          : 'border-[var(--libido-border)] bg-[var(--libido-surface-2)]'
+                      }`}
+                    >
+                      <span className="text-sm text-[var(--libido-text)]">
+                        {p.name}
+                      </span>
+                      <span className="font-bold text-[var(--libido-text)]">
+                        R$ {Number(p.price).toFixed(2).replace('.', ',')}
+                      </span>
+                    </button>
+                  ))}
+                </div>
                 <div>
-
                   <label className="block text-sm font-medium text-[var(--libido-text)] mb-1">
                     CPF do titular
                   </label>
-
-
                   <input
                     type="text"
                     inputMode="numeric"
@@ -433,52 +351,33 @@ export function PixCheckout({
                     onChange={handleCpfChange}
                     className="w-full bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-xl px-4 py-3 text-[var(--libido-text)]"
                   />
-
-
                   {cpf.length > 13 && !isCpfValid && (
                     <p className="text-xs text-red-500 mt-1">
                       CPF inválido
                     </p>
                   )}
-
                 </div>
-
-
                 <button
                   onClick={handleGeneratePix}
-                  disabled={!isCpfValid}
+                  disabled={!isCpfValid || !selectedPlanId}
                   className="w-full bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-bold py-3 rounded-xl disabled:opacity-50"
                 >
                   Gerar Pix
                 </button>
-
               </div>
-
-
             ) : (
-
               pixData.status === 'PAID' ? (
-
                 <div className="text-center py-8 flex flex-col items-center">
-
                   <CheckCircle2 className="w-12 h-12 text-green-500 mb-4" />
-
                   <p className="text-green-500 font-bold text-lg mb-2">
                     Pagamento confirmado. Premium ativado.
                   </p>
-
-
                   <p className="text-[var(--libido-muted)] opacity-70 text-sm">
                     Redirecionando...
                   </p>
-
                 </div>
-
-
               ) : (
-
                 <div className="flex flex-col items-center gap-4 bg-white/5 p-4 rounded-2xl mb-4">
-
                   {pixData.qrCodeImage && (
                     <img
                       src={pixData.qrCodeImage}
@@ -486,55 +385,36 @@ export function PixCheckout({
                       className="w-48 h-48 rounded-lg bg-white p-2"
                     />
                   )}
-
-
                   {pixData.amount && (
                     <p className="text-[var(--libido-text)] font-bold">
                       R$ {pixData.amount.toFixed(2).replace('.', ',')}
                     </p>
                   )}
-
-
                   <p className="text-xs text-[var(--libido-accent)]">
                     Aguardando pagamento...
                   </p>
-
-
                   {pixData.qrCodeText && (
-
                     <button
                       onClick={handleCopy}
                       className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-semibold"
                     >
-
                       {copied ? (
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
-
-
                       {copied
                         ? 'Código Pix copiado'
                         : 'Copiar código Pix'
                       }
-
                     </button>
-
                   )}
-
                 </div>
-
               )
-
             )}
-
           </div>
-
         </motion.div>
-
       </div>
-
     </AnimatePresence>
   );
 }

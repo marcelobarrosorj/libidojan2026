@@ -4,6 +4,13 @@ import { config } from '../config/env.js';
 const PAGBANK_SANDBOX_URL = "https://sandbox.api.pagseguro.com";
 const PAGBANK_SANDBOX_TAX_ID = "12345678909";
 
+export interface PlanInfo {
+  id: string;
+  name: string;
+  price: number;
+  durationDays: number;
+}
+
 export function resolvePagBankCustomerTaxId(
   apiUrl: string,
   customerTaxId?: string,
@@ -18,14 +25,17 @@ export function resolvePagBankCustomerTaxId(
   return normalizedTaxId;
 }
 
-export const createPixPayment = async (userId: string, customerTaxId: string) => {
+export const createPixPayment = async (
+  userId: string,
+  customerTaxId: string,
+  plan: PlanInfo
+) => {
   if (!config.PAGBANK_TOKEN) {
     throw new Error('Credenciais do PagBank nao configuradas.');
   }
-  const amountCents = config.PREMIUM_PRICE_CENTS;
+  const amountCents = Math.round(plan.price * 100);
   const paymentIdLocal = Math.random().toString(36).substring(2, 15);
   const referenceId = 'libido-premium_' + userId + '_' + paymentIdLocal;
-
   const payload = {
     reference_id: referenceId,
     customer: {
@@ -36,7 +46,7 @@ export const createPixPayment = async (userId: string, customerTaxId: string) =>
     items: [
       {
         reference_id: 'libido-premium',
-        name: 'Libido Premium',
+        name: 'Libido Premium - ' + plan.name,
         quantity: 1,
         unit_amount: amountCents
       }
@@ -44,7 +54,7 @@ export const createPixPayment = async (userId: string, customerTaxId: string) =>
     charges: [
       {
         reference_id: 'libido-premium-charge',
-        description: 'Libido Premium',
+        description: 'Libido Premium - ' + plan.name,
         amount: {
           value: amountCents,
           currency: 'BRL'
@@ -59,14 +69,12 @@ export const createPixPayment = async (userId: string, customerTaxId: string) =>
     ],
     notification_urls: config.PAGBANK_WEBHOOK_URL ? [config.PAGBANK_WEBHOOK_URL] : []
   };
-
   const response = await axios.post(config.PAGBANK_API_URL + '/orders', payload, {
     headers: {
       'Authorization': 'Bearer ' + config.PAGBANK_TOKEN,
       'Content-Type': 'application/json'
     }
   });
-
   const charge = response.data.charges?.[0];
   if (!charge) {
     throw new Error('Cobranca ausente na resposta do PagBank');
@@ -76,14 +84,14 @@ export const createPixPayment = async (userId: string, customerTaxId: string) =>
     throw new Error('QR Code ausente na resposta do PagBank');
   }
   const imageLink = charge.links?.find((l: any) => l.rel === 'QRCODE.PNG')?.href || '';
-
   return {
     paymentId: response.data.id,
     status: charge.status || 'WAITING',
     qrCodeText: qrCode.text,
     qrCodeImage: imageLink,
     expirationDate: charge.payment_method?.pix?.expiration_date,
-    amount: amountCents / 100
+    amount: amountCents / 100,
+    planId: plan.id
   };
 };
 
