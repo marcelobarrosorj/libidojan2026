@@ -1,16 +1,24 @@
+ï»¿# Dependencias
 node_modules/
-build/
-dist/
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
-.vercel
 
-# Arquivos locais de backup e documentação
-historico_git.txt
-libidojan2026_backup.zip
-projeto_documentacao.txt
-projeto_estrutura.txt
-projeto_git_historico.txt
+# Builds e cobertura de testes
+dist/
+build/
+coverage/
+
+# Variaveis de ambiente - NUNCA subir (contem tokens)
+.env
+.env.*
+!.env.example
+
+# Arquivos de trabalho e logs gerados nas sessoes (raiz do projeto)
+/*.txt
+
+# Backups de codigo
+*.backup
+*.backup-*
+
+# Logs e arquivos de sistema
+*.log
+.DS_Store
+Thumbs.db

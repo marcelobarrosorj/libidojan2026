@@ -1,9 +1,0 @@
-﻿=== HOMOLOGACAO PAGBANK - TESTE PIX (SANDBOX) ===
-Data/hora do teste: 2026-09-14 13:03:59
-
-=== REQUEST ===
-POST https://sandbox.api.pagseguro.com/orders
-{"reference_id":"libido-premium_homolog_002","customer":{"name":"Cliente Teste Libido","email":"pagamento@libidoapp.com","tax_id":"12345678909"},"items":[{"reference_id":"libido-premium","name":"Libido Premium","quantity":1,"unit_amount":500}],"qr_codes":[{"amount":{"value":500},"expiration_date":"2026-09-15T23:59:59Z"}],"notification_urls":["https://www.libidoapp.com.br/api/webhook/pagbank"]}
-
-=== RESPONSE (HTTP 201) ===
-{"id":"ORDE_76B8B97B-8677-4B2D-ABB9-926FEF298B1B","reference_id":"libido-premium_homolog_002","created_at":"2026-09-14T13:04:00.479-03:00","customer":{"name":"Cliente Teste Libido","email":"pagamento@libidoapp.com","tax_id":"12345678909"},"items":[{"reference_id":"libido-premium","name":"Libido Premium","quantity":1,"unit_amount":500}],"qr_codes":[{"id":"QRCO_CAD61D5A-73FF-4B80-ACDE-D34A5513E593","expiration_date":"2026-09-15T20:59:59.000-03:00","amount":{"value":500},"text":"00020101021226850014br.gov.bcb.pix2563api-h.pagseguro.com/pix/v2/CAD61D5A-73FF-4B80-ACDE-D34A5513E5935204729953039865802BR5922MARIO MARCELO BARROSO 6013Volta Redonda62070503***630412F5","arrangements":["PIX"],"links":[{"rel":"QRCODE.PNG","href":"https://sandbox.api.pagseguro.com/qrcode/QRCO_CAD61D5A-73FF-4B80-ACDE-D34A5513E593/png","media":"image/png","type":"GET"},{"rel":"QRCODE.BASE64","href":"https://sandbox.api.pagseguro.com/qrcode/QRCO_CAD61D5A-73FF-4B80-ACDE-D34A5513E593/base64","media":"text/plain","type":"GET"}]}],"notification_urls":["https://www.libidoapp.com.br/api/webhook/pagbank"],"links":[{"rel":"SELF","href":"https://sandbox.api.pagseguro.com/orders/ORDE_76B8B97B-8677-4B2D-ABB9-926FEF298B1B","media":"application/json","type":"GET"},{"rel":"PAY","href":"https://sandbox.api.pagseguro.com/orders/ORDE_76B8B97B-8677-4B2D-ABB9-926FEF298B1B/pay","media":"application/json","type":"POST"}]}
