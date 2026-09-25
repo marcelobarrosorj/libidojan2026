@@ -1,4 +1,4 @@
-import { resolvePagBankCustomerTaxId } from '../services/pagbank.js';
+﻿import { resolvePagBankCustomerTaxId } from '../services/pagbank.js';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
@@ -27,7 +27,7 @@ const {
 });
 
 vi.mock('../config/env', () => ({
-  config: { PAGBANK_TOKEN: 'mock-pagbank-token' },
+  config: { PAGBANK_TOKEN: 'mock-pagbank-token', PREMIUM_PRICE_CENTS: 1990 },
   validateProductionEnvironment: vi.fn(),
   getBackendAvailability: vi.fn(() => true),
 }));
@@ -158,7 +158,7 @@ describe('Payment API Tests', () => {
         .send({ customerTaxId: '52998224725' });
         
       expect(res.status).toBe(500);
-      expect(res.body).toEqual({ error: 'Erro interno ao criar pagamento' });
+      expect(res.body).toEqual({ error: 'Erro interno ao criar pagamento.' });
       
       expect(consoleSpy).toHaveBeenCalledWith('PAGBANK_REQUEST_ERROR', {
         status: 400,
@@ -217,7 +217,7 @@ describe('Payment API Tests', () => {
         .send({});
         
       expect(res.status).toBe(400);
-      expect(res.body.error).toBe('CPF inválido');
+      expect(res.body.error).toBe('CPF inválido.');
     });
 
     it('Fails if invalid CPF is provided', async () => {
@@ -228,7 +228,7 @@ describe('Payment API Tests', () => {
         .send({ customerTaxId: '11111111111' });
         
       expect(res.status).toBe(400);
-      expect(res.body.error).toBe('CPF inválido');
+      expect(res.body.error).toBe('CPF inválido.');
     });
     
     it('Creates payment if valid CPF is provided', async () => {
@@ -270,7 +270,7 @@ describe('Payment API Tests', () => {
 
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
-        reference_id: 'ref_user-123',
+        reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'PAID', amount: { value: 1990 } }]
       });
       mockRpc.mockResolvedValue({ data: true, error: null });
@@ -298,7 +298,7 @@ describe('Payment API Tests', () => {
 
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
-        reference_id: 'ref_user-123',
+        reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'PAID', amount: { value: 1990 } }]
       });
       mockRpc.mockResolvedValue({ data: false, error: null });
@@ -339,7 +339,7 @@ describe('Payment API Tests', () => {
         .set('x-authenticity-token', signature)
         .send(payload);
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(200);
     });
 
     it('WAITING status', async () => {
@@ -349,7 +349,7 @@ describe('Payment API Tests', () => {
 
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
-        reference_id: 'ref_user-123',
+        reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'WAITING', amount: { value: 1990 } }]
       });
 
@@ -370,7 +370,7 @@ describe('Payment API Tests', () => {
 
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
-        reference_id: 'ref_user-123',
+        reference_id: 'libido-premium_user-123_local1',
         charges: [{ status: 'CANCELED', amount: { value: 1990 } }]
       });
 

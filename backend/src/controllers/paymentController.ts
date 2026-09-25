@@ -71,7 +71,7 @@ export const createPayment = async (
 
     return res.status(200).json(pixData);
   } catch (error: any) {
-    console.error('Erro em createPayment:', error.message);
+    if (error && error.response && error.response.status) { const dados = error.response.data || {}; const lista = Array.isArray(dados.error_messages) ? dados.error_messages : []; const safeErrors = lista.map((e: any) => ({ code: e && e.code, error: e && e.error, description: e && e.description, parameter_name: e && e.parameter_name })); console.error('PAGBANK_REQUEST_ERROR', { status: error.response.status, errors: safeErrors }); } console.error('Erro em createPayment:', error.message);
 
     return res.status(500).json({
       error: 'Erro interno ao criar pagamento.'

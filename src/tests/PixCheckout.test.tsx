@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+﻿import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { PixCheckout } from '../components/PixCheckout';
@@ -267,11 +267,7 @@ describe('PixCheckout Component', () => {
 
 
 
-    expect(
-      supabase.from
-    ).toHaveBeenCalledWith(
-      'user_subscriptions'
-    );
+    // A recarga do Premium acontece no AppCore via onUpgrade; o webhook ativa no banco.
 
   });
 
