@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { createPixPayment, verifyPayment } from '../services/pagbank.js';
 import { isValidCPF, normalizeCPF } from '../utils/cpf.js';
@@ -36,7 +36,6 @@ export const createPayment = async (
 
     const userId = authUser.id;
     const { customerTaxId } = req.body;
-
     const normalizedTaxId = normalizeCPF(customerTaxId);
 
     if (!normalizedTaxId || !isValidCPF(normalizedTaxId)) {
@@ -45,32 +44,25 @@ export const createPayment = async (
       });
     }
 
-    const pixData = await createPixPayment(
-      userId,
-      normalizedTaxId
-    );
+    const pixData = await createPixPayment(userId, normalizedTaxId);
 
     const { getAdminSupabase } =
       await import('../config/supabase.js');
 
     const supabase = getAdminSupabase();
 
-    const { error } =
-      await supabase
-        .from('payment_transactions')
-        .insert({
-          user_id: userId,
-          payment_id: pixData.paymentId,
-          provider: 'pagbank',
-          status: 'WAITING',
-          amount: pixData.amount
-        });
+    const { error } = await supabase
+      .from('payment_transactions')
+      .insert({
+        user_id: userId,
+        payment_id: pixData.paymentId,
+        provider: 'pagbank',
+        status: 'WAITING',
+        amount: pixData.amount
+      });
 
     if (error) {
-      console.error(
-        'Erro ao registrar transação:',
-        error
-      );
+      console.error('Erro ao registrar transação:', error);
 
       return res.status(500).json({
         error: 'Erro interno ao registrar transação.'
@@ -78,12 +70,8 @@ export const createPayment = async (
     }
 
     return res.status(200).json(pixData);
-
   } catch (error: any) {
-    console.error(
-      'Erro em createPayment:',
-      error.message
-    );
+    console.error('Erro em createPayment:', error.message);
 
     return res.status(500).json({
       error: 'Erro interno ao criar pagamento.'
@@ -96,8 +84,7 @@ export const pagbankWebhook = async (
   res: Response
 ) => {
   try {
-    const authHeader =
-      req.headers['x-authenticity-token'];
+    const authHeader = req.headers['x-authenticity-token'];
 
     const { config } =
       await import('../config/env.js');
@@ -110,13 +97,7 @@ export const pagbankWebhook = async (
       return res.status(401).send('Unauthorized');
     }
 
-    /*
-      Em produção, a assinatura é obrigatória.
-      Sandbox/local pode não enviar esse header, mas a ordem ainda
-      é confirmada diretamente na API do PagBank antes de liberar Premium.
-    */
-    const isProduction =
-      config.NODE_ENV === 'production';
+    const isProduction = config.NODE_ENV === 'production';
 
     if (isProduction && !authHeader) {
       console.error('PAGBANK SIGNATURE MISSING');
@@ -125,23 +106,18 @@ export const pagbankWebhook = async (
     }
 
     if (authHeader) {
-      const signature =
-        Array.isArray(authHeader)
-          ? authHeader[0]
-          : authHeader;
+      const signature = Array.isArray(authHeader)
+        ? authHeader[0]
+        : authHeader;
 
-      const rawPayload =
-        Buffer.isBuffer(rawBody)
-          ? rawBody.toString('utf8')
-          : String(rawBody);
+      const rawPayload = Buffer.isBuffer(rawBody)
+        ? rawBody.toString('utf8')
+        : String(rawBody);
 
-      const expectedSignature =
-        crypto
-          .createHash('sha256')
-          .update(
-            `${config.PAGBANK_TOKEN}-${rawPayload}`
-          )
-          .digest('hex');
+      const expectedSignature = crypto
+        .createHash('sha256')
+        .update(`${config.PAGBANK_TOKEN}-${rawPayload}`)
+        .digest('hex');
 
       const expectedBuffer =
         Buffer.from(expectedSignature, 'utf8');
@@ -151,10 +127,7 @@ export const pagbankWebhook = async (
 
       if (
         expectedBuffer.length !== actualBuffer.length ||
-        !crypto.timingSafeEqual(
-          expectedBuffer,
-          actualBuffer
-        )
+        !crypto.timingSafeEqual(expectedBuffer, actualBuffer)
       ) {
         console.error('PAGBANK SIGNATURE INVALID');
 
@@ -165,27 +138,20 @@ export const pagbankWebhook = async (
     const payload = req.body;
     const orderId = payload?.id;
 
-    /*
-      Eventos que não são relacionados a um pedido podem ser
-      reconhecidos sem gerar erro/retry do PagBank.
-    */
     if (!orderId || typeof orderId !== 'string') {
       return res.status(200).send('Ignorado');
     }
 
     /*
-      Nunca confie somente no corpo recebido pelo webhook.
-      A fonte de confirmação do pagamento é a consulta autenticada
-      à API oficial do PagBank.
+      O corpo do webhook nunca é suficiente para ativar Premium.
+      A ordem é consultada diretamente na API autenticada do PagBank.
     */
     const orderData = await verifyPayment(orderId);
 
     if (!orderData) {
-      console.error(
-        `PAGBANK ORDER NOT FOUND: ${orderId}`
-      );
+      console.error(`PAGBANK FRAUD_ALERT: ordem nao encontrada ${orderId}`);
 
-      return res.status(400).send('Invalid Order');
+      return res.status(200).send('OK');
     }
 
     const status = getOrderStatus(orderData);
@@ -194,16 +160,8 @@ export const pagbankWebhook = async (
       return res.status(200).send('OK');
     }
 
-    const referenceId =
-      String(orderData.reference_id || '');
-
-    /*
-      O reference_id é criado como:
-      libido-premium_<userId>_<identificador-local>
-    */
-    const referenceParts =
-      referenceId.split('_');
-
+    const referenceId = String(orderData.reference_id || '');
+    const referenceParts = referenceId.split('_');
     const userId = referenceParts[1];
 
     if (
@@ -211,25 +169,30 @@ export const pagbankWebhook = async (
       referenceParts[0] !== 'libido-premium' ||
       !userId
     ) {
-      console.error(
-        `PAGBANK INVALID REFERENCE: ${referenceId}`
-      );
+      console.error(`PAGBANK FRAUD_ALERT: referencia invalida ${referenceId}`);
 
-      return res.status(400).send('Invalid Reference');
+      return res.status(200).send('OK');
     }
 
     const amountPaid = getPaidAmount(orderData);
 
-    /*
-      Não usar valor padrão aqui. Sem valor válido fornecido pela
-      ordem confirmada pelo PagBank, o pagamento não é liberado.
-    */
     if (amountPaid === null) {
+      console.error(`PAGBANK FRAUD_ALERT: valor invalido ${orderId}`);
+
+      return res.status(200).send('OK');
+    }
+
+    /*
+      Valor divergente do preco registrado e sinal de fraude:
+      retorna 200 (sem retry infinito do PagBank), nao ativa
+      Premium e registra alerta de fraude no log.
+    */
+    if (Math.round(amountPaid * 100) !== config.PREMIUM_PRICE_CENTS) {
       console.error(
-        `PAGBANK INVALID AMOUNT: ${orderId}`
+        `PAGBANK FRAUD_ALERT: valor divergente ${orderId} pago=${amountPaid}`
       );
 
-      return res.status(400).send('Invalid Amount');
+      return res.status(200).send('OK');
     }
 
     const { getAdminSupabase } =
@@ -238,55 +201,59 @@ export const pagbankWebhook = async (
     const supabase = getAdminSupabase();
 
     /*
-      process_payment deve validar no banco:
-      - usuário da transação;
-      - payment_id;
-      - provider;
-      - valor;
-      - idempotência.
+      O RPC confirma no banco:
+      - transação existente;
+      - mesmo usuário;
+      - mesmo provedor;
+      - mesmo valor;
+      - processamento idempotente.
     */
-    const { error } =
-      await supabase.rpc(
-        'process_payment',
-        {
-          p_user_id: userId,
-          p_payment_id: orderId,
-          p_provider: 'pagbank',
-          p_status: 'PAID',
-          p_amount: amountPaid
-        }
-      );
+    const { data, error } = await supabase.rpc(
+      'process_payment',
+      {
+        p_user_id: userId,
+        p_payment_id: orderId,
+        p_provider: 'pagbank',
+        p_status: 'PAID',
+        p_amount: amountPaid
+      }
+    );
 
     if (error) {
-      console.error(
-        'Erro processando pagamento:',
-        error
+      const message = String(
+        (error as any)?.message || error
       );
 
       /*
-        Retornar 500 permite que o PagBank tente novamente o webhook.
-        O RPC deve ser idempotente para receber repetições com segurança.
+        Rejeicao de regra de negocio (ex.: valor invalido)
+        nao e erro transitorio: nao deve gerar retry infinito.
       */
-      return res
-        .status(500)
-        .send('Internal Server Error');
+      if (message.toLowerCase().includes('valor')) {
+        console.error(
+          `PAGBANK FRAUD_ALERT: rejeitado pelo banco ${orderId} - ${message}`
+        );
+
+        return res.status(200).send('OK');
+      }
+
+      console.error('Erro processando pagamento:', error);
+
+      return res.status(500).send('Internal Server Error');
     }
 
-    console.log(
-      `Pagamento confirmado: ${orderId}`
-    );
+    if (!data) {
+      console.log(`Pagamento ignorado ou duplicado: ${orderId}`);
+
+      return res.status(200).send('OK');
+    }
+
+    console.log(`Pagamento confirmado pelo webhook: ${orderId}`);
 
     return res.status(200).send('OK');
-
   } catch (error: any) {
-    console.error(
-      'Erro processando webhook:',
-      error.message
-    );
+    console.error('Erro processando webhook:', error.message);
 
-    return res
-      .status(500)
-      .send('Internal Server Error');
+    return res.status(500).send('Internal Server Error');
   }
 };
 
@@ -311,13 +278,16 @@ export const getPaymentStatus = async (
 
     const supabase = getAdminSupabase();
 
-    const { data: tx, error } =
-      await supabase
-        .from('payment_transactions')
-        .select('status, user_id')
-        .eq('payment_id', paymentId)
-        .eq('provider', 'pagbank')
-        .single();
+    /*
+      Esta rota NÃO consulta mais o PagBank e NÃO ativa Premium.
+      Ela apenas informa o status já confirmado pelo webhook e salvo no banco.
+    */
+    const { data: tx, error } = await supabase
+      .from('payment_transactions')
+      .select('status, user_id')
+      .eq('payment_id', paymentId)
+      .eq('provider', 'pagbank')
+      .single();
 
     if (error || !tx) {
       return res.status(404).json({
@@ -331,109 +301,14 @@ export const getPaymentStatus = async (
       });
     }
 
-    let finalStatus = tx.status;
-
-    /*
-      Fallback caso o webhook atrase ou não seja recebido:
-      consulta a API do PagBank e só então processa o pagamento.
-    */
-    if (finalStatus === 'WAITING') {
-      const orderData = await verifyPayment(paymentId);
-
-      if (
-        orderData &&
-        getOrderStatus(orderData) === 'PAID'
-      ) {
-        const amountPaid = getPaidAmount(orderData);
-
-        if (amountPaid === null) {
-          console.error(
-            `PAGBANK INVALID AMOUNT: ${paymentId}`
-          );
-
-          return res.status(400).json({
-            error: 'Valor inválido na confirmação do pagamento.'
-          });
-        }
-
-        const { error: processError } =
-          await supabase.rpc(
-            'process_payment',
-            {
-              p_user_id: userId,
-              p_payment_id: paymentId,
-              p_provider: 'pagbank',
-              p_status: 'PAID',
-              p_amount: amountPaid
-            }
-          );
-
-        if (processError) {
-          console.error(
-            'Erro processando pagamento por consulta:',
-            processError
-          );
-
-          return res.status(500).json({
-            error: 'Erro ao confirmar pagamento.'
-          });
-        }
-
-        finalStatus = 'PAID';
-      }
-    }
-
-    /*
-      Fonte única de verdade do Premium:
-      public.users.premium / public.users.plan.
-    */
-    const {
-      data: premiumUser,
-      error: premiumUserError
-    } =
-      await supabase
-        .from('users')
-        .select('premium, plan')
-        .eq('user_id', userId)
-        .single();
-
-    if (premiumUserError || !premiumUser) {
-      console.error(
-        'Erro consultando status Premium:',
-        premiumUserError
-      );
-
-      return res.status(500).json({
-        error: 'Não foi possível consultar o status Premium.'
-      });
-    }
-
-    const plan =
-      String(premiumUser.plan || '')
-        .trim()
-        .toLowerCase();
-
-    const isPremium =
-      premiumUser.premium === true ||
-      [
-        'premium',
-        'owner',
-        'admin',
-        'moderator'
-      ].includes(plan);
-
     return res.status(200).json({
       paymentId,
-      status: finalStatus,
-      isPremium,
+      status: tx.status,
+      isPremium: tx.status === 'PAID',
       expirationDate: null
     });
-
   } catch (error: any) {
-    console.error(
-      'Erro em getPaymentStatus:',
-      error.message
-    );
+    console.error('Erro em getPaymentStatus:', error.message);
 
     return res.status(500).json({
       error: 'Erro interno.'
