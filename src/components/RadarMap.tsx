@@ -136,6 +136,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
         const dist = distanciaMetros(meuPonto.lat, meuPonto.lon, d.lat!, d.lon!);
         return { user: d.u as User, x: ponto.x, y: ponto.y, dist };
       })
+      .filter((p) => p.dist >= 100)
       .sort((a, b) => a.dist - b.dist);
   }, [users, meuPonto, tick]);
 
