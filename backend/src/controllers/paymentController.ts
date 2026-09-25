@@ -97,42 +97,44 @@ export const pagbankWebhook = async (
       return res.status(401).send('Unauthorized');
     }
 
-    const isProduction = config.NODE_ENV === 'production';
-
-    if (isProduction && !authHeader) {
+    /*
+      A assinatura é obrigatória SEMPRE, em qualquer ambiente.
+      Não dependemos de NODE_ENV: se a variável não estiver
+      configurada, o webhook continua rejeitando requisições
+      sem assinatura.
+    */
+    if (!authHeader) {
       console.error('PAGBANK SIGNATURE MISSING');
 
       return res.status(401).send('Unauthorized');
     }
 
-    if (authHeader) {
-      const signature = Array.isArray(authHeader)
-        ? authHeader[0]
-        : authHeader;
+    const signature = Array.isArray(authHeader)
+      ? authHeader[0]
+      : authHeader;
 
-      const rawPayload = Buffer.isBuffer(rawBody)
-        ? rawBody.toString('utf8')
-        : String(rawBody);
+    const rawPayload = Buffer.isBuffer(rawBody)
+      ? rawBody.toString('utf8')
+      : String(rawBody);
 
-      const expectedSignature = crypto
-        .createHash('sha256')
-        .update(`${config.PAGBANK_TOKEN}-${rawPayload}`)
-        .digest('hex');
+    const expectedSignature = crypto
+      .createHash('sha256')
+      .update(config.PAGBANK_TOKEN + '-' + rawPayload)
+      .digest('hex');
 
-      const expectedBuffer =
-        Buffer.from(expectedSignature, 'utf8');
+    const expectedBuffer =
+      Buffer.from(expectedSignature, 'utf8');
 
-      const actualBuffer =
-        Buffer.from(signature, 'utf8');
+    const actualBuffer =
+      Buffer.from(signature, 'utf8');
 
-      if (
-        expectedBuffer.length !== actualBuffer.length ||
-        !crypto.timingSafeEqual(expectedBuffer, actualBuffer)
-      ) {
-        console.error('PAGBANK SIGNATURE INVALID');
+    if (
+      expectedBuffer.length !== actualBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, actualBuffer)
+    ) {
+      console.error('PAGBANK SIGNATURE INVALID');
 
-        return res.status(401).send('Unauthorized');
-      }
+      return res.status(401).send('Unauthorized');
     }
 
     const payload = req.body;
@@ -149,7 +151,7 @@ export const pagbankWebhook = async (
     const orderData = await verifyPayment(orderId);
 
     if (!orderData) {
-      console.error(`PAGBANK FRAUD_ALERT: ordem nao encontrada ${orderId}`);
+      console.error('PAGBANK FRAUD_ALERT: ordem nao encontrada ' + orderId);
 
       return res.status(200).send('OK');
     }
@@ -169,7 +171,7 @@ export const pagbankWebhook = async (
       referenceParts[0] !== 'libido-premium' ||
       !userId
     ) {
-      console.error(`PAGBANK FRAUD_ALERT: referencia invalida ${referenceId}`);
+      console.error('PAGBANK FRAUD_ALERT: referencia invalida ' + referenceId);
 
       return res.status(200).send('OK');
     }
@@ -177,7 +179,7 @@ export const pagbankWebhook = async (
     const amountPaid = getPaidAmount(orderData);
 
     if (amountPaid === null) {
-      console.error(`PAGBANK FRAUD_ALERT: valor invalido ${orderId}`);
+      console.error('PAGBANK FRAUD_ALERT: valor invalido ' + orderId);
 
       return res.status(200).send('OK');
     }
@@ -189,7 +191,7 @@ export const pagbankWebhook = async (
     */
     if (Math.round(amountPaid * 100) !== config.PREMIUM_PRICE_CENTS) {
       console.error(
-        `PAGBANK FRAUD_ALERT: valor divergente ${orderId} pago=${amountPaid}`
+        'PAGBANK FRAUD_ALERT: valor divergente ' + orderId + ' pago=' + amountPaid
       );
 
       return res.status(200).send('OK');
@@ -230,7 +232,7 @@ export const pagbankWebhook = async (
       */
       if (message.toLowerCase().includes('valor')) {
         console.error(
-          `PAGBANK FRAUD_ALERT: rejeitado pelo banco ${orderId} - ${message}`
+          'PAGBANK FRAUD_ALERT: rejeitado pelo banco ' + orderId + ' - ' + message
         );
 
         return res.status(200).send('OK');
@@ -242,12 +244,12 @@ export const pagbankWebhook = async (
     }
 
     if (!data) {
-      console.log(`Pagamento ignorado ou duplicado: ${orderId}`);
+      console.log('Pagamento ignorado ou duplicado: ' + orderId);
 
       return res.status(200).send('OK');
     }
 
-    console.log(`Pagamento confirmado pelo webhook: ${orderId}`);
+    console.log('Pagamento confirmado pelo webhook: ' + orderId);
 
     return res.status(200).send('OK');
   } catch (error: any) {
