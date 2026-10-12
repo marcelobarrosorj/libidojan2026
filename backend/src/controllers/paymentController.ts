@@ -169,7 +169,13 @@ export const pagbankWebhook = async (
       O corpo do webhook nunca é suficiente para ativar Premium.
       A ordem é consultada diretamente na API autenticada do PagBank.
     */
-    const orderData = await verifyPayment(orderId);
+    let orderData: any = null;
+    try {
+      orderData = await verifyPayment(orderId);
+    } catch (errVerificacao: any) {
+      console.error('PAGBANK FRAUD_ALERT: falha ao consultar ordem ' + orderId + ' - ' + String(errVerificacao?.message || errVerificacao));
+      return res.status(200).send('OK');
+    }
     if (!orderData) {
       console.error('PAGBANK FRAUD_ALERT: ordem nao encontrada ' + orderId);
       return res.status(200).send('OK');
