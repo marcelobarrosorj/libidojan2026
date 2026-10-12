@@ -1,14 +1,25 @@
-// PWA-INSTALL-MOD v4: o clique SEMPRE responde - instalacao direta quando o navegador permite, instrucoes quando nao
+// PWA-INSTALL-MOD v5: aviso gerado de acordo com o dispositivo (Android, iPhone ou computador)
 let promptAdiado: any = null;
 let iniciado = false;
 let banner: HTMLDivElement | null = null;
-let modoAtual: 'prompt' | 'hint' | 'ios' | null = null;
+let modoAtual: string | null = null;
 let aguardandoEvento = true;
 let promptEmAndamento = false;
 
 const CHAVE_INSTALADO = 'libido-pwa-instalado';
 const CHAVE_DISPENSADO = 'libido-pwa-dispensado-em';
 const SETE_DIAS = 7 * 24 * 60 * 60 * 1000;
+
+type Dispositivo = 'ios' | 'android' | 'desktop';
+
+function tipoDispositivo(): Dispositivo {
+  const ua = navigator.userAgent || '';
+  const iOSClassico = /iphone|ipad|ipod/i.test(ua);
+  const iPadModerno = /Macintosh/i.test(ua) && (navigator as any).maxTouchPoints > 1;
+  if (iOSClassico || iPadModerno) return 'ios';
+  if (/android/i.test(ua)) return 'android';
+  return 'desktop';
+}
 
 function jaInstalado(): boolean {
   try {
@@ -38,18 +49,11 @@ function dispensadoRecentemente(): boolean {
   return false;
 }
 
-function ehIOS(): boolean {
-  const ua = navigator.userAgent || '';
-  const iOSClassico = /iphone|ipad|ipod/i.test(ua);
-  const iPadModerno = /Macintosh/i.test(ua) && (navigator as any).maxTouchPoints > 1;
-  return iOSClassico || iPadModerno;
-}
-
 function esconderBanner() {
   if (banner) { banner.remove(); banner = null; modoAtual = null; }
 }
 
-function abrirInstrucoes(tipo: 'menu' | 'ios') {
+function abrirInstrucoes(disp: Dispositivo) {
   const overlay = document.createElement('div');
   Object.assign(overlay.style, {
     position: 'fixed', top: '0', left: '0', right: '0', bottom: '0',
@@ -59,22 +63,33 @@ function abrirInstrucoes(tipo: 'menu' | 'ios') {
   const card = document.createElement('div');
   Object.assign(card.style, {
     background: '#1e1e24', border: '1px solid rgba(168,85,247,0.35)', borderRadius: '16px',
-    padding: '22px', maxWidth: '360px', width: '100%', boxSizing: 'border-box',
+    padding: '22px', maxWidth: '380px', width: '100%', boxSizing: 'border-box',
     fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
   } as any);
   const titulo = document.createElement('div');
-  titulo.textContent = tipo === 'ios' ? 'Adicionar à Tela de Início' : 'Instalar o Libido';
+  titulo.textContent = disp === 'ios' ? 'Adicionar à Tela de Início' : disp === 'android' ? 'Instalar o Libido no celular' : 'Instalar o Libido no computador';
   Object.assign(titulo.style, { color: '#ffffff', fontSize: '18px', fontWeight: '800', marginBottom: '14px' } as any);
   card.appendChild(titulo);
-  const passos = tipo === 'ios' ? [
-    '1. Toque no botão Compartilhar (o quadrado com a seta)',
-    '2. Toque em "Adicionar à Tela de Início"',
-    '3. Toque em "Adicionar" para confirmar',
-  ] : [
-    '1. Toque no menu do navegador (os 3 pontinhos no canto)',
-    '2. Toque em "Instalar aplicativo"',
-    '3. Confirme em "Instalar"',
-  ];
+  let passos: string[] = [];
+  if (disp === 'ios') {
+    passos = [
+      '1. Toque no botão Compartilhar (o quadrado com a seta)',
+      '2. Toque em "Adicionar à Tela de Início"',
+      '3. Toque em "Adicionar" para confirmar',
+    ];
+  } else if (disp === 'android') {
+    passos = [
+      '1. Toque no menu do navegador (os 3 pontinhos no canto)',
+      '2. Toque em "Instalar aplicativo" (ou "Adicionar à tela inicial")',
+      '3. Confirme tocando em "Instalar"',
+    ];
+  } else {
+    passos = [
+      '1. Procure o ícone de instalar na barra de endereço (do lado do endereço do site) e clique nele',
+      '2. Ou abra o menu do navegador (os 3 pontinhos no canto superior direito)',
+      '3. Escolha "Instalar Libido..." (ou "Salvar e compartilhar" > "Instalar página como app") e confirme',
+    ];
+  }
   for (let i = 0; i < passos.length; i++) {
     const linha = document.createElement('div');
     linha.textContent = passos[i];
@@ -122,12 +137,13 @@ function acionarInstalacao() {
     }
     return;
   }
-  abrirInstrucoes(ehIOS() ? 'ios' : 'menu');
+  abrirInstrucoes(tipoDispositivo());
 }
 
 function montarBanner(modo: 'prompt' | 'hint' | 'ios') {
   if (banner && modoAtual === modo) return;
   esconderBanner();
+  const disp = tipoDispositivo();
   banner = document.createElement('div');
   const ehMobile = window.matchMedia('(max-width: 768px)').matches;
   Object.assign(banner.style, {
@@ -164,14 +180,15 @@ function montarBanner(modo: 'prompt' | 'hint' | 'ios') {
   Object.assign(texto.style, { flex: '1', minWidth: '0' } as any);
   const titulo = document.createElement('div');
   const sub = document.createElement('div');
+  const onde = disp === 'desktop' ? 'no seu computador' : 'no seu celular';
   if (modo === 'ios') {
     titulo.textContent = 'Adicione o Libido à tela inicial';
     sub.textContent = 'Toque aqui para ver o passo a passo';
   } else if (modo === 'hint') {
-    titulo.textContent = 'Instale o Libido no seu aparelho';
-    sub.textContent = 'Toque aqui para ver como instalar';
+    titulo.textContent = 'Instale o Libido ' + onde;
+    sub.textContent = 'Toque aqui para ver o passo a passo';
   } else {
-    titulo.textContent = 'Instale o Libido no seu aparelho';
+    titulo.textContent = 'Instale o Libido ' + onde;
     sub.textContent = 'Toque aqui para instalar agora';
   }
   Object.assign(titulo.style, { color: '#ffffff', fontSize: '14px', fontWeight: '700', lineHeight: '1.2' } as any);
@@ -224,8 +241,8 @@ async function talvezMostrar() {
     return;
   }
   if (dispensadoRecentemente()) return;
-  if (!promptAdiado && aguardandoEvento && !ehIOS()) return;
-  const alvo: 'prompt' | 'hint' | 'ios' = promptAdiado ? 'prompt' : (ehIOS() ? 'ios' : 'hint');
+  if (!promptAdiado && aguardandoEvento && tipoDispositivo() !== 'ios') return;
+  const alvo: 'prompt' | 'hint' | 'ios' = promptAdiado ? 'prompt' : (tipoDispositivo() === 'ios' ? 'ios' : 'hint');
   montarBanner(alvo);
 }
 
