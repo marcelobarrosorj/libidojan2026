@@ -120,7 +120,7 @@ export default function App() {
       }
         if (currentUser.emailVerified) {
           setUser(currentUser);
-          if (session?.user && !session.user.email_confirmed_at) { setPendingEmailVerification(true); } else { setPendingEmailVerification(false); } // FUNNEL-FIX
+          setPendingEmailVerification(false);
 
           setSupabaseLoading(true);
 
@@ -135,6 +135,8 @@ export default function App() {
             setLoading(false);
           }
         } else {
+          setPendingEmailVerification(true); // FUNNEL-FIX-ELSE
+          setLoading(false);
           setUser(currentUser);
           setLoading(false);
         }

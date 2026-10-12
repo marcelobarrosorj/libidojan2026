@@ -19,6 +19,7 @@ vi.mock('../services/supabase', () => ({
           session: null
         }
       }),
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }), // SESSAO-MORTA-MOCK
       signInWithPassword: vi.fn(),
       signUp: vi.fn(),
       signOut: vi.fn(),
@@ -50,6 +51,8 @@ vi.mock('../services/auth', async (importOriginal) => {
     updatePassword: vi.fn()
   };
 });
+
+vi.mock('../services/presence', () => ({ startPresence: vi.fn(), stopPresence: vi.fn() }));
 
 import * as auth from '../services/auth';
 import { getUserById } from '../services/users';
@@ -88,6 +91,18 @@ describe('Monetization Funnel Final Verification', () => {
         }
       }
     });
+    (getUserById as Mock).mockResolvedValueOnce({
+      nickname: 'Test',
+      status: 'active',
+      plan: 'free',
+      is_banned: false,
+      is_deleted: false
+    });
+    (auth.getCurrentUser as Mock).mockImplementationOnce((cb: any) => {
+      cb({ id: '1', email: 'test@test.com', emailVerified: false });
+      return () => {};
+    });
+
     render(<App />);
     await waitFor(() => {
       expect(
