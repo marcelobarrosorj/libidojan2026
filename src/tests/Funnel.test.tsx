@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
+import { supabase } from '../services/supabase';
 
 vi.mock('../services/supabase', () => ({
   supabase: {
@@ -28,17 +29,13 @@ vi.mock('../services/supabase', () => ({
   }
 }));
 
-
 vi.mock('../services/users', () => ({
   getUserById: vi.fn(),
   updateUserProfile: vi.fn()
 }));
 
-
 vi.mock('../services/auth', async (importOriginal) => {
-
   const mod = await importOriginal() as any;
-
   return {
     ...mod,
     login: vi.fn(),
@@ -52,32 +49,19 @@ vi.mock('../services/auth', async (importOriginal) => {
     resetPasswordForEmail: vi.fn(),
     updatePassword: vi.fn()
   };
-
 });
-
 
 import * as auth from '../services/auth';
 import { getUserById } from '../services/users';
 
-
 describe('Monetization Funnel Final Verification', () => {
-
-
   beforeEach(() => {
-
     vi.clearAllMocks();
-
     sessionStorage.clear();
-
     document.body.className = '';
-
   });
 
-
-
   it('cadastro sem sessão', async () => {
-
-
     (auth.register as Mock).mockResolvedValueOnce({
       user: {
         id: '1',
@@ -86,123 +70,69 @@ describe('Monetization Funnel Final Verification', () => {
       },
       session: null
     });
-
-
     render(<App />);
-
-
     expect(
       screen.getByText(/Criar conta gratuita/i)
     ).toBeInTheDocument();
-
   });
 
-
-
   it('usuário ainda não confirmado', async () => {
-
-
-    (auth.getCurrentUser as Mock)
-      .mockImplementationOnce((cb: any) => {
-
-        cb({
-          id: '1',
-          email: 'test@test.com',
-          emailVerified: false
-        });
-
-        return () => {};
-
-      });
-
-
+    (supabase.auth.getSession as Mock).mockResolvedValueOnce({
+      data: {
+        session: {
+          user: {
+            id: '1',
+            email: 'test@test.com',
+            email_confirmed_at: null
+          }
+        }
+      }
+    });
     render(<App />);
-
-
     await waitFor(() => {
-
       expect(
         screen.getByText(/Confirme seu E-mail/i)
       ).toBeInTheDocument();
-
     });
-
   });
 
-
-
   it('usuário confirmado', async () => {
-
-
-    (auth.getCurrentUser as Mock)
-      .mockImplementationOnce((cb: any) => {
-
-        cb({
-          id: '1',
-          email: 'test@test.com',
-          emailVerified: true
-        });
-
-        return () => {};
-
-      });
-
-
-    (getUserById as Mock)
-      .mockResolvedValueOnce({
-        nickname: 'Test',
-        status: 'active',
-        plan: 'free',
-        is_banned: false,
-        is_deleted: false
-      });
-
-
+    (supabase.auth.getSession as Mock).mockResolvedValueOnce({
+      data: {
+        session: {
+          user: {
+            id: '1',
+            email: 'test@test.com',
+            email_confirmed_at: '2026-01-01T00:00:00Z'
+          }
+        }
+      }
+    });
+    (getUserById as Mock).mockResolvedValueOnce({
+      nickname: 'Test',
+      status: 'active',
+      plan: 'free',
+      is_banned: false,
+      is_deleted: false
+    });
     render(<App />);
-
-
     await waitFor(() => {
-
       expect(
         screen.queryByText(/Confirme seu E-mail/i)
       ).not.toBeInTheDocument();
-
     });
-
   });
-
-
 
   it('retorno pelo link de confirmação', () => {
-
-
-    window.location.hash =
-      '#access_token=123&type=signup';
-
-
+    window.location.hash = '#access_token=123&type=signup';
     render(<App />);
-
-
-    expect(window.location.hash)
-      .toBe('#access_token=123&type=signup');
-
-
+    expect(window.location.hash).toBe('#access_token=123&type=signup');
   });
 
-
-
   it('recuperação de senha', async () => {
-
-
     render(<App />);
-
-
     expect(
       screen.getByText(/Fazer login/i)
     ).toBeInTheDocument();
-
-
   });
-
-
 });
