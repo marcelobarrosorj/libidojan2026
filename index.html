@@ -68,5 +68,13 @@ window.addEventListener('unhandledrejection', function (e) {
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+<!-- SW-REGISTER-MOD -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+</script>
   </body>
 </html>
