@@ -122,7 +122,7 @@ describe('Monetization Funnel Final Verification', () => {
     await waitFor(() => {
 
       expect(
-        screen.getByText(/Configurar Conta/i)
+        screen.getByText(/Confirme seu E-mail/i)
       ).toBeInTheDocument();
 
     });
@@ -164,7 +164,7 @@ describe('Monetization Funnel Final Verification', () => {
     await waitFor(() => {
 
       expect(
-        screen.queryByText(/Configurar Conta/i)
+        screen.queryByText(/Confirme seu E-mail/i)
       ).not.toBeInTheDocument();
 
     });
