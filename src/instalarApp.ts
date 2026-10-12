@@ -145,7 +145,7 @@ function montarBanner(modo: 'prompt' | 'hint' | 'ios') {
   esconderBanner();
   const disp = tipoDispositivo();
   banner = document.createElement('div');
-  const ehMobile = window.matchMedia('(max-width: 768px)').matches;
+  const ehMobile = typeof window.matchMedia === 'function' ? window.matchMedia('(max-width: 768px)').matches : false; // MATCHMEDIA-GUARD
   Object.assign(banner.style, {
     position: 'fixed', left: '50%', transform: 'translateX(-50%)',
     bottom: ehMobile ? '78px' : '16px',

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { uploadPhoto } from '../services/uploadPhoto';
+import { createPost } from '../services/posts'; // FOTO-CADASTRO
 
 interface OnboardingProps {
   userId: string;
@@ -124,7 +125,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         relationship_status: relationshipStatus,
         bio: bio, // Enviando apenas o texto puro (sem JSON.stringify)
         photo_url: finalPhotoUrl || photoUrl || undefined,
-        photos: [], // Adicionado conforme os campos requeridos
+          photos: finalPhotoUrl ? [finalPhotoUrl] : [], // FOTO-CADASTRO: foto do cadastro vai para a galeria
         height: relationshipStatus === 'solteiro' && singleHeight ? parseInt(singleHeight) : null,
         biotype: relationshipStatus === 'solteiro' ? singleBiotype : null,
         sexual_orientation: relationshipStatus === 'solteiro' ? singleOrientation : null,
@@ -152,6 +153,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         .upsert(payload, { onConflict: 'user_id' });
 
       if (error) throw error;
+          if (finalPhotoUrl) { try { await createPost({ id: '', userId: userId, image: finalPhotoUrl, text: '', likes: 0, createdAt: Date.now() }); } catch (eP) { console.error('ONBOARDING-POST falhou', eP); } } // FOTO-CADASTRO
       onComplete();
     } catch (err: any) {
       console.error('Erro técnico interno ao salvar:', err);

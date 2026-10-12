@@ -215,7 +215,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         const currentPhotos = currentUser?.photos || [];
         const updatedPhotos = [...currentPhotos, url];
         await updateUserProfile(userId, { photos: updatedPhotos });
-        try { await createPost({ id: '', userId: userId, image: url, text: '', likes: 0, createdAt: Date.now() }); } catch (eAP) {} // GALLERY-AUTOPOST: foto da galeria vira post no feed
+        try { await createPost({ id: '', userId: userId, image: url, text: '', likes: 0, createdAt: Date.now() }); } catch (eAP) { console.error('GALLERY-AUTOPOST falhou', eAP); } // GALLERY-AUTOPOST: foto da galeria vira post no feed
         alert("Foto adicionada à galeria e publicada no feed!");
       }
       
