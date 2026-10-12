@@ -1,16 +1,13 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import { config } from '../config/env.js';
-
 const PAGBANK_SANDBOX_URL = "https://sandbox.api.pagseguro.com";
 const PAGBANK_SANDBOX_TAX_ID = "12345678909";
-
 export interface PlanInfo {
   id: string;
   name: string;
   price: number;
   durationDays: number;
 }
-
 export function resolvePagBankCustomerTaxId(
   apiUrl: string,
   customerTaxId?: string,
@@ -24,7 +21,6 @@ export function resolvePagBankCustomerTaxId(
   }
   return normalizedTaxId;
 }
-
 export const createPixPayment = async (
   userId: string,
   customerTaxId: string,
@@ -61,9 +57,7 @@ export const createPixPayment = async (
         },
         payment_method: {
           type: 'PIX',
-          pix: {
-            expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          }
+          pix: {}
         }
       }
     ],
@@ -79,22 +73,29 @@ export const createPixPayment = async (
   if (!charge) {
     throw new Error('Cobranca ausente na resposta do PagBank');
   }
-  const qrCode = charge.qr_code;
-  if (!qrCode) {
+  /*
+    A API do PagBank devolve o QR dentro de charges[0].qr_codes (lista).
+    Cada item tem: text (copia e cola), expiration_date e links (QRCODE.PNG).
+  */
+  const qr = charge.qr_codes?.[0];
+  const qrCodeText = qr?.text || '';
+  if (!qrCodeText) {
     throw new Error('QR Code ausente na resposta do PagBank');
   }
-  const imageLink = charge.links?.find((l: any) => l.rel === 'QRCODE.PNG')?.href || '';
+  const imageLink =
+    qr?.links?.find((l: any) => l.rel === 'QRCODE.PNG')?.href ||
+    charge.links?.find((l: any) => l.rel === 'QRCODE.PNG')?.href ||
+    '';
   return {
     paymentId: response.data.id,
     status: charge.status || 'WAITING',
-    qrCodeText: qrCode.text,
+    qrCodeText: qrCodeText,
     qrCodeImage: imageLink,
-    expirationDate: charge.payment_method?.pix?.expiration_date,
+    expirationDate: qr?.expiration_date ?? null,
     amount: amountCents / 100,
     planId: plan.id
   };
 };
-
 export const verifyPayment = async (paymentId: string) => {
   if (!config.PAGBANK_TOKEN) return null;
   const response = await axios.get(config.PAGBANK_API_URL + '/orders/' + paymentId, {
