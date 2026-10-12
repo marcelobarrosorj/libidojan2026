@@ -24,7 +24,7 @@ export const config = {
   get PAGBANK_TOKEN() { return process.env.PAGBANK_TOKEN as string; },
   get PAGBANK_API_URL() { return process.env.PAGBANK_API_URL || 'https://sandbox.api.pagseguro.com'; },
   get PAGBANK_WEBHOOK_URL() { return process.env.PAGBANK_WEBHOOK_URL as string; },
-  get PREMIUM_PRICE_CENTS() { return parseInt(process.env.PREMIUM_PRICE_CENTS || '1990', 10); },
+  get PREMIUM_PRICE_CENTS() { return parseInt(process.env.PREMIUM_PRICE_CENTS || '990', 10); },
   get BASE_URL() { return process.env.BASE_URL || 'http://localhost:3000'; },
   get PORT() { return process.env.PORT || 3000; },
   get NODE_ENV() { return process.env.NODE_ENV || 'development'; }
