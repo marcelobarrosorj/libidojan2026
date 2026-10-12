@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { supabase } from '../services/supabase';
+import { uploadPhoto } from '../services/uploadPhoto';
 
 interface OnboardingProps {
   userId: string;
@@ -12,6 +13,8 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState('');
 
   // Casal
   const [maleNickname, setMaleNickname] = useState('');
@@ -52,6 +55,10 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
 
     if (!privacyAccepted) {
       setMessage('Você deve aceitar as regras de privacidade.');
+      return;
+    }
+    if (!photoFile) {
+      setMessage('A foto de perfil é obrigatória.');
       return;
     }
 
@@ -97,6 +104,16 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
     setMessage('Salvando perfil...');
 
     try {
+      let finalPhotoUrl: string | undefined = undefined;
+      if (photoFile) {
+        setMessage('Enviando foto...');
+        try {
+          finalPhotoUrl = await uploadPhoto(photoFile, userId);
+        } catch (upErr: any) {
+          setMessage('Falha ao enviar a foto. Tente novamente.');
+          return;
+        }
+      }
       const parsedAge = relationshipStatus === 'solteiro' ? parseInt(singleAge) : parseInt(maleAge);
 
       const payload: any = {
@@ -106,7 +123,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         gender: relationshipStatus === 'solteiro' ? singleGender : 'Casal',
         relationship_status: relationshipStatus,
         bio: bio, // Enviando apenas o texto puro (sem JSON.stringify)
-        photo_url: photoUrl || "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=256&auto=format&fit=crop",
+        photo_url: finalPhotoUrl || photoUrl || undefined,
         photos: [], // Adicionado conforme os campos requeridos
         height: relationshipStatus === 'solteiro' && singleHeight ? parseInt(singleHeight) : null,
         biotype: relationshipStatus === 'solteiro' ? singleBiotype : null,
@@ -253,6 +270,16 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
             />
           </div>
 
+          <div>
+            <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Foto de perfil (obrigatória)</label>
+            <input type="file" accept="image/*" className="hidden" id="onboarding-photo" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f)); } }} />
+            <div className="flex items-center gap-3 mt-1.5">
+              <button type="button" onClick={() => document.getElementById('onboarding-photo')?.click()} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
+                {photoFile ? 'Trocar foto' : 'Escolher foto'}
+              </button>
+              {photoPreview && <img src={photoPreview} alt="previa" className="w-12 h-12 rounded-xl object-cover border border-[var(--libido-border)]" />}
+            </div>
+          </div>
           <label className="flex items-start gap-3 p-4 bg-[var(--libido-surface-2)]/80 border border-[var(--libido-border)] rounded-2xl cursor-pointer">
             <input type="checkbox" checked={privacyAccepted} onChange={e => setPrivacyAccepted(e.target.checked)} className="mt-1"/>
             <div>

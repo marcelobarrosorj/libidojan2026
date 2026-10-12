@@ -57,7 +57,7 @@ export const createPixPayment = async (
         },
         payment_method: {
           type: 'PIX',
-          pix: {}
+          pix: { expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }
         }
       }
     ],
@@ -77,7 +77,7 @@ export const createPixPayment = async (
     A API do PagBank devolve o QR dentro de charges[0].qr_codes (lista).
     Cada item tem: text (copia e cola), expiration_date e links (QRCODE.PNG).
   */
-  const qr = charge.qr_codes?.[0];
+  const qr = charge.qr_code || response.data.qr_codes?.[0] || charge.qr_codes?.[0];
   const qrCodeText = qr?.text || '';
   if (!qrCodeText) {
     throw new Error('QR Code ausente na resposta do PagBank');
@@ -91,7 +91,7 @@ export const createPixPayment = async (
     status: charge.status || 'WAITING',
     qrCodeText: qrCodeText,
     qrCodeImage: imageLink,
-    expirationDate: qr?.expiration_date ?? null,
+    expirationDate: qr?.expiration_date ?? charge.payment_method?.pix?.expiration_date ?? null,
     amount: amountCents / 100,
     planId: plan.id
   };

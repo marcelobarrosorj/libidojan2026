@@ -4,7 +4,7 @@ import app from '../app.js';
 import crypto from 'crypto';
 
 vi.mock('../config/env.js', () => ({
-  config: { PAGBANK_TOKEN: 'pagbank-test-token', PREMIUM_PRICE_CENTS: 1990 },
+  config: { PAGBANK_TOKEN: 'pagbank-test-token', PREMIUM_PRICE_CENTS: 990 },
   getBackendAvailability: () => true
 }));
 
@@ -58,9 +58,9 @@ describe('Webhook Tests', () => {
     mockVerifyPayment.mockResolvedValue({
       id: 'order_123',
       reference_id: 'libido-premium_user1_local1',
-      charges: [{ status: 'PAID', amount: { value: 1990 } }]
+      charges: [{ status: 'PAID', amount: { value: 990 } }]
     });
-    mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
+    mockSingle.mockResolvedValue({ data: { amount: 9.90, status: 'WAITING' }, error: null });
     mockRpc.mockResolvedValue({ data: true, error: null });
     const res = await request(app)
       .post('/api/webhook/pagbank')
@@ -75,7 +75,7 @@ describe('Webhook Tests', () => {
       p_payment_id: 'order_123',
       p_provider: 'pagbank',
       p_status: 'PAID',
-      p_amount: 19.90
+      p_amount: 9.90
     });
   });
 
@@ -110,7 +110,7 @@ describe('Webhook Tests', () => {
     mockVerifyPayment.mockResolvedValue({
       id: 'order_waiting',
       reference_id: 'libido-premium_user1_local1',
-      charges: [{ status: 'WAITING', amount: { value: 1990 } }]
+      charges: [{ status: 'WAITING', amount: { value: 990 } }]
     });
     const res = await request(app)
       .post('/api/webhook/pagbank')
@@ -130,7 +130,7 @@ describe('Webhook Tests', () => {
       reference_id: 'libido-premium_user1_local1',
       charges: [{ status: 'PAID', amount: { value: 1000 } }]
     });
-    mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
+    mockSingle.mockResolvedValue({ data: { amount: 9.90, status: 'WAITING' }, error: null });
     const res = await request(app)
       .post('/api/webhook/pagbank')
       .set('x-authenticity-token', signature)
@@ -147,7 +147,7 @@ describe('Webhook Tests', () => {
     mockVerifyPayment.mockResolvedValue({
       id: 'order_sem_tx',
       reference_id: 'libido-premium_user1_local1',
-      charges: [{ status: 'PAID', amount: { value: 1990 } }]
+      charges: [{ status: 'PAID', amount: { value: 990 } }]
     });
     mockSingle.mockResolvedValue({ data: null, error: { message: 'not found' } });
     const res = await request(app)
@@ -166,9 +166,9 @@ describe('Webhook Tests', () => {
     mockVerifyPayment.mockResolvedValue({
       id: 'order_dupe',
       reference_id: 'libido-premium_user1_local1',
-      charges: [{ status: 'PAID', amount: { value: 1990 } }]
+      charges: [{ status: 'PAID', amount: { value: 990 } }]
     });
-    mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
+    mockSingle.mockResolvedValue({ data: { amount: 9.90, status: 'WAITING' }, error: null });
     mockRpc.mockResolvedValue({ data: false, error: null });
     const res = await request(app)
       .post('/api/webhook/pagbank')
@@ -187,9 +187,9 @@ describe('Webhook Tests', () => {
     mockVerifyPayment.mockResolvedValue({
       id: 'order_log',
       reference_id: 'libido-premium_user1_local1',
-      charges: [{ status: 'PAID', amount: { value: 1990 } }]
+      charges: [{ status: 'PAID', amount: { value: 990 } }]
     });
-    mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
+    mockSingle.mockResolvedValue({ data: { amount: 9.90, status: 'WAITING' }, error: null });
     mockRpc.mockResolvedValue({ data: true, error: null });
     await request(app)
       .post('/api/webhook/pagbank')

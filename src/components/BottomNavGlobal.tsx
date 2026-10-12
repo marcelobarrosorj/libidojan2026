@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield } from 'lucide-react';
 
 interface BottomNavProps {
+  unreadChat?: number; // NOTIF-BADGE
   activeTab: string;
   onTabChange: (tab: string) => void;
   isAdmin?: boolean;
 }
 
-export function BottomNavGlobal({ activeTab, onTabChange, isAdmin }: BottomNavProps) {
+export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 0 }: BottomNavProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const mainTabs = [
@@ -95,8 +96,10 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin }: BottomNavPr
                 ? 'text-[var(--libido-accent)]'
                 : 'text-[var(--libido-muted)]/50 hover:text-[var(--libido-muted)]/80'
             }`}
+          style={{ position: 'relative' }}
           >
             <tab.icon size={18} strokeWidth={activeTab === tab.id ? 2.5 : 1.5} />
+            {tab.id === 'chat' && unreadChat > 0 && (<span style={{ position: 'absolute', top: -4, right: 8, background: '#ef4444', color: '#fff', borderRadius: 999, minWidth: 16, height: 16, fontSize: 10, fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', zIndex: 5 }}>{unreadChat > 9 ? '9+' : unreadChat}</span>)}{/* NOTIF-BADGE */}
             <span className="text-[8px] font-bold uppercase tracking-wider">
               {tab.label}
             </span>

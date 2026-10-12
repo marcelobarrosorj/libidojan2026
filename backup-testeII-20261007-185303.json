@@ -1,0 +1,41 @@
+﻿{
+    "email":  null,
+    "password_hash":  null,
+    "email_verified":  null,
+    "user_id":  "2e0b49b9-fa5c-444c-bfef-d618318dae10",
+    "nickname":  "Teste II",
+    "pin":  "1403",
+    "photo_url":  null,
+    "age":  "50",
+    "gender":  "Casal",
+    "relationship_status":  "casal",
+    "interests":  null,
+    "updated_at":  null,
+    "bio":  "Teste",
+    "photos":  [
+
+               ],
+    "status":  "active",
+    "height":  null,
+    "biotype":  null,
+    "sexual_orientation":  null,
+    "plan":  "free",
+    "couple_profile":  {
+                           "maleAge":  50,
+                           "femaleAge":  50,
+                           "maleHeight":  180,
+                           "maleBiotype":  "Padrão",
+                           "femaleHeight":  170,
+                           "maleNickname":  "M",
+                           "femaleBiotype":  "Padrão",
+                           "femaleNickname":  "F",
+                           "maleOrientation":  "Heterossexual",
+                           "femaleOrientation":  "Bissexual"
+                       },
+    "premium":  false,
+    "role":  "user",
+    "is_banned":  false,
+    "is_deleted":  false,
+    "is_online":  true,
+    "created_at":  "2026-10-07T20:36:54.520544+00:00"
+}

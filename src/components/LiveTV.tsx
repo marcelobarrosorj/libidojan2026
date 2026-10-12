@@ -1,4 +1,4 @@
-import { Tv, Lock, MessageCircle, Users, Send } from 'lucide-react';
+import { Tv, Lock, MessageCircle, Users } from 'lucide-react';
 import { useState } from 'react';
 
 interface LiveTVProps {
@@ -75,9 +75,6 @@ export function LiveTV({ isPremium, onShowPremiumModal }: LiveTVProps) {
             placeholder="Digite sua mensagem..."
             className="flex-1 bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none focus:border-[var(--libido-accent)] placeholder:text-[var(--libido-text)]/20"
           />
-          <button className="w-10 h-10 bg-[var(--libido-accent)] rounded-xl flex items-center justify-center text-black hover:opacity-90 transition-opacity">
-            <Send size={14} />
-          </button>
         </div>
       </div>
     </div>

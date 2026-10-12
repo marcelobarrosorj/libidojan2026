@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { Post } from '../types';
+import { isDemoEnabled, demoPosts, isDemoId } from '../demo/index';
 
 const mapSupabaseToPost = (row: any): Post => ({
   id: String(row.id),
@@ -11,67 +12,50 @@ const mapSupabaseToPost = (row: any): Post => ({
 });
 
 export const createPost = async (post: Post) => {
-  try {
-    const { error } = await supabase.from('posts').insert({
-      user_id: post.userId,
-      image: post.image,
-      text: post.text,
-      created_at: new Date(post.createdAt).toISOString()
-    });
-    
-    if (error) throw error;
-  } catch (err) {
-    console.error('Error creating post in supabase:', err);
-  }
+  const { error } = await supabase.from('posts').insert({
+    user_id: post.userId,
+    image: post.image || null,
+    text: post.text,
+    created_at: new Date(post.createdAt).toISOString()
+  });
+  if (error) throw error;
 };
-
-import { isDemoEnabled, demoPosts } from '../demo/index';
 
 export const getFeedPosts = (callback: (posts: Post[]) => void) => {
   let isSubscribed = true;
-  
   if (isDemoEnabled) {
-    // Quando a demonstração estiver ativada, mostrar somente os novos posts demonstrativos centralizados.
-    // Nunca misture um post demo com chamadas reais ao Supabase.
     callback([...demoPosts] as Post[]);
     return () => { isSubscribed = false; };
   }
-
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
-      
       if (error) throw error;
-      
       if (isSubscribed && data) {
-        let finalPosts = data.map(mapSupabaseToPost);
+        const finalPosts = data.map(mapSupabaseToPost);
         callback(finalPosts);
       }
     } catch (err) {
       console.error('Error fetching posts from supabase:', err);
     }
   };
-  
   fetchPosts();
-  
   const channel = supabase.channel('public:posts')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
       fetchPosts();
     })
     .subscribe();
-    
   return () => {
     isSubscribed = false;
     supabase.removeChannel(channel);
   };
 };
 
-import { isDemoId } from '../demo/index';
 export const likePost = async (postId: string) => {
-  if (isDemoId(postId)) return; // ações em posts de demonstração: somente estado local
+  if (isDemoId(postId)) return;
   try {
     const { error } = await supabase.rpc('increment_likes', { post_id: postId });
     if (error) {
@@ -83,4 +67,54 @@ export const likePost = async (postId: string) => {
   } catch (err) {
     console.error('Error liking post in supabase:', err);
   }
+};
+
+// FEED-DELETE: o autor pode excluir o proprio post a qualquer momento
+export async function excluirPost(postId: string): Promise<boolean> {
+  const { error } = await (supabase as any).from('posts').delete().eq('id', postId);
+  if (error) { console.error('FEED-DELETE falhou', error); return false; }
+  return true;
+}
+
+// CURTIDA-TOGGLE: curtir/descurtir de verdade (um like por usuario, alternavel)
+export const getMinhasCurtidas = async (userId: string): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('post_likes')
+    .select('post_id')
+    .eq('user_id', userId);
+  if (error) return [];
+  return (data || []).map((r: any) => r.post_id);
+};
+
+export const toggleCurtida = async (postId: string) => {
+  try {
+    const { data: sess } = await supabase.auth.getSession();
+    const uid = (sess as any)?.user?.id || (sess as any)?.session?.user?.id;
+    if (!uid) return;
+    const { data: existente } = await supabase
+      .from('post_likes')
+      .select('post_id')
+      .eq('post_id', postId)
+      .eq('user_id', uid)
+      .maybeSingle();
+    if (existente) {
+      await supabase.from('post_likes').delete().eq('post_id', postId).eq('user_id', uid);
+      const { error: eRpc } = await supabase.rpc('curtir_post', { p_post_id: postId, p_delta: -1 });
+      if (eRpc) {
+        const { data: post } = await supabase.from('posts').select('likes').eq('id', postId).maybeSingle();
+        const novo = Math.max(0, ((post as any)?.likes || 0) - 1);
+        await supabase.from('posts').update({ likes: novo }).eq('id', postId);
+      }
+    } else {
+      const { error: eIns } = await supabase.from('post_likes').insert({ post_id: postId, user_id: uid });
+      if (!eIns) {
+        const { error: eRpc2 } = await supabase.rpc('curtir_post', { p_post_id: postId, p_delta: 1 });
+        if (eRpc2) {
+          const { data: post } = await supabase.from('posts').select('likes').eq('id', postId).maybeSingle();
+          const novo = ((post as any)?.likes || 0) + 1;
+          await supabase.from('posts').update({ likes: novo }).eq('id', postId);
+        }
+      }
+    }
+  } catch (eT) {}
 };

@@ -17,6 +17,7 @@ import { Logo } from './components/Logo';
 import { PinScreen } from './components/PinScreen';
 import { AppCore } from './components/AppCore';
 import { Onboarding } from './components/Onboarding';
+import { startPresence, stopPresence } from './services/presence';
 
 export default function App() {
   const [email, setEmail] = useState("");
@@ -41,6 +42,7 @@ export default function App() {
 
   const [isRecovering, setIsRecovering] = useState(false);
   const [recoveryMode, setRecoveryMode] = useState<'request' | 'update' | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const blurTimeoutRef = useRef<any>(null);
 
@@ -97,7 +99,25 @@ export default function App() {
     window.addEventListener('profileUpdated', handleProfileUpdate);
 
     const unsubscribe = getCurrentUser(async (currentUser) => {
+  if (currentUser && currentUser.emailVerified) { startPresence((currentUser as any).user_id || (currentUser as any).id); } else { stopPresence(); }
       if (currentUser) {
+      // SESSAO-MORTA: confere com o servidor se a conta de login ainda existe
+      try {
+        const { error: errSessao } = await supabase.auth.getUser();
+        if (errSessao) {
+          await supabase.auth.signOut();
+          setUser(null);
+          setSupabaseUser(null);
+          setLoading(false);
+          return;
+        }
+      } catch (eSessao) {
+        await supabase.auth.signOut();
+        setUser(null);
+        setSupabaseUser(null);
+        setLoading(false);
+        return;
+      }
         if (currentUser.emailVerified) {
           setUser(currentUser);
           setPendingEmailVerification(false);
@@ -298,6 +318,11 @@ export default function App() {
     setShowLanding(true);
   };
 
+  const [aceitouAviso, setAceitouAviso] = useState(false);
+  const registerWithConfirm = async (e: React.FormEvent) => {
+    await register(e);
+  };
+
   const handlePasswordRecoveryRequest = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -319,6 +344,11 @@ export default function App() {
     e.preventDefault();
 
     setAuthLoading(true);
+    if (password !== confirmPassword) {
+      setError('As senhas nao coincidem. Verifique e tente novamente.');
+      setAuthLoading(false);
+      return;
+    }
     setError("");
 
     try {
@@ -388,6 +418,22 @@ export default function App() {
               {authLoading ? 'VERIFICANDO...' : 'JÁ CONFIRMEI O E-MAIL'}
             </button>
 
+            {!isLogin && (
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">
+                  Confirmar Senha
+                </label>
+
+                <input
+                  type="password"
+                  placeholder="********"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-[var(--libido-accent)] transition-colors"
+                />
+              </div>
+            )}
+
             <button
               onClick={handleResendVerificationAction}
               disabled={isResending || resendCooldown > 0}
@@ -416,7 +462,16 @@ export default function App() {
   }
 
   if (user) {
-    if (!supabaseUser) {
+    const su: any = supabaseUser;
+    const perfilIncompleto =
+      !su ||
+      !su.nickname ||
+      !(su.relationship_status || su.relationshipStatus) ||
+      !su.gender ||
+      su.age === null ||
+      su.age === undefined ||
+      su.age === '';
+    if (perfilIncompleto || !supabaseUser) {
       return (
         <Onboarding
           userId={user.id}
@@ -628,6 +683,20 @@ export default function App() {
               />
             </div>
 
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">
+                Confirmar Senha
+              </label>
+
+              <input
+                type="password"
+                placeholder="********"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full bg-[var(--libido-surface-2)] border border-[var(--libido-border)] text-[var(--libido-text)] rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-[var(--libido-accent)] transition-colors"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={authLoading}
@@ -639,7 +708,7 @@ export default function App() {
         ) : (
           <form
             className="flex flex-col gap-5 w-full"
-            onSubmit={isLogin ? login : register}
+            onSubmit={isLogin ? login : registerWithConfirm}
           >
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">
@@ -681,9 +750,33 @@ export default function App() {
               />
             </div>
 
+            {!isLogin && (
+              <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-accent)]/40 rounded-2xl p-4 flex flex-col gap-2 mb-2">
+                <p className="text-[10px] font-black tracking-[0.15em] uppercase text-[var(--libido-accent)]">
+                  Aviso obrigatório
+                </p>
+                <ul className="text-[11px] text-[var(--libido-text)] leading-relaxed list-disc pl-4 flex flex-col gap-1">
+                  <li>É proibido publicar fotos contendo crianças ou adolescentes, mesmo que você seja o responsável ou esteja acompanhado.</li>
+                  <li>É proibido publicar conteúdo ilegal ou inadequado, incluindo pedofilia, violência ou conteúdo não consensual.</li>
+                  <li>O descumprimento resulta em banimento permanente e denúncia às autoridades competentes.</li>
+                  <li>A responsabilidade pela postagem de fotos de rosto é exclusivamente do usuário.</li>
+                </ul>
+                <label className="flex items-start gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={aceitouAviso}
+                    onChange={(e) => setAceitouAviso(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 accent-[var(--libido-accent)] shrink-0"
+                  />
+                  <span className="text-[11px] text-[var(--libido-muted)] leading-relaxed">
+                    Li e concordo com os avisos acima. Tenho 18 anos ou mais e sou o único responsável pelo conteúdo que publicar.
+                  </span>
+                </label>
+              </div>
+            )}
             <button
               type="submit"
-              disabled={authLoading}
+              disabled={authLoading || (!isLogin && !aceitouAviso)}
               className="w-full bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-bold py-4 mt-2 rounded-[16px] text-sm tracking-wide transition-all shadow-[0_4px_20px_rgba(216,107,63,0.15)] hover:shadow-[0_4px_25px_rgba(216,107,63,0.25)] hover:scale-[1.01] active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-50"
             >
               {authLoading
@@ -700,6 +793,7 @@ export default function App() {
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
+                setAceitouAviso(false);
                 setError("");
                 setMsg("");
               }}

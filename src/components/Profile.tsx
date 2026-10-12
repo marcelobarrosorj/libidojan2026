@@ -1,4 +1,6 @@
 import { useState, useEffect, ChangeEvent } from 'react';
+import { supabase } from '../services/supabase';
+import { getUsersByIds } from '../services/users';
 import { Eye, Lock, Camera, Sparkles, Edit3, Plus, Trash2, Check, Users } from 'lucide-react';
 import { uploadPhoto } from '../services/uploadPhoto';
 import { ImageEditor } from './ImageEditor';
@@ -6,6 +8,16 @@ import { User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
 import { formatUserNumber } from '../utils/formatUserNumber';
 import { updateUserProfile } from '../services/users';
+import { createPost } from '../services/posts'; // GALLERY-AUTOPOST
+// NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
+function extrairTextoBio(b: any): string {
+  if (!b || typeof b !== 'string') return '';
+  const t = b.trim();
+  if (t.startsWith('{') && t.includes('isCouple')) {
+    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch (eB) {}
+  }
+  return b;
+}
 
 interface ProfileProps {
   userId?: string;
@@ -22,6 +34,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [editBio, setEditBio] = useState('');
   const [uploading, setUploading] = useState(false);
   const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null);
+  const [followersCount, setFollowersCount] = useState<number | null>(null);
+  const [followersList, setFollowersList] = useState<any[] | null>(null);
   const [saving, setSaving] = useState(false);
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
@@ -54,6 +68,25 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       setEditNickname(currentUser.nickname || '');
       const rawBio = currentUser.bio || '';
       const relationship = currentUser.relationship_status || 'solteiro';
+      // NOVO: le os dados do casal da coluna couple_profile (formato atual do onboarding)
+      const cp: any = (currentUser as any).couple_profile || (currentUser as any).coupleProfile;
+      if (cp && typeof cp === 'object' && (cp.maleNickname || cp.femaleNickname || cp.maleAge || cp.femaleAge)) {
+        setIsCouple(true);
+        setMaleNickname(cp.maleNickname || '');
+        setMaleAge(cp.maleAge != null ? String(cp.maleAge) : '');
+        setMaleOrientation(cp.maleOrientation || 'Heterossexual');
+        setMaleBiotype(cp.maleBiotype || 'Padrão');
+        setMaleHeight(cp.maleHeight != null ? String(cp.maleHeight) : '');
+        setMaleWeight(cp.maleWeight != null ? String(cp.maleWeight) : '');
+        setFemaleNickname(cp.femaleNickname || '');
+        setFemaleAge(cp.femaleAge != null ? String(cp.femaleAge) : '');
+        setFemaleOrientation(cp.femaleOrientation || 'Bissexual');
+        setFemaleBiotype(cp.femaleBiotype || 'Padrão');
+        setFemaleHeight(cp.femaleHeight != null ? String(cp.femaleHeight) : '');
+        setFemaleWeight(cp.femaleWeight != null ? String(cp.femaleWeight) : '');
+        setEditBio(extrairTextoBio(rawBio) || (cp && typeof cp.text === 'string' ? cp.text : ''));
+        return;
+      }
       
       try {
         const parsed = JSON.parse(rawBio);
@@ -106,6 +139,45 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
     e.target.value = '';
   };
 
+  useEffect(() => {
+    const carregar = async () => {
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const meuId = sess?.session?.user?.id;
+        if (!meuId) { setFollowersCount(0); return; }
+        const { count } = await supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', meuId);
+        setFollowersCount(count ?? 0);
+      } catch {
+        setFollowersCount(0);
+      }
+    };
+    carregar();
+  }, []);
+
+  useEffect(() => {
+    const carregarLista = async () => {
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const meuId = sess?.session?.user?.id;
+        if (!meuId) { setFollowersList([]); return; }
+        const { data: seguidores } = await supabase
+          .from('follows')
+          .select('follower_id')
+          .eq('following_id', meuId);
+        const ids = (seguidores || []).map((s: any) => s.follower_id);
+        if (!ids.length) { setFollowersList([]); return; }
+        const users = await getUsersByIds(ids);
+        setFollowersList(users);
+      } catch {
+        setFollowersList([]);
+      }
+    };
+    carregarLista();
+  }, []);
+
   const handleGalleryUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
@@ -143,7 +215,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         const currentPhotos = currentUser?.photos || [];
         const updatedPhotos = [...currentPhotos, url];
         await updateUserProfile(userId, { photos: updatedPhotos });
-        alert("Foto editada e adicionada à galeria com sucesso!");
+        try { await createPost({ id: '', userId: userId, image: url, text: '', likes: 0, createdAt: Date.now() }); } catch (eAP) {} // GALLERY-AUTOPOST: foto da galeria vira post no feed
+        alert("Foto adicionada à galeria e publicada no feed!");
       }
       
       setEditingImageUrl(null);
@@ -335,10 +408,26 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         </div>
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-3.5 rounded-2xl">
           <p className="text-[8px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider">Seguidores</p>
-          <p className="text-sm font-black text-[var(--libido-text)] mt-1">8</p>
+          <p className="text-sm font-black text-[var(--libido-text)] mt-1">{followersCount !== null ? followersCount : "..."}</p>
         </div>
       </div>
 
+      {followersList !== null && followersList.length > 0 && (
+        <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl mb-6">
+          <p className="text-[8px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-2">Quem te segue ({followersList.length})</p>
+          <div className="space-y-2.5">
+            {followersList.map((f: any) => (
+              <div key={f.id || f.user_id} className="flex items-center gap-3">
+                <ProtectedImage currentUser={currentUser} src={f.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} className="w-9 h-9 rounded-full" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{f.nickname || 'Usuário'}</p>
+                  {f.isOnline ? <p className="text-[9px] text-green-400 font-bold">Online agora</p> : <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl mb-6 text-left">
         <p className="text-[8px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-1.5">Sobre Nós / Bio</p>
         <p className="text-xs text-[var(--libido-muted)] opacity-90 font-medium leading-relaxed">{editBio || 'Sem biografia cadastrada...'}</p>
@@ -382,9 +471,46 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
 
       {activePhotoIndex !== null && userPhotos[activePhotoIndex] && (
         <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4">
-          <button onClick={() => setActivePhotoIndex(null)} className="absolute top-6 right-6 text-[var(--libido-muted)] opacity-80 hover:text-[var(--libido-text)] text-lg">✕ Close</button>
+            <button
+              type="button"
+              onClick={() => setActivePhotoIndex(null)}
+            className="absolute top-4 right-4 z-[70] w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-2xl font-bold shadow-lg hover:scale-105 transition-transform"
+              aria-label="Fechar"
+            >
+            X
+            </button>
           
-          <ProtectedImage currentUser={currentUser} src={userPhotos[activePhotoIndex]} className="max-w-full max-h-[60vh] rounded-2xl border border-[var(--libido-border)] shadow-2xl mb-8" alt="Visualização" style={{ objectFit: "contain" }} />
+          <div
+            className="relative touch-none select-none"
+            onPointerDown={(e) => { e.currentTarget.dataset.sx = String(e.clientX); e.currentTarget.dataset.sy = String(e.clientY); }}
+            onPointerUp={(e) => {
+              const sx = Number(e.currentTarget.dataset.sx ?? e.clientX);
+              const sy = Number(e.currentTarget.dataset.sy ?? e.clientY);
+              delete e.currentTarget.dataset.sx;
+              delete e.currentTarget.dataset.sy;
+              const dx = e.clientX - sx;
+              const dy = e.clientY - sy;
+              const total = userPhotos.length;
+              if (total < 2) return;
+              if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                setActivePhotoIndex((i) => (i === null ? 0 : dx < 0 ? (i + 1) % total : (i - 1 + total) % total));
+              } else if (dy < -40 && Math.abs(dy) > Math.abs(dx)) {
+                setActivePhotoIndex((i) => (i === null ? 0 : (i + 1) % total));
+              } else if (dy > 40 && Math.abs(dy) > Math.abs(dx)) {
+                setActivePhotoIndex((i) => (i === null ? 0 : (i - 1 + total) % total));
+              } else if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+                setActivePhotoIndex((i) => (i === null ? 0 : (i + 1) % total));
+              }
+            }}
+          >
+            <img
+              src={userPhotos[activePhotoIndex]}
+              alt="Foto ampliada"
+              className="block mx-auto max-w-full max-h-[65vh] w-auto h-auto object-contain rounded-2xl border border-[var(--libido-border)] shadow-2xl mb-8"
+              style={{ objectFit: "contain" }}
+            />
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-black/70 text-white text-[10px] font-black px-3 py-1 rounded-full pointer-events-none">{(activePhotoIndex ?? 0) + 1} / {userPhotos.length}</div>
+          </div>
           
           <div className="flex gap-4 w-full max-w-xs">
             <button 

@@ -1,11 +1,22 @@
 import { createReport } from '../services/admin';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, Shield, Ban, Trash2, Eye, Lock, Users, Flag, MessageCircle } from 'lucide-react';
 import { User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
+import { PhotoGallery } from './PhotoGallery';
 import { formatUserNumber } from '../utils/formatUserNumber';
 import { isDemoId } from '../demo';
 import { updateUserProfile, deleteUserProfile } from '../services/users';
+import { supabase } from '../services/supabase';
+// NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
+function extrairTextoBio(b: any): string {
+  if (!b || typeof b !== 'string') return '';
+  const t = b.trim();
+  if (t.startsWith('{') && t.includes('isCouple')) {
+    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch (eB) {}
+  }
+  return b;
+}
 
 interface ViewProfileProps {
   currentUser?: User | null;
@@ -20,8 +31,68 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   const [showConfirmBan, setShowConfirmBan] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [galleryViewerIndex, setGalleryViewerIndex] = useState<number | null>(null);
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followBusy, setFollowBusy] = useState(false);
+  const [followersCount, setFollowersCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let ativo = true;
+    const carregar = async () => {
+      if (!user?.user_id) return;
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const meuId = sess?.session?.user?.id;
+        const { count } = await supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', user.user_id);
+        if (ativo) setFollowersCount(count ?? 0);
+        if (!meuId) return;
+        const { data } = await supabase
+          .from('follows')
+          .select('id')
+          .eq('follower_id', meuId)
+          .eq('following_id', user.user_id)
+          .maybeSingle();
+        if (ativo) setIsFollowing(!!data);
+      } catch {}
+    };
+    carregar();
+    return () => { ativo = false; };
+  }, [user?.user_id]);
+
+  const alternarSeguir = async () => {
+    if (!user?.user_id || followBusy) return;
+    if (isDemoId(user.user_id)) { alert('Nao e possivel seguir perfis de demonstracao.'); return; }
+    setFollowBusy(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const meuId = sess?.session?.user?.id;
+      if (!meuId) { alert('Faca login para seguir.'); return; }
+      if (isFollowing) {
+        await supabase.from('follows').delete().eq('follower_id', meuId).eq('following_id', user.user_id);
+        setIsFollowing(false);
+        setFollowersCount((c) => Math.max(0, (c ?? 1) - 1));
+      } else {
+        const { error } = await supabase.from('follows').insert({ follower_id: meuId, following_id: user.user_id });
+        if (error) throw error;
+        setIsFollowing(true);
+        setFollowersCount((c) => (c ?? 0) + 1);
+      }
+    } catch (err: any) {
+      const fkCode = String((err as any)?.code || '');
+      if (fkCode === '23503') {
+        alert('Nao foi possivel seguir: este perfil nao esta mais disponivel.');
+      } else {
+        alert('Erro ao atualizar: ' + (err?.message || 'tente novamente'));
+      }
+    } finally {
+      setFollowBusy(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -34,7 +105,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   const nickname = user.nickname || 'Usuário';
   const photoUrl = user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
   const userPhotos: string[] = user.photos || [];
-  const displayBio = user.bio || '';
+  const displayBio = extrairTextoBio(user.bio) || '';
   const isOnline = user.isOnline || user.is_online || false;
 
   const isCouple = !!user.couple_profile;
@@ -118,8 +189,11 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
           </div>
           <h2 className="text-lg font-black text-[var(--libido-text)] flex items-center justify-center gap-1">{nickname} {user.userNumber ? <span className="text-[12px] text-[var(--libido-muted)] opacity-50">#{formatUserNumber(user.userNumber)}</span> : null}</h2>
           <p className="text-[10px] text-[var(--libido-muted)] opacity-50 font-semibold mt-0.5">{isOnline ? '🟢 Online agora' : '⚪ Offline'}</p>
+          {followersCount !== null && (
+            <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-bold mt-1">{followersCount} seguidores</p>
+          )}
 
-          <div className="flex gap-3 mt-4">
+          <div className="flex flex-wrap justify-center gap-3 mt-4">
             <button
               onClick={() => navigate?.('chat', { user })}
               className="flex items-center gap-2 bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black py-3 px-6 rounded-2xl text-[10px] uppercase tracking-widest hover:opacity-90 shadow-lg shadow-[var(--libido-accent)]/15"
@@ -130,6 +204,14 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
             <button onClick={() => setShowReportModal(true)} className="flex items-center gap-2 bg-white/5 border border-[var(--libido-border)] text-[var(--libido-muted)] opacity-80 font-black py-3 px-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-white/10">
               <Flag size={12} />
               Denunciar
+            </button>
+            <button
+              onClick={alternarSeguir}
+              disabled={followBusy}
+              className={`flex items-center gap-2 font-black py-3 px-5 rounded-2xl text-[10px] uppercase tracking-widest transition-all ${isFollowing ? 'bg-white/5 border border-[var(--libido-border)] text-[var(--libido-muted)] opacity-80' : 'bg-[var(--libido-accent)]/15 border border-[var(--libido-accent)]/40 text-[var(--libido-accent)] hover:bg-[var(--libido-accent)]/25'}`}
+            >
+              <Users size={12} />
+              {isFollowing ? 'Seguindo' : 'Seguir'}
             </button>
           </div>
         </div>
@@ -190,7 +272,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
             <div className="grid grid-cols-3 gap-2">
               {userPhotos.map((imgUrl: string, idx: number) => (
                 <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-[var(--libido-border)] relative">
-                  <ProtectedImage currentUser={currentUser} src={imgUrl} alt="gallery" className={`w-full h-full ${!isPremium && idx > 0 ? "blur-lg" : ""}`} />
+                  <ProtectedImage currentUser={currentUser} src={imgUrl} alt="gallery" onClick={() => { if (isPremium || idx === 0) setGalleryViewerIndex(idx); }} className={`w-full h-full ${!isPremium && idx > 0 ? "blur-lg" : ""}`} />
                   {!isPremium && idx > 0 && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                       <Lock size={14} className="text-[var(--libido-accent)]" />
@@ -206,6 +288,15 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
       </div>
 
       
+      {galleryViewerIndex !== null && userPhotos[galleryViewerIndex] && (
+        <PhotoGallery
+          photos={userPhotos as string[]}
+          initialIndex={galleryViewerIndex}
+          onClose={() => setGalleryViewerIndex(null)}
+          currentUser={currentUser}
+        />
+      )}
+
       {showReportModal && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full space-y-4">

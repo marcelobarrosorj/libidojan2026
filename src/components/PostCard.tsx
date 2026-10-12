@@ -1,21 +1,29 @@
 import { Post, User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
-import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
-import { useState } from 'react';
+import { Heart} from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { likePost } from '../services/posts';
+import { toggleCurtida } from '../services/posts';
+import { supabase } from '../services/supabase'; // CURTIDA-TOGGLE
 import { PhotoGallery } from './PhotoGallery';
 
 export function PostCard({ post, user, currentUser }: { post: Post; user?: User; currentUser?: User | null; key?: string | number }) {
   const [liked, setLiked] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const myIdPC = (currentUser as any)?.user_id || (currentUser as any)?.id; // CURTIDA-TOGGLE
+  useEffect(() => {
+    if (!myIdPC || !post?.id) return;
+    supabase.from('post_likes').select('post_id').eq('post_id', post.id).eq('user_id', myIdPC).maybeSingle()
+      .then(({ data }: any) => { if (data) setLiked(true); });
+  }, [myIdPC, post?.id]);
 
   const handleLike = () => {
     if (!liked) {
-      setLiked(true);
-      likePost(post.id).catch(console.error);
+      setLiked(v => !v);
+      toggleCurtida(post.id).catch(console.error);
     } else {
       setLiked(false);
+      toggleCurtida(post.id).catch(console.error); // CURTIDA-TOGGLE: descurtir persiste
     }
   };
 
@@ -58,16 +66,13 @@ export function PostCard({ post, user, currentUser }: { post: Post; user?: User;
           >
             <Heart className={`w-[26px] h-[26px] ${liked ? 'fill-red-500 text-red-500 line-through-none' : 'text-[var(--libido-text)]'}`} />
           </motion.button>
-          <button className="text-[var(--libido-text)] focus:outline-none transition-transform hover:scale-110"><MessageCircle className="w-[26px] h-[26px]" /></button>
-          <button className="text-[var(--libido-text)] focus:outline-none transition-transform hover:scale-110"><Send className="w-[26px] h-[26px]" /></button>
         </div>
-        <button className="text-[var(--libido-text)] focus:outline-none transition-transform hover:scale-110"><Bookmark className="w-[26px] h-[26px]" /></button>
       </div>
 
       {/* Content */}
       <div className="px-4 space-y-1.5">
         <div className="text-[13px] font-semibold text-[var(--libido-text)]">
-          {(post.likes + (liked ? 1 : 0)).toLocaleString()} curtidas
+          {(post.likes || 0).toLocaleString()} curtidas
         </div>
         <div className="text-[13px] text-[var(--libido-text)] leading-snug">
           <span className="font-semibold mr-1.5">{user?.username}</span>

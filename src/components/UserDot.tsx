@@ -1,6 +1,7 @@
 import React from 'react';
 import { User } from '../types';
 import { motion } from 'motion/react';
+import { ProtectedImage } from './ProtectedImage';
 
 interface UserDotProps {
   user: User & { tempDistance?: number };
@@ -22,7 +23,7 @@ export function UserDot({ user }: UserDotProps) {
     >
       <div className={`relative flex items-center justify-center ${user.plan === 'premium' ? 'ring-2 ring-offset-1 ring-offset-[var(--libido-bg)] ring-[var(--libido-accent)] rounded-full' : ''}`}>
         <div className="w-[32px] h-[32px] rounded-full bg-[var(--libido-surface)] shadow-lg z-20 overflow-hidden ring-1 ring-[var(--libido-border)] shadow-accent/20">
-          <img src={user.photo_url} className="w-full h-full object-cover" />
+          <ProtectedImage src={user.photo_url} className="w-full h-full object-cover" />
         </div>
         {user.isOnline && <div className="absolute -bottom-0.5 -right-0.5 w-[10px] h-[10px] bg-green-500 rounded-full border-2 border-[var(--libido-surface)] z-30" />}
         <div className="absolute inset-[-4px] rounded-full border border-accent opacity-50 animate-dot-pulse z-10" style={{ animationDelay: `${Math.random() * 2}s` }}></div>

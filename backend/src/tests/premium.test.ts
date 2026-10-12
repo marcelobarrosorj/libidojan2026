@@ -9,7 +9,7 @@ describe('Premium Activation', () => {
       p_payment_id: 'order_123',
       p_provider: 'pagbank',
       p_status: 'PAID',
-      p_amount: 19.90
+      p_amount: 9.90
     });
     expect(mockRpc).toHaveBeenCalledWith('process_payment', expect.objectContaining({ p_status: 'PAID' }));
   });
@@ -21,7 +21,7 @@ describe('Premium Activation', () => {
       p_payment_id: 'order_123',
       p_provider: 'pagbank',
       p_status: 'PAID',
-      p_amount: 19.90
+      p_amount: 9.90
     });
     expect(mockRpc).toHaveBeenCalled();
   });

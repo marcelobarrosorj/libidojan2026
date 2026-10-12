@@ -93,3 +93,11 @@ input:focus, textarea:focus, select:focus {
 .animate-sweep { animation: sweep 4s linear infinite; }
 .animate-sonar-ping { animation: sonar-ping 4s linear infinite; }
 .animate-dot-pulse { animation: dot-pulse 2s ease-out infinite; }
+
+/* NOCOPY-CSS: fotos nao podem ser copiadas (selecao, arrasto, menu longo) */
+img {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+}

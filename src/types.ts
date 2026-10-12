@@ -1,6 +1,3 @@
-**codeTypeScript**
-
-```
 export interface CoupleProfileData {
   // Campos reais Supabase
   maleNickname?: string;
@@ -120,4 +117,3 @@ export interface AdminLog {
   targetId: string;
   timestamp: number;
 }
-```

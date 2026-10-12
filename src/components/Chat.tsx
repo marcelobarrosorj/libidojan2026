@@ -17,6 +17,8 @@ import { ProtectedImage } from "./ProtectedImage";
 import { formatUserNumber } from "../utils/formatUserNumber";
 import { listenAllUserMessages, sendMessage } from "../services/chat";
 import { getUsersByIds } from "../services/users";
+import { markMessagesAsDelivered, markMessagesAsRead } from '../services/chat';
+import { playMessageSound } from '../services/sounds';
 
 interface ChatProps {
   user?: User;
@@ -73,6 +75,7 @@ export function Chat({
   const [allMessages, setAllMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastReceivedAt = useRef(0); // SOM-NOVA
 
   useEffect(() => {
     if (user && (user.id || user.user_id)) {
@@ -99,6 +102,14 @@ export function Chat({
     const unsubscribe = listenAllUserMessages(userId, async (messages) => {
       setAllMessages(messages);
 
+      // SOM-NOVA: toca quando chega mensagem nova de outra pessoa
+      const recebidas = messages.filter((m) => m.to === userId);
+      if (recebidas.length > 0) {
+        const maxT = Math.max(...recebidas.map((m) => m.createdAt));
+        if (lastReceivedAt.current > 0 && maxT > lastReceivedAt.current) playMessageSound();
+        lastReceivedAt.current = maxT;
+      }
+
       const uniqueUserIds = new Set<string>();
 
       messages.forEach((m) => {
@@ -114,6 +125,18 @@ export function Chat({
   }, [userId]);
 
   const otherUsers = users.filter((u) => (u.user_id || u.id) !== userId);
+  // TICKS-EFEITO: enquanto o chat esta aberto, marca recebidas como entregues
+  useEffect(() => {
+    if (!userId) return;
+    markMessagesAsDelivered(userId);
+    const t = setInterval(() => markMessagesAsDelivered(userId), 4000);
+    return () => clearInterval(t);
+  }, [userId]);
+  // TICKS-LEITURA: com a conversa aberta, marca as mensagens recebidas como LIDAS
+  useEffect(() => {
+    if (!userId || !activeChat) return;
+    markMessagesAsRead(userId, activeChat);
+  }, [userId, activeChat, allMessages]);
 
   const contacts: ChatContact[] = otherUsers
     .map((u) => {
@@ -142,7 +165,7 @@ export function Chat({
               minute: "2-digit",
             })
           : "",
-        unread: 0,
+        unread: userMsgs.filter((m) => m.to === userId && m.status !== "read").length,
         online: !!u.isOnline,
         lastMessageTime: lastMsg ? lastMsg.createdAt : 0,
       };
@@ -155,6 +178,21 @@ export function Chat({
     c.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
   let activeChatContact = contacts.find((c) => c.id === activeChat);
+  // TELA-PRETA-FIX: garante que a conversa aberta sempre tenha um contato (ex: aberta pelo Radar/perfil sem historico)
+  if (!activeChatContact && activeChat) {
+    const uFb = users.find((u) => (u.user_id || u.id) === activeChat) || ((user && (user.user_id || user.id) === activeChat) ? user : null);
+    activeChatContact = {
+      id: activeChat,
+      name: (uFb as any)?.nickname || (uFb as any)?.name || 'Usuario',
+      userNumber: (uFb as any)?.userNumber,
+      avatar: (uFb as any)?.photo_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback',
+      lastMessage: 'Iniciar conversa',
+      time: '',
+      unread: 0,
+      online: !!(uFb as any)?.isOnline,
+      lastMessageTime: 0,
+    };
+  }
 
   if (!activeChatContact && user && activeChat === (user.user_id || user.id)) {
     activeChatContact = {
@@ -250,13 +288,7 @@ export function Chat({
           </div>
 
 
-          <button className="text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] p-1 flex-shrink-0">
-            <Phone size={18} />
-          </button>
 
-          <button className="text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] p-1 flex-shrink-0">
-            <MoreVertical size={18} />
-          </button>
 
         </div>
 
@@ -341,9 +373,6 @@ export function Chat({
         {/* CAMPO DE ENVIO */}
         <div className="flex-none flex items-center gap-2 px-2 py-2 bg-[var(--libido-bg)] border-t border-[var(--libido-border)] w-full">
 
-          <button className="text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] p-2 flex-shrink-0">
-            <Smile size={22} />
-          </button>
 
 
           <div className="flex-1 flex items-center bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl px-4 py-2.5 gap-2 min-w-0">
@@ -358,14 +387,10 @@ export function Chat({
             />
 
 
-            <button className="text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] flex-shrink-0">
-              <Camera size={18} />
-            </button>
 
           </div>
 
 
-          {messageInput.trim() ? (
 
             <button
               onClick={handleSend}
@@ -374,13 +399,8 @@ export function Chat({
               <Send size={16} />
             </button>
 
-          ) : (
 
-            <button className="w-11 h-11 bg-[var(--libido-accent)] rounded-full flex items-center justify-center flex-shrink-0 text-black hover:opacity-90 shadow-lg">
-              <Mic size={16} />
-            </button>
 
-          )}
 
         </div>
 
@@ -501,7 +521,7 @@ export function Chat({
 
               <div className="flex items-center justify-between mt-0.5 min-w-0">
 
-                <p className="text-[11px] text-[var(--libido-muted)] opacity-60 truncate flex-1 mr-2 min-w-0">
+                <p className={`text-[11px] truncate flex-1 mr-2 min-w-0 ${contact.unread > 0 ? "text-[var(--libido-text)] font-bold" : "text-[var(--libido-muted)] opacity-60"}`}>
                   {contact.lastMessage}
                 </p>
 

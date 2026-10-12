@@ -122,15 +122,15 @@ export const listenAllUserMessages = (
   fetchAndNotifyAll();
 
   const channel = supabase
-    .channel(`all_messages_${userId}`)
+    .channel(`all_messages_${userId}_${Math.random().toString(36).slice(2, 8)}`) // CANAL-UNICO
     .on(
       'postgres_changes',
       {
-        event: 'INSERT',
+        event: '*',
         schema: 'public',
         table: 'messages'
       },
-      (payload) => {
+      (payload: any) => {
         if (
           payload.new &&
           (
@@ -143,10 +143,12 @@ export const listenAllUserMessages = (
       }
     )
     .subscribe();
+  const poll = setInterval(() => fetchAndNotifyAll(), 5000); // CHAT-POLL
 
   return () => {
     listeners = listeners.filter(cb => cb !== callback);
     supabase.removeChannel(channel);
+  clearInterval(poll); // CHAT-POLL
   };
 };
 
@@ -156,4 +158,26 @@ export const listenMessages = (
   callback: (messages: Message[]) => void
 ) => {
   return () => {};
+};
+
+// TICKS-MARK: marca como ENTREGUES as mensagens que o usuario recebeu
+export const markMessagesAsDelivered = async (userId: string) => {
+  const { error } = await supabase
+    .from('messages')
+    .update({ status: 'delivered', delivered_at: new Date().toISOString() })
+    .eq('receiver_id', userId)
+    .eq('status', 'sent');
+  if (error) console.error('TICKS-MARK delivered falhou:', error);
+};
+
+// TICKS-MARK: marca como LIDAS as mensagens de uma conversa aberta
+export const markMessagesAsRead = async (userId: string, partnerId?: string) => {
+  let q = supabase
+    .from('messages')
+    .update({ status: 'read', read_at: new Date().toISOString() })
+    .eq('receiver_id', userId)
+    .in('status', ['sent', 'delivered']);
+  if (partnerId) q = q.eq('sender_id', partnerId);
+  const { error } = await q;
+  if (error) console.error('TICKS-MARK read falhou:', error);
 };

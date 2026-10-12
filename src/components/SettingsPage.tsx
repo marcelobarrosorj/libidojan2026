@@ -1,5 +1,6 @@
-import { Eye, Bell, Shield, LogOut, Moon, ChevronRight } from 'lucide-react';
+import { Bell, Shield, LogOut, Moon, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { OwnerInvites } from './OwnerInvites'; // OWNER-INVITES
 
 interface SettingsPageProps {
   onLogout?: () => void;
@@ -21,22 +22,8 @@ export function SettingsPage({ onLogout, currentUser, isPremium }: SettingsPageP
       <div className="space-y-2">
         <p className="text-[9px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-widest px-1 mt-2">Privacidade</p>
 
-        <div className="flex items-center justify-between bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-purple-500/10 rounded-xl flex items-center justify-center"><Eye size={14} className="text-purple-400" /></div>
-            <div>
-              <p className="text-xs font-black text-[var(--libido-text)]">Modo Fantasma</p>
-              <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-semibold">Invisível no radar de proximidade</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => setGhostMode(!ghostMode)}
-            className={`w-12 h-7 rounded-full transition-all flex items-center px-1 ${ghostMode ? 'bg-[var(--libido-accent)] justify-end' : 'bg-white/10 justify-start'}`}
-          >
-            <div className="w-5 h-5 bg-white rounded-full shadow-md transition-all" />
-          </button>
-        </div>
 
+        <OwnerInvites />
         <div className="flex items-center justify-between bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center"><Bell size={14} className="text-blue-400" /></div>
@@ -46,7 +33,7 @@ export function SettingsPage({ onLogout, currentUser, isPremium }: SettingsPageP
             </div>
           </div>
           <button 
-            onClick={() => setNotifications(!notifications)}
+            onClick={() => { const novo = !notifications; setNotifications(novo); try { localStorage.setItem('libido_notifications', novo ? 'on' : 'off'); } catch (eN) {} }} // NOTIF-TOGGLE
             className={`w-12 h-7 rounded-full transition-all flex items-center px-1 ${notifications ? 'bg-[var(--libido-accent)] justify-end' : 'bg-white/10 justify-start'}`}
           >
             <div className="w-5 h-5 bg-white rounded-full shadow-md transition-all" />
@@ -59,7 +46,7 @@ export function SettingsPage({ onLogout, currentUser, isPremium }: SettingsPageP
         className="flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 p-4 rounded-2xl mt-4 transition-colors"
       >
         <LogOut size={14} className="text-red-400" />
-        <span className="text-xs font-black text-red-400 uppercase tracking-widest">Desconectar Nódulo</span>
+<span className="text-xs font-black text-red-400 uppercase tracking-widest">Sair</span>
       </button>
     </div>
   );

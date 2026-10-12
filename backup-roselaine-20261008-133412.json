@@ -1,0 +1,41 @@
+﻿{
+    "email":  "roselainefm2015@gmail.com",
+    "password_hash":  null,
+    "email_verified":  null,
+    "user_id":  "e3a968a5-5df1-4061-995d-a60a46a6dcf0",
+    "nickname":  "M",
+    "pin":  "1403",
+    "photo_url":  "https://hkuwlazwtxwfffnpgfdd.supabase.co/storage/v1/object/public/photos/e3a968a5-5df1-4061-995d-a60a46a6dcf0/1791411212762-image.jpg",
+    "age":  "50",
+    "gender":  "Casal",
+    "relationship_status":  "casal",
+    "interests":  null,
+    "updated_at":  null,
+    "bio":  "Nnn",
+    "photos":  [
+
+               ],
+    "status":  "active",
+    "height":  null,
+    "biotype":  null,
+    "sexual_orientation":  null,
+    "plan":  "free",
+    "couple_profile":  {
+                           "maleAge":  50,
+                           "femaleAge":  40,
+                           "maleHeight":  180,
+                           "maleBiotype":  "Padrão",
+                           "femaleHeight":  170,
+                           "maleNickname":  "M",
+                           "femaleBiotype":  "Padrão",
+                           "femaleNickname":  "K",
+                           "maleOrientation":  "Heterossexual",
+                           "femaleOrientation":  "Bissexual"
+                       },
+    "premium":  false,
+    "role":  "user",
+    "is_banned":  false,
+    "is_deleted":  false,
+    "is_online":  true,
+    "created_at":  "2026-10-07T22:07:38.540363+00:00"
+}

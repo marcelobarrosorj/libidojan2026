@@ -56,9 +56,13 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="mb-12"><Logo size="lg" /></div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-fraunces font-medium leading-[1.1] mb-6 max-w-4xl mx-auto">
+          <span className="font-semibold">Segurança acima do prazer.</span><br/>
           Conexões adultas.<br/>
           <span className="text-[var(--libido-muted)]">Privacidade levada a sério.</span>
         </h1>
+      <p className="text-xs md:text-sm text-[var(--libido-muted)] mb-8">
+        Dados protegidos · Denúncia em 1 toque
+      </p>
         
         <p className="text-sm md:text-lg text-[var(--libido-muted)] mb-12 max-w-2xl mx-auto leading-relaxed">
           Um espaço para maiores de 18 anos que desejam conhecer pessoas, conversar e explorar novas possibilidades com liberdade, respeito e discrição.<br/><br/>
@@ -125,8 +129,8 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
           </p>
 
           <div className="bg-[var(--libido-bg)] border border-[var(--libido-border)] rounded-2xl p-6 md:p-8 mb-8 inline-block text-left mx-auto w-full max-w-sm">
-            <h3 className="text-lg font-bold text-[var(--libido-text)] mb-2 text-center">Libido Premium</h3>
-            <div className="text-4xl font-fraunces font-medium text-[var(--libido-accent)] mb-4 text-center">R$ 19,90</div>
+            <h3 id="premium-section" className="text-lg font-bold text-[var(--libido-text)] mb-2 text-center">Libido Premium</h3>
+            <div className="text-4xl font-fraunces font-medium text-[var(--libido-accent)] mb-4 text-center">R$ 9,90</div>
             <p className="text-xs text-[var(--libido-muted)] text-center pb-4 border-b border-[var(--libido-border)]">Pagamento por Pix.</p>
             <ul className="mt-4 space-y-3 text-xs text-[var(--libido-muted)]">
               <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-[var(--libido-gold)]" /> Radar exclusivo</li>
@@ -135,7 +139,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             </ul>
           </div>
 
-          <button className="bg-[var(--libido-bg)] border border-[var(--libido-accent)]/50 text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm transition-all hover:bg-[var(--libido-surface)] inline-flex items-center gap-2">
+          <button onClick={() => document.getElementById('premium-section')?.scrollIntoView({ behavior: 'smooth' })} className="bg-[var(--libido-bg)] border border-[var(--libido-accent)]/50 text-[var(--libido-text)] font-bold py-4 px-8 rounded-[16px] text-sm transition-all hover:bg-[var(--libido-surface)] inline-flex items-center gap-2">
             Conhecer o Premium
           </button>
 

@@ -1,9 +1,10 @@
-﻿import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X } from 'lucide-react';
 import { User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
+import { supabase } from '../services/supabase';
 
 interface RadarMapProps {
   users: User[];
@@ -71,10 +72,13 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
         }).catch(() => {});
       }
     };
+    let watchIdGPS: number | null = null; // GPS-CONTINUO
+    let ultimaSalva = 0; // GPS-CONTINUO
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      watchIdGPS = navigator.geolocation.watchPosition(
         (pos) => {
           if (ativo) setMeuPonto({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude }).eq('user_id', userId).then(({ error }) => { if (error) console.error('SALVA-COORD falhou', error); }); } // SALVA-COORD
         },
         () => usarBanco(),
         { timeout: 8000, enableHighAccuracy: true }
@@ -84,6 +88,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
     }
     return () => {
       ativo = false;
+      if (watchIdGPS !== null && typeof navigator !== 'undefined' && navigator.geolocation) navigator.geolocation.clearWatch(watchIdGPS); // GPS-CONTINUO
     };
   }, [currentUser, userId]);
   // 2) Cria o mapa escuro (Leaflet + OpenStreetMap/CARTO, sem chave de API)
@@ -179,6 +184,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
             <ProtectedImage
               currentUser={currentUser}
               src={user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=32'}
+              style={{ border: (user as any).is_online ? '2.5px solid #22c55e' : 'none', boxShadow: (user as any).is_online ? '0 0 8px rgba(34,197,94,0.8)' : 'none' }} // ONLINE-DOT
               alt=""
               className="w-full h-full"
             />

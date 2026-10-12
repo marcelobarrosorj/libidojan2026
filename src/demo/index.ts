@@ -1,6 +1,5 @@
 
-export const isDemoEnabled = import.meta.env.VITE_ENABLE_DEMO_CONTENT === 'true' || 
-                             (import.meta.env.MODE !== 'production' && import.meta.env.VITE_ENABLE_DEMO_CONTENT !== 'false');
+export const isDemoEnabled = false;
 
 export const demoProfiles = [
   {

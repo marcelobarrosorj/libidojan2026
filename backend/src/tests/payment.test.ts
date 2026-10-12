@@ -1,4 +1,4 @@
-﻿import { resolvePagBankCustomerTaxId } from '../services/pagbank.js';
+import { resolvePagBankCustomerTaxId } from '../services/pagbank.js';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
@@ -33,7 +33,7 @@ const {
 });
 
 vi.mock('../config/env', () => ({
-  config: { PAGBANK_TOKEN: 'mock-pagbank-token', PREMIUM_PRICE_CENTS: 1990 },
+  config: { PAGBANK_TOKEN: 'mock-pagbank-token', PREMIUM_PRICE_CENTS: 990 },
   validateProductionEnvironment: vi.fn(),
   getBackendAvailability: vi.fn(() => true),
 }));
@@ -74,7 +74,7 @@ import app from '../app.js';
 const PLANO_DAY_USE = {
   id: 'plan-dayuse-1',
   name: 'Acesso 24 horas',
-  price: 19.90,
+  price: 9.90,
   duration_days: 1,
   active: true
 };
@@ -162,7 +162,7 @@ describe('Payment API Tests', () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
       const mockedPixData = {
         paymentId: 'pag-123',
-        amount: 19.90,
+        amount: 9.90,
         qrCodeText: 'pix-copia-cola',
         qrCodeImage: '',
         status: 'WAITING',
@@ -178,7 +178,7 @@ describe('Payment API Tests', () => {
       expect(mockCreatePixPayment).toHaveBeenCalledWith('user-123', '52998224725', {
         id: 'plan-dayuse-1',
         name: 'Acesso 24 horas',
-        price: 19.90,
+        price: 9.90,
         durationDays: 1
       });
       expect(mockCreatePixPayment).toHaveBeenCalledTimes(1);
@@ -187,7 +187,7 @@ describe('Payment API Tests', () => {
         payment_id: 'pag-123',
         provider: 'pagbank',
         status: 'WAITING',
-        amount: 19.90,
+        amount: 9.90,
         plan_id: 'plan-dayuse-1'
       });
       expect(res.body.paymentId).toBe('pag-123');
@@ -227,7 +227,7 @@ describe('Payment API Tests', () => {
 
     it('Creates payment if valid CPF is provided', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const mockedPixData = { paymentId: 'pag-123', amount: 19.90, planId: 'plan-dayuse-1' };
+      const mockedPixData = { paymentId: 'pag-123', amount: 9.90, planId: 'plan-dayuse-1' };
       mockCreatePixPayment.mockResolvedValue(mockedPixData);
       mockInsert.mockResolvedValue({ error: null });
       const res = await request(app)
@@ -298,7 +298,7 @@ describe('Payment API Tests', () => {
 
     it('5. Fails to save transaction', async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: 'user-123' } }, error: null });
-      const mockedPixData = { paymentId: 'pag-123', amount: 19.90, planId: 'plan-dayuse-1' };
+      const mockedPixData = { paymentId: 'pag-123', amount: 9.90, planId: 'plan-dayuse-1' };
       mockCreatePixPayment.mockResolvedValue(mockedPixData);
       mockInsert.mockResolvedValue({ error: { message: 'DB Error' } });
       const res = await request(app)
@@ -332,9 +332,9 @@ describe('Payment API Tests', () => {
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'PAID', amount: { value: 1990 } }]
+        charges: [{ status: 'PAID', amount: { value: 990 } }]
       });
-      mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
+      mockSingle.mockResolvedValue({ data: { amount: 9.90, status: 'WAITING' }, error: null });
       mockRpc.mockResolvedValue({ data: true, error: null });
       const res = await request(app)
         .post('/api/webhook/pagbank')
@@ -347,7 +347,7 @@ describe('Payment API Tests', () => {
         p_payment_id: 'ord-123',
         p_provider: 'pagbank',
         p_status: 'PAID',
-        p_amount: 19.90
+        p_amount: 9.90
       });
     });
 
@@ -358,9 +358,9 @@ describe('Payment API Tests', () => {
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'PAID', amount: { value: 1990 } }]
+        charges: [{ status: 'PAID', amount: { value: 990 } }]
       });
-      mockSingle.mockResolvedValue({ data: { amount: 19.90, status: 'WAITING' }, error: null });
+      mockSingle.mockResolvedValue({ data: { amount: 9.90, status: 'WAITING' }, error: null });
       mockRpc.mockResolvedValue({ data: false, error: null });
       const res = await request(app)
         .post('/api/webhook/pagbank')
@@ -377,7 +377,7 @@ describe('Payment API Tests', () => {
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'PAID', amount: { value: 1990 } }]
+        charges: [{ status: 'PAID', amount: { value: 990 } }]
       });
       mockSingle.mockResolvedValue({ data: { amount: 49.90, status: 'WAITING' }, error: null });
       const res = await request(app)
@@ -396,7 +396,7 @@ describe('Payment API Tests', () => {
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'PAID', amount: { value: 1990 } }]
+        charges: [{ status: 'PAID', amount: { value: 990 } }]
       });
       mockSingle.mockResolvedValue({ data: null, error: { message: 'not found' } });
       const res = await request(app)
@@ -440,7 +440,7 @@ describe('Payment API Tests', () => {
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'WAITING', amount: { value: 1990 } }]
+        charges: [{ status: 'WAITING', amount: { value: 990 } }]
       });
       const res = await request(app)
         .post('/api/webhook/pagbank')
@@ -458,7 +458,7 @@ describe('Payment API Tests', () => {
       mockVerifyPayment.mockResolvedValue({
         id: 'ord-123',
         reference_id: 'libido-premium_user-123_local1',
-        charges: [{ status: 'CANCELED', amount: { value: 1990 } }]
+        charges: [{ status: 'CANCELED', amount: { value: 990 } }]
       });
       const res = await request(app)
         .post('/api/webhook/pagbank')

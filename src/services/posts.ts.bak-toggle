@@ -1,0 +1,77 @@
+import { supabase } from './supabase';
+import { Post } from '../types';
+import { isDemoEnabled, demoPosts, isDemoId } from '../demo/index';
+
+const mapSupabaseToPost = (row: any): Post => ({
+  id: String(row.id),
+  userId: row.user_id,
+  image: row.image,
+  text: row.text,
+  likes: row.likes ?? 0,
+  createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+});
+
+export const createPost = async (post: Post) => {
+  const { error } = await supabase.from('posts').insert({
+    user_id: post.userId,
+    image: post.image || null,
+    text: post.text,
+    created_at: new Date(post.createdAt).toISOString()
+  });
+  if (error) throw error;
+};
+
+export const getFeedPosts = (callback: (posts: Post[]) => void) => {
+  let isSubscribed = true;
+  if (isDemoEnabled) {
+    callback([...demoPosts] as Post[]);
+    return () => { isSubscribed = false; };
+  }
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      if (isSubscribed && data) {
+        const finalPosts = data.map(mapSupabaseToPost);
+        callback(finalPosts);
+      }
+    } catch (err) {
+      console.error('Error fetching posts from supabase:', err);
+    }
+  };
+  fetchPosts();
+  const channel = supabase.channel('public:posts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+      fetchPosts();
+    })
+    .subscribe();
+  return () => {
+    isSubscribed = false;
+    supabase.removeChannel(channel);
+  };
+};
+
+export const likePost = async (postId: string) => {
+  if (isDemoId(postId)) return;
+  try {
+    const { error } = await supabase.rpc('increment_likes', { post_id: postId });
+    if (error) {
+      const { data: post } = await supabase.from('posts').select('likes').eq('id', postId).single();
+      if (post) {
+        await supabase.from('posts').update({ likes: (post.likes || 0) + 1 }).eq('id', postId);
+      }
+    }
+  } catch (err) {
+    console.error('Error liking post in supabase:', err);
+  }
+};
+
+// FEED-DELETE: o autor pode excluir o proprio post a qualquer momento
+export async function excluirPost(postId: string): Promise<boolean> {
+  const { error } = await (supabase as any).from('posts').delete().eq('id', postId);
+  if (error) { console.error('FEED-DELETE falhou', error); return false; }
+  return true;
+}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Libido | Conexões adultas com privacidade e segurança</title>
+    <meta
+      name="description"
+      content="Conheça o Libido, uma plataforma exclusiva para maiores de 18 anos, criada para conexões adultas com liberdade, respeito, privacidade e segurança."
+    />
+    <meta
+      property="og:title"
+      content="Libido | Conexões adultas com privacidade e segurança"
+    />
+    <meta
+      property="og:description"
+      content="Conheça o Libido, uma plataforma exclusiva para maiores de 18 anos, criada para conexões adultas com liberdade, respeito, privacidade e segurança."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Libido | Conexões adultas com privacidade e segurança"
+    />
+    <meta
+      name="twitter:description"
+      content="Conheça o Libido, uma plataforma exclusiva para maiores de 18 anos, criada para conexões adultas com liberdade, respeito, privacidade e segurança."
+    />
+    <link rel="canonical" href="https://libido.app" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap"
+      rel="stylesheet"
+    />
+<script>
+window.addEventListener('error', function (e) {
+  var d = document.getElementById('libido-errbar');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'libido-errbar';
+    d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#7f1d1d;color:#fff;font:12px monospace;padding:10px;white-space:pre-wrap;z-index:99999;max-height:45%;overflow:auto';
+    (document.body || document.documentElement).appendChild(d);
+  }
+  d.textContent += 'ERRO: ' + (e.message || '') + ' | ' + (e.filename || '') + ':' + (e.lineno || '') + '\n';
+});
+window.addEventListener('unhandledrejection', function (e) {
+  var d = document.getElementById('libido-errbar');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'libido-errbar';
+    d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#7f1d1d;color:#fff;font:12px monospace;padding:10px;white-space:pre-wrap;z-index:99999;max-height:45%;overflow:auto';
+    (document.body || document.documentElement).appendChild(d);
+  }
+  d.textContent += 'PROMISE: ' + ((e.reason && (e.reason.message || String(e.reason))) || '') + '\n';
+});
+</script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

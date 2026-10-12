@@ -1,5 +1,5 @@
 import { updateUserProfile } from '../services/users';
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, useRef, ReactNode } from "react";
 import { AppShell } from "./AppShell";
 import { HeaderGlobal } from "./HeaderGlobal";
 import { BottomNavGlobal } from "./BottomNavGlobal";
@@ -8,6 +8,10 @@ import { PixCheckout } from "./PixCheckout";
 import { User } from '../types';
 import { SecurityWatermark } from './SecurityWatermark';
 import { checkUserPremium } from '../services/premium';
+import { iniciarGpsGlobal } from '../services/gpsGlobal'; // GPS-GLOBAL-MOD
+import { iniciarNotificacoesGlobais } from '../services/notificacoesGlobais'; // NOTIF-GLOBAL-MOD
+import { iniciarInstalarApp } from '../instalarApp'; // PWA-INSTALL-MOD
+iniciarInstalarApp(); // PWA-INSTALL-MOD
 
 interface AppCoreProps {
   userId?: string;
@@ -35,10 +39,13 @@ export function AppCore({
 
   const isOwner = userPlan === 'owner' || userRole === 'owner';
 
+  const premiumUntilStr = (currentUser as any)?.premium_until || ''; // PREM-EXPIRA
+  const premiumUntilMs = premiumUntilStr ? new Date(premiumUntilStr).getTime() : 0; // PREM-EXPIRA
+  const premiumValido = !premiumUntilMs || premiumUntilMs > Date.now(); // PREM-EXPIRA: sem data = eterno
   const isPremium =
     isOwner ||
     hasActiveSubscription ||
-    userPlan === 'premium' ||
+    (userPlan === 'premium' && premiumValido) || // PREM-EXPIRA: flag so vale dentro do prazo
     userPlan === 'admin' ||
     userRole === 'admin';
 
@@ -94,6 +101,19 @@ export function AppCore({
       setShowPixModal(false);
     }
   }, [isOwner]);
+  // GPS-GLOBAL-MOD: posicao salva continuamente com o app aberto (qualquer tela)
+  useEffect(() => {
+    if (!userId) return;
+    return iniciarGpsGlobal(userId);
+  }, [userId]);
+  // NOTIF-GLOBAL-MOD: escuta global de notificacoes (modulo externo)
+  const [unreadChat, setUnreadChat] = useState(0);
+  const activeTabRef = useRef(activeTab);
+  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
+  useEffect(() => {
+    if (!userId) return;
+    return iniciarNotificacoesGlobais(userId, () => activeTabRef.current, setUnreadChat);
+  }, [userId]);
 
   const openPremiumCheckout = () => {
     // Owner, admin e usuários Premium não podem abrir cobrança.
@@ -119,6 +139,16 @@ export function AppCore({
         onSettingsClick={() => navigate('settings')}
         onNotificationsClick={() => navigate('invites')}
       />
+      {showNav && (
+        <div className="flex-none bg-[var(--libido-bg)] border-b border-[var(--libido-border)] relative z-50">
+          <BottomNavGlobal
+            activeTab={activeTab}
+            onTabChange={(tab) => navigate(tab)}
+            isAdmin={isAdmin}
+            unreadChat={unreadChat}
+          />
+        </div>
+      )}
 
       <ContentRouter
         activeTab={activeTab}
@@ -132,15 +162,6 @@ export function AppCore({
         currentUser={currentUser}
       />
 
-      {showNav && (
-        <div className="flex-none bg-[var(--libido-bg)] border-t border-[var(--libido-border)] relative z-50">
-          <BottomNavGlobal
-            activeTab={activeTab}
-            onTabChange={(tab) => navigate(tab)}
-            isAdmin={isAdmin}
-          />
-        </div>
-      )}
 
       <PixCheckout
         isOpen={showPixModal && !isPremium && !isOwner}

@@ -1,7 +1,7 @@
-﻿import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
-vi.mock('../config/env.js', () => ({ config: { PAGBANK_TOKEN: 'pagbank-test-token', PREMIUM_PRICE_CENTS: 1990 }, getBackendAvailability: () => true }));
+vi.mock('../config/env.js', () => ({ config: { PAGBANK_TOKEN: 'pagbank-test-token', PREMIUM_PRICE_CENTS: 990 }, getBackendAvailability: () => true }));
 const mockVerifyPayment = vi.fn();
 vi.mock('../services/pagbank.js', () => ({
   verifyPayment: (...args: any[]) => mockVerifyPayment(...args)

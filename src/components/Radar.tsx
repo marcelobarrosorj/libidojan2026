@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Users, Map as MapIcon, Radar as RadarIcon } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Users, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { User } from '../types';
 import { getActiveUsers } from '../services/users';
 import { ProtectedImage } from './ProtectedImage';
 import { RadarMap } from './RadarMap';
+import { supabase } from '../services/supabase';
 
 interface RadarProps {
   userId?: string;
@@ -11,17 +12,92 @@ interface RadarProps {
   currentUser?: User | null;
 }
 
+// Distancia em metros entre dois pontos (formula de Haversine)
+function distanciaMetros(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371000;
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLon = (lon2 - lon1) * rad;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Arredonda a distancia para nunca expor posicao exata
+function formatarDistancia(metros: number): string {
+  if (metros < 1000) {
+    const passo = Math.max(100, Math.round(metros / 100) * 100);
+    return `~${passo} m`;
+  }
+  const km = Math.round((metros / 1000) * 10) / 10;
+  return `~${km.toFixed(1).replace('.', ',')} km`;
+}
+
 export function Radar({ userId, navigate, currentUser }: RadarProps) {
   const [operators, setOperators] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modo, setModo] = useState<'mapa' | 'radar'>('mapa');
+  const [modo, setModo] = useState<'mapa' | 'lista'>('mapa');
+  const [meuPonto, setMeuPonto] = useState<{ lat: number; lon: number } | null>(null);
+
+  useEffect(() => {
+    let ativo = true;
+    const usarBanco = () => {
+      const cu = currentUser as any;
+      if (cu?.lat != null && cu?.lon != null) {
+        setMeuPonto({ lat: Number(cu.lat), lon: Number(cu.lon) });
+        return;
+      }
+      if (userId) {
+        supabaseQuery(userId).then((data: any) => {
+          if (!ativo) return;
+          if (data && data.lat != null && data.lon != null) {
+            setMeuPonto({ lat: Number(data.lat), lon: Number(data.lon) });
+          }
+        }).catch(() => {});
+      }
+    };
+    let watchIdGPS: number | null = null; // GPS-CONTINUO
+    let ultimaSalva = 0; // GPS-CONTINUO
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      watchIdGPS = navigator.geolocation.watchPosition(
+        (pos) => {
+          if (ativo) setMeuPonto({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude }).eq('user_id', userId).then(({ error }) => { if (error) console.error('SALVA-COORD falhou', error); }); } // SALVA-COORD
+        },
+        () => usarBanco(),
+        { timeout: 8000, enableHighAccuracy: true }
+      );
+    } else {
+      usarBanco();
+    }
+    return () => {
+      ativo = false;
+      if (watchIdGPS !== null && typeof navigator !== 'undefined' && navigator.geolocation) navigator.geolocation.clearWatch(watchIdGPS); // GPS-CONTINUO
+    };
+  }, [currentUser, userId]);
+
+  // Lista de proximos: distancia real, do mais perto para o mais longe
+  const listaProximos = useMemo(() => {
+    if (!meuPonto) return [];
+    return operators
+      .map((u: any) => ({
+        user: u,
+        lat: u?.lat != null ? Number(u.lat) : null,
+        lon: u?.lon != null ? Number(u.lon) : null
+      }))
+      .filter((d) => d.lat !== null && d.lon !== null)
+      .map((d) => ({ user: d.user, dist: distanciaMetros(meuPonto.lat, meuPonto.lon, d.lat!, d.lon!) }))
+      .filter((p) => p.dist >= 100)
+      .sort((a, b) => a.dist - b.dist);
+  }, [operators, meuPonto]);
 
   useEffect(() => {
     const fetchOperators = async () => {
       if (!userId) return;
       try {
         const users = await getActiveUsers(userId);
-        setOperators(users);
+setOperators(users);
       } catch (err) {
         console.error('Falha ao buscar usuários no Radar:', err);
       } finally {
@@ -29,6 +105,8 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
       }
     };
     fetchOperators();
+    const t = setInterval(fetchOperators, 15000); // RADAR-REFRESH
+    return () => clearInterval(t); // RADAR-REFRESH
   }, [userId]);
 
   return (
@@ -51,10 +129,10 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
               <MapIcon size={10} /> Mapa
             </button>
             <button
-              onClick={() => setModo('radar')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-colors ${modo === 'radar' ? 'bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)]' : 'text-[var(--libido-muted)]'}`}
+              onClick={() => setModo('lista')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-colors ${modo === 'lista' ? 'bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)]' : 'text-[var(--libido-muted)]'}`}
             >
-              <RadarIcon size={10} /> Radar
+              <ListIcon size={10} /> Lista
             </button>
           </div>
         </div>
@@ -62,6 +140,43 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
 
       {modo === 'mapa' ? (
         <RadarMap users={operators} currentUser={currentUser} userId={userId} navigate={navigate} />
+      ) : modo === 'lista' ? (
+        <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
+          {!meuPonto && (
+            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Obtendo sua localização...</p>
+          )}
+          {meuPonto && listaProximos.length === 0 && (
+            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Nenhum usuário com localização ativa</p>
+          )}
+          <div className="space-y-2.5">
+            {listaProximos.map((p) => (
+              <div
+                key={p.user.id}
+                onClick={() => navigate?.('viewprofile', { user: p.user })}
+                className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] rounded-2xl p-3 flex items-center gap-3 cursor-pointer active:opacity-80"
+              >
+                <div className="w-11 h-11 rounded-full overflow-hidden border border-[var(--libido-border)] shrink-0">
+                  <ProtectedImage
+                    currentUser={currentUser}
+                    src={p.user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=64'}
+                    alt=""
+                    className="w-full h-full"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-[var(--libido-text)] truncate flex items-center gap-1.5">
+                    {p.user.name}
+                    {p.user.isOnline && (
+                      <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
+                    )}
+                  </p>
+                  <p className="text-[10px] font-black text-[var(--libido-muted)]">{formatarDistancia(p.dist)}</p>
+                </div>
+                <span className="px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-xs font-black uppercase tracking-wide shrink-0">Ver perfil</span>
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
         <div className="flex-1 flex items-center justify-center relative min-h-[300px]">
           <div className="absolute w-72 h-72 rounded-full border border-[var(--libido-border)] flex items-center justify-center">
@@ -105,4 +220,15 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
       )}
     </div>
   );
+}
+
+// Consulta direta ao banco pela posicao do usuario atual
+async function supabaseQuery(userId: string): Promise<any> {
+  const { supabase } = await import('../services/supabase');
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('lat, lon')
+    .eq('user_id', userId)
+    .maybeSingle();
+  return data;
 }

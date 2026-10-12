@@ -22,7 +22,7 @@ const originalFetch = global.fetch;
 
 const PLANOS = {
   plans: [
-    { id: 'plan-dayuse-1', name: 'Acesso 24 horas', price: 19.90, duration_days: 1 },
+    { id: 'plan-dayuse-1', name: 'Acesso 24 horas', price: 9.90, duration_days: 1 },
     { id: 'plan-mensal-1', name: 'Plano Mensal', price: 49.90, duration_days: 30 }
   ]
 };
@@ -107,7 +107,7 @@ describe('PixCheckout Component', () => {
           json: () =>
             Promise.resolve({
               paymentId: 'pag-123',
-              amount: 19.90,
+              amount: 9.90,
               qrCodeImage: 'base64-image-string',
               qrCodeText: 'pix-code-str',
               status: 'WAITING',
@@ -179,7 +179,7 @@ describe('PixCheckout Component', () => {
         );
     });
     expect(
-      await screen.findByText('R$ 19,90')
+      await screen.findByText('R$ 9,90')
     ).toBeTruthy();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(10000);

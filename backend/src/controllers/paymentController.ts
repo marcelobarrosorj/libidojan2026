@@ -1,4 +1,4 @@
-﻿import { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { createPixPayment, verifyPayment } from '../services/pagbank.js';
 import { isValidCPF, normalizeCPF } from '../utils/cpf.js';
@@ -119,6 +119,7 @@ export const pagbankWebhook = async (
     const rawBody = (req as any).rawBody;
     if (!rawBody) {
       console.error('PAGBANK WEBHOOK WITHOUT RAW BODY');
+      console.error('PAGBANK-DEBUG sem raw body', { contentType: req.headers['content-type'] }); // PAGBANK-DEBUG
       return res.status(401).send('Unauthorized');
     }
     /*
@@ -141,6 +142,13 @@ export const pagbankWebhook = async (
       .createHash('sha256')
       .update(config.PAGBANK_TOKEN + '-' + rawPayload)
       .digest('hex');
+    console.log('PAGBANK-DEBUG', { // PAGBANK-DEBUG
+      tokenLen: config.PAGBANK_TOKEN.length, // PAGBANK-DEBUG
+      tokenTemEspacoInvisivel: /\s/.test(config.PAGBANK_TOKEN), // PAGBANK-DEBUG
+      payloadLen: rawPayload.length, // PAGBANK-DEBUG
+      recebidoPrefixo: String(signature).slice(0, 8), // PAGBANK-DEBUG
+      esperadoPrefixo: expectedSignature.slice(0, 8) // PAGBANK-DEBUG
+    }); // PAGBANK-DEBUG
     const expectedBuffer =
       Buffer.from(expectedSignature, 'utf8');
     const actualBuffer =
@@ -193,7 +201,7 @@ export const pagbankWebhook = async (
     /*
       O valor pago deve bater com o valor registrado na transacao
       criada no checkout (que ja carrega o plano escolhido).
-      Funciona para o day use (19,90) e para o mensal (49,90).
+      Funciona para o day use (9,90) e para o mensal (49,90).
     */
     const { data: tx } = await supabase
       .from('payment_transactions')
