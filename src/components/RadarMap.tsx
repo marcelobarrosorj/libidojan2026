@@ -120,7 +120,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
   // 3) Recentra no usuario quando a posicao chega
   useEffect(() => {
     if (mapRef.current && meuPonto) {
-      mapRef.current.setView([meuPonto.lat, meuPonto.lon], 14);
+      if (!(window as any).__LIBIDO_CENTROU__) { mapRef.current.setView([meuPonto.lat, meuPonto.lon], 14); (window as any).__LIBIDO_CENTROU__ = true; } // B1-FIX: centraliza so na 1a correcao do GPS - nunca mais reseta o zoom/posicao do usuario
     }
   }, [meuPonto]);
 
