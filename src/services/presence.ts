@@ -11,6 +11,23 @@ async function gravar(userId: string, online: boolean): Promise<void> {
       .from('users')
       .update(online ? { is_online: true, updated_at: new Date().toISOString() } : { is_online: false }) // B2-FIX: heartbeat grava updated_at
       .eq('user_id', userId);
+    void (async () => {
+      try {
+        await (supabase as any)
+          .from('user_profiles')
+          .update(online ? { is_online: true, updated_at: new Date().toISOString() } : { is_online: false })
+          .eq('user_id', userId);
+      } catch (ePresPerfil1: any) {
+        try {
+          await (supabase as any)
+            .from('user_profiles')
+            .update({ is_online: online })
+            .eq('user_id', userId);
+        } catch (ePresPerfil2: any) {
+          console.warn('PRES-ALERT: heartbeat em user_profiles falhou', (ePresPerfil2 && ePresPerfil2.message) || ePresPerfil2);
+        }
+      }
+    })(); // B4-FIX: espelha o heartbeat na tabela que o radar le (user_profiles)
   } catch {
     // silencioso: presenca nunca deve travar o app
   }

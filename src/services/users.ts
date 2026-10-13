@@ -28,6 +28,7 @@ export const mapSupabaseToUser = (data: any): User => {
     followers: data.followers || 0,
     following: data.following || 0,
     isOnline: data.is_online || data.isOnline || false,
+    updated_at: data.updated_at || data.last_seen || null, // B5-FIX: timestamp para a janela de 5 min do radar
     location: data.location || { x: 0, y: 0 },
     radarUsedToday: data.radar_used_today || data.radarUsedToday || 0,
     visibilityScore: data.visibility_score || data.visibilityScore || 100,
