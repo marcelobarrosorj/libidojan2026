@@ -9,7 +9,7 @@ async function gravar(userId: string, online: boolean): Promise<void> {
     const { supabase } = await import('./supabase');
     await supabase
       .from('users')
-      .update({ is_online: online })
+      .update(online ? { is_online: true, updated_at: new Date().toISOString() } : { is_online: false }) // B2-FIX: heartbeat grava updated_at
       .eq('user_id', userId);
   } catch {
     // silencioso: presenca nunca deve travar o app

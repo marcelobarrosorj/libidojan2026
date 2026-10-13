@@ -37,7 +37,7 @@ export function Top({ isPremium, onShowPremiumModal, userId, navigate }: TopProp
 
   const topRanked = [...users]
     .filter(u => !u.isBanned && !u.isDeleted)
-    .sort((a, b) => (b.followers || 0) - (a.followers || 0));
+    .sort((a, b) => ((b.followers || 0) - (a.followers || 0)) || ((new Date((a as any).createdAt || 0).getTime() || 0) - (new Date((b as any).createdAt || 0).getTime() || 0))); // D1-FIX: empate de seguidores = conta mais antiga na frente
   const seteDiasAtras = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const novatos = topRanked.filter(u => (((u as any).createdAt) || 0) >= seteDiasAtras).slice(0, 5);
 

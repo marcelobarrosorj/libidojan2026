@@ -97,7 +97,18 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
       if (!userId) return;
       try {
         const users = await getActiveUsers(userId);
-setOperators(users);
+        const agoraMs = Date.now();
+        const JANELA_ONLINE_MS = 5 * 60 * 1000;
+        const estaOnlineAgora = (u: any) => {
+          const ts = u?.last_seen ?? u?.updated_at;
+          const online = u?.is_online === true || u?.isOnline === true;
+          if (!online || !ts) return false;
+          return (agoraMs - new Date(ts).getTime()) < JANELA_ONLINE_MS;
+        };
+        const comTimestamp = (users || []).filter((u: any) => !!(u?.last_seen ?? u?.updated_at));
+        const onlineAgora = (comTimestamp.length > 0 ? (users || []).filter(estaOnlineAgora) : (users || []).filter((u: any) => u?.is_online === true || u?.isOnline === true))
+          .map((u: any) => ({ ...u, is_online: u?.is_online === true || u?.isOnline === true, isOnline: u?.is_online === true || u?.isOnline === true })); // B3-FIX: radar mostra SO quem esta online de verdade
+        setOperators(onlineAgora);
       } catch (err) {
         console.error('Falha ao buscar usuários no Radar:', err);
       } finally {

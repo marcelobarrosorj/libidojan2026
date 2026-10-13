@@ -81,7 +81,7 @@ export function PhotoGallery({ photos, initialIndex = 0, onClose, currentUser }:
               <ProtectedImage
                 currentUser={currentUser}
                 src={photos[currentIndex]}
-                className="max-w-full max-h-full"
+                className="max-w-full max-h-full sm:max-w-[85vw] sm:max-h-[85vh]" // C1-FIX: no notebook a foto nao toma a tela inteira
                 style={{ objectFit: 'contain' }}
               />
             </motion.div>
