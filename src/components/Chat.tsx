@@ -8,6 +8,7 @@ import {
   CheckCheck,
   Camera,
   Eye,
+  EyeOff,
   Smile,
   Mic,
   Phone,
@@ -64,9 +65,9 @@ function MessageStatus({ status }: { status: string }) {
 }
 
 // CHAT7-8: rotulo da ultima mensagem na lista de conversas
-const previewFor = (t: string) => {
+const previewFor = (t: string, fromId?: string, meId?: string) => {
   if (t === "[FOTO-REMOVIDA]") return "Foto removida";
-  if (t === "[FOTO1X-VISTA]") return "Foto visualizada";
+  if (t === "[FOTO1X-VISTA]") return fromId && meId && fromId === meId ? "Mensagem aberta" : "Foto visualizada";
   if (t.startsWith("[FOTO1X]")) return "Foto (1x)";
   if (t.startsWith("[FOTO]")) return "Foto";
   return t;
@@ -246,7 +247,7 @@ export function Chat({
         avatar:
           u.photo_url ||
           "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
-        lastMessage: lastMsg ? previewFor(lastMsg.text) : "Iniciar conversa",
+        lastMessage: lastMsg ? previewFor(lastMsg.text, lastMsg.from, userId) : "Iniciar conversa",
         time: lastMsg
           ? new Date(lastMsg.createdAt).toLocaleTimeString("pt-BR", {
               hour: "2-digit",
@@ -391,13 +392,19 @@ export function Chat({
     await updateMessageContent(msg.id, "[FOTO-REMOVIDA]");
   };
 
-  // CHAT8: abrir a foto de visualizacao unica (marca como vista e apaga o arquivo)
+  // CHAT8: abrir a foto de visualizacao unica (marca como vista; o arquivo e apagado ao fechar)
   const openViewOnce = async (msg: ChatMessage) => {
+    if (!msg.text || !msg.text.startsWith("[FOTO1X]")) return;
     const url = msg.text.substring(8);
     setViewOnceUrl(url);
     if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
-    await updateMessageContent(msg.id, "[FOTO1X-VISTA]");
-    deleteChatPhotoFile(url);
+    updateMessageContent(msg.id, "[FOTO1X-VISTA]");
+  };
+
+  // CHAT8-FIX: o arquivo da foto so e apagado quando a visualizacao e FECHADA
+  const closeViewOnce = () => {
+    if (viewOnceUrl) deleteChatPhotoFile(viewOnceUrl);
+    setViewOnceUrl(null);
   };
 
   if (activeChat && activeChatContact) {
@@ -493,9 +500,12 @@ export function Chat({
                     Foto removida
                   </p>
                 ) : msg.text === "[FOTO1X-VISTA]" ? (
-                  <p className="italic text-[var(--libido-muted)] text-[13px] py-1">
-                    Foto visualizada
-                  </p>
+                    <div className="flex items-center gap-2 py-1">
+                      <EyeOff size={16} className="text-[var(--libido-muted)] flex-shrink-0" />
+                      <p className="italic text-[var(--libido-muted)] text-[13px]">
+                        {msg.fromMe ? "Mensagem aberta" : "Foto visualizada"}
+                      </p>
+                    </div>
                 ) : msg.text.startsWith("[FOTO1X]") ? (
                   msg.fromMe ? (
                     <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
@@ -621,7 +631,7 @@ export function Chat({
         {viewOnceUrl && (
           <div
             className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center"
-            onClick={() => setViewOnceUrl(null)}
+            onClick={closeViewOnce}
           >
             <ProtectedImage
               currentUser={currentUser}
@@ -720,4 +730,5 @@ export function Chat({
     </div>
   );
 }
+
 
