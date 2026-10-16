@@ -24,3 +24,5 @@ coverage/
 Thumbs.db
 .vercel
 .env*
+*.bak*
+*.txt
