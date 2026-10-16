@@ -78,6 +78,10 @@ export const mapUserToSupabase = (user: Partial<User>): any => {
 
 export const createUserProfile = async (user: User) => {
   const supaUser = mapUserToSupabase(user);
+  // TRIAL-36H: todo cadastro novo ganha 36 horas de acesso completo gratis (so na primeira criacao de perfil)
+  supaUser.premium = true;
+  supaUser.plan = 'premium';
+  supaUser.premium_until = new Date(Date.now() + 36 * 3600000).toISOString();
   const { error } = await supabase
     .from('users')
     .upsert(supaUser, { onConflict: 'user_id', ignoreDuplicates: true });
@@ -216,4 +220,5 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
   demoUsers.forEach(u => { if (u.id && !map.has(u.id)) map.set(u.id, u); });
   return Array.from(map.values());
 };
+
 
