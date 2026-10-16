@@ -101,11 +101,17 @@ img {
   -webkit-touch-callout: none !important;
   -webkit-user-drag: none !important;
 }
-/* LIGHTBOX-FIT: foto em visualizador sempre proporcionada - nao estica nem corta */
+/* LIGHTBOX-FIT v2: foto sempre proporcionada e com margem - limite por viewport (vh/vw nunca falha; % falha quando o pai tem altura automatica) */
 .libido-lightbox img {
   object-fit: contain !important;
   width: auto !important;
   height: auto !important;
   max-width: 100% !important;
-  max-height: 100% !important;
+  max-height: calc(100vh - 3rem) !important;
+}
+@media (min-width: 768px) {
+  .libido-lightbox img {
+    max-width: 85vw !important;
+    max-height: 85vh !important;
+  }
 }
