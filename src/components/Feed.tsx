@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { Heart, MessageSquare, Lock, Star, ImagePlus } from "lucide-react";
-import { getFeedPosts, toggleCurtida, getMinhasCurtidas, createPost } from "../services/posts";
+import { getFeedPosts, toggleCurtida, getMinhasCurtidas, createPost, getComentarios, adicionarComentario, excluirComentario } from "../services/posts"; // COMENTARIOS-FEED
 import { uploadPhoto } from "../services/uploadPhoto";
 import { getAllUsers, getUsersByIds } from "../services/users";
 import { Post, User } from '../types';
@@ -29,6 +29,11 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
   const [novoArquivo, setNovoArquivo] = useState<File | null>(null);
   const [publicando, setPublicando] = useState(false);
   const inputArquivo = useRef<HTMLInputElement>(null);
+  // COMENTARIOS-FEED: estado dos comentarios por post
+  const [comentariosAbertos, setComentariosAbertos] = useState<Record<string, boolean>>({});
+  const [comentarios, setComentarios] = useState<Record<string, any[]>>({});
+  const [novoComentario, setNovoComentario] = useState<Record<string, string>>({});
+  const [carregandoComentarios, setCarregandoComentarios] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const unsubscribe = getFeedPosts(async (fetchedPosts) => {
@@ -66,6 +71,47 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
     await toggleCurtida(id);
   };
 
+  // COMENTARIOS-FEED: abrir/fechar painel e carregar comentarios do post
+  const toggleComentarios = async (postId: string) => {
+    const aberto = !!comentariosAbertos[postId];
+    setComentariosAbertos(prev => ({ ...prev, [postId]: !aberto }));
+    if (!aberto && !comentarios[postId]) {
+      setCarregandoComentarios(prev => ({ ...prev, [postId]: true }));
+      try {
+        const lista: any[] = await getComentarios(postId);
+        const ids = Array.from(new Set((lista || []).map((cm: any) => cm.user_id).filter(Boolean)));
+        const mapa: Record<string, string> = {};
+        if (ids.length > 0) {
+          try {
+            const us = await getUsersByIds(ids);
+            (us || []).forEach((u: any) => { mapa[u.user_id || u.id] = u.nickname || u.name || 'Usuario'; });
+          } catch {}
+        }
+        setComentarios(prev => ({ ...prev, [postId]: (lista || []).map((cm: any) => ({ ...cm, nickname: mapa[cm.user_id] || 'Usuario' })) }));
+      } catch {}
+      setCarregandoComentarios(prev => ({ ...prev, [postId]: false }));
+    }
+  };
+  // COMENTARIOS-FEED: enviar novo comentario
+  const enviarComentario = async (postId: string) => {
+    const uid = (currentUser as any)?.user_id || (currentUser as any)?.id;
+    if (!uid) { alert('Entre na sua conta para comentar.'); return; }
+    const texto = (novoComentario[postId] || '').trim();
+    if (!texto) return;
+    try {
+      const novo: any = await adicionarComentario(postId, uid, texto);
+      if (novo) {
+        const meuNome = (currentUser as any)?.nickname || (currentUser as any)?.name || 'Usuario';
+        setComentarios(prev => ({ ...prev, [postId]: [...(prev[postId] || []), { ...novo, nickname: meuNome }] }));
+        setNovoComentario(prev => ({ ...prev, [postId]: '' }));
+      } else {
+        alert('Nao foi possivel comentar. Rode o SQL do relatorio no Supabase e tente de novo.');
+      }
+    } catch (e) {
+      console.error('Erro ao comentar:', e);
+      alert('Erro ao comentar. Tente novamente.');
+    }
+  };
   const handlePublicar = async () => {
     if (publicando) return;
     const texto = novoTexto.trim();
@@ -238,13 +284,57 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
                   <span>{likes[post.id] || post.likes}</span>
                 </button>
                 <button
-                  onClick={() => !isPremium ? onShowPremiumModal?.() : console.log("comment click")}
+                  onClick={() => toggleComentarios(post.id)}
                   className="flex items-center gap-1.5 text-xs font-bold text-[var(--libido-muted)] opacity-70 hover:text-blue-500 transition-colors"
                 >
                   <MessageSquare size={16} />
                   <span>Comentar</span>
                 </button>
               </div>
+              {comentariosAbertos[post.id] && (
+                <div className="mt-4 pt-4 border-t border-[var(--libido-border)]">
+                  {carregandoComentarios[post.id] && (
+                    <p className="text-[10px] text-[var(--libido-muted)] mb-2">Carregando comentarios...</p>
+                  )}
+                  {(comentarios[post.id] || []).length === 0 && !carregandoComentarios[post.id] && (
+                    <p className="text-[10px] text-[var(--libido-muted)] mb-2">Nenhum comentario ainda. Seja o primeiro!</p>
+                  )}
+                  {(comentarios[post.id] || []).map((cm: any) => (
+                    <div key={cm.id} className="flex items-start justify-between gap-2 mb-2 bg-[var(--libido-bg)] border border-[var(--libido-border)] rounded-xl px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-[var(--libido-accent)]">{(cm as any).nickname || "Usuario"}</p>
+                        <p className="text-xs text-[var(--libido-text)] break-words">{cm.texto}</p>
+                      </div>
+                      {cm.user_id === ((currentUser as any)?.user_id || (currentUser as any)?.id) && (
+                        <button
+                          onClick={async () => {
+                            const okDel = await excluirComentario(cm.id);
+                            if (okDel) setComentarios(prev => ({ ...prev, [post.id]: (prev[post.id] || []).filter((x: any) => x.id !== cm.id) }));
+                          }}
+                          className="text-[10px] text-red-400 font-bold shrink-0"
+                        >
+                          x
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      value={novoComentario[post.id] || ""}
+                      onChange={e => setNovoComentario(prev => ({ ...prev, [post.id]: e.target.value }))}
+                      placeholder="Escreva um comentario..."
+                      maxLength={300}
+                      className="flex-1 bg-[var(--libido-bg)] border border-[var(--libido-border)] rounded-xl px-3 py-2 text-xs text-[var(--libido-text)] placeholder:text-[var(--libido-muted)] outline-none focus:border-[var(--libido-accent)]"
+                    />
+                    <button
+                      onClick={() => enviarComentario(post.id)}
+                      className="bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black text-[10px] px-4 py-2 rounded-xl uppercase tracking-widest active:scale-95 transition-all"
+                    >
+                      Enviar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
@@ -260,3 +350,4 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
     </div>
   );
 }
+

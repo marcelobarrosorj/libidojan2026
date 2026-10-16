@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+﻿import { supabase } from './supabase';
 import { Post } from '../types';
 import { isDemoEnabled, demoPosts, isDemoId } from '../demo/index';
 
@@ -118,3 +118,37 @@ export const toggleCurtida = async (postId: string) => {
     }
   } catch (eT) {}
 };
+
+// COMENTARIOS-FEED: sistema de comentarios dos posts do feed
+export const getComentarios = async (postId: string): Promise<any[]> => {
+  try {
+    const { data, error } = await (supabase as any)
+      .from('post_comments')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+    if (error || !data) return [];
+    return data as any[];
+  } catch { return []; }
+};
+export const adicionarComentario = async (postId: string, userId: string, texto: string): Promise<any | null> => {
+  try {
+    const { data, error } = await (supabase as any)
+      .from('post_comments')
+      .insert({ post_id: postId, user_id: userId, texto })
+      .select()
+      .single();
+    if (error || !data) return null;
+    return data;
+  } catch { return null; }
+};
+export const excluirComentario = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await (supabase as any)
+      .from('post_comments')
+      .delete()
+      .eq('id', id);
+    return !error;
+  } catch { return false; }
+};
+
