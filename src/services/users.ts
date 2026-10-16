@@ -61,6 +61,10 @@ export const mapUserToSupabase = (user: Partial<User>): any => {
   if (user.createdAt !== undefined) result.created_at = new Date(user.createdAt).toISOString();
   if (user.isOnline !== undefined) result.is_online = user.isOnline;
   
+    // PREM-PROTEGE: status premium so muda via convite, webhook PagBank ou trial inicial
+  delete result.premium;
+  delete result.plan;
+  delete result.premium_until;
   delete result.id;
   delete result.userNumber;
   delete result.user_number;
