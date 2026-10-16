@@ -1,22 +1,29 @@
-﻿interface LogoProps {
+// LOGO-NOME: nome Libido ao lado do simbolo - o componente e unico
+// (header global, landing e telas de entrada), entao cobre todas as paginas
+interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 export function Logo({ size = 'md', className = '' }: LogoProps) {
-  const sizes = {
+  const iconSizes = {
     sm: 'w-7 h-9',
     md: 'w-9 h-12',
     lg: 'w-14 h-[72px]'
   };
+  const textSizes = {
+    sm: 'text-base',
+    md: 'text-2xl',
+    lg: 'text-4xl'
+  };
 
   return (
     <div
-      className={'inline-flex items-center justify-center select-none ' + className}
+      className={'inline-flex items-center gap-2 select-none ' + className}
       aria-label="Libido"
     >
       <svg
-        className={sizes[size]}
+        className={iconSizes[size]}
         viewBox="0 0 64 72"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -50,6 +57,7 @@ export function Logo({ size = 'md', className = '' }: LogoProps) {
           fill="url(#libidoGold)"
         />
       </svg>
+      <span className={'font-fraunces font-medium leading-none text-[var(--libido-text)] ' + textSizes[size]}>Libido</span>
     </div>
   );
 }
