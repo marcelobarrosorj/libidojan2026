@@ -1,5 +1,13 @@
 // ATENDIMENTO-EMAIL: barra de contato global - aparece em todas as telas do app
 import { ReactNode } from "react";
+
+// TEMA-INIT: aplica o tema salvo antes do primeiro render (roda 1x, ao carregar o app)
+try {
+  if (typeof window !== 'undefined' && localStorage.getItem('libido_tema') === 'claro') {
+    document.documentElement.classList.add('tema-claro');
+  }
+} catch (eTema) {}
+
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div

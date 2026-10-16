@@ -115,3 +115,20 @@ img {
     max-height: 85vh !important;
   }
 }
+/* TEMA-CLARO: paleta clara alternavel - vence o tema escuro quando html.tema-claro esta ativo */
+html.tema-claro {
+  --libido-bg: #FAF5EE;
+  --libido-black: #FFFFFF;
+  --libido-surface: #FFFFFF;
+  --libido-surface-2: #F0E7DB;
+  --libido-border: #DCCBB6;
+  --libido-accent: #C0562A;
+  --libido-accent-hover: #A3451F;
+  --libido-gold: #A9762B;
+  --libido-text: #2B2015;
+  --libido-muted: #7A6A58;
+}
+/* TEMA-CLARO: texto claro sobre botoes com gradiente de destaque (contraste) */
+html.tema-claro [class*="from-[var(--libido-accent)]"] {
+  color: #FFF9F1 !important;
+}
