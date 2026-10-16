@@ -167,7 +167,7 @@ export const getAllUsers = async (): Promise<User[]> => {
   return Array.from(map.values());
 };
 
-export const getActiveUsers = async (currentUserId: string): Promise<User[]> => {
+export const getActiveUsersOriginal = async (currentUserId: string): Promise<User[]> => {
   const { data, error } = await supabase
     .from('user_profiles')
     .select('*')
@@ -222,3 +222,14 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
 };
 
 
+
+// PERFIS-INCOMPLETOS: wrapper que filtra perfis sem foto (cadastro incompleto)
+// Qualquer conta sem foto deixa de aparecer no app - agora e no futuro.
+export async function getActiveUsers(...args: any[]): Promise<any> {
+  const res: any = await (getActiveUsersOriginal as any)(...args);
+  const filtrar = (lista: any[]) => lista.filter((u: any) => ((u.photo_url && String(u.photo_url).trim() !== '') || (Array.isArray(u.photos) && u.photos.length > 0) || (typeof u.photos === 'string' && u.photos.trim() !== '' && u.photos.trim() !== '[]' && u.photos.trim() !== 'null')));
+  if (Array.isArray(res)) { return filtrar(res); }
+  if (res && Array.isArray(res.data)) { return { ...res, data: filtrar(res.data) }; }
+  if (res && Array.isArray(res.users)) { return { ...res, users: filtrar(res.users) }; }
+  return res;
+}
