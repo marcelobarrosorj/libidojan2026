@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Logo } from './Logo';
 import { ChevronDown, Lock, EyeOff, Shield, CheckCircle2 } from 'lucide-react';
 
@@ -251,8 +251,8 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Política de Privacidade</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Central de Segurança</a>
             <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Regras da Comunidade</a>
-            <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Ajuda e suporte</a>
-            <a href="#" className="hover:text-[var(--libido-text)] transition-colors">Contato</a>
+            <a href="mailto:libidoapp@gmail.com" className="hover:text-[var(--libido-text)] transition-colors">Ajuda e suporte</a>
+            <a href="mailto:libidoapp@gmail.com" className="hover:text-[var(--libido-text)] transition-colors">Contato</a>
             <button onClick={onPartnersClick} className="mt-2 text-[var(--libido-accent)] font-bold hover:text-[var(--libido-accent-hover)] transition-colors uppercase tracking-wider text-[10px]">Parceiros (B2B)</button>
             <a href="#" className="mt-4 opacity-50 hover:opacity-100 transition-opacity">Excluir minha conta</a>
           </div>
