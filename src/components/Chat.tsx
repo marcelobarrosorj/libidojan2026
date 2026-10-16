@@ -1,4 +1,4 @@
-﻿import { isDemoId } from "../demo";
+import { isDemoId } from "../demo";
 import { useState, useEffect, useRef } from "react";
 import {
   Search,
@@ -630,7 +630,7 @@ export function Chat({
         {/* CHAT8: overlay da foto de visualizacao unica (abre 1x e some) */}
         {viewOnceUrl && (
           <div
-            className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center"
+            className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center libido-lightbox"
             onClick={closeViewOnce}
           >
             <ProtectedImage

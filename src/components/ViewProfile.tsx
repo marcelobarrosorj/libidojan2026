@@ -298,7 +298,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
       )}
 
       {showReportModal && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 libido-lightbox">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full space-y-4">
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase text-center">Denunciar Perfil</h3>
             <textarea 
@@ -316,7 +316,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
       )}
 
       {showConfirmBan && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 libido-lightbox">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
             <Ban size={32} className="text-orange-400 mx-auto" />
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase">Banir {nickname}?</h3>
@@ -330,7 +330,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
       )}
 
       {showConfirmDelete && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 libido-lightbox">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
             <Trash2 size={32} className="text-red-400 mx-auto" />
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase">Excluir {nickname}?</h3>

@@ -47,7 +47,7 @@ export function PhotoGallery({ photos, initialIndex = 0, onClose, currentUser }:
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center overscroll-none touch-none"
+        className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center overscroll-none touch-none libido-lightbox"
       >
         <button 
           onClick={onClose}
