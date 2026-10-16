@@ -1,6 +1,17 @@
-import { supabase } from './supabase';
+﻿import { supabase } from './supabase';
 import { User } from '../types';
 import { isDemoEnabled, demoProfiles, isDemoId } from '../demo/index';
+
+// ONLINE-HONESTO: online de verdade = is_online true E atividade nos ultimos 5 minutos
+// (mesma regra do Radar). Assim a bolinha verde nunca mente.
+const JANELA_ONLINE_MS = 5 * 60 * 1000;
+const onlineDeVerdade = (data: any): boolean => {
+  const online = data.is_online === true || data.isOnline === true;
+  if (!online) return false;
+  const ts = data.last_seen || data.updated_at;
+  if (!ts) return false;
+  return (Date.now() - new Date(ts).getTime()) < JANELA_ONLINE_MS;
+};
 
 export const mapSupabaseToUser = (data: any): User => {
   return {
@@ -27,7 +38,7 @@ export const mapSupabaseToUser = (data: any): User => {
     createdAt: data.created_at ? new Date(data.created_at).getTime() : (data.createdAt || Date.now()),
     followers: data.followers || 0,
     following: data.following || 0,
-    isOnline: data.is_online || data.isOnline || false,
+    isOnline: onlineDeVerdade(data), // ONLINE-HONESTO: mesma janela de 5 min do radar
     updated_at: data.updated_at || data.last_seen || null, // B5-FIX: timestamp para a janela de 5 min do radar
     location: data.location || { x: 0, y: 0 },
     radarUsedToday: data.radar_used_today || data.radarUsedToday || 0,
@@ -205,3 +216,4 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
   demoUsers.forEach(u => { if (u.id && !map.has(u.id)) map.set(u.id, u); });
   return Array.from(map.values());
 };
+
