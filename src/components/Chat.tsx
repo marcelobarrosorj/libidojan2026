@@ -7,6 +7,7 @@ import {
   Check,
   CheckCheck,
   Camera,
+  Eye,
   Smile,
   Mic,
   Phone,
@@ -62,6 +63,66 @@ function MessageStatus({ status }: { status: string }) {
   return null;
 }
 
+// CHAT7-8: rotulo da ultima mensagem na lista de conversas
+const previewFor = (t: string) => {
+  if (t === "[FOTO-REMOVIDA]") return "Foto removida";
+  if (t === "[FOTO1X-VISTA]") return "Foto visualizada";
+  if (t.startsWith("[FOTO1X]")) return "Foto (1x)";
+  if (t.startsWith("[FOTO]")) return "Foto";
+  return t;
+};
+
+// CHAT7-8: atualiza o conteudo de uma mensagem no banco
+const updateMessageContent = async (messageId: string, newContent: string) => {
+  const { error } = await supabase
+    .from("messages")
+    .update({ content: newContent })
+    .eq("id", messageId);
+  if (error) console.error("CHAT7-8 update falhou:", error.message);
+};
+
+// CHAT7-8: apaga o arquivo da foto de CHAT no Storage (funcao segura no banco)
+const deleteChatPhotoFile = async (url: string) => {
+  try {
+    const marker = "/object/public/photos/";
+    const idx = url.indexOf(marker);
+    if (idx === -1) return;
+    const path = url.substring(idx + marker.length);
+    const { error } = await supabase.rpc("libido_delete_chat_file", { p_path: path });
+    if (error) console.error("CHAT7-8 arquivo falhou:", error.message);
+  } catch (e: any) {
+    console.error("CHAT7-8 arquivo falhou:", e?.message || e);
+  }
+};
+
+// CHAT9: canal de "digitando..." em tempo real (sem banco e sem SQL)
+const createTypingChannel = (
+  meId: string,
+  partnerId: string,
+  onPartnerTyping: () => void
+) => {
+  if (isDemoId(meId) || isDemoId(partnerId)) {
+    return { notifyTyping: () => {}, cleanup: () => {} };
+  }
+  const name = "typing_" + [meId, partnerId].sort().join("_");
+  const ch = supabase.channel(name);
+  ch.on("broadcast", { event: "typing" }, (msg: any) => {
+    if (msg?.payload?.userId && msg.payload.userId !== meId) onPartnerTyping();
+  });
+  ch.subscribe();
+  return {
+    notifyTyping: () => {
+      try {
+        const p = ch.send({ type: "broadcast", event: "typing", payload: { userId: meId } });
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch {}
+    },
+    cleanup: () => {
+      supabase.removeChannel(ch);
+    },
+  };
+};
+
 export function Chat({
   userId,
   isPremium,
@@ -81,6 +142,14 @@ export function Chat({
   );
   // CHAT6-FOTO: estado de envio de foto
   const [sendingPhoto, setSendingPhoto] = useState(false);
+  // CHAT8: modo da proxima foto (normal ou visualizacao unica) + overlay
+  const pickOnceRef = useRef(false);
+  const [viewOnceUrl, setViewOnceUrl] = useState<string | null>(null);
+  // CHAT9: outro lado digitando
+  const [partnerTyping, setPartnerTyping] = useState(false);
+  const typingChannelRef = useRef<ReturnType<typeof createTypingChannel> | null>(null);
+  const typingHideRef = useRef<any>(null);
+  const lastTypingSentRef = useRef(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const lastReceivedAt = useRef(0); // SOM-NOVA
@@ -126,6 +195,24 @@ export function Chat({
     return () => unsubscribe();
   }, [userId]);
 
+  // CHAT9-DIGITANDO: canal de tempo real da conversa aberta
+  useEffect(() => {
+    if (!userId || !activeChat) {
+      setPartnerTyping(false);
+      return;
+    }
+    typingChannelRef.current?.cleanup();
+    typingChannelRef.current = createTypingChannel(userId, activeChat, () => {
+      setPartnerTyping(true);
+      if (typingHideRef.current) clearTimeout(typingHideRef.current);
+      typingHideRef.current = setTimeout(() => setPartnerTyping(false), 3000);
+    });
+    return () => {
+      typingChannelRef.current?.cleanup();
+      typingChannelRef.current = null;
+    };
+  }, [userId, activeChat]);
+
   const otherUsers = users.filter((u) => (u.user_id || u.id) !== userId);
 
   // TICKS-EFEITO: enquanto o chat esta aberto, marca recebidas como entregues
@@ -159,9 +246,7 @@ export function Chat({
         avatar:
           u.photo_url ||
           "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
-        lastMessage: lastMsg
-          ? (lastMsg.text.startsWith("[FOTO]") ? "Foto" : lastMsg.text)
-          : "Iniciar conversa",
+        lastMessage: lastMsg ? previewFor(lastMsg.text) : "Iniciar conversa",
         time: lastMsg
           ? new Date(lastMsg.createdAt).toLocaleTimeString("pt-BR", {
               hour: "2-digit",
@@ -255,7 +340,7 @@ export function Chat({
     localStorage.setItem("libido_chat_font", String(next));
   };
 
-  // CHAT6-FOTO: sobe a foto no Storage e envia como mensagem [FOTO]url
+  // CHAT6-FOTO: sobe a foto no Storage e envia como [FOTO]url ou [FOTO1X]url
   const handlePhoto = async (file: File) => {
     if (!userId || !activeChat) return;
     if (isDemoId(activeChat)) return;
@@ -263,6 +348,8 @@ export function Chat({
       onShowPremiumModal?.();
       return;
     }
+    const once = pickOnceRef.current;
+    pickOnceRef.current = false;
     setSendingPhoto(true);
     try {
       const path = `${userId}/chat-${Date.now()}-${file.name}`;
@@ -275,7 +362,7 @@ export function Chat({
       await sendMessage({
         from: userId,
         to: activeChat,
-        text: `[FOTO]${data.publicUrl}`,
+        text: (once ? "[FOTO1X]" : "[FOTO]") + data.publicUrl,
         createdAt: Date.now(),
       });
     } catch (e: any) {
@@ -283,6 +370,34 @@ export function Chat({
     } finally {
       setSendingPhoto(false);
     }
+  };
+
+  // CHAT9: ao digitar, avisa o outro lado (no maximo 1x a cada 1,5s)
+  const handleInputChange = (v: string) => {
+    setMessageInput(v);
+    const now = Date.now();
+    if (v.trim() && now - lastTypingSentRef.current > 1500) {
+      lastTypingSentRef.current = now;
+      typingChannelRef.current?.notifyTyping();
+    }
+  };
+
+  // CHAT7: excluir a foto enviada para os dois lados (apaga do servidor)
+  const deletePhotoForAll = async (msg: ChatMessage) => {
+    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
+    if (!confirm("Excluir esta foto para os dois? Ela sera apagada do servidor.")) return;
+    const url = msg.text.substring(6);
+    await deleteChatPhotoFile(url);
+    await updateMessageContent(msg.id, "[FOTO-REMOVIDA]");
+  };
+
+  // CHAT8: abrir a foto de visualizacao unica (marca como vista e apaga o arquivo)
+  const openViewOnce = async (msg: ChatMessage) => {
+    const url = msg.text.substring(8);
+    setViewOnceUrl(url);
+    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
+    await updateMessageContent(msg.id, "[FOTO1X-VISTA]");
+    deleteChatPhotoFile(url);
   };
 
   if (activeChat && activeChatContact) {
@@ -311,8 +426,17 @@ export function Chat({
             <h3 className="text-sm font-bold text-[var(--libido-text)] truncate">
               {activeChatContact.name}
             </h3>
-            <p className="text-[10px] text-[var(--libido-muted)] opacity-60">
-              {activeChatContact.online
+            {/* CHAT9: status vira "digitando..." quando o outro esta escrevendo */}
+            <p
+              className={`text-[10px] ${
+                partnerTyping
+                  ? "text-[var(--libido-accent)] font-bold"
+                  : "text-[var(--libido-muted)] opacity-60"
+              }`}
+            >
+              {partnerTyping
+                ? "digitando..."
+                : activeChatContact.online
                 ? "online"
                 : "visto por ultimo recentemente"}
             </p>
@@ -364,13 +488,55 @@ export function Chat({
                     : "bg-[#26262e] rounded-bl-md"
                 }`}
               >
-                {msg.text.startsWith("[FOTO]") ? (
-                  <ProtectedImage
-                    currentUser={currentUser}
-                    src={msg.text.substring(6)}
-                    className="w-[220px] max-h-[300px] object-cover rounded-xl mb-1"
-                    alt="foto"
-                  />
+                {msg.text === "[FOTO-REMOVIDA]" ? (
+                  <p className="italic text-[var(--libido-muted)] text-[13px] py-1">
+                    Foto removida
+                  </p>
+                ) : msg.text === "[FOTO1X-VISTA]" ? (
+                  <p className="italic text-[var(--libido-muted)] text-[13px] py-1">
+                    Foto visualizada
+                  </p>
+                ) : msg.text.startsWith("[FOTO1X]") ? (
+                  msg.fromMe ? (
+                    <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
+                      <span className="text-[var(--libido-muted)] text-[11px] font-bold">
+                        Foto — visualizacao unica
+                      </span>
+                      <span className="text-[var(--libido-muted)] opacity-50 text-[10px]">
+                        1x
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => openViewOnce(msg)}
+                      className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1 hover:bg-black/40"
+                    >
+                      <span className="text-[var(--libido-text)] text-[12px] font-bold">
+                        Foto
+                      </span>
+                      <span className="text-[var(--libido-muted)] text-[10px]">
+                        toque para ver (1x)
+                      </span>
+                    </button>
+                  )
+                ) : msg.text.startsWith("[FOTO]") ? (
+                  <div className="relative">
+                    <ProtectedImage
+                      currentUser={currentUser}
+                      src={msg.text.substring(6)}
+                      className="w-[220px] max-h-[300px] object-cover rounded-xl mb-1"
+                      alt="foto"
+                    />
+                    {msg.fromMe && (
+                      <button
+                        onClick={() => deletePhotoForAll(msg)}
+                        title="Excluir para os dois"
+                        className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 ) : (
                   <p
                     className="text-[var(--libido-text)]/90 leading-relaxed break-words break-all whitespace-pre-wrap"
@@ -404,7 +570,6 @@ export function Chat({
         </div>
         {/* CAMPO DE ENVIO */}
         <div className="flex-none flex items-center gap-2 px-2 py-2 bg-[var(--libido-bg)] border-t border-[var(--libido-border)] w-full">
-          {/* CHAT6-FOTO: camera para enviar foto */}
           <input
             ref={fileRef}
             type="file"
@@ -423,11 +588,23 @@ export function Chat({
           >
             <Camera size={20} />
           </button>
+          {/* CHAT8: botao olho 1x = a proxima foto sera de visualizacao unica */}
+          <button
+            onClick={() => {
+              pickOnceRef.current = true;
+              fileRef.current?.click();
+            }}
+            title="Foto de visualizacao unica (1x)"
+            className="w-10 h-10 flex flex-col items-center justify-center flex-shrink-0 text-[var(--libido-muted)] hover:text-[var(--libido-text)]"
+          >
+            <Eye size={16} />
+            <span className="text-[7px] font-black leading-none mt-0.5">1x</span>
+          </button>
           <div className="flex-1 flex items-center bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl px-4 py-2.5 gap-2 min-w-0">
             <input
               type="text"
               value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
+              onChange={(e) => handleInputChange(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="Mensagem"
               className="flex-1 bg-transparent text-[16px] text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20 min-w-0"
@@ -440,6 +617,23 @@ export function Chat({
               <Send size={16} />
             </button>
         </div>
+        {/* CHAT8: overlay da foto de visualizacao unica (abre 1x e some) */}
+        {viewOnceUrl && (
+          <div
+            className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center"
+            onClick={() => setViewOnceUrl(null)}
+          >
+            <ProtectedImage
+              currentUser={currentUser}
+              src={viewOnceUrl}
+              className="max-w-full max-h-full object-contain"
+              alt="foto"
+            />
+            <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
+              Fechar ✕
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -526,3 +720,4 @@ export function Chat({
     </div>
   );
 }
+
