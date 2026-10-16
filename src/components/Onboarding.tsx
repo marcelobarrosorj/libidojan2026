@@ -84,8 +84,8 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         setMessage('Por favor, preencha os nomes e idades do casal.');
         return;
       }
-      const mAge = parseInt(maleAge);
-      const fAge = parseInt(femaleAge);
+      const mAge = (calcularIdade(maleAge) ?? -1); // CASAL-DATA
+      const fAge = (calcularIdade(femaleAge) ?? -1); // CASAL-DATA
       if (isNaN(mAge) || mAge < 18 || mAge > 120 || isNaN(fAge) || fAge < 18 || fAge > 120) {
         setMessage('Ambos devem ter 18 anos ou mais.');
         return;
@@ -121,7 +121,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
       const payload: any = {
         user_id: userId,
         nickname: nickname,
-        age: (calcularIdade(singleAge) ?? null), birth_date: ((singleAge) || null),
+        age: (calcularIdade(singleAge) ?? calcularIdade(maleAge) ?? null), birth_date: ((singleAge || maleAge) || null), // CASAL-DATA
         gender: relationshipStatus === 'solteiro' ? singleGender : 'Casal',
         relationship_status: relationshipStatus,
         bio: bio, // Enviando apenas o texto puro (sem JSON.stringify)
@@ -137,12 +137,12 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
       if (relationshipStatus === 'casal') {
         payload.couple_profile = {
           maleNickname,
-          maleAge: maleAge ? parseInt(maleAge) : null,
+          maleAge: (calcularIdade(maleAge) ?? null), maleBirthDate: (maleAge || null), // CASAL-DATA
           maleOrientation,
           maleBiotype,
           maleHeight: maleHeight ? parseInt(maleHeight) : null,
           femaleNickname,
-          femaleAge: femaleAge ? parseInt(femaleAge) : null,
+          femaleAge: (calcularIdade(femaleAge) ?? null), femaleBirthDate: (femaleAge || null), // CASAL-DATA
           femaleOrientation,
           femaleBiotype,
           femaleHeight: femaleHeight ? parseInt(femaleHeight) : null
@@ -241,7 +241,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
                 <h4 className="text-[10px] font-black text-[var(--libido-accent)] uppercase tracking-widest">👨 Parceiro (Ele)</h4>
                 <div className="grid grid-cols-2 gap-2">
                   <input type="text" placeholder="Apelido" value={maleNickname} onChange={e => setMaleNickname(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
-                  <input type="number" placeholder="Idade" value={maleAge} onChange={e => setMaleAge(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
+                  <input type="date" value={maleAge} onChange={e => setMaleAge(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <input type="number" placeholder="Altura (cm)" value={maleHeight} onChange={e => setMaleHeight(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
@@ -253,7 +253,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
                 <h4 className="text-[10px] font-black text-[var(--libido-accent)] uppercase tracking-widest">👩 Parceira (Ela)</h4>
                 <div className="grid grid-cols-2 gap-2">
                   <input type="text" placeholder="Apelido" value={femaleNickname} onChange={e => setFemaleNickname(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
-                  <input type="number" placeholder="Idade" value={femaleAge} onChange={e => setFemaleAge(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
+                  <input type="date" value={femaleAge} onChange={e => setFemaleAge(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <input type="number" placeholder="Altura (cm)" value={femaleHeight} onChange={e => setFemaleHeight(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none"/>
