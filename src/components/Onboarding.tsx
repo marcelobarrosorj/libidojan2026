@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { calcularIdade } from '../services/idade'; // IDADE-AUTOMATICA
 import { Sparkles } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { uploadPhoto } from '../services/uploadPhoto';
@@ -68,7 +69,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         setMessage('Por favor, informe sua idade e gênero.');
         return;
       }
-      const age = parseInt(singleAge);
+      const age = (calcularIdade(singleAge) ?? -1);
       if (isNaN(age) || age < 18 || age > 120) {
         setMessage('Você deve ter 18 anos ou mais.');
         return;
@@ -115,12 +116,12 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
           return;
         }
       }
-      const parsedAge = relationshipStatus === 'solteiro' ? parseInt(singleAge) : parseInt(maleAge);
+      const parsedAge = relationshipStatus === 'solteiro' ? (calcularIdade(singleAge) ?? -1) : parseInt(maleAge);
 
       const payload: any = {
         user_id: userId,
         nickname: nickname,
-        age: isNaN(parsedAge) ? null : parsedAge,
+        age: (calcularIdade(singleAge) ?? null), birth_date: ((singleAge) || null),
         gender: relationshipStatus === 'solteiro' ? singleGender : 'Casal',
         relationship_status: relationshipStatus,
         bio: bio, // Enviando apenas o texto puro (sem JSON.stringify)
@@ -209,8 +210,8 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Idade</label>
-                  <input type="number" value={singleAge} onChange={e => setSingleAge(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
+                  <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Data de nascimento</label>
+                  <input type="date" value={singleAge} onChange={e => setSingleAge(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
                 </div>
                 <div>
                   <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Gênero</label>

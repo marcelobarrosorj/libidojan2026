@@ -1,4 +1,5 @@
-﻿import { supabase } from './supabase';
+import { supabase } from './supabase';
+import { calcularIdade } from './idade'; // IDADE-AUTOMATICA
 import { User } from '../types';
 import { isDemoEnabled, demoProfiles, isDemoId } from '../demo/index';
 
@@ -223,11 +224,22 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
 
 
 
-// PERFIS-INCOMPLETOS: wrapper que filtra perfis sem foto (cadastro incompleto)
-// Qualquer conta sem foto deixa de aparecer no app - agora e no futuro.
+// PERFIS-INCOMPLETOS + IDADE-AUTOMATICA: wrapper do radar/feed.
+// Filtra perfis sem foto (cadastro incompleto) e recalcula a idade
+// pela data de nascimento - no aniversario a idade muda sozinha.
 export async function getActiveUsers(...args: any[]): Promise<any> {
   const res: any = await (getActiveUsersOriginal as any)(...args);
-  const filtrar = (lista: any[]) => lista.filter((u: any) => ((u.photo_url && String(u.photo_url).trim() !== '') || (Array.isArray(u.photos) && u.photos.length > 0) || (typeof u.photos === 'string' && u.photos.trim() !== '' && u.photos.trim() !== '[]' && u.photos.trim() !== 'null')));
+  const temFoto = (u: any) => {
+    if (u.photo_url && String(u.photo_url).trim() !== '') return true;
+    if (Array.isArray(u.photos) && u.photos.length > 0) return true;
+    if (typeof u.photos === 'string' && u.photos.trim() !== '' && u.photos.trim() !== '[]' && u.photos.trim() !== 'null') return true;
+    return false;
+  };
+  const comIdade = (u: any) => {
+    const ic = calcularIdade(u.birth_date);
+    return (ic !== null && ic !== undefined) ? { ...u, age: ic } : u;
+  };
+  const filtrar = (lista: any[]) => lista.filter((u: any) => temFoto(u)).map((u: any) => comIdade(u));
   if (Array.isArray(res)) { return filtrar(res); }
   if (res && Array.isArray(res.data)) { return { ...res, data: filtrar(res.data) }; }
   if (res && Array.isArray(res.users)) { return { ...res, users: filtrar(res.users) }; }
