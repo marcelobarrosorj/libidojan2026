@@ -1,4 +1,5 @@
-import { updateUserProfile } from '../services/users';
+﻿import { updateUserProfile } from '../services/users';
+import { initNavHistory, registrarTela } from '../services/navHistory'; // NAV-HISTORY
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { AppShell } from "./AppShell";
 import { HeaderGlobal } from "./HeaderGlobal";
@@ -125,6 +126,8 @@ export function AppCore({
   };
 
   const navigate = (tab: string, params?: any) => {
+    registrarTela(tab, params); // NAV-HISTORY: registra a tela no historico
+    initNavHistory(navigate); // NAV-HISTORY: ativa o botao voltar interno
     setActiveTab(tab);
     setNavParams(params || null);
   };
@@ -176,3 +179,4 @@ export function AppCore({
     </AppShell>
   );
 }
+
