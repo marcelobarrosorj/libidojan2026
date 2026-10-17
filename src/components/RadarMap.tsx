@@ -81,7 +81,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude }).eq('user_id', userId).then(({ error }) => { if (error) console.error('SALVA-COORD falhou', error); }); } // SALVA-COORD
         },
         () => usarBanco(),
-        { timeout: 8000, enableHighAccuracy: true }
+        { timeout: 20000, enableHighAccuracy: true, maximumAge: 0 }
       );
     } else {
       usarBanco();
