@@ -46,6 +46,41 @@ export default function App() {
 
   const blurTimeoutRef = useRef<any>(null);
 
+  // PROMO-CAPTURA: guarda o codigo do link (?promo=MAIS18) na entrada do site
+  useEffect(() => {
+    try {
+      const pPromo = new URLSearchParams(window.location.search).get('promo');
+      if (pPromo && pPromo.trim()) localStorage.setItem('libido_promo', pPromo.trim().toUpperCase());
+    } catch (ePromo) {}
+  }, []);
+  // PROMO-APP: ativa os dias gratis quando surge uma sessao logada
+  // Auto-suficiente: escuta o onAuthStateChange por conta propria
+  useEffect(() => {
+    const { data: promoData } = supabase.auth.onAuthStateChange((_evento, sessionPromo) => {
+      if (!sessionPromo || !sessionPromo.user) return;
+      const codigoPromo = localStorage.getItem('libido_promo');
+      if (!codigoPromo) return;
+      localStorage.removeItem('libido_promo');
+      (async () => {
+        try {
+          const { data: resPromo, error: errPromo } = await supabase.rpc('usar_promo', { p_codigo: codigoPromo });
+          if (errPromo) { console.error('PROMO-APP erro:', errPromo); return; }
+          const dias = typeof resPromo === 'number' ? resPromo : -9;
+          if (dias > 0) {
+            alert('Promoção ativada: ' + dias + ' dias grátis com acesso completo!');
+          } else if (dias === -3) {
+            alert('Este link de promoção expirou ou já esgotou seus usos.');
+          }
+          // -2 = ja usou uma promocao antes: fica em silencio
+        } catch (ePromo2) {
+          console.error('PROMO-APP falhou:', ePromo2);
+        }
+      })();
+    });
+    return () => {
+      try { promoData?.subscription?.unsubscribe(); } catch (ePromo3) {}
+    };
+  }, []);
   useEffect(() => {
     const {
       data: { subscription: recoverySubscription }
