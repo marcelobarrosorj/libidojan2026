@@ -1,4 +1,4 @@
-﻿import { supabase } from './supabase';
+import { supabase } from './supabase';
 import { Post } from '../types';
 import { isDemoEnabled, demoPosts, isDemoId } from '../demo/index';
 
@@ -127,7 +127,7 @@ export const getComentarios = async (postId: string): Promise<any[]> => {
       .select('*')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
-    if (error || !data) return [];
+    if (error || !data) { console.error('COMENTARIOS-LEITURA-ERRO:', error); return []; } // COMENTARIO-ERRO-VISIVEL
     return data as any[];
   } catch { return []; }
 };
@@ -138,7 +138,7 @@ export const adicionarComentario = async (postId: string, userId: string, texto:
       .insert({ post_id: postId, user_id: userId, texto })
       .select()
       .single();
-    if (error || !data) return null;
+    if (error || !data) { console.error('COMENTARIO-GRAVACAO-ERRO:', error); return null; } // COMENTARIO-ERRO-VISIVEL
     return data;
   } catch { return null; }
 };

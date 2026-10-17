@@ -105,7 +105,7 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
         setComentarios(prev => ({ ...prev, [postId]: [...(prev[postId] || []), { ...novo, nickname: meuNome }] }));
         setNovoComentario(prev => ({ ...prev, [postId]: '' }));
       } else {
-        alert('Nao foi possivel comentar. Rode o SQL do relatorio no Supabase e tente de novo.');
+        alert('Não foi possível comentar: o banco recusou o comentário. Rode o SQL COMENTARIOS-TABELA no Supabase (SQL Editor) e tente de novo.'); // COMENTARIO-ERRO-VISIVEL
       }
     } catch (e) {
       console.error('Erro ao comentar:', e);
