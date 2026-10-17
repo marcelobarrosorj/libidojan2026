@@ -42,22 +42,22 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
   // Casal
   const [maleNickname, setMaleNickname] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleNickname'] || ''; } catch (eR_maleNickname) { return ''; } });
   const [maleAge, setMaleAge] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleAge'] || ''; } catch (eR_maleAge) { return ''; } });
-  const [maleOrientation, setMaleOrientation] = useState('Heterossexual');
-  const [maleBiotype, setMaleBiotype] = useState('Padrão');
+  const [maleOrientation, setMaleOrientation] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleOrientation'] || 'Heterossexual'; } catch (eR_maleOrientation) { return 'Heterossexual'; } });
+  const [maleBiotype, setMaleBiotype] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleBiotype'] || 'Padrão'; } catch (eR_maleBiotype) { return 'Padrão'; } });
   const [maleHeight, setMaleHeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleHeight'] || ''; } catch (eR_maleHeight) { return ''; } });
   const [maleWeight, setMaleWeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleWeight'] || ''; } catch (eR_maleWeight) { return ''; } });
   const [femaleNickname, setFemaleNickname] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleNickname'] || ''; } catch (eR_femaleNickname) { return ''; } });
   const [femaleAge, setFemaleAge] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleAge'] || ''; } catch (eR_femaleAge) { return ''; } });
-  const [femaleOrientation, setFemaleOrientation] = useState('Bissexual');
-  const [femaleBiotype, setFemaleBiotype] = useState('Padrão');
+  const [femaleOrientation, setFemaleOrientation] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleOrientation'] || 'Bissexual'; } catch (eR_femaleOrientation) { return 'Bissexual'; } });
+  const [femaleBiotype, setFemaleBiotype] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleBiotype'] || 'Padrão'; } catch (eR_femaleBiotype) { return 'Padrão'; } });
   const [femaleHeight, setFemaleHeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleHeight'] || ''; } catch (eR_femaleHeight) { return ''; } });
   const [femaleWeight, setFemaleWeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleWeight'] || ''; } catch (eR_femaleWeight) { return ''; } });
 
   // Solteiro
   const [singleAge, setSingleAge] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleAge'] || ''; } catch (eR_singleAge) { return ''; } });
   const [singleGender, setSingleGender] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleGender'] || ''; } catch (eR_singleGender) { return ''; } });
-  const [singleOrientation, setSingleOrientation] = useState('Bissexual');
-  const [singleBiotype, setSingleBiotype] = useState('Padrão');
+  const [singleOrientation, setSingleOrientation] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleOrientation'] || 'Bissexual'; } catch (eR_singleOrientation) { return 'Bissexual'; } });
+  const [singleBiotype, setSingleBiotype] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleBiotype'] || 'Padrão'; } catch (eR_singleBiotype) { return 'Padrão'; } });
   const [singleHeight, setSingleHeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleHeight'] || ''; } catch (eR_singleHeight) { return ''; } });
   const [singleWeight, setSingleWeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleWeight'] || ''; } catch (eR_singleWeight) { return ''; } });
 
@@ -298,7 +298,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
             <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Foto de perfil (obrigatória)</label>
             <input type="file" accept="image/*" className="hidden" id="onboarding-photo" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f)); } }} />
             <div className="flex items-center gap-3 mt-1.5">
-              <button type="button" onClick={() => { try { localStorage.setItem('libido_rascunho_' + userId, JSON.stringify({ relationshipStatus, nickname, bio, singleAge, singleGender, singleHeight, singleWeight, singleOrientation, maleNickname, maleAge, maleHeight, maleWeight, maleOrientation, femaleNickname, femaleAge, femaleHeight, femaleWeight, femaleOrientation, privacyAccepted })); } catch (eRasc) {} document.getElementById('onboarding-photo')?.click(); }} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
+              <button type="button" onClick={() => { try { localStorage.setItem('libido_rascunho_' + userId, JSON.stringify({ relationshipStatus, nickname, bio, singleAge, singleGender, singleHeight, singleWeight, singleOrientation, singleBiotype, maleNickname, maleAge, maleHeight, maleWeight, maleOrientation, maleBiotype, femaleNickname, femaleAge, femaleHeight, femaleWeight, femaleOrientation, femaleBiotype, privacyAccepted })); } catch (eRasc) {} document.getElementById('onboarding-photo')?.click(); }} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
                 {photoFile ? 'Trocar foto' : 'Escolher foto'}
               </button>
               {photoPreview && <img src={photoPreview} alt="previa" className="w-12 h-12 rounded-xl object-cover border border-[var(--libido-border)]" />}
