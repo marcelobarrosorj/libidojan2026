@@ -15,6 +15,9 @@ const onlineDeVerdade = (data: any): boolean => {
 };
 
 export const mapSupabaseToUser = (data: any): User => {
+  // IDADE-EDIT: idade sempre recalculada pela data de nascimento em toda leitura do app
+  const idadeCalc = calcularIdade(data.birth_date);
+  if (idadeCalc != null) data.age = idadeCalc;
   return {
     ...data,
     id: data.user_id || data.id,

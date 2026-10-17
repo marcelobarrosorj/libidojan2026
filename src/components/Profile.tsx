@@ -8,6 +8,7 @@ import { User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
 import { formatUserNumber } from '../utils/formatUserNumber';
 import { updateUserProfile } from '../services/users';
+import { calcularIdade } from '../services/idade'; // IDADE-EDIT: idade calculada pela data de nascimento
 import { createPost } from '../services/posts'; // GALLERY-AUTOPOST
 // NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
 function extrairTextoBio(b: any): string {
@@ -62,6 +63,10 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [singleOrientation, setSingleOrientation] = useState('Bissexual');
   const [singleBiotype, setSingleBiotype] = useState('Padrão');
   const [singleHeight, setSingleHeight] = useState('');
+  // IDADE-EDIT: datas de nascimento na edicao (perfis existentes incluidos)
+  const [singleBirth, setSingleBirth] = useState('');
+  const [maleBirth, setMaleBirth] = useState('');
+  const [femaleBirth, setFemaleBirth] = useState('');
 
   useEffect(() => {
     if (currentUser) {
@@ -73,13 +78,15 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       if (cp && typeof cp === 'object' && (cp.maleNickname || cp.femaleNickname || cp.maleAge || cp.femaleAge)) {
         setIsCouple(true);
         setMaleNickname(cp.maleNickname || '');
-        setMaleAge(cp.maleAge != null ? String(cp.maleAge) : '');
+        setMaleAge(cp.maleAge != null ? String(cp.maleAge) : (calcularIdade(cp.maleBirthDate) != null ? String(calcularIdade(cp.maleBirthDate)) : ''));
+        setMaleBirth(cp.maleBirthDate || '');
         setMaleOrientation(cp.maleOrientation || 'Heterossexual');
         setMaleBiotype(cp.maleBiotype || 'Padrão');
         setMaleHeight(cp.maleHeight != null ? String(cp.maleHeight) : '');
         setMaleWeight(cp.maleWeight != null ? String(cp.maleWeight) : '');
         setFemaleNickname(cp.femaleNickname || '');
-        setFemaleAge(cp.femaleAge != null ? String(cp.femaleAge) : '');
+        setFemaleAge(cp.femaleAge != null ? String(cp.femaleAge) : (calcularIdade(cp.femaleBirthDate) != null ? String(calcularIdade(cp.femaleBirthDate)) : ''));
+        setFemaleBirth(cp.femaleBirthDate || '');
         setFemaleOrientation(cp.femaleOrientation || 'Bissexual');
         setFemaleBiotype(cp.femaleBiotype || 'Padrão');
         setFemaleHeight(cp.femaleHeight != null ? String(cp.femaleHeight) : '');
@@ -93,14 +100,16 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         if (parsed && parsed.isCouple) {
           setIsCouple(true);
           setMaleNickname(parsed.maleNickname || '');
-          setMaleAge(parsed.maleAge?.toString() || '');
+          setMaleAge(parsed.maleAge?.toString() || (calcularIdade(parsed.maleBirthDate) != null ? String(calcularIdade(parsed.maleBirthDate)) : ''));
+          setMaleBirth(parsed.maleBirthDate || '');
           setMaleOrientation(parsed.maleOrientation || 'Heterossexual');
           setMaleBiotype(parsed.maleBiotype || 'Padrão');
           setMaleHeight(parsed.maleHeight || '');
           setMaleWeight(parsed.maleWeight || '');
 
           setFemaleNickname(parsed.femaleNickname || '');
-          setFemaleAge(parsed.femaleAge?.toString() || '');
+          setFemaleAge(parsed.femaleAge?.toString() || (calcularIdade(parsed.femaleBirthDate) != null ? String(calcularIdade(parsed.femaleBirthDate)) : ''));
+          setFemaleBirth(parsed.femaleBirthDate || '');
           setFemaleOrientation(parsed.femaleOrientation || 'Bissexual');
           setFemaleBiotype(parsed.femaleBiotype || 'Padrão');
           setFemaleHeight(parsed.femaleHeight || '');
@@ -117,6 +126,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setIsCouple(relationship === 'casal');
         setEditBio(rawBio);
         setSingleAge(currentUser.age?.toString() || '');
+        setSingleBirth(currentUser.birth_date || '');
         setSingleGender(currentUser.gender || 'Masculino');
         setSingleOrientation(currentUser.sexual_orientation || 'Bissexual');
         setSingleBiotype(currentUser.biotype || 'Padrão');
@@ -258,32 +268,50 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       alert("O apelido não pode ficar vazio.");
       return;
     }
+    const idadeSingle = calcularIdade(singleBirth);
+    if (idadeSingle != null && idadeSingle < 18) {
+      alert("Você deve ter 18 anos ou mais.");
+      return;
+    }
+    const mIdadeChk = calcularIdade(maleBirth);
+    const fIdadeChk = calcularIdade(femaleBirth);
+    if (isCouple && ((mIdadeChk != null && mIdadeChk < 18) || (fIdadeChk != null && fIdadeChk < 18))) {
+      alert("Ambos devem ter 18 anos ou mais.");
+      return;
+    }
     setSaving(true);
     try {
       let bioContent = editBio;
       let genderVal = singleGender;
-      let ageVal = singleAge ? parseInt(singleAge) : null;
+      let couplePayload: any = undefined; // IDADE-EDIT: mantem o couple_profile em sincronia com a bio
+      let ageVal = (idadeSingle != null) ? idadeSingle : (singleAge ? parseInt(singleAge) : null);
       let relationVal = isCouple ? 'casal' : 'solteiro';
 
       if (isCouple) {
-        bioContent = JSON.stringify({
+        const mIdade = (mIdadeChk != null) ? mIdadeChk : (maleAge ? parseInt(maleAge) : null);
+        const fIdade = (fIdadeChk != null) ? fIdadeChk : (femaleAge ? parseInt(femaleAge) : null);
+        const cpObj = {
           isCouple: true,
           maleNickname,
-          maleAge: parseInt(maleAge),
+          maleAge: mIdade,
+          maleBirthDate: maleBirth || null,
           maleOrientation,
           maleBiotype,
           maleHeight,
           maleWeight,
           femaleNickname,
-          femaleAge: parseInt(femaleAge),
+          femaleAge: fIdade,
+          femaleBirthDate: femaleBirth || null,
           femaleOrientation,
           femaleBiotype,
           femaleHeight,
           femaleWeight,
           text: editBio
-        });
+        };
+        bioContent = JSON.stringify(cpObj);
+        couplePayload = cpObj;
         genderVal = 'Casal';
-        ageVal = maleAge ? parseInt(maleAge) : null;
+        ageVal = mIdade != null ? mIdade : null;
       }
 
       await updateUserProfile(userId, {
@@ -292,6 +320,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         relationship_status: relationVal,
         gender: genderVal,
         age: ageVal ? ageVal.toString() : undefined,
+        birth_date: ((isCouple ? maleBirth : singleBirth) || undefined), // IDADE-EDIT
+        coupleProfile: couplePayload, // IDADE-EDIT
         height: !isCouple && singleHeight ? parseInt(singleHeight) : undefined,
         biotype: !isCouple ? singleBiotype : undefined,
         sexual_orientation: !isCouple ? singleOrientation : undefined
@@ -562,7 +592,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                     <p className="text-[8px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1">Parceiro (Ele)</p>
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" placeholder="Apelido" value={maleNickname} onChange={e => setMaleNickname(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
-                      <input type="number" placeholder="Idade" value={maleAge} onChange={e => setMaleAge(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
+                      <input type="date" value={maleBirth} onChange={e => setMaleBirth(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" placeholder="Altura (cm)" value={maleHeight} onChange={e => setMaleHeight(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
@@ -587,7 +617,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                     <p className="text-[8px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1">Parceira (Ela)</p>
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" placeholder="Apelido" value={femaleNickname} onChange={e => setFemaleNickname(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
-                      <input type="number" placeholder="Idade" value={femaleAge} onChange={e => setFemaleAge(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
+                      <input type="date" value={femaleBirth} onChange={e => setFemaleBirth(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" placeholder="Altura (cm)" value={femaleHeight} onChange={e => setFemaleHeight(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--libido-accent)] text-[var(--libido-text)]"/>
@@ -613,8 +643,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                   <p className="text-[8px] font-black text-[var(--libido-muted)] opacity-50 tracking-widest uppercase mb-1">Dados Individuais</p>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[8px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Idade</label>
-                      <input type="number" placeholder="Idade" value={singleAge} onChange={e => setSingleAge(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
+                      <label className="text-[8px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Data de nascimento</label>
+                      <input type="date" value={singleBirth} onChange={e => setSingleBirth(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
                     </div>
                     <div>
                       <label className="text-[8px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Gênero</label>

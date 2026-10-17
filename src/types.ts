@@ -41,6 +41,7 @@ export interface User {
   user_id?: string;    
   nickname?: string;
   age?: string;
+  birth_date?: string; // IDADE-EDIT: data de nascimento - idade calculada automaticamente
   gender?: string;
   relationship_status?: string;
   bio?: string;

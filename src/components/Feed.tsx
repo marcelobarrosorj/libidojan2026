@@ -1,8 +1,8 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Heart, MessageSquare, Lock, Star, ImagePlus } from "lucide-react";
 import { getFeedPosts, toggleCurtida, getMinhasCurtidas, createPost, getComentarios, adicionarComentario, excluirComentario } from "../services/posts"; // COMENTARIOS-FEED
 import { uploadPhoto } from "../services/uploadPhoto";
-import { getAllUsers, getUsersByIds } from "../services/users";
+import { getAllUsers, getUsersByIds, getUserById, updateUserProfile } from "../services/users"; // FEED-AUTOGALERIA
 import { Post, User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
 import { formatUserNumber } from '../utils/formatUserNumber';
@@ -137,6 +137,16 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
         createdAt: Date.now(),
       };
       await createPost(novoPost);
+      // FEED-AUTOGALERIA: foto publicada no feed tambem entra na galeria do perfil
+      if (imagem) {
+        try {
+          const uFresh: any = await getUserById(userId);
+          const atuais: string[] = uFresh?.photos || (currentUser as any)?.photos || [];
+          if (!atuais.includes(imagem)) {
+            await updateUserProfile(userId, { photos: [...atuais, imagem] });
+          }
+        } catch (eG) { console.error('FEED-AUTOGALERIA falhou', eG); }
+      }
       setPosts(prev => [{ ...novoPost, id: 'local-' + Date.now() }, ...prev]);
       setNovoTexto('');
       setNovoArquivo(null);
