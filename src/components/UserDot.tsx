@@ -30,7 +30,7 @@ export function UserDot({ user }: UserDotProps) {
       </div>
       <div className="absolute top-[36px] px-2 py-1 bg-[var(--libido-bg)]/90 rounded-lg border border-[var(--libido-border)] text-[10px] font-bold text-[var(--libido-text)] whitespace-nowrap transition-all opacity-0 group-hover:opacity-100 group-hover:scale-110 shadow-lg pointer-events-none max-w-[120px] overflow-hidden text-ellipsis flex items-center gap-1">
         {user.plan === 'premium' && <div className="w-1.5 h-1.5 rounded-full bg-[var(--libido-accent)]" />}
-        {user.name.length > 15 ? user.name.slice(0, 12) + '...' : user.name} • {((user.tempDistance || 0) * 1000).toFixed(0)}m
+        {user.name.length > 15 ? user.name.slice(0, 12) + '...' : user.name} • {((user.tempDistance || 0) * 1000) < 1000 ? '~' + Math.max(100, Math.round(((user.tempDistance || 0) * 1000) / 100) * 100) + ' m' : '~' + (user.tempDistance || 0).toFixed(1).replace('.', ',') + ' km'}
       </div>
     </motion.div>
   );

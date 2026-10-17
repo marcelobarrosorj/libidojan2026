@@ -88,7 +88,7 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
       }))
       .filter((d) => d.lat !== null && d.lon !== null)
       .map((d) => ({ user: d.user, dist: distanciaMetros(meuPonto.lat, meuPonto.lon, d.lat!, d.lon!) }))
-      .filter((p) => p.dist >= 100)
+      .filter((p) => p.dist >= 0)
       .sort((a, b) => a.dist - b.dist);
   }, [operators, meuPonto]);
 

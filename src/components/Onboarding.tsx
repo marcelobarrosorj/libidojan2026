@@ -5,44 +5,65 @@ import { supabase } from '../services/supabase';
 import { uploadPhoto } from '../services/uploadPhoto';
 import { createPost } from '../services/posts'; // FOTO-CADASTRO
 
+// FOTO-FIX: comprime a foto antes do envio (menos memoria e menos falha)
+async function comprimirFoto(file: File): Promise<File> {
+  try {
+    const img = await createImageBitmap(file);
+    const maxLado = 1280;
+    const escala = Math.min(1, maxLado / Math.max(img.width, img.height));
+    const w = Math.round(img.width * escala);
+    const h = Math.round(img.height * escala);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/jpeg', 0.85));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch (eComp) {
+    return file;
+  }
+}
 interface OnboardingProps {
   userId: string;
   onComplete: () => void;
 }
 
 export function Onboarding({ userId, onComplete }: OnboardingProps) {
-  const [relationshipStatus, setRelationshipStatus] = useState<'casal' | 'solteiro' | ''>('');
-  const [nickname, setNickname] = useState('');
-  const [bio, setBio] = useState('');
+  const [relationshipStatus, setRelationshipStatus] = useState<'casal' | 'solteiro' | ''>(() => { try { const vRs = (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}')).relationshipStatus; return vRs === 'casal' || vRs === 'solteiro' ? vRs : ''; } catch (eR_rs) { return ''; } });
+  const [nickname, setNickname] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['nickname'] || ''; } catch (eR_nickname) { return ''; } });
+  const [bio, setBio] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['bio'] || ''; } catch (eR_bio) { return ''; } });
   const [photoUrl, setPhotoUrl] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState('');
 
   // Casal
-  const [maleNickname, setMaleNickname] = useState('');
-  const [maleAge, setMaleAge] = useState('');
+  const [maleNickname, setMaleNickname] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleNickname'] || ''; } catch (eR_maleNickname) { return ''; } });
+  const [maleAge, setMaleAge] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleAge'] || ''; } catch (eR_maleAge) { return ''; } });
   const [maleOrientation, setMaleOrientation] = useState('Heterossexual');
   const [maleBiotype, setMaleBiotype] = useState('Padrão');
-  const [maleHeight, setMaleHeight] = useState('');
-  const [maleWeight, setMaleWeight] = useState('');
-  const [femaleNickname, setFemaleNickname] = useState('');
-  const [femaleAge, setFemaleAge] = useState('');
+  const [maleHeight, setMaleHeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleHeight'] || ''; } catch (eR_maleHeight) { return ''; } });
+  const [maleWeight, setMaleWeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['maleWeight'] || ''; } catch (eR_maleWeight) { return ''; } });
+  const [femaleNickname, setFemaleNickname] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleNickname'] || ''; } catch (eR_femaleNickname) { return ''; } });
+  const [femaleAge, setFemaleAge] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleAge'] || ''; } catch (eR_femaleAge) { return ''; } });
   const [femaleOrientation, setFemaleOrientation] = useState('Bissexual');
   const [femaleBiotype, setFemaleBiotype] = useState('Padrão');
-  const [femaleHeight, setFemaleHeight] = useState('');
-  const [femaleWeight, setFemaleWeight] = useState('');
+  const [femaleHeight, setFemaleHeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleHeight'] || ''; } catch (eR_femaleHeight) { return ''; } });
+  const [femaleWeight, setFemaleWeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['femaleWeight'] || ''; } catch (eR_femaleWeight) { return ''; } });
 
   // Solteiro
-  const [singleAge, setSingleAge] = useState('');
-  const [singleGender, setSingleGender] = useState('');
+  const [singleAge, setSingleAge] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleAge'] || ''; } catch (eR_singleAge) { return ''; } });
+  const [singleGender, setSingleGender] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleGender'] || ''; } catch (eR_singleGender) { return ''; } });
   const [singleOrientation, setSingleOrientation] = useState('Bissexual');
   const [singleBiotype, setSingleBiotype] = useState('Padrão');
-  const [singleHeight, setSingleHeight] = useState('');
-  const [singleWeight, setSingleWeight] = useState('');
+  const [singleHeight, setSingleHeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleHeight'] || ''; } catch (eR_singleHeight) { return ''; } });
+  const [singleWeight, setSingleWeight] = useState<string>(() => { try { return (JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}'))['singleWeight'] || ''; } catch (eR_singleWeight) { return ''; } });
 
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(() => { try { return !!(JSON.parse(localStorage.getItem('libido_rascunho_' + userId) || '{}')).privacyAccepted; } catch (eR_pa) { return false; } });
 
   const saveProfile = async () => {
     if (!relationshipStatus) {
@@ -110,7 +131,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
       if (photoFile) {
         setMessage('Enviando foto...');
         try {
-          finalPhotoUrl = await uploadPhoto(photoFile, userId);
+          finalPhotoUrl = await uploadPhoto(await comprimirFoto(photoFile), userId);
         } catch (upErr: any) {
           setMessage('Falha ao enviar a foto. Tente novamente.');
           return;
@@ -155,7 +176,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
 
       if (error) throw error;
           if (finalPhotoUrl) { try { await createPost({ id: '', userId: userId, image: finalPhotoUrl, text: '', likes: 0, createdAt: Date.now() }); } catch (eP) { console.error('ONBOARDING-POST falhou', eP); } } // FOTO-CADASTRO
-      onComplete();
+      try { localStorage.removeItem('libido_rascunho_' + userId); } catch (eLimpa) {} onComplete();
     } catch (err: any) {
       console.error('Erro técnico interno ao salvar:', err);
       setMessage('Não foi possível salvar seu perfil. Tente novamente.');
@@ -277,7 +298,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
             <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Foto de perfil (obrigatória)</label>
             <input type="file" accept="image/*" className="hidden" id="onboarding-photo" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f)); } }} />
             <div className="flex items-center gap-3 mt-1.5">
-              <button type="button" onClick={() => document.getElementById('onboarding-photo')?.click()} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
+              <button type="button" onClick={() => { try { localStorage.setItem('libido_rascunho_' + userId, JSON.stringify({ relationshipStatus, nickname, bio, singleAge, singleGender, singleHeight, singleWeight, singleOrientation, maleNickname, maleAge, maleHeight, maleWeight, maleOrientation, femaleNickname, femaleAge, femaleHeight, femaleWeight, femaleOrientation, privacyAccepted })); } catch (eRasc) {} document.getElementById('onboarding-photo')?.click(); }} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
                 {photoFile ? 'Trocar foto' : 'Escolher foto'}
               </button>
               {photoPreview && <img src={photoPreview} alt="previa" className="w-12 h-12 rounded-xl object-cover border border-[var(--libido-border)]" />}
