@@ -9,6 +9,7 @@ import { User } from '../types';
 import { SecurityWatermark } from './SecurityWatermark';
 import { checkUserPremium } from '../services/premium';
 import { iniciarGpsGlobal } from '../services/gpsGlobal'; // GPS-GLOBAL-MOD
+import { startPresence, stopPresence } from '../services/presence'; // PRESENCA-MOD
 import { iniciarNotificacoesGlobais } from '../services/notificacoesGlobais'; // NOTIF-GLOBAL-MOD
 import { iniciarInstalarApp } from '../instalarApp'; // PWA-INSTALL-MOD
 iniciarInstalarApp(); // PWA-INSTALL-MOD
@@ -105,6 +106,12 @@ export function AppCore({
   useEffect(() => {
     if (!userId) return;
     return iniciarGpsGlobal(userId);
+  }, [userId]);
+  // PRESENCA-MOD: heartbeat de presenca (is_online verdadeiro com app aberto)
+  useEffect(() => {
+    if (!userId) return;
+    void startPresence(userId);
+    return () => { void stopPresence(); };
   }, [userId]);
   // NOTIF-GLOBAL-MOD: escuta global de notificacoes (modulo externo)
   const [unreadChat, setUnreadChat] = useState(0);

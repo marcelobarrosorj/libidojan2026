@@ -340,7 +340,7 @@ export default function App() {
   const logout = async () => {
     if (user) {
       try {
-        await updateUserProfile(user.id, { status: 'inactive' });
+        // STATUS-FIX: escrita automatica de status removida (bug do inactive)
       } catch (err) {
         console.error('Erro ao atualizar status de saída:', err);
       }
