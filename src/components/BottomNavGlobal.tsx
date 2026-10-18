@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield } from 'lucide-react';
+import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield, Search, Bell, Zap } from 'lucide-react';
 
 interface BottomNavProps {
   unreadChat?: number; // NOTIF-BADGE
   activeTab: string;
   onTabChange: (tab: string) => void;
   isAdmin?: boolean;
+  isPremium?: boolean; // BARRA-UNICA
+  onPremiumClick?: () => void; // BARRA-UNICA
 }
 
-export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 0 }: BottomNavProps) {
+export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 0, isPremium, onPremiumClick }: BottomNavProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const mainTabs = [
@@ -16,6 +18,10 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 
     { id: 'radar', label: 'Radar', icon: Radio },
     { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'profile', label: 'Perfil', icon: User },
+  ];
+  const extraTabs = [ // BARRA-UNICA: BUSCA e ALERTAS na mesma barra
+    { id: 'busca', label: 'Busca', icon: Search, dot: false },
+    { id: 'invites', label: 'Alertas', icon: Bell, dot: true },
   ];
 
   const menuItems = [
@@ -81,6 +87,23 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 
                   )}
                 </button>
               ))}
+              {!isPremium && onPremiumClick && ( // BARRA-UNICA: Premium no MENU
+                <button
+                  onClick={() => {
+                    onPremiumClick();
+                    setShowMenu(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all text-[var(--libido-accent)] border border-[var(--libido-accent)]/30 hover:bg-[var(--libido-accent)]/10"
+                >
+                  <Zap size={16} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">
+                    Assinar Premium
+                  </span>
+                  <span className="ml-auto text-[7px] font-black bg-[var(--libido-accent)]/20 text-[var(--libido-accent)] px-1.5 py-0.5 rounded">
+                    VIP
+                  </span>
+                </button>
+              )}
             </nav>
           </div>
         </div>
@@ -117,6 +140,24 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 
           <Menu size={18} strokeWidth={1.5} />
           <span className="text-[8px] font-bold uppercase tracking-wider">Menu</span>
         </button>
+        {extraTabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all ${
+              activeTab === tab.id
+                ? 'text-[var(--libido-accent)]'
+                : 'text-[var(--libido-muted)]/50 hover:text-[var(--libido-muted)]/80'
+            }`}
+          style={{ position: 'relative' }}
+          >
+            <tab.icon size={18} strokeWidth={activeTab === tab.id ? 2.5 : 1.5} />
+            {tab.dot && (<span className="absolute top-0 right-0 w-3 h-3 bg-[var(--libido-accent)] rounded-full border-[3px] border-[var(--libido-bg)]"></span>)}{/* BARRA-UNICA: bolinha de pendentes */}
+            <span className="text-[8px] font-bold uppercase tracking-wider">
+              {tab.label}
+            </span>
+          </button>
+        ))}
       </nav>
     </>
   );

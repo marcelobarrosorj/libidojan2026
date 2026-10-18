@@ -16,6 +16,7 @@ import { User } from "../types";
 export const routes: Record<string, React.FC<any>> = {
   feed: Feed,
   radar: Radar,
+  busca: Radar,
   chat: Chat,
   profile: Profile,
   top: Top,

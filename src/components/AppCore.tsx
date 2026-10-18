@@ -1,8 +1,7 @@
-﻿import { updateUserProfile } from '../services/users';
+import { updateUserProfile } from '../services/users';
 import { initNavHistory, registrarTela } from '../services/navHistory'; // NAV-HISTORY
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { AppShell } from "./AppShell";
-import { HeaderGlobal } from "./HeaderGlobal";
 import { BottomNavGlobal } from "./BottomNavGlobal";
 import { ContentRouter } from "./ContentRouter";
 import { PixCheckout } from "./PixCheckout";
@@ -136,12 +135,6 @@ export function AppCore({
     <AppShell>
       <SecurityWatermark currentUser={currentUser} local={false} />
 
-      <HeaderGlobal
-        onSearchClick={() => navigate('radar')}
-        onEnergyClick={openPremiumCheckout}
-        onSettingsClick={() => navigate('settings')}
-        onNotificationsClick={() => navigate('invites')}
-      />
       {showNav && (
         <div className="flex-none bg-[var(--libido-bg)] border-b border-[var(--libido-border)] relative z-50">
           <BottomNavGlobal
@@ -149,6 +142,8 @@ export function AppCore({
             onTabChange={(tab) => navigate(tab)}
             isAdmin={isAdmin}
             unreadChat={unreadChat}
+            isPremium={isPremium}
+            onPremiumClick={openPremiumCheckout}
           />
         </div>
       )}
