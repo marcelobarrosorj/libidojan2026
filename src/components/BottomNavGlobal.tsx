@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield, Search, Bell, Zap } from 'lucide-react';
+import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield, Bell, Zap } from 'lucide-react';
 
 interface BottomNavProps {
   unreadChat?: number; // NOTIF-BADGE
@@ -19,8 +19,7 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 
     { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'profile', label: 'Perfil', icon: User },
   ];
-  const extraTabs = [ // BARRA-UNICA: BUSCA e ALERTAS na mesma barra
-    { id: 'busca', label: 'Busca', icon: Search, dot: false },
+  const extraTabs = [ // BARRA-UNICA: ALERTAS na barra
     { id: 'invites', label: 'Alertas', icon: Bell, dot: true },
   ];
 
