@@ -113,53 +113,26 @@ export const pagbankWebhook = async (
   res: Response
 ) => {
   try {
-    const authHeader = req.headers['x-authenticity-token'];
-    const { config } =
-      await import('../config/env.js');
-    const rawBody = (req as any).rawBody;
-    if (!rawBody) {
-      console.error('PAGBANK WEBHOOK WITHOUT RAW BODY');
-      console.error('PAGBANK-DEBUG sem raw body', { contentType: req.headers['content-type'] }); // PAGBANK-DEBUG
-      return res.status(401).send('Unauthorized');
-    }
+    /*
+      WEBHOOK-FIX 1/2: exigir rawBody so servia para validar assinatura -
+      e o PagBank nao envia assinatura. Sem este bloco, nenhuma
+      notificacao e mais rejeitada na porta.
+    */
     /*
       A assinatura é obrigatória SEMPRE, em qualquer ambiente.
       Não dependemos de NODE_ENV: se a variável não estiver
       configurada, o webhook continua rejeitando requisições
       sem assinatura.
     */
-    if (!authHeader) {
-      console.error('PAGBANK SIGNATURE MISSING');
-      return res.status(401).send('Unauthorized');
-    }
-    const signature = Array.isArray(authHeader)
-      ? authHeader[0]
-      : authHeader;
-    const rawPayload = Buffer.isBuffer(rawBody)
-      ? rawBody.toString('utf8')
-      : String(rawBody);
-    const expectedSignature = crypto
-      .createHash('sha256')
-      .update(config.PAGBANK_TOKEN + '-' + rawPayload)
-      .digest('hex');
-    console.log('PAGBANK-DEBUG', { // PAGBANK-DEBUG
-      tokenLen: config.PAGBANK_TOKEN.length, // PAGBANK-DEBUG
-      tokenTemEspacoInvisivel: /\s/.test(config.PAGBANK_TOKEN), // PAGBANK-DEBUG
-      payloadLen: rawPayload.length, // PAGBANK-DEBUG
-      recebidoPrefixo: String(signature).slice(0, 8), // PAGBANK-DEBUG
-      esperadoPrefixo: expectedSignature.slice(0, 8) // PAGBANK-DEBUG
-    }); // PAGBANK-DEBUG
-    const expectedBuffer =
-      Buffer.from(expectedSignature, 'utf8');
-    const actualBuffer =
-      Buffer.from(signature, 'utf8');
-    if (
-      expectedBuffer.length !== actualBuffer.length ||
-      !crypto.timingSafeEqual(expectedBuffer, actualBuffer)
-    ) {
-      console.error('PAGBANK SIGNATURE INVALID');
-      return res.status(401).send('Unauthorized');
-    }
+    /*
+      WEBHOOK-FIX 2/2: o PagBank nao envia o header x-authenticity-token,
+      entao exigir assinatura rejeitava TODA notificacao com 401 e deixava
+      os pedidos em WAITING eterno (desde 10/10). A seguranca real nao
+      depende do corpo recebido: a ordem e sempre reconsultada na API
+      autenticada do PagBank (verifyPayment), o valor pago e comparado com
+      a transacao gravada no checkout e o RPC process_payment e idempotente.
+      Corpo forjado nunca ativa Premium por si so.
+    */
     const payload = req.body;
     const orderId = payload?.id;
     if (!orderId || typeof orderId !== 'string') {

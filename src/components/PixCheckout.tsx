@@ -89,7 +89,7 @@ export function PixCheckout({
             data.plans.length > 0
           ) {
             setPlans(data.plans);
-            setSelectedPlanId((atual) => atual || data.plans[0].id);
+            setSelectedPlanId((atual) => atual || (data.plans.find((p: any) => String(p?.name || '').toLowerCase().includes('premium'))?.id || data.plans[0]?.id));
           }
         }
       } catch {}
