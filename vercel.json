@@ -4,11 +4,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/api/send-push", "destination": "/api/index" },
-    { "source": "/api/push", "destination": "/api/index" },
     { "source": "/api/webhook", "destination": "/api/index" },
-    { "source": "/api/payment", "destination": "/api/index" },
-    { "source": "/api/health", "destination": "/api/index" },
+    { "source": "/api/pagbank", "destination": "/api/index" },
     { "source": "/((?!api).*)", "destination": "/index.html" }
   ]
 }
