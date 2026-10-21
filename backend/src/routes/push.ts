@@ -4,11 +4,19 @@ import { createHash } from "node:crypto";
 
 const router = Router();
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-const SECRET = process.env.PUSH_WEBHOOK_SECRET || "";
-const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY || "";
-const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || "";
+// LIMPEZA: remove \n, \r, espacos e invisiveis das variaveis de ambiente
+function limpar(v: any): string {
+  if (!v) return "";
+  return String(v)
+    .replace(/\\n|\\r/g, "")
+    .replace(/[\s\u200B-\u200D\uFEFF]/g, "");
+}
+
+const SUPABASE_URL = limpar(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL);
+const SERVICE_KEY = limpar(process.env.SUPABASE_SERVICE_ROLE_KEY);
+const SECRET = limpar(process.env.PUSH_WEBHOOK_SECRET);
+const VAPID_PUBLIC = limpar(process.env.VAPID_PUBLIC_KEY);
+const VAPID_PRIVATE = limpar(process.env.VAPID_PRIVATE_KEY);
 const ORIGEM = "https://www.libidoapp.com.br";
 const REF_ESPERADO = "hkuwlazwtxwfffnpgfdd";
 
@@ -75,13 +83,16 @@ router.get("/", async (_req, res) => {
   const wp = await carregarWebPush();
   const leitura = await testarLeitura();
   const host = hostDe(SUPABASE_URL);
+  const bruto = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
   res.status(200).json({
     ok: true,
     rota: "express-diagnostico",
     node: process.version,
     supabaseHost: host,
     refConfere: host.indexOf(REF_ESPERADO) === 0,
-    keyLen: SERVICE_KEY.length,
+    keyLenBruto: bruto.length,
+    keyLenLimpo: SERVICE_KEY.length,
+    tinhaLixo: bruto.length !== SERVICE_KEY.length,
     keyFp: fpDe(SERVICE_KEY),
     temVapid: Boolean(VAPID_PUBLIC && VAPID_PRIVATE),
     webPushCarregou: Boolean(wp),
@@ -127,8 +138,7 @@ router.post("/", async (req: any, res: any) => {
         motivo: "falha ao ler inscricoes",
         status: r.status,
         detalhe: detalhe,
-        host: hostDe(SUPABASE_URL),
-        keyLen: SERVICE_KEY.length,
+        keyLenLimpo: SERVICE_KEY.length,
         keyFp: fpDe(SERVICE_KEY)
       });
     }
