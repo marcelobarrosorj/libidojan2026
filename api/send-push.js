@@ -1,13 +1,19 @@
-// PUSH-SEND: envia a notificacao para o destinatario da mensagem
-import webpush from 'web-push';
+// PUSH-SEND v2: carrega web-push via createRequire (evita erro de interop ESM/CJS)
+import { createRequire } from 'node:module';
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const SECRET = process.env.PUSH_WEBHOOK_SECRET;
 const ORIGEM = 'https://www.libidoapp.com.br';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SECRET = process.env.PUSH_WEBHOOK_SECRET || '';
 
-if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails('mailto:libidoapp@gmail.com', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+let webpush = null;
+let erroWebPush = null;
+
+try {
+  const require = createRequire(import.meta.url);
+  webpush = require('web-push');
+} catch (e) {
+  erroWebPush = String((e && e.message) || e);
 }
 
 function cabecalhos() {
@@ -31,14 +37,17 @@ async function nomeDe(uid) {
 }
 
 export default async function handler(req, res) {
-  // rota de teste: abrir no navegador mostra se ela esta no ar
+  // DIAGNOSTICO: abre no navegador e mostra o estado real da funcao
   if (req.method === 'GET') {
     return res.status(200).json({
       ok: true,
       rota: 'ativa',
+      node: process.version,
       temUrlSupabase: Boolean(SUPABASE_URL),
       temServiceKey: Boolean(SERVICE_KEY),
-      temVapid: Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
+      temVapid: Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY),
+      webPushCarregou: Boolean(webpush),
+      erroWebPush: erroWebPush
     });
   }
 
@@ -48,6 +57,12 @@ export default async function handler(req, res) {
     }
     if (SECRET && req.headers['x-webhook-secret'] !== SECRET) {
       return res.status(401).json({ ok: false, erro: 'segredo invalido' });
+    }
+    if (!webpush) {
+      return res.status(200).json({ ok: false, motivo: 'web-push indisponivel', erro: erroWebPush });
+    }
+    if (!SUPABASE_URL || !SERVICE_KEY) {
+      return res.status(200).json({ ok: false, motivo: 'variaveis do Supabase ausentes' });
     }
 
     const corpo = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
@@ -59,6 +74,16 @@ export default async function handler(req, res) {
     }
     if (remetente && String(remetente) === String(destinatario)) {
       return res.status(200).json({ ok: true, enviados: 0, motivo: 'mensagem para si mesmo' });
+    }
+
+    try {
+      webpush.setVapidDetails(
+        'mailto:libidoapp@gmail.com',
+        process.env.VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+      );
+    } catch (e) {
+      return res.status(200).json({ ok: false, motivo: 'VAPID invalido', erro: String(e && e.message ? e.message : e) });
     }
 
     const url = SUPABASE_URL + '/rest/v1/push_subscriptions?user_id=eq.' + encodeURIComponent(destinatario) + '&select=endpoint,p256dh,auth';
@@ -73,11 +98,9 @@ export default async function handler(req, res) {
     }
 
     const nome = await nomeDe(remetente);
-    const texto = nome ? nome + ' te enviou uma mensagem' : 'Voce recebeu uma nova mensagem';
-
     const payload = JSON.stringify({
       title: 'Libido',
-      body: texto,
+      body: nome ? nome + ' te enviou uma mensagem' : 'Voce recebeu uma nova mensagem',
       url: ORIGEM + '/'
     });
 
@@ -103,6 +126,6 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true, enviados: enviados, inscricoes: inscricoes.length });
   } catch (e) {
-    return res.status(500).json({ ok: false, erro: String(e && e.message ? e.message : e) });
+    return res.status(200).json({ ok: false, motivo: 'excecao', erro: String(e && e.message ? e.message : e) });
   }
 }
