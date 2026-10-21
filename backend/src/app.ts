@@ -3,6 +3,7 @@ import cors from "cors";
 import { getBackendAvailability } from "./config/env.js";
 import paymentRoutes from "./routes/payment.js";
 import webhookRoutes from "./routes/webhook.js";
+import pushRoutes from "./routes/push.js";
 
 const app = express();
 
@@ -22,6 +23,10 @@ app.use("/api/webhook", (req, res, next) => {
   }
   next();
 }, webhookRoutes);
+
+// PUSH: notificacoes (registrado antes do catch-all de /api)
+app.use("/api/send-push", pushRoutes);
+app.use("/api/push", pushRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
