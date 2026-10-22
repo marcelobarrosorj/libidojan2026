@@ -66,7 +66,8 @@ export async function ativarPush(): Promise<boolean> {
       user_id: uid,
       endpoint: sub.endpoint,
       p256dh: p256dh,
-      auth: auth
+      auth: auth,
+      created_at: new Date().toISOString()
     });
 
     if (error) {
