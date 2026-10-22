@@ -37,7 +37,16 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
 
   useEffect(() => {
     const unsubscribe = getFeedPosts(async (fetchedPosts) => {
-      setPosts(fetchedPosts);
+      setPosts((prev) => {
+        // FEED-DEDUP-UI: quando o post real chega do servidor, o otimista
+        // correspondente sai da lista. Antes os dois apareciam juntos.
+        const chave = (p: any) => (p.userId || "") + "|" + (p.image || "") + "|" + (p.text || "");
+        const reais = new Set(fetchedPosts.map(chave));
+        const pendentes = prev.filter(
+          (p: any) => String(p.id).startsWith("local-") && !reais.has(chave(p)),
+        );
+        return [...pendentes, ...fetchedPosts];
+      });
       const uniqueUserIds = new Set<string>();
       fetchedPosts.forEach(p => {
         if (p.userId) uniqueUserIds.add(p.userId);
@@ -147,7 +156,12 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
           }
         } catch (eG) { console.error('FEED-AUTOGALERIA falhou', eG); }
       }
-      setPosts(prev => [{ ...novoPost, id: 'local-' + Date.now() }, ...prev]);
+      // FEED-AVATAR-LOCAL: o post recem-publicado ja nasce com o avatar do autor.
+      // Sem isso ele aparecia com o DiceBear ate o proximo refetch.
+      const meuAvatar = (currentUser as any)?.photo_url
+        || ((currentUser as any)?.photos && (currentUser as any).photos[0])
+        || "";
+      setPosts(prev => [{ ...novoPost, id: 'local-' + Date.now(), avatar: meuAvatar } as any, ...prev]);
       setNovoTexto('');
       setNovoArquivo(null);
       if (inputArquivo.current) inputArquivo.current.value = '';
