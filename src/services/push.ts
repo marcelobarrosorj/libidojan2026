@@ -2,7 +2,6 @@
 import { supabase } from './supabase';
 import { VAPID_PUBLIC_KEY } from './pushConfig';
 
-// PUSH-DIAG: mostra na tela o motivo quando o push falha
 let pushStatus = '';
 let jaAvisou = false;
 
@@ -72,7 +71,23 @@ export async function ativarPush(): Promise<boolean> {
     const uid = sess && sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
     if (!uid) { avisar('sem sessao ativa'); return false; }
 
-    await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+    // PUSH-SEM-BURACO: atualiza se ja existe, cria se nao existe.
+    // Antes era delete + insert: se o insert falhasse, a inscricao sumia de vez.
+    const { data: existente } = await supabase
+      .from('push_subscriptions')
+      .select('id')
+      .eq('endpoint', sub.endpoint)
+      .limit(1);
+
+    if (existente && existente.length > 0) {
+      const { error } = await supabase
+        .from('push_subscriptions')
+        .update({ user_id: uid, p256dh: p256dh, auth: auth })
+        .eq('id', existente[0].id);
+      if (error) { avisar('banco recusou (update): ' + error.message); return false; }
+      avisar('OK inscricao atualizada');
+      return true;
+    }
 
     const { error } = await supabase.from('push_subscriptions').insert({
       user_id: uid,
@@ -83,7 +98,6 @@ export async function ativarPush(): Promise<boolean> {
     });
 
     if (error) { avisar('banco recusou: ' + error.message); return false; }
-
     avisar('OK inscricao gravada');
     return true;
   } catch (e: any) {
