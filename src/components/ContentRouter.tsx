@@ -64,7 +64,7 @@ export function ContentRouter({
 
   return (
     <main
-      className="flex-1 flex flex-col w-full min-w-0 max-w-full overflow-hidden relative z-0 bg-[var(--libido-bg)] min-h-0"
+      className="flex-1 flex flex-col w-full min-w-0 max-w-full overflow-hidden relative bg-[var(--libido-bg)] min-h-0"
     >
       <Component
         isPremium={isPremium}
