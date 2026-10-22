@@ -1,10 +1,11 @@
+import './services/antiPrint';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './services/locationTracker';
 import './services/alertasSonoros';
-import './services/push'; // RASTREIO-GLOBAL
+import './services/push';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
