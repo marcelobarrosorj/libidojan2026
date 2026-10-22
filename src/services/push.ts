@@ -24,11 +24,15 @@ export async function ativarPush(): Promise<boolean> {
   try {
     if (typeof window === 'undefined') return false;
     if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+      console.warn('PUSH: navegador sem suporte a push');
       return false;
     }
 
     const permissao = await Notification.requestPermission();
-    if (permissao !== 'granted') return false;
+    if (permissao !== 'granted') {
+      console.warn('PUSH: permissao nao concedida ->', permissao);
+      return false;
+    }
 
     await registrarServiceWorker();
     const reg = await navigator.serviceWorker.ready;
@@ -44,20 +48,33 @@ export async function ativarPush(): Promise<boolean> {
     const json: any = sub.toJSON();
     const p256dh = json && json.keys ? json.keys.p256dh : null;
     const auth = json && json.keys ? json.keys.auth : null;
-    if (!p256dh || !auth) return false;
+    if (!p256dh || !auth) {
+      console.warn('PUSH: inscricao sem chaves p256dh/auth');
+      return false;
+    }
 
     const sess = await supabase.auth.getSession();
     const uid = sess && sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
-    if (!uid) return false;
+    if (!uid) {
+      console.warn('PUSH: sem sessao ativa, nao da para gravar a inscricao');
+      return false;
+    }
 
     await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
-    await supabase.from('push_subscriptions').insert({
+
+    const { error } = await supabase.from('push_subscriptions').insert({
       user_id: uid,
       endpoint: sub.endpoint,
       p256dh: p256dh,
       auth: auth
     });
 
+    if (error) {
+      console.warn('PUSH: insert recusado ->', error.message, error.code, error.hint);
+      return false;
+    }
+
+    console.log('PUSH: inscricao gravada para', uid);
     return true;
   } catch (e) {
     console.warn('PUSH: falha ao ativar', e);
@@ -80,7 +97,6 @@ export function iniciarPush(): void {
   document.addEventListener('pointerdown', tentar, { passive: true });
   document.addEventListener('touchstart', tentar, { passive: true });
 
-  // se o usuario entrar depois do primeiro toque, tenta de novo
   try {
     supabase.auth.onAuthStateChange(function (_ev: any, sess: any) {
       if (typeof Notification === 'undefined') return;

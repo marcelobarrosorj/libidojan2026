@@ -1,6 +1,5 @@
-// PUSH: rota de notificacao (Express) + diagnostico de credenciais
+// PUSH: notificacao com o app fechado (PWA + Web Push)
 import { Router } from "express";
-import { createHash } from "node:crypto";
 
 const router = Router();
 
@@ -18,7 +17,6 @@ const SECRET = limpar(process.env.PUSH_WEBHOOK_SECRET);
 const VAPID_PUBLIC = limpar(process.env.VAPID_PUBLIC_KEY);
 const VAPID_PRIVATE = limpar(process.env.VAPID_PRIVATE_KEY);
 const ORIGEM = "https://www.libidoapp.com.br";
-const REF_ESPERADO = "hkuwlazwtxwfffnpgfdd";
 
 let wpCache: any = null;
 let erroCache: string | null = null;
@@ -51,55 +49,19 @@ function urlBase(): string {
   return SUPABASE_URL.replace(/\/+$/, "");
 }
 
-function hostDe(u: string): string {
-  try { return new URL(u).host; } catch { return "url_invalida"; }
-}
-
-function fpDe(s: string): string {
-  if (!s) return "vazia";
-  return createHash("sha256").update(s, "utf8").digest("hex").slice(0, 10);
-}
-
-async function testarLeitura() {
-  const out: any = { status: 0, corpo: "", erro: null };
-  if (!urlBase() || !SERVICE_KEY) {
-    out.erro = "variaveis ausentes";
-    return out;
+// SAUDE: so responde com segredo. Nao expoe host, chave nem erro do banco.
+router.get("/", async (req: any, res: any) => {
+  if (SECRET && req.headers["x-webhook-secret"] !== SECRET) {
+    return res.status(401).json({ ok: false, erro: "segredo invalido" });
   }
-  try {
-    const r = await fetch(urlBase() + "/rest/v1/push_subscriptions?select=user_id&limit=1", {
-      headers: cabecalhos() as any
-    });
-    out.status = r.status;
-    try { out.corpo = ((await r.text()) || "").slice(0, 300); } catch {}
-  } catch (e: any) {
-    out.status = -1;
-    out.erro = String((e && e.message) || e);
-  }
-  return out;
-}
-
-router.get("/", async (_req, res) => {
   const wp = await carregarWebPush();
-  const leitura = await testarLeitura();
-  const host = hostDe(SUPABASE_URL);
-  const bruto = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-  res.status(200).json({
+  return res.status(200).json({
     ok: true,
-    rota: "express-diagnostico",
-    node: process.version,
-    supabaseHost: host,
-    refConfere: host.indexOf(REF_ESPERADO) === 0,
-    keyLenBruto: bruto.length,
-    keyLenLimpo: SERVICE_KEY.length,
-    tinhaLixo: bruto.length !== SERVICE_KEY.length,
-    keyFp: fpDe(SERVICE_KEY),
-    temVapid: Boolean(VAPID_PUBLIC && VAPID_PRIVATE),
-    webPushCarregou: Boolean(wp),
-    erroWebPush: erroCache,
-    leituraStatus: leitura.status,
-    leituraCorpo: leitura.corpo,
-    leituraErro: leitura.erro
+    rota: "express",
+    webPush: Boolean(wp),
+    supabase: Boolean(urlBase() && SERVICE_KEY),
+    vapid: Boolean(VAPID_PUBLIC && VAPID_PRIVATE),
+    erroWebPush: erroCache
   });
 });
 
@@ -125,22 +87,16 @@ router.post("/", async (req: any, res: any) => {
       return res.status(200).json({ ok: false, motivo: "sem receiver_id", chaves: Object.keys(corpo) });
     }
 
-    const url = urlBase() + "/rest/v1/push_subscriptions?user_id=eq." +
-      encodeURIComponent(destinatario) + "&select=endpoint,p256dh,auth";
-
-    const r = await fetch(url, { headers: cabecalhos() as any });
+    const r = await fetch(
+      urlBase() + "/rest/v1/push_subscriptions?user_id=eq." +
+        encodeURIComponent(destinatario) + "&select=endpoint,p256dh,auth",
+      { headers: cabecalhos() as any }
+    );
 
     if (!r.ok) {
       let detalhe = "";
-      try { detalhe = ((await r.text()) || "").slice(0, 300); } catch {}
-      return res.status(200).json({
-        ok: false,
-        motivo: "falha ao ler inscricoes",
-        status: r.status,
-        detalhe: detalhe,
-        keyLenLimpo: SERVICE_KEY.length,
-        keyFp: fpDe(SERVICE_KEY)
-      });
+      try { detalhe = ((await r.text()) || "").slice(0, 200); } catch {}
+      return res.status(200).json({ ok: false, motivo: "falha ao ler inscricoes", status: r.status, detalhe });
     }
 
     const inscricoes: any = await r.json();
