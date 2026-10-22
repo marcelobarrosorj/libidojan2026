@@ -638,7 +638,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                         <option value="Homossexual">Homossexual</option>
                       </select>
                       <select value={maleBiotype} onChange={e => setMaleBiotype(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none">
-                        <option value="Padr�o">Biotipo: Padr�o</option>
+                        <option value="Padrão">Biotipo: Padrão</option>
                         <option value="Atlético">Atlético</option>
                         <option value="Fortinho">Fortinho</option>
                         <option value="Magro">Magro</option>
@@ -663,7 +663,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                         <option value="Homossexual">Homossexual</option>
                       </select>
                       <select value={femaleBiotype} onChange={e => setFemaleBiotype(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none">
-                        <option value="Padr�o">Biotipo: Padr�o</option>
+                        <option value="Padrão">Biotipo: Padrão</option>
                         <option value="Magro">Magro</option>
                         <option value="Atlético">Atlético</option>
                         <option value="Curvilínea">Curvilínea</option>
@@ -699,7 +699,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Orienta��o</label>
+                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Orientação</label>
                       <select value={singleOrientation} onChange={e => setSingleOrientation(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
                         <option value="Bissexual">Bissexual</option>
                         <option value="Heterossexual">Heterossexual</option>
