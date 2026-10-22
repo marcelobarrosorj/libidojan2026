@@ -132,3 +132,25 @@ html.tema-claro {
 html.tema-claro [class*="from-[var(--libido-accent)]"] {
   color: #FFF9F1 !important;
 }
+/* NOCOPY-GLOBAL: restaura a regra global do commit 9fdd33c.
+   Antes cobria TODA imagem do app. Depois do refactor ficou restrita ao
+   componente ProtectedImage, e qualquer <img> fora dele perdeu a protecao
+   contra selecao, arrasto e menu de toque longo. */
+img,
+video {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  user-drag: none !important;
+}
+
+img::selection,
+video::selection {
+  background: transparent;
+}
+
+/* NOCOPY-GLOBAL-FIM */
