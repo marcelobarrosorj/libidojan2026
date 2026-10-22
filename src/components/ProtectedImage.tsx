@@ -12,6 +12,7 @@ interface ProtectedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   currentUser?: User | null;
   fallbackSrc?: string;
   semMarca?: boolean;
+  ajuste?: 'cover' | 'contain';
 }
 
 export function ProtectedImage({
@@ -20,6 +21,7 @@ export function ProtectedImage({
   className,
   style,
   semMarca = false,
+  ajuste = 'cover',
   ...props
 }: ProtectedImageProps) {
   const [error, setError] = useState(false);
@@ -43,7 +45,7 @@ export function ProtectedImage({
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
         onContextMenu={(e) => e.preventDefault()}
-        className="w-full h-full object-cover block"
+        className={"w-full h-full block " + (ajuste === "contain" ? "object-contain" : "object-cover")}
         style={{
           userSelect: 'none',
           WebkitUserSelect: 'none',

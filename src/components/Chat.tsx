@@ -672,6 +672,7 @@ export function Chat({
             <ProtectedImage
               currentUser={currentUser}
               src={viewOnceUrl}
+              ajuste="contain"
               className="max-w-full max-h-full object-contain"
               alt="foto"
             />
