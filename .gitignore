@@ -26,3 +26,7 @@ Thumbs.db
 .env*
 *.bak*
 *.txt
+
+VAPID-PARA-VERCEL.txt
+
+PUSH-WEBHOOK.sql
