@@ -8,13 +8,19 @@ try {
   }
 } catch (eTema) {}
 
+// SCROLL-RESET: impede o navegador de restaurar a rolagem antiga ao abrir o app
+try {
+  if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
+} catch (eScroll) {}
+
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div
       className="
         w-full
         max-w-full
-        min-h-screen
         h-screen
         bg-[var(--libido-bg)]
         text-[var(--libido-text)]
@@ -28,6 +34,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         overflow-hidden
         font-sans
       "
+      style={{
+        // TOPO-FIX: 100dvh = altura realmente visivel no celular (o h-screen acima fica como fallback)
+        height: '100dvh',
+        // TOPO-FIX: reserva o espaco do notch/barra de status para os botoes do topo aparecerem
+        paddingTop: 'env(safe-area-inset-top)',
+        // TOPO-FIX: reserva o espaco da barra inferior do iPhone
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
     >
       <div className="flex-1 flex flex-col min-h-0">
         {children}

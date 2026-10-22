@@ -13,7 +13,6 @@ interface RadarMapProps {
   navigate?: (tab: string, params?: any) => void;
 }
 
-// Distancia em metros entre dois pontos (formula de Haversine)
 function distanciaMetros(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000;
   const rad = Math.PI / 180;
@@ -25,7 +24,6 @@ function distanciaMetros(lat1: number, lon1: number, lat2: number, lon2: number)
   return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Arredonda a distancia para nunca expor posicao exata
 function formatarDistancia(metros: number): string {
   if (metros < 1000) {
     const passo = Math.max(100, Math.round(metros / 100) * 100);
@@ -35,7 +33,6 @@ function formatarDistancia(metros: number): string {
   return `~${km.toFixed(1).replace('.', ',')} km`;
 }
 
-// Deslocamento estavel por usuario (jitter): o pino nunca mostra o ponto exato
 function jitterPorId(id: string): { dLat: number; dLon: number } {
   let h = 0;
   for (let i = 0; i < id.length; i++) {
@@ -50,9 +47,16 @@ function jitterPorId(id: string): { dLat: number; dLon: number } {
 export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const jaCentrouRef = useRef(false);
+  const meuPontoRef = useRef<{ lat: number; lon: number } | null>(null);
   const [tick, setTick] = useState(0);
   const [meuPonto, setMeuPonto] = useState<{ lat: number; lon: number } | null>(null);
   const [selecionado, setSelecionado] = useState<{ user: User; dist: number } | null>(null);
+
+  // CENTRO-VOLTA: mantem a posicao atual acessivel dentro do observer
+  useEffect(() => {
+    meuPontoRef.current = meuPonto;
+  }, [meuPonto]);
 
   // 1) Posicao do usuario: GPS do navegador primeiro, banco como fallback
   useEffect(() => {
@@ -72,13 +76,19 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
         }).catch(() => {});
       }
     };
-    let watchIdGPS: number | null = null; // GPS-CONTINUO
-    let ultimaSalva = 0; // GPS-CONTINUO
+    let watchIdGPS: number | null = null;
+    let ultimaSalva = 0;
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       watchIdGPS = navigator.geolocation.watchPosition(
         (pos) => {
           if (ativo) setMeuPonto({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude }).eq('user_id', userId).then(({ error }) => { if (error) console.error('SALVA-COORD falhou', error); }); } // SALVA-COORD
+          if (ativo && Date.now() - ultimaSalva > 30000) {
+            ultimaSalva = Date.now();
+            (supabase as any).from('users')
+              .update({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+              .eq('user_id', userId)
+              .then(({ error }) => { if (error) console.error('SALVA-COORD falhou', error); });
+          }
         },
         () => usarBanco(),
         { timeout: 20000, enableHighAccuracy: true, maximumAge: 0 }
@@ -88,43 +98,85 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
     }
     return () => {
       ativo = false;
-      if (watchIdGPS !== null && typeof navigator !== 'undefined' && navigator.geolocation) navigator.geolocation.clearWatch(watchIdGPS); // GPS-CONTINUO
+      if (watchIdGPS !== null && typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchIdGPS);
+      }
     };
   }, [currentUser, userId]);
-  // 2) Cria o mapa escuro (Leaflet + OpenStreetMap/CARTO, sem chave de API)
+
+  // 2) Cria o mapa escuro (Leaflet + Esri Dark Gray)
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    if (el.clientWidth === 0 || el.clientHeight === 0) return;
     let map: L.Map | null = null;
-    try {
-      map = L.map(el, { center: [-22.9068, -43.1729], zoom: 13, zoomControl: false });
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '&copy; Esri',
-        subdomains: 'abcd',
-        maxZoom: 16
-      }).addTo(map);
-      const atualizar = () => setTick((t) => t + 1);
-      map.on('move', atualizar);
-      map.on('zoom', atualizar);
-      mapRef.current = map;
-    } catch {
-      map = null;
+
+    const criarMapa = () => {
+      if (map) return;
+      if (el.clientWidth === 0 || el.clientHeight === 0) return;
+      try {
+        map = L.map(el, { center: [-22.9068, -43.1729], zoom: 13, zoomControl: false });
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; Esri',
+          subdomains: 'abcd',
+          maxZoom: 16
+        }).addTo(map);
+        const atualizar = () => setTick((t) => t + 1);
+        map.on('move', atualizar);
+        map.on('zoom', atualizar);
+        mapRef.current = map;
+        setTick((t) => t + 1);
+      } catch {
+        map = null;
+      }
+    };
+
+    criarMapa();
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => {
+        if (!map) criarMapa();
+        else map.invalidateSize();
+      });
+      ro.observe(el);
     }
+
     return () => {
+      if (ro) ro.disconnect();
       if (map) map.remove();
       mapRef.current = null;
     };
   }, []);
 
-  // 3) Recentra no usuario quando a posicao chega
+  // 3) Centraliza UMA vez por montagem
   useEffect(() => {
-    if (mapRef.current && meuPonto) {
-      if (!(window as any).__LIBIDO_CENTROU__) { mapRef.current.setView([meuPonto.lat, meuPonto.lon], 14); (window as any).__LIBIDO_CENTROU__ = true; } // B1-FIX: centraliza so na 1a correcao do GPS - nunca mais reseta o zoom/posicao do usuario
+    if (mapRef.current && meuPonto && !jaCentrouRef.current) {
+      mapRef.current.setView([meuPonto.lat, meuPonto.lon], 14);
+      jaCentrouRef.current = true;
+      setTick((t) => t + 1);
     }
   }, [meuPonto]);
 
-  // 4) Pinos: posicao na tela + distancia real (calculada nas coordenadas verdadeiras)
+  // 3b) CENTRO-VOLTA: quando a tela do radar volta a ficar visivel, centraliza de novo
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && mapRef.current && meuPontoRef.current) {
+            mapRef.current.setView([meuPontoRef.current.lat, meuPontoRef.current.lon], 14);
+            setTick((t) => t + 1);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // 4) Pinos: posicao na tela + distancia real
   const pins = useMemo(() => {
     const map = mapRef.current;
     if (!map || !meuPonto) return [];
@@ -148,7 +200,6 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
   return (
     <div className="flex-1 relative min-h-[300px] rounded-2xl overflow-hidden border border-[var(--libido-border)] bg-[var(--libido-surface)]">
       <div ref={containerRef} className="absolute inset-0 z-0" />
-
       {(() => {
         const map = mapRef.current;
         if (!meuPonto || !map) return null;
@@ -172,7 +223,6 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           </div>
         );
       })()}
-
       {pins.map(({ user, x, y, dist }) => (
         <button
           key={String(user.id)}
@@ -184,7 +234,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
             <ProtectedImage
               currentUser={currentUser}
               src={user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=32'}
-              style={{ border: (user as any).is_online ? '2.5px solid #22c55e' : 'none', boxShadow: (user as any).is_online ? '0 0 8px rgba(34,197,94,0.8)' : 'none' }} // ONLINE-DOT
+              style={{ border: (user as any).is_online ? '2.5px solid #22c55e' : 'none', boxShadow: (user as any).is_online ? '0 0 8px rgba(34,197,94,0.8)' : 'none' }}
               alt=""
               className="w-full h-full"
             />
@@ -194,7 +244,6 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           </span>
         </button>
       ))}
-
       {meuPonto && pins.length === 0 && (
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
           <p className="px-4 py-2 rounded-xl bg-[var(--libido-bg)]/85 border border-[var(--libido-border)] text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center">
@@ -202,7 +251,6 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           </p>
         </div>
       )}
-
       {!meuPonto && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-[var(--libido-bg)]/70 pointer-events-none">
           <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)]">
@@ -210,7 +258,6 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           </p>
         </div>
       )}
-
       {selecionado && (
         <div className="absolute bottom-3 left-3 right-3 z-40 bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl p-3 flex items-center gap-3 shadow-2xl">
           <div className="w-12 h-12 rounded-full overflow-hidden border border-[var(--libido-border)] shrink-0">
@@ -247,9 +294,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
   );
 }
 
-// Consulta direta ao banco pela posicao do usuario atual
 async function supabaseQuery(userId: string): Promise<any> {
-  const { supabase } = await import('../services/supabase');
   const { data } = await supabase
     .from('user_profiles')
     .select('lat, lon')

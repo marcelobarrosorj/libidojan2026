@@ -1,8 +1,10 @@
-﻿import { StrictMode } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import './services/locationTracker'; // RASTREIO-GLOBAL
+import './services/locationTracker';
+import './services/alertasSonoros';
+import './services/push'; // RASTREIO-GLOBAL
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
