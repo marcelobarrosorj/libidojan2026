@@ -39,6 +39,17 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [visitas, setVisitas] = useState<number | null>(null); // VISITAS-REAIS
   const [visitantes, setVisitantes] = useState<any[]>([]); // VISITAS-REAIS
+
+  useEffect(() => {
+    const carregarVisitas = async () => {
+      const { data } = await supabase.auth.getSession();
+      const meuId = data && data.session && data.session.user ? data.session.user.id : null;
+      if (!meuId) { setVisitas(0); return; }
+      setVisitas(await contarVisitas(meuId));
+      setVisitantes(await listarVisitantes(meuId, 30));
+    };
+    void carregarVisitas();
+  }, []);
   const [followersList, setFollowersList] = useState<any[] | null>(null);
   const [saving, setSaving] = useState(false);
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
@@ -49,14 +60,14 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [maleNickname, setMaleNickname] = useState('');
   const [maleAge, setMaleAge] = useState('');
   const [maleOrientation, setMaleOrientation] = useState('Heterossexual');
-  const [maleBiotype, setMaleBiotype] = useState('PadrÃƒÂ£o');
+  const [maleBiotype, setMaleBiotype] = useState('Padrão');
   const [maleHeight, setMaleHeight] = useState('');
   const [maleWeight, setMaleWeight] = useState('');
 
   const [femaleNickname, setFemaleNickname] = useState('');
   const [femaleAge, setFemaleAge] = useState('');
   const [femaleOrientation, setFemaleOrientation] = useState('Bissexual');
-  const [femaleBiotype, setFemaleBiotype] = useState('PadrÃƒÂ£o');
+  const [femaleBiotype, setFemaleBiotype] = useState('Padrão');
   const [femaleHeight, setFemaleHeight] = useState('');
   const [femaleWeight, setFemaleWeight] = useState('');
 
@@ -64,7 +75,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [singleAge, setSingleAge] = useState('');
   const [singleGender, setSingleGender] = useState('Masculino');
   const [singleOrientation, setSingleOrientation] = useState('Bissexual');
-  const [singleBiotype, setSingleBiotype] = useState('PadrÃƒÂ£o');
+  const [singleBiotype, setSingleBiotype] = useState('Padrão');
   const [singleHeight, setSingleHeight] = useState('');
   // IDADE-EDIT: datas de nascimento na edicao (perfis existentes incluidos)
   const [singleBirth, setSingleBirth] = useState('');
@@ -84,14 +95,14 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setMaleAge(cp.maleAge != null ? String(cp.maleAge) : (calcularIdade(cp.maleBirthDate) != null ? String(calcularIdade(cp.maleBirthDate)) : ''));
         setMaleBirth(cp.maleBirthDate || '');
         setMaleOrientation(cp.maleOrientation || 'Heterossexual');
-        setMaleBiotype(cp.maleBiotype || 'PadrÃƒÂ£o');
+        setMaleBiotype(cp.maleBiotype || 'Padrão');
         setMaleHeight(cp.maleHeight != null ? String(cp.maleHeight) : '');
         setMaleWeight(cp.maleWeight != null ? String(cp.maleWeight) : '');
         setFemaleNickname(cp.femaleNickname || '');
         setFemaleAge(cp.femaleAge != null ? String(cp.femaleAge) : (calcularIdade(cp.femaleBirthDate) != null ? String(calcularIdade(cp.femaleBirthDate)) : ''));
         setFemaleBirth(cp.femaleBirthDate || '');
         setFemaleOrientation(cp.femaleOrientation || 'Bissexual');
-        setFemaleBiotype(cp.femaleBiotype || 'PadrÃƒÂ£o');
+        setFemaleBiotype(cp.femaleBiotype || 'Padrão');
         setFemaleHeight(cp.femaleHeight != null ? String(cp.femaleHeight) : '');
         setFemaleWeight(cp.femaleWeight != null ? String(cp.femaleWeight) : '');
         setEditBio(extrairTextoBio(rawBio) || (cp && typeof cp.text === 'string' ? cp.text : ''));
@@ -106,7 +117,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           setMaleAge(parsed.maleAge?.toString() || (calcularIdade(parsed.maleBirthDate) != null ? String(calcularIdade(parsed.maleBirthDate)) : ''));
           setMaleBirth(parsed.maleBirthDate || '');
           setMaleOrientation(parsed.maleOrientation || 'Heterossexual');
-          setMaleBiotype(parsed.maleBiotype || 'PadrÃƒÂ£o');
+          setMaleBiotype(parsed.maleBiotype || 'Padrão');
           setMaleHeight(parsed.maleHeight || '');
           setMaleWeight(parsed.maleWeight || '');
 
@@ -114,7 +125,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           setFemaleAge(parsed.femaleAge?.toString() || (calcularIdade(parsed.femaleBirthDate) != null ? String(calcularIdade(parsed.femaleBirthDate)) : ''));
           setFemaleBirth(parsed.femaleBirthDate || '');
           setFemaleOrientation(parsed.femaleOrientation || 'Bissexual');
-          setFemaleBiotype(parsed.femaleBiotype || 'PadrÃƒÂ£o');
+          setFemaleBiotype(parsed.femaleBiotype || 'Padrão');
           setFemaleHeight(parsed.femaleHeight || '');
           setFemaleWeight(parsed.femaleWeight || '');
           setEditBio(parsed.text || '');
@@ -132,7 +143,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setSingleBirth(currentUser.birth_date || '');
         setSingleGender(currentUser.gender || 'Masculino');
         setSingleOrientation(currentUser.sexual_orientation || 'Bissexual');
-        setSingleBiotype(currentUser.biotype || 'PadrÃƒÂ£o');
+        setSingleBiotype(currentUser.biotype || 'Padrão');
         setSingleHeight(currentUser.height?.toString() || '');
       }
     }
@@ -229,7 +240,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         const updatedPhotos = [...currentPhotos, url];
         await updateUserProfile(userId, { photos: updatedPhotos });
         try { await createPost({ id: '', userId: userId, image: url, text: '', likes: 0, createdAt: Date.now() }); } catch (eAP) { console.error('GALLERY-AUTOPOST falhou', eAP); } // GALLERY-AUTOPOST: foto da galeria vira post no feed
-        alert("Foto adicionada ÃƒÂ  galeria e publicada no feed!");
+        alert("Foto adicionada à galeria e publicada no feed!");
       }
       
       setEditingImageUrl(null);
@@ -258,7 +269,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       const currentPhotos = currentUser?.photos || [];
       const updatedPhotos = currentPhotos.filter((url: string) => url !== urlToDelete);
       await updateUserProfile(userId, { photos: updatedPhotos });
-      alert("Foto excluÃƒÂ­da!");
+      alert("Foto excluída!");
       setActivePhotoIndex(null);
       window.dispatchEvent(new Event('profileUpdated'));
     } catch (err: any) {
@@ -268,12 +279,12 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
 
   const handleSaveProfile = async () => {
     if (!editNickname.trim()) {
-      alert("O apelido nÃƒÂ£o pode ficar vazio.");
+      alert("O apelido não pode ficar vazio.");
       return;
     }
     const idadeSingle = calcularIdade(singleBirth);
     if (idadeSingle != null && idadeSingle < 18) {
-      alert("VocÃƒÂª deve ter 18 anos ou mais.");
+      alert("Você deve ter 18 anos ou mais.");
       return;
     }
     const mIdadeChk = calcularIdade(maleBirth);
@@ -377,7 +388,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           Configurar Perfil
         </button>
 
-        <span className="text-[11px] font-black tracking-widest text-[var(--libido-muted)] opacity-50 uppercase mt-3">Status: {isPremium ? 'Membro Premium' : 'Membro GrÃƒÂ¡tis'}</span>
+        <span className="text-[11px] font-black tracking-widest text-[var(--libido-muted)] opacity-50 uppercase mt-3">Status: {isPremium ? 'Membro Premium' : 'Membro Grátis'}</span>
       </div>
 
       <div className="h-[1px] bg-white/5 my-6"></div>
@@ -390,7 +401,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-accent)]/20 p-4 rounded-2xl text-left relative overflow-hidden shadow-[0_0_15px_rgba(255,179,0,0.03)]">
-              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ele Ã°Å¸â€˜Â¨</p>
+              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ele 👨</p>
               <h4 className="text-sm font-black truncate">{maleNickname || 'Parceiro'}</h4>
               <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-semibold mt-1">{maleAge ? `${maleAge} anos` : 'Idade n/d'}</p>
               <span className="text-[11px] bg-white/5 text-[var(--libido-muted)] opacity-80 px-2 py-0.5 rounded-md mt-2 inline-block font-bold">{maleOrientation}</span>
@@ -402,7 +413,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
             </div>
 
             <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-accent)]/20 p-4 rounded-2xl text-left relative overflow-hidden shadow-[0_0_15px_rgba(255,179,0,0.03)]">
-              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ela Ã°Å¸â€˜Â©</p>
+              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ela 👩</p>
               <h4 className="text-sm font-black truncate">{femaleNickname || 'Parceira'}</h4>
               <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-semibold mt-1">{femaleAge ? `${femaleAge} anos` : 'Idade n/d'}</p>
               <span className="text-[11px] bg-white/5 text-[var(--libido-muted)] opacity-80 px-2 py-0.5 rounded-md mt-2 inline-block font-bold">{femaleOrientation}</span>
@@ -416,28 +427,28 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         </section>
       ) : (
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl text-left mb-6 relative overflow-hidden">
-          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 tracking-widest uppercase mb-1">InformaÃƒÂ§ÃƒÂµes Pessoais</p>
+          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 tracking-widest uppercase mb-1">Informações Pessoais</p>
           <div className="grid grid-cols-2 gap-4 text-xs font-bold mt-2">
-            <p>GÃƒÅ NERO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.gender || 'n/d'}</span></p>
+            <p>GÊNERO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.gender || 'n/d'}</span></p>
             <p>IDADE: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.age ? `${currentUser.age} anos` : 'n/d'}</span></p>
             <p>BIOTIPO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.biotype || 'n/d'}</span></p>
             <p>ALTURA: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.height ? `${currentUser.height} cm` : 'n/d'}</span></p>
-            <p>ORIENTAÃƒâ€¡ÃƒÆ’O: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.sexualOrientation || 'n/d'}</span></p>
+            <p>ORIENTAÇÃO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.sexualOrientation || 'n/d'}</span></p>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-3 gap-3 text-center mb-6">
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-3.5 rounded-2xl">
-          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider">VisualizaÃƒÂ§ÃƒÂµes</p>
+          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider">Visitas</p>
           <p className="text-sm font-black text-[var(--libido-text)] mt-1 flex items-center justify-center gap-1.5">
             <Eye size={12} className="text-[var(--libido-accent)]" />
-            142
+            {visitas !== null ? visitas : "..."}
           </p>
         </div>
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-3.5 rounded-2xl">
-          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider">InteraÃƒÂ§ÃƒÂµes</p>
-          <p className="text-sm font-black text-[var(--libido-text)] mt-1">29</p>
+          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider">Visitantes</p>
+          <p className="text-sm font-black text-[var(--libido-text)] mt-1">{visitantes.length}</p>
         </div>
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-3.5 rounded-2xl">
           <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider">Seguidores</p>
@@ -453,7 +464,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
               <div key={f.id || f.user_id} className="flex items-center gap-3">
                 <ProtectedImage currentUser={currentUser} src={f.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} className="w-9 h-9 rounded-full" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{f.nickname || 'UsuÃƒÂ¡rio'}</p>
+                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{f.nickname || 'Usuário'}</p>
                   {f.isOnline ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
                 </div>
               </div>
@@ -462,7 +473,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         </div>
       )}
       <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl mb-6 text-left">
-        <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-1.5">Sobre NÃƒÂ³s / Bio</p>
+        <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-1.5">Sobre Nós / Bio</p>
         <p className="text-xs text-[var(--libido-muted)] opacity-90 font-medium leading-relaxed">{editBio || 'Sem biografia cadastrada...'}</p>
       </div>
 
@@ -567,8 +578,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       {showEditModal && (
         <div className="fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-[2rem] p-6 max-w-sm w-full relative animate-in fade-in duration-200 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
-            <button onClick={() => setShowEditModal(false)} className="absolute top-4 right-4 text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] transition-colors">Ã¢Å“â€¢</button>
-            <h3 className="text-base font-black text-[var(--libido-accent)] mb-4 uppercase tracking-widest italic font-fraunces font-medium">ConfiguraÃƒÂ§ÃƒÂµes do Perfil</h3>
+            <button onClick={() => setShowEditModal(false)} className="absolute top-4 right-4 text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] transition-colors">✕</button>
+            <h3 className="text-base font-black text-[var(--libido-accent)] mb-4 uppercase tracking-widest italic font-fraunces font-medium">Configurações do Perfil</h3>
             
             <div className="space-y-3.5 text-left">
               <div>
@@ -608,8 +619,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                         <option value="Homossexual">Homossexual</option>
                       </select>
                       <select value={maleBiotype} onChange={e => setMaleBiotype(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none">
-                        <option value="PadrÃƒÂ£o">Biotipo: PadrÃƒÂ£o</option>
-                        <option value="AtlÃƒÂ©tico">AtlÃƒÂ©tico</option>
+                        <option value="Padrão">Biotipo: Padrão</option>
+                        <option value="Atlético">Atlético</option>
                         <option value="Fortinho">Fortinho</option>
                         <option value="Magro">Magro</option>
                       </select>
@@ -633,10 +644,10 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                         <option value="Homossexual">Homossexual</option>
                       </select>
                       <select value={femaleBiotype} onChange={e => setFemaleBiotype(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none">
-                        <option value="PadrÃƒÂ£o">Biotipo: PadrÃƒÂ£o</option>
+                        <option value="Padrão">Biotipo: Padrão</option>
                         <option value="Magro">Magro</option>
-                        <option value="AtlÃƒÂ©tico">AtlÃƒÂ©tico</option>
-                        <option value="CurvilÃƒÂ­nea">CurvilÃƒÂ­nea</option>
+                        <option value="Atlético">Atlético</option>
+                        <option value="Curvilínea">Curvilínea</option>
                       </select>
                     </div>
                   </div>
@@ -650,7 +661,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                       <input type="date" value={singleBirth} onChange={e => setSingleBirth(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">GÃƒÂªnero</label>
+                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Gênero</label>
                       <select value={singleGender} onChange={e => setSingleGender(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
                         <option value="Masculino">Homem</option>
                         <option value="Feminino">Mulher</option>
@@ -669,7 +680,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">OrientaÃƒÂ§ÃƒÂ£o</label>
+                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Orientação</label>
                       <select value={singleOrientation} onChange={e => setSingleOrientation(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
                         <option value="Bissexual">Bissexual</option>
                         <option value="Heterossexual">Heterossexual</option>
@@ -679,8 +690,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                     <div>
                       <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Biotipo</label>
                       <select value={singleBiotype} onChange={e => setSingleBiotype(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
-                        <option value="PadrÃƒÂ£o">PadrÃƒÂ£o</option>
-                        <option value="AtlÃƒÂ©tico">AtlÃƒÂ©tico</option>
+                        <option value="Padrão">Padrão</option>
+                        <option value="Atlético">Atlético</option>
                         <option value="Fortinho">Fortinho</option>
                         <option value="Magro">Magro</option>
                       </select>
@@ -690,7 +701,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
               )}
 
               <div>
-                <label className="text-[10px] font-black uppercase text-[var(--libido-muted)] opacity-50 tracking-widest">Sobre NÃƒÂ³s / Bio</label>
+                <label className="text-[10px] font-black uppercase text-[var(--libido-muted)] opacity-50 tracking-widest">Sobre Nós / Bio</label>
                 <textarea 
                   value={editBio}
                   onChange={e => setEditBio(e.target.value)}
@@ -704,7 +715,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
               disabled={saving}
               className="w-full bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black py-3.5 rounded-2xl mt-6 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity active:scale-95 shadow-lg shadow-[var(--libido-accent)]/10"
             >
-              {saving ? 'SALVANDO...' : 'SALVAR CONFIGURAÃƒâ€¡Ãƒâ€¢ES'}
+              {saving ? 'SALVANDO...' : 'SALVAR CONFIGURAÇÕES'}
             </button>
           </div>
         </div>
