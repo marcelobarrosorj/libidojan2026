@@ -155,11 +155,21 @@ export function Chat({
   const fileRef = useRef<HTMLInputElement>(null);
   const lastReceivedAt = useRef(0); // SOM-NOVA
 
+  // TRAVA-FIX: abre a conversa apenas quando o alvo (id) realmente muda.
+  // Antes, qualquer mudanca de referencia em user reabria o chat e travava a tela.
+  const alvoAplicado = useRef<string | null>(null);
   useEffect(() => {
-    if (user && (user.id || user.user_id)) {
-      setActiveChat(user.user_id || user.id);
-    }
+    const alvo = user ? (user.user_id || user.id) : null;
+    if (!alvo) return;
+    if (alvoAplicado.current === alvo) return;
+    alvoAplicado.current = alvo;
+    setActiveChat(alvo);
   }, [user]);
+
+  const voltarParaLista = () => {
+    alvoAplicado.current = null;
+    setActiveChat(null);
+  };
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -224,9 +234,18 @@ export function Chat({
     return () => clearInterval(t);
   }, [userId]);
 
-  // TICKS-LEITURA: com a conversa aberta, marca as mensagens recebidas como LIDAS
+  // TICKS-LEITURA: marca como LIDAS so quando ha pendentes e o conjunto mudou.
+  // Antes, o realtime devolvia um array novo, o efeito rodava de novo e travava o app.
+  const ultimaLeitura = useRef<string>("");
   useEffect(() => {
     if (!userId || !activeChat) return;
+    const pendentes = allMessages.filter(
+      (m) => m.from === activeChat && m.to === userId && m.status !== "read",
+    );
+    if (pendentes.length === 0) return;
+    const chave = userId + "|" + activeChat + "|" + pendentes.length + "|" + (pendentes[0] && pendentes[0].id ? pendentes[0].id : "");
+    if (ultimaLeitura.current === chave) return;
+    ultimaLeitura.current = chave;
     markMessagesAsRead(userId, activeChat);
   }, [userId, activeChat, allMessages]);
 
@@ -413,8 +432,10 @@ export function Chat({
         {/* HEADER DA CONVERSA */}
         <div className="flex-none flex items-center gap-3 px-3 py-3 bg-[var(--libido-surface-2)] border-b border-[var(--libido-border)] w-full">
           <button
-            onClick={() => setActiveChat(null)}
-            className="text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] p-1 flex-shrink-0"
+            type="button"
+            aria-label="Voltar para a lista de conversas"
+            onClick={voltarParaLista}
+            className="flex items-center justify-center w-10 h-10 -ml-1 rounded-full bg-white/5 text-[var(--libido-text)] active:scale-95 transition-transform flex-shrink-0"
           >
             <ArrowLeft size={20} />
           </button>
