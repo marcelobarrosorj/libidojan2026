@@ -224,6 +224,20 @@ export function Chat({
     };
   }, [userId, activeChat]);
 
+  // FOTO-CONTATO: busca o perfil real quando a conversa vem do Radar/Perfil e nao ha historico.
+  // Sem isso, quem nunca trocou mensagem caia no avatar generico do DiceBear.
+  const [contatoExtra, setContatoExtra] = useState<any>(null);
+  useEffect(() => {
+    if (!activeChat) { setContatoExtra(null); return; }
+    const jaTem = users.some((u) => (u.user_id || u.id) === activeChat);
+    if (jaTem) { setContatoExtra(null); return; }
+    let vivo = true;
+    getUsersByIds([activeChat])
+      .then((arr) => { if (vivo) setContatoExtra(arr && arr[0] ? arr[0] : null); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [activeChat, users]);
+
   const otherUsers = users.filter((u) => (u.user_id || u.id) !== userId);
 
   // TICKS-EFEITO: enquanto o chat esta aberto, marca recebidas como entregues
@@ -264,7 +278,7 @@ export function Chat({
         name: u.nickname || u.name || "User",
         userNumber: u.userNumber,
         avatar:
-          u.photo_url ||
+          u.photo_url || (u as any)?.photos?.[0] ||
           "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
         lastMessage: lastMsg ? previewFor(lastMsg.text, lastMsg.from, userId) : "Iniciar conversa",
         time: lastMsg
@@ -290,12 +304,12 @@ export function Chat({
 
   // TELA-PRETA-FIX: garante que a conversa aberta sempre tenha um contato (ex: aberta pelo Radar/perfil sem historico)
   if (!activeChatContact && activeChat) {
-    const uFb = users.find((u) => (u.user_id || u.id) === activeChat) || ((user && (user.user_id || user.id) === activeChat) ? user : null);
+    const uFb = users.find((u) => (u.user_id || u.id) === activeChat) || contatoExtra || ((user && (user.user_id || user.id) === activeChat) ? user : null);
     activeChatContact = {
       id: activeChat,
       name: (uFb as any)?.nickname || (uFb as any)?.name || 'Usuario',
       userNumber: (uFb as any)?.userNumber,
-      avatar: (uFb as any)?.photo_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback',
+      avatar: (uFb as any)?.photo_url || ((uFb as any)?.photos && (uFb as any).photos[0]) || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback',
       lastMessage: 'Iniciar conversa',
       time: '',
       unread: 0,
