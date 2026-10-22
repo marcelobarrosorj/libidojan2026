@@ -467,7 +467,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                 <ProtectedImage currentUser={currentUser} src={v.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} className="w-9 h-9 rounded-full" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-black text-[var(--libido-text)] truncate">{v.nickname || 'Usuario'}</p>
-                  {v.isOnline ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
+                  {((v as any).isOnline ?? (v as any).is_online) ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
                 </div>
               </div>
             ))}
