@@ -27,6 +27,7 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
     callback([...demoPosts] as Post[]);
     return () => { isSubscribed = false; };
   }
+
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
@@ -34,14 +35,41 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      if (isSubscribed && data) {
-        const finalPosts = data.map(mapSupabaseToPost);
-        callback(finalPosts);
+      if (!isSubscribed || !data) return;
+
+      // FEED-AVATAR: busca o perfil dos autores e cola o avatar no post.
+      // Antes o avatar dependia do array users estar carregado no Feed,
+      // e quando nao estava o post caia no DiceBear.
+      const ids = Array.from(new Set(data.map((p: any) => p.user_id).filter(Boolean)));
+      const mapaAvatar: Record<string, string> = {};
+      if (ids.length > 0) {
+        const { data: perfis } = await supabase
+          .from('user_profiles')
+          .select('user_id, photo_url, photos')
+          .in('user_id', ids);
+        (perfis || []).forEach((u: any) => {
+          const foto = u.photo_url || (Array.isArray(u.photos) && u.photos[0]) || "";
+          if (foto) mapaAvatar[u.user_id] = foto;
+        });
       }
+
+      if (!isSubscribed) return;
+
+      // FEED-DEDUP: garante id unico antes de entregar a lista.
+      const vistos = new Set<string>();
+      const finalPosts: any[] = [];
+      for (const p of data.map(mapSupabaseToPost)) {
+        if (vistos.has(p.id)) continue;
+        vistos.add(p.id);
+        finalPosts.push({ ...p, avatar: mapaAvatar[p.userId] || "" });
+      }
+
+      callback(finalPosts);
     } catch (err) {
       console.error('Error fetching posts from supabase:', err);
     }
   };
+
   fetchPosts();
   const channel = supabase.channel('public:posts')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
@@ -52,7 +80,7 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
     isSubscribed = false;
     supabase.removeChannel(channel);
   };
-};
+}
 
 export const likePost = async (postId: string) => {
   if (isDemoId(postId)) return;
