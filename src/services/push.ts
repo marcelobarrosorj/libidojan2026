@@ -2,6 +2,28 @@
 import { supabase } from './supabase';
 import { VAPID_PUBLIC_KEY } from './pushConfig';
 
+// PUSH-DIAG: mostra na tela o motivo quando o push falha
+let pushStatus = '';
+let jaAvisou = false;
+
+function avisar(msg: string) {
+  pushStatus = msg;
+  console.warn('PUSH: ' + msg);
+  if (jaAvisou) return;
+  jaAvisou = true;
+  try {
+    if (typeof window !== 'undefined') {
+      window.setTimeout(function () {
+        try { window.alert('PUSH -> ' + msg); } catch (e) {}
+      }, 2000);
+    }
+  } catch (e) {}
+}
+
+export function lerStatusPush(): string {
+  return pushStatus || 'sem registro';
+}
+
 function base64ParaUint8(base64: string): Uint8Array {
   const padding = '='.repeat((4 - (base64.length % 4)) % 4);
   const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -16,23 +38,19 @@ export async function registrarServiceWorker(): Promise<void> {
   try {
     await navigator.serviceWorker.register('/sw.js', { scope: '/' });
   } catch (e) {
-    console.warn('PUSH: falha ao registrar service worker', e);
+    avisar('falha ao registrar service worker');
   }
 }
 
 export async function ativarPush(): Promise<boolean> {
   try {
     if (typeof window === 'undefined') return false;
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-      console.warn('PUSH: navegador sem suporte a push');
-      return false;
-    }
+    if (!('serviceWorker' in navigator)) { avisar('sem serviceWorker neste navegador'); return false; }
+    if (!('PushManager' in window)) { avisar('sem PushManager neste navegador'); return false; }
+    if (!('Notification' in window)) { avisar('sem Notification neste navegador'); return false; }
 
-    const permissao = await Notification.requestPermission();
-    if (permissao !== 'granted') {
-      console.warn('PUSH: permissao nao concedida ->', permissao);
-      return false;
-    }
+    const permissao = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+    if (permissao !== 'granted') { avisar('permissao negada (' + permissao + ')'); return false; }
 
     await registrarServiceWorker();
     const reg = await navigator.serviceWorker.ready;
@@ -48,17 +66,11 @@ export async function ativarPush(): Promise<boolean> {
     const json: any = sub.toJSON();
     const p256dh = json && json.keys ? json.keys.p256dh : null;
     const auth = json && json.keys ? json.keys.auth : null;
-    if (!p256dh || !auth) {
-      console.warn('PUSH: inscricao sem chaves p256dh/auth');
-      return false;
-    }
+    if (!p256dh || !auth) { avisar('inscricao sem chaves p256dh/auth'); return false; }
 
     const sess = await supabase.auth.getSession();
     const uid = sess && sess.data && sess.data.session && sess.data.session.user ? sess.data.session.user.id : null;
-    if (!uid) {
-      console.warn('PUSH: sem sessao ativa, nao da para gravar a inscricao');
-      return false;
-    }
+    if (!uid) { avisar('sem sessao ativa'); return false; }
 
     await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
 
@@ -70,15 +82,12 @@ export async function ativarPush(): Promise<boolean> {
       created_at: new Date().toISOString()
     });
 
-    if (error) {
-      console.warn('PUSH: insert recusado ->', error.message, error.code, error.hint);
-      return false;
-    }
+    if (error) { avisar('banco recusou: ' + error.message); return false; }
 
-    console.log('PUSH: inscricao gravada para', uid);
+    avisar('OK inscricao gravada');
     return true;
-  } catch (e) {
-    console.warn('PUSH: falha ao ativar', e);
+  } catch (e: any) {
+    avisar('excecao: ' + (e && e.message ? e.message : String(e)));
     return false;
   }
 }
