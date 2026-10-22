@@ -442,7 +442,7 @@ export function Chat({
 
   if (activeChat && activeChatContact) {
     return (
-      <div className="fixed top-0 left-0 w-full h-[100dvh] z-[200] md:static md:w-full md:h-full md:flex-1 md:z-auto flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] md:pt-0 md:pb-0">
+      <div className="fixed top-0 left-0 w-full h-[100dvh] z-[900] md:static md:w-full md:h-full md:flex-1 md:z-auto flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] md:pt-0 md:pb-0">
         {/* HEADER DA CONVERSA */}
         <div className="flex-none flex items-center gap-3 px-3 py-3 bg-[var(--libido-surface-2)] border-b border-[var(--libido-border)] w-full">
           <button
