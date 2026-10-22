@@ -22,6 +22,7 @@ export function ProtectedImage({
   style,
   semMarca = false,
   ajuste = 'cover',
+  src,
   ...props
 }: ProtectedImageProps) {
   const [error, setError] = useState(false);
@@ -31,13 +32,17 @@ export function ProtectedImage({
   // travado para sempre, mesmo depois de a foto real estar disponivel.
   useEffect(() => {
     setError(false);
-  }, [props.src]);
+  }, [src]);
 
   return (
-    <div className={`relative overflow-hidden ${className || ''}`} style={style}>
+    <div
+      className={`relative overflow-hidden ${className || ''}`}
+      style={style}
+      data-sensivel={semMarca ? undefined : '1'}
+    >
       <img
         {...props}
-        src={error ? fallbackSrc : props.src}
+        src={error ? fallbackSrc : src}
         onError={(e) => {
           setError(true);
           if (props.onError) props.onError(e);
@@ -45,7 +50,7 @@ export function ProtectedImage({
         draggable={false}
         onDragStart={(e) => e.preventDefault()}
         onContextMenu={(e) => e.preventDefault()}
-        className={"w-full h-full block " + (ajuste === "contain" ? "object-contain" : "object-cover")}
+        className={'w-full h-full block ' + (ajuste === 'contain' ? 'object-contain' : 'object-cover')}
         style={{
           userSelect: 'none',
           WebkitUserSelect: 'none',
