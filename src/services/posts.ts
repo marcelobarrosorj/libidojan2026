@@ -72,7 +72,7 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
 
   fetchPosts();
   const channel = supabase.channel('public:posts')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => {
       fetchPosts();
     })
     .subscribe();
