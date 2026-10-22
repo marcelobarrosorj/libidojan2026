@@ -435,7 +435,7 @@ export function Chat({
             </h3>
             {/* CHAT9: status vira "digitando..." quando o outro esta escrevendo */}
             <p
-              className={`text-[10px] ${
+              className={`text-[12px] ${
                 partnerTyping
                   ? "text-[var(--libido-accent)] font-bold"
                   : "text-[var(--libido-muted)] opacity-60"
@@ -452,7 +452,7 @@ export function Chat({
           <button
             onClick={cycleFont}
             title="Tamanho da letra"
-            className="flex-shrink-0 w-9 h-9 rounded-full border border-[var(--libido-border)] text-[11px] font-bold text-[var(--libido-muted)] hover:text-[var(--libido-text)] flex items-center justify-center"
+            className="flex-shrink-0 w-9 h-9 rounded-full border border-[var(--libido-border)] text-[13px] font-bold text-[var(--libido-muted)] hover:text-[var(--libido-text)] flex items-center justify-center"
           >
             Aa
           </button>
@@ -467,7 +467,7 @@ export function Chat({
           }}
         >
           {isDemoId(activeChat) && (
-            <div className="bg-orange-500/20 text-orange-400 text-[10px] font-bold text-center py-2 px-4 rounded-xl border border-orange-500/30 mb-4 mt-2">
+            <div className="bg-orange-500/20 text-orange-400 text-[12px] font-bold text-center py-2 px-4 rounded-xl border border-orange-500/30 mb-4 mt-2">
               <p className="uppercase tracking-widest">
                 Conversa de Demonstracao
               </p>
@@ -477,7 +477,7 @@ export function Chat({
             </div>
           )}
           <div className="flex items-center justify-center my-3">
-            <span className="bg-[#1a1a2e] text-[var(--libido-muted)] opacity-60 text-[10px] font-bold px-3 py-1 rounded-lg">
+            <span className="bg-[#1a1a2e] text-[var(--libido-muted)] opacity-60 text-[12px] font-bold px-3 py-1 rounded-lg">
               Hoje
             </span>
           </div>
@@ -509,10 +509,10 @@ export function Chat({
                 ) : msg.text.startsWith("[FOTO1X]") ? (
                   msg.fromMe ? (
                     <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
-                      <span className="text-[var(--libido-muted)] text-[11px] font-bold">
-                        Foto — visualizacao unica
+                      <span className="text-[var(--libido-muted)] text-[13px] font-bold">
+                        Foto â€” visualizacao unica
                       </span>
-                      <span className="text-[var(--libido-muted)] opacity-50 text-[10px]">
+                      <span className="text-[var(--libido-muted)] opacity-50 text-[12px]">
                         1x
                       </span>
                     </div>
@@ -524,7 +524,7 @@ export function Chat({
                       <span className="text-[var(--libido-text)] text-[12px] font-bold">
                         Foto
                       </span>
-                      <span className="text-[var(--libido-muted)] text-[10px]">
+                      <span className="text-[var(--libido-muted)] text-[12px]">
                         toque para ver (1x)
                       </span>
                     </button>
@@ -543,7 +543,7 @@ export function Chat({
                         title="Excluir para os dois"
                         className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
                       >
-                        ✕
+                        âœ•
                       </button>
                     )}
                   </div>
@@ -562,7 +562,7 @@ export function Chat({
                       : "justify-start"
                   }`}
                 >
-                  <span className="text-[10px] text-[var(--libido-muted)] opacity-50">
+                  <span className="text-[12px] text-[var(--libido-muted)] opacity-50">
                     {msg.time}
                   </span>
                   {msg.fromMe && (
@@ -573,7 +573,7 @@ export function Chat({
             </div>
           ))}
           {sendingPhoto && (
-            <div className="text-center text-[10px] text-[var(--libido-muted)] opacity-70 font-bold">
+            <div className="text-center text-[12px] text-[var(--libido-muted)] opacity-70 font-bold">
               Enviando foto...
             </div>
           )}
@@ -640,7 +640,7 @@ export function Chat({
               alt="foto"
             />
             <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
-              Fechar ✕
+              Fechar âœ•
             </div>
           </div>
         )}
@@ -698,13 +698,13 @@ export function Chat({
                 <h3 className="text-[13px] font-bold text-[var(--libido-text)] truncate">
                   {contact.name}
                   {contact.userNumber ? (
-                    <span className="text-[10px] text-[var(--libido-muted)] opacity-50 ml-1">
+                    <span className="text-[12px] text-[var(--libido-muted)] opacity-50 ml-1">
                       #{formatUserNumber(contact.userNumber)}
                     </span>
                   ) : null}
                 </h3>
                 <span
-                  className={`text-[10px] flex-shrink-0 ml-2 ${
+                  className={`text-[12px] flex-shrink-0 ml-2 ${
                     contact.unread > 0
                       ? "text-[var(--libido-accent)] font-bold"
                       : "text-[var(--libido-muted)] opacity-50"
@@ -714,7 +714,7 @@ export function Chat({
                 </span>
               </div>
               <div className="flex items-center justify-between mt-0.5 min-w-0">
-                <p className={`text-[11px] truncate flex-1 mr-2 min-w-0 ${contact.unread > 0 ? "text-[var(--libido-text)] font-bold" : "text-[var(--libido-muted)] opacity-60"}`}>
+                <p className={`text-[13px] truncate flex-1 mr-2 min-w-0 ${contact.unread > 0 ? "text-[var(--libido-text)] font-bold" : "text-[var(--libido-muted)] opacity-60"}`}>
                   {contact.lastMessage}
                 </p>
                 {contact.unread > 0 && (

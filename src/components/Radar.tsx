@@ -110,7 +110,7 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
           .map((u: any) => ({ ...u, is_online: u?.is_online === true || u?.isOnline === true, isOnline: u?.is_online === true || u?.isOnline === true })); // B3-FIX: radar mostra SO quem esta online de verdade
         setOperators(onlineAgora);
       } catch (err) {
-        console.error('Falha ao buscar usuários no Radar:', err);
+        console.error('Falha ao buscar usuÃ¡rios no Radar:', err);
       } finally {
         setLoading(false);
       }
@@ -124,8 +124,8 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
     <div className="flex-1 flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden p-5 relative min-h-0">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">Radar NoFake</h1>
-          <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold uppercase tracking-widest mt-0.5">Operadores em Proximidade</p>
+          <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">Radar</h1>
+          <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold uppercase tracking-widest mt-0.5">Pessoas perto de você</p>
         </div>
         <div className="flex flex-col items-end gap-1.5">
           <div className="flex items-center gap-1 bg-[var(--libido-surface-2)] border border-[var(--libido-border)] px-3 py-1.5 rounded-full">
@@ -154,10 +154,10 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
       ) : modo === 'lista' ? (
         <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
           {!meuPonto && (
-            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Obtendo sua localização...</p>
+            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Obtendo sua localizaÃ§Ã£o...</p>
           )}
           {meuPonto && listaProximos.length === 0 && (
-            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Nenhum usuário com localização ativa</p>
+            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Nenhum usuÃ¡rio com localizaÃ§Ã£o ativa</p>
           )}
           <div className="space-y-2.5">
             {listaProximos.map((p) => (
@@ -200,10 +200,10 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
           </div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
             <div className="w-14 h-14 rounded-full border-2 border-[var(--libido-accent)] shadow-[0_0_25px_rgba(255,179,0,0.3)] overflow-hidden">
-              <ProtectedImage currentUser={currentUser} src={currentUser?.photo_url || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=64&auto=format&fit=crop'} alt="Você" className="w-full h-full" />
+              <ProtectedImage currentUser={currentUser} src={currentUser?.photo_url || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=64&auto=format&fit=crop'} alt="VocÃª" className="w-full h-full" />
             </div>
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-[6px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
-              Você
+              VocÃª
             </div>
           </div>
           {loading ? (

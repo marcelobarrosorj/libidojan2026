@@ -8,6 +8,7 @@ import { formatUserNumber } from '../utils/formatUserNumber';
 import { isDemoId } from '../demo';
 import { updateUserProfile, deleteUserProfile } from '../services/users';
 import { supabase } from '../services/supabase';
+import { registrarVisita } from '../services/visits'; // VISITAS
 // NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
 function extrairTextoBio(b: any): string {
   if (!b || typeof b !== 'string') return '';
@@ -37,6 +38,8 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   const [isFollowing, setIsFollowing] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
   const [followersCount, setFollowersCount] = useState<number | null>(null);
+  // VISITAS: registra que este perfil foi aberto
+  useEffect(() => { if (user?.user_id) void registrarVisita(user.user_id); }, [user?.user_id]);
 
   useEffect(() => {
     let ativo = true;
@@ -97,12 +100,12 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   if (!user) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[var(--libido-bg)] text-[var(--libido-muted)] opacity-50 text-xs">
-        Perfil não encontrado.
+        Perfil nÃ£o encontrado.
       </div>
     );
   }
 
-  const nickname = user.nickname || 'Usuário';
+  const nickname = user.nickname || 'UsuÃ¡rio';
   const photoUrl = user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
   const userPhotos: string[] = user.photos || [];
   const displayBio = extrairTextoBio(user.bio) || '';
@@ -115,7 +118,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
     try {
       if (!user.user_id) return;
       await updateUserProfile(user.user_id, { status: 'banned' });
-      alert('Usuário banido com sucesso.');
+      alert('UsuÃ¡rio banido com sucesso.');
       navigate?.('feed');
     } catch (err: any) {
       alert('Erro: ' + err.message);
@@ -125,7 +128,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   
   const handleReport = async () => {
     if (isDemoId(user.id || user.user_id || '')) {
-      alert("Ações de denúncia estão desabilitadas para perfis de demonstração.");
+      alert("AÃ§Ãµes de denÃºncia estÃ£o desabilitadas para perfis de demonstraÃ§Ã£o.");
       setShowReportModal(false);
       return;
     }
@@ -137,11 +140,11 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
         targetUserId: user.user_id,
         reason: reportReason
       });
-      alert('Denúncia enviada com sucesso.');
+      alert('DenÃºncia enviada com sucesso.');
       setShowReportModal(false);
       setReportReason('');
     } catch (err) {
-      alert('Erro ao enviar denúncia.');
+      alert('Erro ao enviar denÃºncia.');
     } finally {
       setIsReporting(false);
     }
@@ -149,13 +152,13 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
 
   const handleDeleteUser = async () => {
     if (currentUser?.plan !== 'owner') {
-      alert("Apenas owners podem excluir usuários.");
+      alert("Apenas owners podem excluir usuÃ¡rios.");
       return;
     }
     try {
       if (!user.user_id) return;
       await deleteUserProfile(user.user_id);
-      alert('Usuário excluído.');
+      alert('UsuÃ¡rio excluÃ­do.');
       navigate?.('feed');
     } catch (err: any) {
       alert('Erro: ' + err.message);
@@ -188,7 +191,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
             <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-[var(--libido-bg)] ${isOnline ? 'bg-green-500' : 'bg-white/20'}`} />
           </div>
           <h2 className="text-lg font-black text-[var(--libido-text)] flex items-center justify-center gap-1">{nickname} {user.userNumber ? <span className="text-[12px] text-[var(--libido-muted)] opacity-50">#{formatUserNumber(user.userNumber)}</span> : null}</h2>
-          <p className="text-[10px] text-[var(--libido-muted)] opacity-50 font-semibold mt-0.5">{isOnline ? '🟢 Online agora' : '⚪ Offline'}</p>
+          <p className="text-[10px] text-[var(--libido-muted)] opacity-50 font-semibold mt-0.5">{isOnline ? 'ðŸŸ¢ Online agora' : 'âšª Offline'}</p>
           {followersCount !== null && (
             <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-bold mt-1">{followersCount} seguidores</p>
           )}
@@ -224,7 +227,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-accent)]/20 p-4 rounded-2xl">
-                <p className="text-[8px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ele 👨</p>
+                <p className="text-[8px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ele ðŸ‘¨</p>
                 <h4 className="text-sm font-black truncate">{coupleData.maleNickname || 'Parceiro'}</h4>
                 <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-semibold mt-1">{coupleData.maleAge ? `${coupleData.maleAge} anos` : ''}</p>
                 <div className="mt-2 pt-2 border-t border-[var(--libido-border)] text-[8px] text-[var(--libido-muted)] opacity-60 font-bold space-y-0.5">
@@ -234,7 +237,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
                 </div>
               </div>
               <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-accent)]/20 p-4 rounded-2xl">
-                <p className="text-[8px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ela 👩</p>
+                <p className="text-[8px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ela ðŸ‘©</p>
                 <h4 className="text-sm font-black truncate">{coupleData.femaleNickname || 'Parceira'}</h4>
                 <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-semibold mt-1">{coupleData.femaleAge ? `${coupleData.femaleAge} anos` : ''}</p>
                 <div className="mt-2 pt-2 border-t border-[var(--libido-border)] text-[8px] text-[var(--libido-muted)] opacity-60 font-bold space-y-0.5">
@@ -256,9 +259,9 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
 
         {!isCouple && (
           <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl">
-            <p className="text-[8px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-2">Informações</p>
+            <p className="text-[8px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-2">InformaÃ§Ãµes</p>
             <div className="grid grid-cols-2 gap-3 text-[10px] font-bold text-[var(--libido-muted)] opacity-70">
-              <p>Gênero: <span className="text-[var(--libido-muted)] opacity-90">{user.gender || 'n/d'}</span></p>
+              <p>GÃªnero: <span className="text-[var(--libido-muted)] opacity-90">{user.gender || 'n/d'}</span></p>
               <p>Idade: <span className="text-[var(--libido-muted)] opacity-90">{user.age ? `${user.age} anos` : 'n/d'}</span></p>
               <p>Biotipo: <span className="text-[var(--libido-muted)] opacity-90">{user.biotype || 'n/d'}</span></p>
               <p>Altura: <span className="text-[var(--libido-muted)] opacity-90">{user.height ? `${user.height} cm` : 'n/d'}</span></p>
@@ -304,7 +307,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
             <textarea 
               value={reportReason}
               onChange={e => setReportReason(e.target.value)}
-              placeholder="Qual o motivo da denúncia?"
+              placeholder="Qual o motivo da denÃºncia?"
               className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-4 py-3 text-xs text-[var(--libido-text)] focus:outline-none focus:border-[var(--libido-accent)] h-24 resize-none"
             />
             <div className="flex gap-3">
@@ -320,7 +323,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
             <Ban size={32} className="text-orange-400 mx-auto" />
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase">Banir {nickname}?</h3>
-            <p className="text-[10px] text-[var(--libido-muted)] opacity-60 font-semibold">O usuário será impedido de acessar o app.</p>
+            <p className="text-[10px] text-[var(--libido-muted)] opacity-60 font-semibold">O usuÃ¡rio serÃ¡ impedido de acessar o app.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowConfirmBan(false)} className="flex-1 py-3 bg-white/5 border border-[var(--libido-border)] rounded-xl text-[9px] font-black text-[var(--libido-text)] uppercase tracking-widest">Cancelar</button>
               <button onClick={handleBanUser} className="flex-1 py-3 bg-orange-500 rounded-xl text-[9px] font-black text-black uppercase tracking-widest">Confirmar Ban</button>
@@ -334,7 +337,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
             <Trash2 size={32} className="text-red-400 mx-auto" />
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase">Excluir {nickname}?</h3>
-            <p className="text-[10px] text-[var(--libido-muted)] opacity-60 font-semibold">AÇÃO IRREVERSÍVEL. Todos os dados serão removidos.</p>
+            <p className="text-[10px] text-[var(--libido-muted)] opacity-60 font-semibold">AÃ‡ÃƒO IRREVERSÃVEL. Todos os dados serÃ£o removidos.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowConfirmDelete(false)} className="flex-1 py-3 bg-white/5 border border-[var(--libido-border)] rounded-xl text-[9px] font-black text-[var(--libido-text)] uppercase tracking-widest">Cancelar</button>
               <button onClick={handleDeleteUser} className="flex-1 py-3 bg-red-600 rounded-xl text-[9px] font-black text-[var(--libido-text)] uppercase tracking-widest">Excluir</button>
