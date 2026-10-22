@@ -86,12 +86,12 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
     }
 
     if (relationshipStatus === 'solteiro') {
-      if (!singleAge || !singleGender) {
-        setMessage('Por favor, informe sua idade e gênero.');
+      if (!singleGender) {
+        setMessage('Por favor, informe seu gênero.');
         return;
       }
       const age = (calcularIdade(singleAge) ?? -1);
-      if (isNaN(age) || age < 18 || age > 120) {
+      if (singleAge && (isNaN(age) || age < 18 || age > 120)) {
         setMessage('Você deve ter 18 anos ou mais.');
         return;
       }
@@ -101,13 +101,13 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         return;
       }
     } else {
-      if (!maleNickname || !maleAge || !femaleNickname || !femaleAge) {
-        setMessage('Por favor, preencha os nomes e idades do casal.');
+      if (!maleNickname || !femaleNickname) {
+        setMessage('Por favor, preencha os nomes do casal.');
         return;
       }
       const mAge = (calcularIdade(maleAge) ?? -1); // CASAL-DATA
       const fAge = (calcularIdade(femaleAge) ?? -1); // CASAL-DATA
-      if (isNaN(mAge) || mAge < 18 || mAge > 120 || isNaN(fAge) || fAge < 18 || fAge > 120) {
+      if ((maleAge && (isNaN(mAge) || mAge < 18 || mAge > 120)) || (femaleAge && (isNaN(fAge) || fAge < 18 || fAge > 120))) {
         setMessage('Ambos devem ter 18 anos ou mais.');
         return;
       }
@@ -231,7 +231,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Data de nascimento</label>
+                  <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Data de nascimento (opcional)</label>
                   <input type="date" value={singleAge} onChange={e => setSingleAge(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-xl px-3 py-2.5 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
                 </div>
                 <div>

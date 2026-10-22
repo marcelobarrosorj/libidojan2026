@@ -46,7 +46,9 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       const meuId = data && data.session && data.session.user ? data.session.user.id : null;
       if (!meuId) { setVisitas(0); return; }
       setVisitas(await contarVisitas(meuId));
-      setVisitantes(await listarVisitantes(meuId, 30));
+      const brutosVis = await listarVisitantes(meuId, 30);
+      const idsVis = brutosVis.map((v: any) => v.visitor_id);
+      setVisitantes(idsVis.length ? await getUsersByIds(idsVis) : []);
     };
     void carregarVisitas();
   }, []);
@@ -455,6 +457,23 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           <p className="text-sm font-black text-[var(--libido-text)] mt-1">{followersCount !== null ? followersCount : "..."}</p>
         </div>
       </div>
+
+      {visitantes.length > 0 && (
+        <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl mb-6">
+          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-2">Quem te visitou ({visitantes.length})</p>
+          <div className="space-y-2.5">
+            {visitantes.slice(0, 10).map((v: any) => (
+              <div key={v.id || v.user_id} className="flex items-center gap-3">
+                <ProtectedImage currentUser={currentUser} src={v.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} className="w-9 h-9 rounded-full" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{v.nickname || 'Usuario'}</p>
+                  {v.isOnline ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {followersList !== null && followersList.length > 0 && (
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl mb-6">
