@@ -62,14 +62,14 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [maleNickname, setMaleNickname] = useState('');
   const [maleAge, setMaleAge] = useState('');
   const [maleOrientation, setMaleOrientation] = useState('Heterossexual');
-  const [maleBiotype, setMaleBiotype] = useState('Padr�o');
+  const [maleBiotype, setMaleBiotype] = useState('Padrão');
   const [maleHeight, setMaleHeight] = useState('');
   const [maleWeight, setMaleWeight] = useState('');
 
   const [femaleNickname, setFemaleNickname] = useState('');
   const [femaleAge, setFemaleAge] = useState('');
   const [femaleOrientation, setFemaleOrientation] = useState('Bissexual');
-  const [femaleBiotype, setFemaleBiotype] = useState('Padr�o');
+  const [femaleBiotype, setFemaleBiotype] = useState('Padrão');
   const [femaleHeight, setFemaleHeight] = useState('');
   const [femaleWeight, setFemaleWeight] = useState('');
 
@@ -77,7 +77,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [singleAge, setSingleAge] = useState('');
   const [singleGender, setSingleGender] = useState('Masculino');
   const [singleOrientation, setSingleOrientation] = useState('Bissexual');
-  const [singleBiotype, setSingleBiotype] = useState('Padr�o');
+  const [singleBiotype, setSingleBiotype] = useState('Padrão');
   const [singleHeight, setSingleHeight] = useState('');
   // IDADE-EDIT: datas de nascimento na edicao (perfis existentes incluidos)
   const [singleBirth, setSingleBirth] = useState('');
@@ -97,14 +97,14 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setMaleAge(cp.maleAge != null ? String(cp.maleAge) : (calcularIdade(cp.maleBirthDate) != null ? String(calcularIdade(cp.maleBirthDate)) : ''));
         setMaleBirth(cp.maleBirthDate || '');
         setMaleOrientation(cp.maleOrientation || 'Heterossexual');
-        setMaleBiotype(cp.maleBiotype || 'Padr�o');
+        setMaleBiotype(cp.maleBiotype || 'Padrão');
         setMaleHeight(cp.maleHeight != null ? String(cp.maleHeight) : '');
         setMaleWeight(cp.maleWeight != null ? String(cp.maleWeight) : '');
         setFemaleNickname(cp.femaleNickname || '');
         setFemaleAge(cp.femaleAge != null ? String(cp.femaleAge) : (calcularIdade(cp.femaleBirthDate) != null ? String(calcularIdade(cp.femaleBirthDate)) : ''));
         setFemaleBirth(cp.femaleBirthDate || '');
         setFemaleOrientation(cp.femaleOrientation || 'Bissexual');
-        setFemaleBiotype(cp.femaleBiotype || 'Padr�o');
+        setFemaleBiotype(cp.femaleBiotype || 'Padrão');
         setFemaleHeight(cp.femaleHeight != null ? String(cp.femaleHeight) : '');
         setFemaleWeight(cp.femaleWeight != null ? String(cp.femaleWeight) : '');
         setEditBio(extrairTextoBio(rawBio) || (cp && typeof cp.text === 'string' ? cp.text : ''));
@@ -119,7 +119,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           setMaleAge(parsed.maleAge?.toString() || (calcularIdade(parsed.maleBirthDate) != null ? String(calcularIdade(parsed.maleBirthDate)) : ''));
           setMaleBirth(parsed.maleBirthDate || '');
           setMaleOrientation(parsed.maleOrientation || 'Heterossexual');
-          setMaleBiotype(parsed.maleBiotype || 'Padr�o');
+          setMaleBiotype(parsed.maleBiotype || 'Padrão');
           setMaleHeight(parsed.maleHeight || '');
           setMaleWeight(parsed.maleWeight || '');
 
@@ -127,7 +127,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           setFemaleAge(parsed.femaleAge?.toString() || (calcularIdade(parsed.femaleBirthDate) != null ? String(calcularIdade(parsed.femaleBirthDate)) : ''));
           setFemaleBirth(parsed.femaleBirthDate || '');
           setFemaleOrientation(parsed.femaleOrientation || 'Bissexual');
-          setFemaleBiotype(parsed.femaleBiotype || 'Padr�o');
+          setFemaleBiotype(parsed.femaleBiotype || 'Padrão');
           setFemaleHeight(parsed.femaleHeight || '');
           setFemaleWeight(parsed.femaleWeight || '');
           setEditBio(parsed.text || '');
@@ -145,7 +145,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setSingleBirth(currentUser.birth_date || '');
         setSingleGender(currentUser.gender || 'Masculino');
         setSingleOrientation(currentUser.sexual_orientation || 'Bissexual');
-        setSingleBiotype(currentUser.biotype || 'Padr�o');
+        setSingleBiotype(currentUser.biotype || 'Padrão');
         setSingleHeight(currentUser.height?.toString() || '');
       }
     }
@@ -281,7 +281,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
 
   const handleSaveProfile = async () => {
     if (!editNickname.trim()) {
-      alert("O apelido n�o pode ficar vazio.");
+      alert("O apelido não pode ficar vazio.");
       return;
     }
     const idadeSingle = calcularIdade(singleBirth);
@@ -435,7 +435,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
             <p>IDADE: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.age ? `${currentUser.age} anos` : 'n/d'}</span></p>
             <p>BIOTIPO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.biotype || 'n/d'}</span></p>
             <p>ALTURA: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.height ? `${currentUser.height} cm` : 'n/d'}</span></p>
-            <p>ORIENTA��O: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.sexualOrientation || 'n/d'}</span></p>
+            <p>ORIENTAÇÃO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.sexualOrientation || 'n/d'}</span></p>
           </div>
         </div>
       )}
@@ -709,7 +709,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                     <div>
                       <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Biotipo</label>
                       <select value={singleBiotype} onChange={e => setSingleBiotype(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
-                        <option value="Padr�o">Padr�o</option>
+                        <option value="Padrão">Padrão</option>
                         <option value="Atlético">Atlético</option>
                         <option value="Fortinho">Fortinho</option>
                         <option value="Magro">Magro</option>

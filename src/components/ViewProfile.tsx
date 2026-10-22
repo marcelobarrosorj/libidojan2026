@@ -100,7 +100,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   if (!user) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[var(--libido-bg)] text-[var(--libido-muted)] opacity-50 text-xs">
-        Perfil n�o encontrado.
+        Perfil não encontrado.
       </div>
     );
   }
@@ -128,7 +128,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   
   const handleReport = async () => {
     if (isDemoId(user.id || user.user_id || '')) {
-      alert("A��es de den�ncia est�o desabilitadas para perfis de demonstra��o.");
+      alert("Ações de denúncia estão desabilitadas para perfis de demonstração.");
       setShowReportModal(false);
       return;
     }
@@ -337,7 +337,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full text-center space-y-4">
             <Trash2 size={32} className="text-red-400 mx-auto" />
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase">Excluir {nickname}?</h3>
-            <p className="text-[10px] text-[var(--libido-muted)] opacity-60 font-semibold">A��O IRREVERS�VEL. Todos os dados ser�o removidos.</p>
+            <p className="text-[10px] text-[var(--libido-muted)] opacity-60 font-semibold">AÇÃO IRREVERSÍVEL. Todos os dados serão removidos.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowConfirmDelete(false)} className="flex-1 py-3 bg-white/5 border border-[var(--libido-border)] rounded-xl text-[9px] font-black text-[var(--libido-text)] uppercase tracking-widest">Cancelar</button>
               <button onClick={handleDeleteUser} className="flex-1 py-3 bg-red-600 rounded-xl text-[9px] font-black text-[var(--libido-text)] uppercase tracking-widest">Excluir</button>
