@@ -188,10 +188,23 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
       }))
       .filter((d) => d.lat !== null && d.lon !== null)
       .map((d) => {
-        const j = jitterPorId(String(d.u.id));
-        const ponto = map.latLngToContainerPoint([d.lat! + j.dLat, d.lon! + j.dLon]);
-        const dist = distanciaMetros(meuPonto.lat, meuPonto.lon, d.lat!, d.lon!);
-        return { user: d.u as User, x: ponto.x, y: ponto.y, dist };
+        const u: any = d.u;
+        let lat = d.lat!;
+        let lon = d.lon!;
+        const online = u?.isOnline === true || u?.is_online === true;
+        if (!online && u?.anelM && meuPonto) {
+          const rad = ((Number(u.angulo) || 0) * Math.PI) / 180;
+          const m = Number(u.anelM) || 2000;
+          lat = meuPonto.lat + (m * Math.cos(rad)) / 111320;
+          lon = meuPonto.lon + (m * Math.sin(rad)) / (111320 * Math.cos((meuPonto.lat * Math.PI) / 180));
+        } else {
+          const j = jitterPorId(String(u.id));
+          lat = lat + j.dLat;
+          lon = lon + j.dLon;
+        }
+        const ponto = map.latLngToContainerPoint([lat, lon]);
+        const dist = distanciaMetros(meuPonto.lat, meuPonto.lon, lat, lon);
+        return { user: u as User, x: ponto.x, y: ponto.y, dist };
       })
       .filter((p) => p.dist >= 0)
       .sort((a, b) => a.dist - b.dist);

@@ -1,3 +1,4 @@
+import { carregarRadarMapa } from '../services/radarMapa';
 import { useState, useEffect, useMemo } from 'react';
 import { Users, Map as MapIcon, List as ListIcon } from 'lucide-react';
 import { User } from '../types';
@@ -79,36 +80,37 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
 
   // Lista de proximos: distancia real, do mais perto para o mais longe
   const listaProximos = useMemo(() => {
-    if (!meuPonto) return [];
     return operators
       .map((u: any) => ({
         user: u,
-        lat: u?.lat != null ? Number(u.lat) : null,
-        lon: u?.lon != null ? Number(u.lon) : null
+        faixa: u?.faixa || '',
+        dist: 0,
+        ordem: typeof u?.ordem === 'number' ? u.ordem : 99
       }))
-      .filter((d) => d.lat !== null && d.lon !== null)
-      .map((d) => ({ user: d.user, dist: distanciaMetros(meuPonto.lat, meuPonto.lon, d.lat!, d.lon!) }))
-      .filter((p) => p.dist >= 0)
-      .sort((a, b) => a.dist - b.dist);
-  }, [operators, meuPonto]);
+      .sort((a: any, b: any) => a.ordem - b.ordem);
+  }, [operators]);
 
   useEffect(() => {
     const fetchOperators = async () => {
       if (!userId) return;
       try {
-        const users = await getActiveUsers(userId);
-        const agoraMs = Date.now();
-        const JANELA_ONLINE_MS = 5 * 60 * 1000;
-        const estaOnlineAgora = (u: any) => {
-          const ts = u?.last_seen ?? u?.updated_at;
-          const online = u?.is_online === true || u?.isOnline === true;
-          if (!online || !ts) return false;
-          return (agoraMs - new Date(ts).getTime()) < JANELA_ONLINE_MS;
-        };
-        const comTimestamp = (users || []).filter((u: any) => !!(u?.last_seen ?? u?.updated_at));
-        const onlineAgora = (comTimestamp.length > 0 ? (users || []).filter(estaOnlineAgora) : (users || []).filter((u: any) => u?.is_online === true || u?.isOnline === true))
-          .map((u: any) => ({ ...u, is_online: u?.is_online === true || u?.isOnline === true, isOnline: u?.is_online === true || u?.isOnline === true })); // B3-FIX: radar mostra SO quem esta online de verdade
-        setOperators(onlineAgora);
+        const perfis = await carregarRadarMapa(50);
+        const mapeados = perfis.map((p) => ({
+          id: p.peerId,
+          user_id: p.peerId,
+          name: p.nickname,
+          nickname: p.nickname,
+          photo_url: p.foto,
+          isOnline: p.online,
+          is_online: p.online,
+          faixa: p.faixa,
+          ordem: p.ordem,
+          anelM: p.anelM,
+          angulo: p.angulo,
+          lat: p.latPin,
+          lon: p.lonPin,
+        }));
+        setOperators(mapeados);
       } catch (err) {
         console.error('Falha ao buscar usuários no Radar:', err);
       } finally {
@@ -181,7 +183,7 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
                       <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
                     )}
                   </p>
-                  <p className="text-[10px] font-black text-[var(--libido-muted)]">{formatarDistancia(p.dist)}</p>
+                  <p className="text-[10px] font-black text-[var(--libido-muted)]">{p.user.isOnline ? p.faixa : 'offline - ' + p.faixa}</p>
                 </div>
                 <span className="px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-xs font-black uppercase tracking-wide shrink-0">Ver perfil</span>
               </div>
