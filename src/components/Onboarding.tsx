@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { uploadPhoto } from '../services/uploadPhoto';
 import { createPost } from '../services/posts'; // FOTO-CADASTRO
+import { salvarPerfil, mensagemPerfil } from '../services/onboarding';
 
 // FOTO-FIX: comprime a foto antes do envio (menos memoria e menos falha)
 async function comprimirFoto(file: File): Promise<File> {
@@ -171,12 +172,16 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
       }
 
       const { error } = await supabase
-        .from('users')
-        .upsert(payload, { onConflict: 'user_id' });
+      const resultado = await salvarPerfil(payload);
 
-      if (error) throw error;
-          if (finalPhotoUrl) { try { await createPost({ id: '', userId: userId, image: finalPhotoUrl, text: '', likes: 0, createdAt: Date.now() }); } catch (eP) { console.error('ONBOARDING-POST falhou', eP); } } // FOTO-CADASTRO
-      try { localStorage.removeItem('libido_rascunho_' + userId); } catch (eLimpa) {} onComplete();
+      if (!resultado.ok) {
+        setMessage(mensagemPerfil(resultado));
+        return;
+      }
+
+      if (finalPhotoUrl) { try { await createPost({ id: '', userId: userId, image: finalPhotoUrl, text: '', likes: 0, createdAt: Date.now() }); } catch (eP) { console.error('ONBOARDING-POST falhou', eP); } }
+      try { localStorage.removeItem('libido_rascunho_' + userId); } catch (eLimpa) {}
+      onComplete();
     } catch (err: any) {
       console.error('Erro técnico interno ao salvar:', err);
       setMessage('Não foi possível salvar seu perfil. Tente novamente.');
