@@ -186,7 +186,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
         lat: u?.lat != null ? Number(u.lat) : null,
         lon: u?.lon != null ? Number(u.lon) : null
       }))
-      .filter((d) => d.lat !== null && d.lon !== null)
+      .filter((d: any) => (d.lat !== null && d.lon !== null) || !!(d.u && d.u.anelM))
       .map((d) => {
         const u: any = d.u;
         let lat = d.lat!;
