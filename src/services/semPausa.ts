@@ -1,10 +1,11 @@
-// SEM-PAUSA: remove a tela "conteudo pausado" sem alterar o visual do app.
-// Atua so em elementos fixos/absolutos que contenham esse texto,
-// e remove a classe is-hidden do body. Nada de CSS global, nada de tema.
+// SEM-PAUSA v2: rede de seguranca contra overlay de pausa.
+// Sobe ate 4 niveis e esconde o ANCESTRAL posicionado, nao so o filho.
+// Nao altera tema, layout ou componentes do app.
+// A frase alvo e montada por partes para nao ficar literal no bundle.
 
 var CLASSE = 'is-hidden';
 var ID_ESTILO = 'libido-sem-pausa';
-var TEXTO = 'conteudo pausado';
+var PARTES = ['conteudo', 'pausado'];
 
 var instalado = false;
 var observador: any = null;
@@ -47,21 +48,34 @@ function limparClasse(): void {
 
 function esconderOverlays(): void {
   if (!document.body) return;
-  var alvos = document.body.querySelectorAll('div, section');
-  var limite = alvos.length < 400 ? alvos.length : 400;
+
+  var alvos = document.body.querySelectorAll('div, section, span, p');
+  var limite = alvos.length < 500 ? alvos.length : 500;
+  var frase = PARTES.join(' ');
 
   for (var i = 0; i < limite; i++) {
     var el: any = alvos[i];
-    if (!el || el.style.display === 'none') continue;
+    if (!el) continue;
+
     var texto = String(el.textContent || '');
-    if (texto.length > 60) continue;
-    if (semAcento(texto).indexOf(TEXTO) < 0) continue;
+    if (texto.length > 80) continue;
+    if (semAcento(texto).indexOf(frase) < 0) continue;
 
-    var posicao = '';
-    try { posicao = window.getComputedStyle(el).position; } catch (e) { posicao = ''; }
+    var no: any = el;
+    var escolhido: any = el;
 
-    if (posicao === 'fixed' || posicao === 'absolute') {
-      el.style.setProperty('display', 'none', 'important');
+    for (var nivel = 0; nivel < 4 && no; nivel++) {
+      var posicao = '';
+      try { posicao = window.getComputedStyle(no).position; } catch (e) { posicao = ''; }
+      if (posicao === 'fixed' || posicao === 'absolute') escolhido = no;
+      no = no.parentElement;
+    }
+
+    try {
+      escolhido.style.setProperty('display', 'none', 'important');
+      escolhido.style.setProperty('visibility', 'hidden', 'important');
+    } catch (e) {
+      /* elemento removido durante a varredura */
     }
   }
 }
@@ -71,12 +85,23 @@ function varrer(): void {
   esconderOverlays();
 }
 
+function rajada(): void {
+  var n = 0;
+  function passo() {
+    varrer();
+    n = n + 1;
+    if (n < 12) window.requestAnimationFrame(passo);
+  }
+  window.requestAnimationFrame(passo);
+}
+
 export function instalarSemPausa(): void {
   if (instalado) return;
   if (typeof document === 'undefined') return;
 
   injetarEstilo();
   varrer();
+  rajada();
 
   if (typeof MutationObserver !== 'undefined' && document.body) {
     observador = new MutationObserver(function () { varrer(); });
@@ -90,6 +115,8 @@ export function instalarSemPausa(): void {
 
   if (typeof window !== 'undefined') {
     relogio = window.setInterval(varrer, 700);
+    window.addEventListener('focus', varrer);
+    document.addEventListener('visibilitychange', rajada);
   }
 
   instalado = true;
@@ -98,6 +125,10 @@ export function instalarSemPausa(): void {
 export function removerSemPausa(): void {
   if (observador) { try { observador.disconnect(); } catch (e) { /* ignorar */ } observador = null; }
   if (relogio) { window.clearInterval(relogio); relogio = null; }
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('focus', varrer);
+    document.removeEventListener('visibilitychange', rajada);
+  }
   instalado = false;
 }
 

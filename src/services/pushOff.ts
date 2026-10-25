@@ -47,7 +47,7 @@ function cancelarInscricao(): void {
       }
     }).catch(function () { /* ignorar */ });
   } catch (e) {
-    /* silencioso: push desligado, nada a reportar */
+    /* silencioso */
   }
 }
 

@@ -91,7 +91,8 @@ function criarEscudo(): HTMLDivElement {
   const el = document.createElement('div');
   el.id = ID_ESCUDO;
   el.setAttribute('aria-hidden', 'true');
-  el.textContent = 'conteudo pausado';
+  /* PAUSA-REMOVIDA: overlay nunca exibe texto */
+  el.style.setProperty('display', 'none', 'important');
   document.body.appendChild(el);
   return el;
 }

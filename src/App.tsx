@@ -100,7 +100,7 @@ export default function App() {
       if (document.hidden) {
         if (!isSafeZone) {
           blurTimeoutRef.current = setTimeout(() => {
-            document.body.classList.add('is-hidden');
+            /* PAUSA-REMOVIDA: sem blur ao navegar */
             setPinVerified(false);
           }, 60000);
         }
