@@ -1,4 +1,6 @@
 import './services/antiPrint';
+import './services/semPausa';
+import './services/pushOff';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
