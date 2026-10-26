@@ -38,3 +38,10 @@ log-execucao.txt
 sql/_runner.cjs
 sql/_teste.cjs
 sql/executar.sql
+auditoria-libido.txt
+auditoria.sql
+auditar.sh
+auditar.ps1
+verificar.ps1
+push-ordem*.ps1
+ler-push.ps1
