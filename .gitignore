@@ -1,4 +1,4 @@
-﻿# Dependencias
+# Dependencias
 node_modules/
 
 # Builds e cobertura de testes
@@ -32,3 +32,9 @@ VAPID-PARA-VERCEL.txt
 PUSH-WEBHOOK.sql
 
 .dburl
+rodar.ps1
+subir.ps1
+log-execucao.txt
+sql/_runner.cjs
+sql/_teste.cjs
+sql/executar.sql
