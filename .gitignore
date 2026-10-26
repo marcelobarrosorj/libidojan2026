@@ -45,3 +45,5 @@ auditar.ps1
 verificar.ps1
 push-ordem*.ps1
 ler-push.ps1
+ciclo1.ps1
+auditoria-criticos.txt
