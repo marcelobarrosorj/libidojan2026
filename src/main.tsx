@@ -1,6 +1,5 @@
 import './services/antiPrint';
 import './services/semPausa';
-import './services/pushOff';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -8,6 +7,7 @@ import './index.css';
 import './services/locationTracker';
 import './services/alertasSonoros';
 import './services/push';
+import './services/pushOff';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
