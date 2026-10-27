@@ -1,3 +1,4 @@
+import { sanitizarImagem } from './media';
 import { supabase } from "./supabase";
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
@@ -26,6 +27,7 @@ export async function uploadPhoto(file: File, requestedUserId: string) {
   console.log("🔥 INICIANDO UPLOAD NO STORAGE PARA O USER: ", userId);
   
   const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const arquivoLimpo = await sanitizarImagem(file);
   const filePath = `${userId}/${Date.now()}-${safeFilename}`;
 
   if (!supabase || !supabase.storage) {
@@ -34,7 +36,7 @@ export async function uploadPhoto(file: File, requestedUserId: string) {
 
   const uploadPromise = supabase.storage
     .from("photos")
-    .upload(filePath, file, {
+    .upload(filePath, arquivoLimpo, {
         upsert: false
     });
 

@@ -1,3 +1,4 @@
+import { sanitizarImagem } from '../services/media';
 import { isDemoId } from "../demo";
 import { useState, useEffect, useRef } from "react";
 import {
