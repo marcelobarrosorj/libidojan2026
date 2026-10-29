@@ -124,7 +124,7 @@ function iniciarGps(): void {
         meuPonto = { lat: pos.coords.latitude, lon: pos.coords.longitude };
       },
       function () {},
-      { enableHighAccuracy: true, maximumAge: 30000, timeout: 20000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
     );
   } catch (e) {}
 }

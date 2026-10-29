@@ -21,7 +21,7 @@ export function iniciarGpsGlobal(userId: string): () => void {
     watchId = navigator.geolocation.watchPosition(
       (pos: GeolocationPosition) => salvar(pos.coords.latitude, pos.coords.longitude),
       (erroGps: any) => console.error('GPS-LOG erro de GPS:', erroGps?.code || erroGps?.message || erroGps), // GPS-LOG
-      { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
     );
   }
 

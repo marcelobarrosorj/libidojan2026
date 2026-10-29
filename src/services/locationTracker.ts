@@ -27,7 +27,7 @@ const comecar = (uid: string) => {
   watchId = navigator.geolocation.watchPosition(
     (pos) => salvarCoordenada(pos.coords.latitude, pos.coords.longitude),
     () => {},
-    { enableHighAccuracy: true, maximumAge: 15000, timeout: 25000 }
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 25000 }
   );
 };
 

@@ -114,7 +114,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
       if (map) return;
       if (el.clientWidth === 0 || el.clientHeight === 0) return;
       try {
-        map = L.map(el, { center: [-22.9068, -43.1729], zoom: 13, zoomControl: false });
+        map = L.map(el, { center: (meuPontoRef.current ? [meuPontoRef.current.lat, meuPontoRef.current.lon] : [0, 0]), zoom: (meuPontoRef.current ? 14 : 2), zoomControl: false });
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
           attribution: '&copy; Esri',
           subdomains: 'abcd',
