@@ -1,23 +1,31 @@
 import { supabase } from './supabase';
-import { calcularIdade } from './idade'; // IDADE-AUTOMATICA
+import { calcularIdade } from './idade';
 import { User } from '../types';
 import { isDemoEnabled, demoProfiles, isDemoId } from '../demo/index';
 
-// ONLINE-HONESTO: online de verdade = is_online true E atividade nos ultimos 5 minutos
-// (mesma regra do Radar). Assim a bolinha verde nunca mente.
-const JANELA_ONLINE_MS = 5 * 60 * 1000;
+const JANELA_ONLINE_MS = 10 * 60 * 1000; // 10 minutos para evitar queda entre heartbeats
 const onlineDeVerdade = (data: any): boolean => {
   const online = data.is_online === true || data.isOnline === true;
   if (!online) return false;
   const ts = data.last_seen || data.updated_at;
-  if (!ts) return false;
+  if (!ts) return true;
   return (Date.now() - new Date(ts).getTime()) < JANELA_ONLINE_MS;
 };
 
+export const usuarioTemFotoValida = (u: any): boolean => {
+  if (!u) return false;
+  const url = String(u.photo_url || u.avatar || '').trim();
+  if (url !== '' && !url.includes('dicebear.com') && !url.includes('unsplash.com')) return true;
+  if (Array.isArray(u.photos) && u.photos.some((f: any) => String(f || '').trim() !== '')) return true;
+  if (Array.isArray(u.gallery) && u.gallery.some((f: any) => String(f || '').trim() !== '')) return true;
+  return false;
+};
+
 export const mapSupabaseToUser = (data: any): User => {
-  // IDADE-EDIT: idade sempre recalculada pela data de nascimento em toda leitura do app
   const idadeCalc = calcularIdade(data.birth_date);
   if (idadeCalc != null) data.age = idadeCalc;
+  const galeria = Array.isArray(data.photos) ? data.photos : (Array.isArray(data.gallery) ? data.gallery : []);
+  const fotoPrincipal = data.photo_url || data.avatar || (galeria.length > 0 ? galeria[0] : '');
   return {
     ...data,
     id: data.user_id || data.id,
@@ -31,9 +39,9 @@ export const mapSupabaseToUser = (data: any): User => {
     sexual_orientation: data.sexual_orientation || data.sexualOrientation,
     coupleProfile: data.couple_profile || data.coupleProfile,
     couple_profile: data.couple_profile || data.coupleProfile,
-    gallery: data.photos || data.gallery || [],
-    photos: data.photos || data.gallery || [],
-    photo_url: data.photo_url || data.avatar || '',
+    gallery: galeria,
+    photos: galeria,
+    photo_url: fotoPrincipal,
     relationship_status: data.relationship_status || data.relationshipStatus,
     isBanned: data.is_banned || data.isBanned || false,
     is_banned: data.is_banned || data.isBanned || false,
@@ -42,8 +50,8 @@ export const mapSupabaseToUser = (data: any): User => {
     createdAt: data.created_at ? new Date(data.created_at).getTime() : (data.createdAt || Date.now()),
     followers: data.followers || 0,
     following: data.following || 0,
-    isOnline: onlineDeVerdade(data), // ONLINE-HONESTO: mesma janela de 5 min do radar
-    updated_at: data.updated_at || data.last_seen || null, // B5-FIX: timestamp para a janela de 5 min do radar
+    isOnline: onlineDeVerdade(data),
+    updated_at: data.updated_at || data.last_seen || null,
     location: data.location || { x: 0, y: 0 },
     radarUsedToday: data.radar_used_today || data.radarUsedToday || 0,
     visibilityScore: data.visibility_score || data.visibilityScore || 100,
@@ -63,8 +71,7 @@ export const mapUserToSupabase = (user: Partial<User>): any => {
   if (user.isDeleted !== undefined) result.is_deleted = user.isDeleted;
   if (user.createdAt !== undefined) result.created_at = new Date(user.createdAt).toISOString();
   if (user.isOnline !== undefined) result.is_online = user.isOnline;
-  
-    // PREM-PROTEGE: status premium so muda via convite, webhook PagBank ou trial inicial
+
   delete result.premium;
   delete result.plan;
   delete result.premium_until;
@@ -80,13 +87,12 @@ export const mapUserToSupabase = (user: Partial<User>): any => {
   delete result.isDeleted;
   delete result.createdAt;
   delete result.isOnline;
-  
+
   return result;
 };
 
 export const createUserProfile = async (user: User) => {
   const supaUser = mapUserToSupabase(user);
-  // TRIAL-36H: todo cadastro novo ganha 36 horas de acesso completo gratis (so na primeira criacao de perfil)
   supaUser.premium = true;
   supaUser.plan = 'premium';
   supaUser.premium_until = new Date(Date.now() + 36 * 3600000).toISOString();
@@ -103,32 +109,31 @@ export const getUserById = async (userId: string): Promise<User | null> => {
   if (isDemoId(userId)) {
     return demoProfiles.find(u => u.id === userId) as unknown as User || null;
   }
-  
+
   const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('user_id', userId)
     .single();
-    
+
   if (error) {
     if (error.code !== 'PGRST116') {
       console.error('Error fetching user by id:', error);
     }
     return null;
   }
-  
+
   if (!data) return null;
-  
+
   try {
     const { data: roleData, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', userId)
       .maybeSingle();
-      
+
     if (!roleError && roleData && roleData.role) {
       data.role = roleData.role;
-      
       if (
         roleData.role === 'owner' ||
         roleData.role === 'admin' ||
@@ -137,10 +142,8 @@ export const getUserById = async (userId: string): Promise<User | null> => {
         data.plan = roleData.role;
       }
     }
-  } catch (err) {
-    // Continuar normalmente
-  }
-  
+  } catch {}
+
   return mapSupabaseToUser(data);
 };
 
@@ -155,6 +158,12 @@ export const updateUserProfile = async (userId: string, data: Partial<User>) => 
     console.error('Error updating user profile:', error);
     throw error;
   }
+  try {
+    await (supabase as any)
+      .from('user_profiles')
+      .update(updateData)
+      .eq('user_id', userId);
+  } catch {}
 };
 
 export const getAllUsers = async (): Promise<User[]> => {
@@ -165,9 +174,9 @@ export const getAllUsers = async (): Promise<User[]> => {
     console.error('Error fetching all users:', error);
     return isDemoEnabled ? (demoProfiles as unknown as User[]) : [];
   }
-  const realUsers = (data || []).map(mapSupabaseToUser);
+  const realUsers = (data || []).map(mapSupabaseToUser).filter(usuarioTemFotoValida);
   if (!isDemoEnabled) return realUsers;
-  
+
   const validDemos = (demoProfiles as unknown as User[]).filter(u => isDemoId(u.id || ''));
   const map = new Map<string, User>();
   realUsers.forEach(u => { if (u.id) map.set(u.id, u); });
@@ -185,9 +194,9 @@ export const getActiveUsersOriginal = async (currentUserId: string): Promise<Use
     console.error('Error fetching active users:', error);
     return isDemoEnabled ? (demoProfiles as unknown as User[]) : [];
   }
-  const realUsers = (data || []).map(mapSupabaseToUser);
+  const realUsers = (data || []).map(mapSupabaseToUser).filter(usuarioTemFotoValida);
   if (!isDemoEnabled) return realUsers;
-  
+
   const validDemos = (demoProfiles as unknown as User[]).filter(u => isDemoId(u.id || ''));
   const map = new Map<string, User>();
   realUsers.forEach(u => { if (u.id) map.set(u.id, u); });
@@ -197,10 +206,32 @@ export const getActiveUsersOriginal = async (currentUserId: string): Promise<Use
 
 export const deleteUserProfile = async (userId: string) => {
   if (isDemoId(userId)) return;
+  try {
+    const { data: listaArquivos } = await supabase.storage.from('photos').list(userId);
+    if (listaArquivos && listaArquivos.length > 0) {
+      const caminhos = listaArquivos.map((f: any) => `${userId}/${f.name}`);
+      await supabase.storage.from('photos').remove(caminhos);
+    }
+  } catch {}
+
+  try { await (supabase as any).from('posts').delete().eq('user_id', userId); } catch {}
+  try { await (supabase as any).from('post_comments').delete().eq('user_id', userId); } catch {}
+  try { await (supabase as any).from('post_likes').delete().eq('user_id', userId); } catch {}
+  try { await (supabase as any).from('follows').delete().or(`follower_id.eq.${userId},following_id.eq.${userId}`); } catch {}
+  try { await (supabase as any).from('profile_visits').delete().or(`visitor_id.eq.${userId},visited_id.eq.${userId}`); } catch {}
+  try { await (supabase as any).from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch {}
+  try { await (supabase as any).from('push_subscriptions').delete().eq('user_id', userId); } catch {}
+  try { await (supabase as any).from('user_profiles').delete().eq('user_id', userId); } catch {}
+
   const { error } = await supabase
     .from('users')
     .delete()
     .eq('user_id', userId);
+
+  try {
+    await supabase.rpc('excluir_minha_conta');
+  } catch {}
+
   if (error) {
     console.error('Error deleting user profile:', error);
     throw error;
@@ -212,7 +243,7 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
   const realIds = userIds.filter(id => !isDemoId(id));
   const demoUsers = isDemoEnabled ? (demoProfiles as unknown as User[]).filter(u => userIds.includes(u.id!) && isDemoId(u.id!)) : [];
   if (!realIds.length) return demoUsers;
-  
+
   const { data, error } = await supabase
     .from('user_profiles')
     .select('*')
@@ -221,32 +252,21 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
     console.error('Error fetching users by ids:', error);
     return demoUsers;
   }
-  const realUsers = (data || []).map(mapSupabaseToUser);
-  
+  const realUsers = (data || []).map(mapSupabaseToUser).filter(usuarioTemFotoValida);
+
   const map = new Map<string, User>();
   realUsers.forEach(u => { if (u.id) map.set(u.id, u); });
   demoUsers.forEach(u => { if (u.id && !map.has(u.id)) map.set(u.id, u); });
   return Array.from(map.values());
 };
 
-
-
-// PERFIS-INCOMPLETOS + IDADE-AUTOMATICA: wrapper do radar/feed.
-// Filtra perfis sem foto (cadastro incompleto) e recalcula a idade
-// pela data de nascimento - no aniversario a idade muda sozinha.
 export async function getActiveUsers(...args: any[]): Promise<any> {
   const res: any = await (getActiveUsersOriginal as any)(...args);
-  const temFoto = (u: any) => {
-    if (u.photo_url && String(u.photo_url).trim() !== '') return true;
-    if (Array.isArray(u.photos) && u.photos.length > 0) return true;
-    if (typeof u.photos === 'string' && u.photos.trim() !== '' && u.photos.trim() !== '[]' && u.photos.trim() !== 'null') return true;
-    return false;
-  };
   const comIdade = (u: any) => {
     const ic = calcularIdade(u.birth_date);
     return (ic !== null && ic !== undefined) ? { ...u, age: ic } : u;
   };
-  const filtrar = (lista: any[]) => lista.filter((u: any) => temFoto(u)).map((u: any) => comIdade(u));
+  const filtrar = (lista: any[]) => lista.filter((u: any) => usuarioTemFotoValida(u)).map((u: any) => comIdade(u));
   if (Array.isArray(res)) { return filtrar(res); }
   if (res && Array.isArray(res.data)) { return { ...res, data: filtrar(res.data) }; }
   if (res && Array.isArray(res.users)) { return { ...res, users: filtrar(res.users) }; }

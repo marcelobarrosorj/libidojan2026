@@ -503,7 +503,7 @@ export default function App() {
     const perfilIncompleto =
       !su ||
       !su.nickname ||
-      !(su.relationship_status || su.relationshipStatus);
+      !(su.relationship_status || su.relationshipStatus) || (!su.photo_url && (!Array.isArray(su.photos) || su.photos.length === 0));
     if (perfilIncompleto || !supabaseUser) {
       return (
         <Onboarding

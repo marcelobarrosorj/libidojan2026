@@ -71,7 +71,7 @@ export function iniciarNotificacoesGlobais(
   });
 
   const chFollow = supabase.channel('notif-follows-' + userId + '_' + Math.random().toString(36).slice(2, 8)) // CANAL-UNICO
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'follows' }, (p: any) => {
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'follows', filter: (typeof meuId !== 'undefined' && meuId ? 'following_id=eq.' + meuId : undefined) }, (p: any) => {
       const alvo = String(p.new?.following_id ?? '');
       if (alvo === String(userId)) {
         playFollowSound();

@@ -171,7 +171,6 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         };
       }
 
-      const { error } = await supabase
       const resultado = await salvarPerfil(payload);
 
       if (!resultado.ok) {

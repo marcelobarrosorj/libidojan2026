@@ -1,6 +1,6 @@
 import { createReport } from '../services/admin';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Shield, Ban, Trash2, Eye, Lock, Users, Flag, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Ban, Trash2, Lock, Users, Flag, MessageCircle, ShieldOff } from 'lucide-react';
 import { User } from '../types';
 import { ProtectedImage } from './ProtectedImage';
 import { PhotoGallery } from './PhotoGallery';
@@ -8,13 +8,13 @@ import { formatUserNumber } from '../utils/formatUserNumber';
 import { isDemoId } from '../demo';
 import { updateUserProfile, deleteUserProfile } from '../services/users';
 import { supabase } from '../services/supabase';
-import { registrarVisita } from '../services/visits'; // VISITAS
-// NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
+import { registrarVisita } from '../services/visits';
+
 function extrairTextoBio(b: any): string {
   if (!b || typeof b !== 'string') return '';
   const t = b.trim();
   if (t.startsWith('{') && t.includes('isCouple')) {
-    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch (eB) {}
+    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch {}
   }
   return b;
 }
@@ -28,7 +28,7 @@ interface ViewProfileProps {
   onShowPremiumModal?: () => void;
 }
 
-export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumModal, currentUser }: ViewProfileProps) {
+export function ViewProfile({ user, navigate, isPremium, currentUser }: ViewProfileProps) {
   const [showConfirmBan, setShowConfirmBan] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -38,7 +38,9 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
   const [isFollowing, setIsFollowing] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
   const [followersCount, setFollowersCount] = useState<number | null>(null);
-  // VISITAS: registra que este perfil foi aberto
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockBusy, setBlockBusy] = useState(false);
+
   useEffect(() => { if (user?.user_id) void registrarVisita(user.user_id); }, [user?.user_id]);
 
   useEffect(() => {
@@ -48,35 +50,74 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
       try {
         const { data: sess } = await supabase.auth.getSession();
         const meuId = sess?.session?.user?.id;
-        const { count } = await supabase
-          .from('follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('following_id', user.user_id);
-        if (ativo) setFollowersCount(count ?? 0);
+
+        // Usa RPC segura no servidor para contar seguidores sem expor a tabela follows inteira
+        const { data: rpcCount, error: errRpcCount } = await supabase.rpc('contar_seguidores', {
+          p_user_id: user.user_id
+        });
+        if (!errRpcCount && typeof rpcCount === 'number') {
+          if (ativo) setFollowersCount(rpcCount);
+        } else {
+          const { count } = await supabase
+            .from('follows')
+            .select('*', { count: 'exact', head: true })
+            .eq('following_id', user.user_id);
+          if (ativo) setFollowersCount(count ?? 0);
+        }
+
         if (!meuId) return;
-        const { data } = await supabase
+
+        const { data: followRow } = await supabase
           .from('follows')
           .select('id')
           .eq('follower_id', meuId)
           .eq('following_id', user.user_id)
           .maybeSingle();
-        if (ativo) setIsFollowing(!!data);
+        if (ativo) setIsFollowing(!!followRow);
+
+        const { data: blockRow } = await supabase
+          .from('blocks')
+          .select('id')
+          .eq('blocker_id', meuId)
+          .eq('blocked_id', user.user_id)
+          .maybeSingle();
+        if (ativo) setIsBlocked(!!blockRow);
       } catch {}
     };
     carregar();
     return () => { ativo = false; };
   }, [user?.user_id]);
 
+  // ITEM 7: Escrita de follows movida para RPC no servidor com validacao anti-duplicidade, anti-self-follow e rate limit
   const alternarSeguir = async () => {
     if (!user?.user_id || followBusy) return;
-    if (isDemoId(user.user_id)) { alert('Nao e possivel seguir perfis de demonstracao.'); return; }
+    if (isDemoId(user.user_id)) { alert('Não é possível seguir perfis de demonstração.'); return; }
     setFollowBusy(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const meuId = sess?.session?.user?.id;
-      if (!meuId) { alert('Faca login para seguir.'); return; }
+      if (!meuId) { alert('Faça login para seguir.'); return; }
+      if (meuId === user.user_id) { alert('Você não pode seguir o próprio perfil.'); return; }
+
+      const { data: rpcRes, error: rpcErr } = await supabase.rpc('alternar_seguir', {
+        p_target_id: user.user_id
+      });
+
+      if (!rpcErr && rpcRes && typeof rpcRes === 'object') {
+        const r = rpcRes as any;
+        if (r.ok === false) {
+          alert(r.erro || 'Não foi possível completar a ação.');
+          return;
+        }
+        setIsFollowing(!!r.following);
+        if (typeof r.count === 'number') setFollowersCount(r.count);
+        return;
+      }
+
+      // Fallback seguro caso a RPC ainda nao tenha sido criada no banco
       if (isFollowing) {
-        await supabase.from('follows').delete().eq('follower_id', meuId).eq('following_id', user.user_id);
+        const { error } = await supabase.from('follows').delete().eq('follower_id', meuId).eq('following_id', user.user_id);
+        if (error) throw error;
         setIsFollowing(false);
         setFollowersCount((c) => Math.max(0, (c ?? 1) - 1));
       } else {
@@ -86,14 +127,55 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
         setFollowersCount((c) => (c ?? 0) + 1);
       }
     } catch (err: any) {
-      const fkCode = String((err as any)?.code || '');
-      if (fkCode === '23503') {
-        alert('Nao foi possivel seguir: este perfil nao esta mais disponivel.');
-      } else {
-        alert('Erro ao atualizar: ' + (err?.message || 'tente novamente'));
-      }
+      alert('Erro ao atualizar: ' + (err?.message || 'tente novamente'));
     } finally {
       setFollowBusy(false);
+    }
+  };
+
+  // ITEM 8: Bloqueio real de usuario via RPC e tabela blocks
+  const alternarBloqueio = async () => {
+    if (!user?.user_id || blockBusy) return;
+    if (isDemoId(user.user_id)) { alert('Não aplicável para perfil de demonstração.'); return; }
+    const confirmar = isBlocked
+      ? confirm(`Deseja desbloquear ${user.nickname || 'este perfil'}?`)
+      : confirm(`Bloquear ${user.nickname || 'este perfil'}? Vocês deixarão de se seguir e não poderão trocar mensagens.`);
+    if (!confirmar) return;
+
+    setBlockBusy(true);
+    try {
+      const { data: rpcRes, error: rpcErr } = await supabase.rpc('alternar_bloqueio', {
+        p_target_id: user.user_id
+      });
+      if (!rpcErr && rpcRes && typeof rpcRes === 'object') {
+        const r = rpcRes as any;
+        setIsBlocked(!!r.blocked);
+        if (r.blocked) {
+          setIsFollowing(false);
+          alert('Usuário bloqueado com sucesso.');
+          navigate?.('radar');
+        } else {
+          alert('Usuário desbloqueado.');
+        }
+        return;
+      }
+
+      const { data: sess } = await supabase.auth.getSession();
+      const meuId = sess?.session?.user?.id;
+      if (!meuId) return;
+      if (isBlocked) {
+        await supabase.from('blocks').delete().eq('blocker_id', meuId).eq('blocked_id', user.user_id);
+        setIsBlocked(false);
+      } else {
+        await supabase.from('blocks').insert({ blocker_id: meuId, blocked_id: user.user_id });
+        setIsBlocked(true);
+        setIsFollowing(false);
+        navigate?.('radar');
+      }
+    } catch (err: any) {
+      alert('Erro ao bloquear/desbloquear: ' + (err?.message || 'tente novamente'));
+    } finally {
+      setBlockBusy(false);
     }
   };
 
@@ -125,7 +207,6 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
     }
   };
 
-  
   const handleReport = async () => {
     if (isDemoId(user.id || user.user_id || '')) {
       alert("Ações de denúncia estão desabilitadas para perfis de demonstração.");
@@ -143,7 +224,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
       alert('Denúncia enviada com sucesso.');
       setShowReportModal(false);
       setReportReason('');
-    } catch (err) {
+    } catch {
       alert('Erro ao enviar denúncia.');
     } finally {
       setIsReporting(false);
@@ -171,10 +252,10 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
         <button onClick={() => navigate?.('radar')} className="text-[var(--libido-muted)] opacity-70 hover:text-[var(--libido-text)]"><ArrowLeft size={20} /></button>
         <h2 className="text-sm font-black uppercase tracking-wider flex-1">{nickname} {user.userNumber ? <span className="text-[10px] text-[var(--libido-muted)] opacity-50 ml-1">#{formatUserNumber(user.userNumber)}</span> : null}</h2>
         {(
-    (currentUser?.plan === 'owner') || 
-    (currentUser?.plan === 'admin' && user.plan !== 'owner' && user.plan !== 'admin') || 
-    (currentUser?.plan === 'moderator' && user.plan !== 'owner' && user.plan !== 'admin' && user.plan !== 'moderator')
-  ) && (
+          (currentUser?.plan === 'owner') ||
+          (currentUser?.plan === 'admin' && user.plan !== 'owner' && user.plan !== 'admin') ||
+          (currentUser?.plan === 'moderator' && user.plan !== 'owner' && user.plan !== 'admin' && user.plan !== 'moderator')
+        ) && (
           <div className="flex gap-2">
             <button onClick={() => setShowConfirmBan(true)} className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center hover:bg-orange-500/20"><Ban size={14} className="text-orange-400" /></button>
             {currentUser?.plan === 'owner' && (
@@ -196,25 +277,37 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
             <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-bold mt-1">{followersCount} seguidores</p>
           )}
 
-          <div className="flex flex-wrap justify-center gap-3 mt-4">
-            <button
-              onClick={() => navigate?.('chat', { user })}
-              className="flex items-center gap-2 bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black py-3 px-6 rounded-2xl text-[10px] uppercase tracking-widest hover:opacity-90 shadow-lg shadow-[var(--libido-accent)]/15"
-            >
-              <MessageCircle size={12} />
-              Enviar Mensagem
-            </button>
+          <div className="flex flex-wrap justify-center gap-2.5 mt-4">
+            {!isBlocked && (
+              <button
+                onClick={() => navigate?.('chat', { user })}
+                className="flex items-center gap-2 bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black py-3 px-5 rounded-2xl text-[10px] uppercase tracking-widest hover:opacity-90 shadow-lg shadow-[var(--libido-accent)]/15"
+              >
+                <MessageCircle size={12} />
+                Enviar Mensagem
+              </button>
+            )}
+            {!isBlocked && (
+              <button
+                onClick={alternarSeguir}
+                disabled={followBusy}
+                className={`flex items-center gap-2 font-black py-3 px-5 rounded-2xl text-[10px] uppercase tracking-widest transition-all ${isFollowing ? 'bg-white/5 border border-[var(--libido-border)] text-[var(--libido-muted)] opacity-80' : 'bg-[var(--libido-accent)]/15 border border-[var(--libido-accent)]/40 text-[var(--libido-accent)] hover:bg-[var(--libido-accent)]/25'}`}
+              >
+                <Users size={12} />
+                {isFollowing ? 'Seguindo' : 'Seguir'}
+              </button>
+            )}
             <button onClick={() => setShowReportModal(true)} className="flex items-center gap-2 bg-white/5 border border-[var(--libido-border)] text-[var(--libido-muted)] opacity-80 font-black py-3 px-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-white/10">
               <Flag size={12} />
               Denunciar
             </button>
             <button
-              onClick={alternarSeguir}
-              disabled={followBusy}
-              className={`flex items-center gap-2 font-black py-3 px-5 rounded-2xl text-[10px] uppercase tracking-widest transition-all ${isFollowing ? 'bg-white/5 border border-[var(--libido-border)] text-[var(--libido-muted)] opacity-80' : 'bg-[var(--libido-accent)]/15 border border-[var(--libido-accent)]/40 text-[var(--libido-accent)] hover:bg-[var(--libido-accent)]/25'}`}
+              onClick={alternarBloqueio}
+              disabled={blockBusy}
+              className={`flex items-center gap-2 font-black py-3 px-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all ${isBlocked ? 'bg-red-600/30 border border-red-500/40 text-red-300' : 'bg-white/5 border border-[var(--libido-border)] text-[var(--libido-muted)] opacity-80 hover:bg-red-500/10 hover:text-red-400'}`}
             >
-              <Users size={12} />
-              {isFollowing ? 'Seguindo' : 'Seguir'}
+              <ShieldOff size={12} />
+              {isBlocked ? 'Desbloquear' : 'Bloquear'}
             </button>
           </div>
         </div>
@@ -290,7 +383,6 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
         </div>
       </div>
 
-      
       {galleryViewerIndex !== null && userPhotos[galleryViewerIndex] && (
         <PhotoGallery
           photos={userPhotos as string[]}
@@ -304,7 +396,7 @@ export function ViewProfile({ user, navigate, isAdmin, isPremium, onShowPremiumM
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 libido-lightbox">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl p-6 max-w-xs w-full space-y-4">
             <h3 className="text-sm font-black text-[var(--libido-text)] uppercase text-center">Denunciar Perfil</h3>
-            <textarea 
+            <textarea
               value={reportReason}
               onChange={e => setReportReason(e.target.value)}
               placeholder="Qual o motivo da denúncia?"

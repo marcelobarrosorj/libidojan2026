@@ -9,7 +9,8 @@ import { ProtectedImage } from './ProtectedImage';
 import { formatUserNumber } from '../utils/formatUserNumber';
 import { updateUserProfile } from '../services/users';
 import { calcularIdade } from '../services/idade'; // IDADE-EDIT: idade calculada pela data de nascimento
-import { createPost } from '../services/posts'; // GALLERY-AUTOPOST
+import { createPost, excluirPostPorFoto } from '../services/posts';
+import { deleteUserProfile } from '../services/users'; // GALLERY-AUTOPOST
 import { contarVisitas, listarVisitantes } from '../services/visits'; // VISITAS-REAIS
 // NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
 function extrairTextoBio(b: any): string {
@@ -736,6 +737,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
             >
               {saving ? 'SALVANDO...' : 'SALVAR CONFIGURAÇÕES'}
             </button>
+            <button type="button" onClick={handleDeleteOwnProfile} disabled={saving} className="w-full bg-red-600/15 border border-red-500/30 text-red-400 font-black py-3 rounded-2xl mt-3 text-[11px] uppercase tracking-widest hover:bg-red-600/25 transition-all">Excluir Meu Perfil Permanentemente</button>
           </div>
         </div>
       )}

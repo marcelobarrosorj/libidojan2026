@@ -70,3 +70,41 @@ document.addEventListener('dragstart', (e) => {
   }
 })();
 
+
+
+// AFILIADO-TRACKING (Item 11): captura links de criadoras (ex: /bibi, ?ref=bibi, ?promo=MAIS18)
+(async () => {
+  try {
+    const rotasReservadas = new Set(['', 'login', 'register', 'invite', 'admin', 'parceiros', 'partners', 'radar', 'chat', 'feed', 'profile']);
+    const seg = window.location.pathname.replace(/^\/+|\/+$/g, '').split('/')[0] || '';
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get('ref') || params.get('afiliado') || params.get('promo') || '';
+    const slugDetectado = refParam || (!rotasReservadas.has(seg.toLowerCase()) ? seg : '');
+
+    if (slugDetectado && /^[A-Za-z0-9_\-]{2,40}$/.test(slugDetectado)) {
+      localStorage.setItem('libido_affiliate_ref', slugDetectado.toLowerCase());
+      if (seg && !rotasReservadas.has(seg.toLowerCase())) {
+        window.history.replaceState(null, '', '/');
+      }
+    }
+
+    const refPendente = localStorage.getItem('libido_affiliate_ref');
+    if (!refPendente) return;
+
+    const { supabase } = await import('./services/supabase');
+    let gravado = false;
+    const vincularAfiliado = async () => {
+      if (gravado) return;
+      const { data } = await supabase.auth.getSession();
+      const uid = data?.session?.user?.id;
+      if (!uid) return;
+      gravado = true;
+      try {
+        await supabase.rpc('registrar_indicacao', { p_slug: refPendente });
+        localStorage.removeItem('libido_affiliate_ref');
+      } catch {}
+    };
+    supabase.auth.onAuthStateChange(() => { void vincularAfiliado(); });
+    void vincularAfiliado();
+  } catch {}
+})();

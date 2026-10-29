@@ -192,7 +192,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
         let lat = d.lat!;
         let lon = d.lon!;
         const online = u?.isOnline === true || u?.is_online === true;
-        if (!online && u?.anelM && meuPonto) {
+        if ((d.lat === null || d.lon === null || !online) && meuPonto) {
           const rad = ((Number(u.angulo) || 0) * Math.PI) / 180;
           const m = Number(u.anelM) || 2000;
           lat = meuPonto.lat + (m * Math.cos(rad)) / 111320;

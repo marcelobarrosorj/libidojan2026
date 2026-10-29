@@ -37,11 +37,10 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
       if (error) throw error;
       if (!isSubscribed || !data) return;
 
-      // FEED-AVATAR: busca o perfil dos autores e cola o avatar no post.
-      // Antes o avatar dependia do array users estar carregado no Feed,
-      // e quando nao estava o post caia no DiceBear.
       const ids = Array.from(new Set(data.map((p: any) => p.user_id).filter(Boolean)));
       const mapaAvatar: Record<string, string> = {};
+      const usuariosComFoto = new Set<string>();
+
       if (ids.length > 0) {
         const { data: perfis } = await supabase
           .from('user_profiles')
@@ -49,17 +48,21 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
           .in('user_id', ids);
         (perfis || []).forEach((u: any) => {
           const foto = u.photo_url || (Array.isArray(u.photos) && u.photos[0]) || "";
-          if (foto) mapaAvatar[u.user_id] = foto;
+          if (foto && String(foto).trim() !== '') {
+            mapaAvatar[u.user_id] = foto;
+            usuariosComFoto.add(u.user_id);
+          }
         });
       }
 
       if (!isSubscribed) return;
 
-      // FEED-DEDUP: garante id unico antes de entregar a lista.
       const vistos = new Set<string>();
       const finalPosts: any[] = [];
       for (const p of data.map(mapSupabaseToPost)) {
         if (vistos.has(p.id)) continue;
+        // Proibido exibir posts de usuarios sem foto
+        if (!usuariosComFoto.has(p.userId)) continue;
         vistos.add(p.id);
         finalPosts.push({ ...p, avatar: mapaAvatar[p.userId] || "" });
       }
@@ -71,16 +74,24 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
   };
 
   fetchPosts();
+  const handleFeedRefresh = () => { fetchPosts(); };
+  if (typeof window !== 'undefined') {
+    window.addEventListener('feedUpdated', handleFeedRefresh);
+  }
+
   const channel = supabase.channel('public:posts')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => {
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
       fetchPosts();
     })
     .subscribe();
   return () => {
     isSubscribed = false;
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('feedUpdated', handleFeedRefresh);
+    }
     supabase.removeChannel(channel);
   };
-}
+};
 
 export const likePost = async (postId: string) => {
   if (isDemoId(postId)) return;
@@ -97,14 +108,57 @@ export const likePost = async (postId: string) => {
   }
 };
 
-// FEED-DELETE: o autor pode excluir o proprio post a qualquer momento
+// FEED-DELETE: exclui o post do feed (e atualiza a tela imediatamente)
 export async function excluirPost(postId: string): Promise<boolean> {
-  const { error } = await (supabase as any).from('posts').delete().eq('id', postId);
-  if (error) { console.error('FEED-DELETE falhou', error); return false; }
-  return true;
+  try {
+    const { data: postAtual } = await (supabase as any).from('posts').select('user_id, image').eq('id', postId).maybeSingle();
+    const { error } = await (supabase as any).from('posts').delete().eq('id', postId);
+    if (error) {
+      console.error('FEED-DELETE falhou', error);
+      return false;
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('feedUpdated'));
+    }
+    return true;
+  } catch (e) {
+    console.error('FEED-DELETE erro:', e);
+    return false;
+  }
 }
 
-// CURTIDA-TOGGLE: curtir/descurtir de verdade (um like por usuario, alternavel)
+// GALERIA->FEED SYNC: ao excluir foto da galeria, exclui todos os posts do feed com aquela foto
+export async function excluirPostPorFoto(userId: string, imageUrl: string): Promise<boolean> {
+  if (!userId || !imageUrl) return false;
+  try {
+    const { error } = await (supabase as any)
+      .from('posts')
+      .delete()
+      .eq('user_id', userId)
+      .eq('image', imageUrl);
+    if (error) {
+      console.error('GALERIA-FEED-DELETE falhou:', error);
+      return false;
+    }
+    // Tenta remover do Storage caso seja do bucket photos
+    try {
+      const marcador = '/object/public/photos/';
+      const idx = imageUrl.indexOf(marcador);
+      if (idx !== -1) {
+        const storagePath = decodeURIComponent(imageUrl.substring(idx + marcador.length));
+        await supabase.storage.from('photos').remove([storagePath]);
+      }
+    } catch {}
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('feedUpdated'));
+    }
+    return true;
+  } catch (e) {
+    console.error('GALERIA-FEED-DELETE erro:', e);
+    return false;
+  }
+}
+
 export const getMinhasCurtidas = async (userId: string): Promise<string[]> => {
   const { data, error } = await supabase
     .from('post_likes')
@@ -147,7 +201,6 @@ export const toggleCurtida = async (postId: string) => {
   } catch (eT) {}
 };
 
-// COMENTARIOS-FEED: sistema de comentarios dos posts do feed
 export const getComentarios = async (postId: string): Promise<any[]> => {
   try {
     const { data, error } = await (supabase as any)
@@ -155,10 +208,11 @@ export const getComentarios = async (postId: string): Promise<any[]> => {
       .select('*')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
-    if (error || !data) { console.error('COMENTARIOS-LEITURA-ERRO:', error); return []; } // COMENTARIO-ERRO-VISIVEL
+    if (error || !data) { console.error('COMENTARIOS-LEITURA-ERRO:', error); return []; }
     return data as any[];
   } catch { return []; }
 };
+
 export const adicionarComentario = async (postId: string, userId: string, texto: string): Promise<any | null> => {
   try {
     const { data, error } = await (supabase as any)
@@ -166,10 +220,11 @@ export const adicionarComentario = async (postId: string, userId: string, texto:
       .insert({ post_id: postId, user_id: userId, texto })
       .select()
       .single();
-    if (error || !data) { console.error('COMENTARIO-GRAVACAO-ERRO:', error); return null; } // COMENTARIO-ERRO-VISIVEL
+    if (error || !data) { console.error('COMENTARIO-GRAVACAO-ERRO:', error); return null; }
     return data;
   } catch { return null; }
 };
+
 export const excluirComentario = async (id: string): Promise<boolean> => {
   try {
     const { error } = await (supabase as any)
@@ -179,4 +234,3 @@ export const excluirComentario = async (id: string): Promise<boolean> => {
     return !error;
   } catch { return false; }
 };
-

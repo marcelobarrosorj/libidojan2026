@@ -47,3 +47,8 @@ push-ordem*.ps1
 ler-push.ps1
 ciclo1.ps1
 auditoria-criticos.txt
+backend/.env
+backend/.env.*
+.backup_env_*
+.backup_libido_*
+.backup_auditoria_*

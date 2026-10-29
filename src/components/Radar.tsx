@@ -64,7 +64,7 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
       watchIdGPS = navigator.geolocation.watchPosition(
         (pos) => {
           if (ativo) setMeuPonto({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude }).eq('user_id', userId).then(({ error }) => { if (error) console.error('SALVA-COORD falhou', error); }); } // SALVA-COORD
+          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude, is_online: true, updated_at: new Date().toISOString() }).eq('user_id', userId).then(() => {}); (supabase as any).from('user_profiles').update({ lat: pos.coords.latitude, lon: pos.coords.longitude, is_online: true }).eq('user_id', userId).then(() => {}); } // SALVA-COORD
         },
         () => usarBanco(),
         { timeout: 20000, enableHighAccuracy: true, maximumAge: 0 }
