@@ -24,7 +24,7 @@ export const usuarioTemFotoValida = (u: any): boolean => {
 export const mapSupabaseToUser = (data: any): User => {
   const idadeCalc = calcularIdade(data.birth_date);
   if (idadeCalc != null) data.age = idadeCalc;
-  const galeria = Array.isArray(data.photos) ? data.photos : (Array.isArray(data.gallery) ? data.gallery : []);
+  const galeria = Array.isArray(data.photos) && data.photos.length > 0 ? data.photos : (Array.isArray(data.gallery) && data.gallery.length > 0 ? data.gallery : []);
   const fotoPrincipal = data.photo_url || data.avatar || (galeria.length > 0 ? galeria[0] : '');
   return {
     ...data,

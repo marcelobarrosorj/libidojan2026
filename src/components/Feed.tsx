@@ -121,8 +121,12 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
       alert('Erro ao comentar. Tente novamente.');
     }
   };
+  // FIX-DUPLO-TOQUE: trava sincrona. setPublicando e assincrono, entao dois
+  // toques rapidos leem publicando=false nos dois handlers e publicam 2x.
+  const enviandoRef = useRef(false);
   const handlePublicar = async () => {
-    if (publicando) return;
+    if (enviandoRef.current) return;
+    enviandoRef.current = true;
     const texto = novoTexto.trim();
     if (!texto && !novoArquivo) return;
     const userId = (currentUser as any)?.user_id || (currentUser as any)?.id;
@@ -169,6 +173,7 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
       console.error('Erro ao publicar:', e);
       alert('Erro ao publicar. Tente novamente.');
     } finally {
+      enviandoRef.current = false;
       setPublicando(false);
     }
   };

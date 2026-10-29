@@ -52,3 +52,6 @@ backend/.env.*
 .backup_env_*
 .backup_libido_*
 .backup_auditoria_*
+
+.quarentena-*
+.backup-limpeza-*

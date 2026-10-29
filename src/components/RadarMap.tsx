@@ -183,16 +183,16 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
     return users
       .map((u: any) => ({
         u,
-        lat: u?.lat != null ? Number(u.lat) : null,
-        lon: u?.lon != null ? Number(u.lon) : null
+        lat: u?.lat != null ? Number(u.lat) : (u?.last_lat != null ? Number(u.last_lat) : null),
+        lon: u?.lon != null ? Number(u.lon) : (u?.last_lng != null ? Number(u.last_lng) : null)
       }))
       .filter((d: any) => (d.lat !== null && d.lon !== null) || !!(d.u && d.u.anelM))
       .map((d) => {
         const u: any = d.u;
         let lat = d.lat!;
         let lon = d.lon!;
-        const online = u?.isOnline === true || u?.is_online === true;
-        if ((d.lat === null || d.lon === null || !online) && meuPonto) {
+        const online = u?.isOnline === true || u?.is_online === true; void online;
+        if ((d.lat === null || d.lon === null) && meuPonto) {
           const rad = ((Number(u.angulo) || 0) * Math.PI) / 180;
           const m = Number(u.anelM) || 2000;
           lat = meuPonto.lat + (m * Math.cos(rad)) / 111320;
@@ -225,7 +225,7 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
             <div className="w-11 h-11 rounded-full border-2 border-[var(--libido-accent)] shadow-[0_0_20px_rgba(255,179,0,0.35)] overflow-hidden">
               <ProtectedImage
                 currentUser={currentUser}
-                src={currentUser?.photo_url || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=64&auto=format&fit=crop'}
+                src={currentUser?.photo_url || ''}
                 alt="Você"
                 className="w-full h-full"
               />

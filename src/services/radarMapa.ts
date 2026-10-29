@@ -62,7 +62,7 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
     (perfisDiretos || []).forEach((u: any) => {
       const uid = u.user_id || u.id;
       if (!uid || uid === meuId) return;
-      const galeria = Array.isArray(u.photos) ? u.photos : [];
+      const galeria = Array.isArray(u.photos) && u.photos.length > 0 ? u.photos : (Array.isArray(u.gallery) ? u.gallery : []);
       const foto = String(u.photo_url || galeria[0] || '').trim();
       if (!foto) return; // Proibido usuario sem foto
 
@@ -77,9 +77,9 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
           existente.ordem = Math.min(existente.ordem, 1);
           existente.faixa = existente.faixa || 'Online perto de você';
         }
-        if (existente.latPin === null && u.lat != null && u.lon != null) {
-          existente.latPin = Number(u.lat);
-          existente.lonPin = Number(u.lon);
+        if (existente.latPin === null && (u.lat != null || u.last_lat != null) && (u.lon != null || u.last_lng != null)) {
+          existente.latPin = Number(u.lat != null ? u.lat : u.last_lat);
+          existente.lonPin = Number(u.lon != null ? u.lon : u.last_lng);
         }
       } else {
         mapa.set(uid, {
@@ -91,14 +91,14 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
           ordem: estaOnline ? 1 : 20,
           anelM: estaOnline ? 1000 : 2000,
           angulo: anguloDeterministico(String(uid)),
-          latPin: u.lat != null ? Number(u.lat) : null,
-          lonPin: u.lon != null ? Number(u.lon) : null,
+          latPin: u.lat != null ? Number(u.lat) : (u.last_lat != null ? Number(u.last_lat) : null),
+          lonPin: u.lon != null ? Number(u.lon) : (u.last_lng != null ? Number(u.last_lng) : null),
         });
       }
     });
   } catch {}
 
-  return Array.from(mapa.values()).sort((a, b) => {
+  return Array.from(mapa.values()).filter((p) => p.latPin !== null && p.lonPin !== null).sort((a, b) => {
     if (a.online !== b.online) return a.online ? -1 : 1;
     return a.ordem - b.ordem;
   });
@@ -109,7 +109,7 @@ export type PosicaoRadar =
   | { tipo: 'anel'; raioM: number; angulo: number };
 
 export function posicaoNoRadar(p: PerfilRadar): PosicaoRadar {
-  if (p.online && p.latPin !== null && p.lonPin !== null) {
+  if (p.latPin !== null && p.lonPin !== null) {
     return { tipo: 'pino', lat: p.latPin, lon: p.lonPin };
   }
   return { tipo: 'anel', raioM: p.anelM > 0 ? p.anelM : 1500, angulo: p.angulo };

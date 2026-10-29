@@ -53,8 +53,7 @@ export const sendMessage = async (message: Omit<Message, 'id'>) => {
 
     const newMsg: Message = {
       ...message,
-      id: 'fallback:msg:' + Date.now(),
-      status: 'sent'
+      id: 'falha:msg:' + Date.now(), status: 'failed'
     };
 
     demoMessages.push(newMsg);

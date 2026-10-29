@@ -116,6 +116,21 @@ export default function App() {
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
+    // FIX-PRINT: marca d agua com id do usuario. Navegador nao bloqueia print
+    // do sistema, mas cada captura passa a ser rastreavel.
+    try {
+      const velha = document.getElementById('libido-marca');
+      if (velha) velha.remove();
+      const marca = document.createElement('div');
+      marca.id = 'libido-marca';
+      marca.textContent = 'LIBIDO';
+      document.body.appendChild(marca);
+      supabase.auth.getSession().then(({ data: sm }) => {
+        const uid = sm?.session?.user?.id || '';
+        if (uid) marca.textContent = 'LIBIDO ' + uid.slice(0, 8).toUpperCase();
+      }).catch(() => {});
+    } catch (eMarca) { console.error(eMarca); }
+
     const handleProfileUpdate = async () => {
       try {
         const {
@@ -197,6 +212,7 @@ export default function App() {
       recoverySubscription.unsubscribe();
       unsubscribe();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+    try { const mm = document.getElementById('libido-marca'); if (mm) mm.remove(); document.body.classList.remove('is-hidden'); } catch (eM2) {}
       window.removeEventListener('profileUpdated', handleProfileUpdate);
 
       if (blurTimeoutRef.current) {
