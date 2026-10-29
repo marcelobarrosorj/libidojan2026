@@ -149,7 +149,7 @@ export function AppCore({
             onTabChange={(tab) => navigate(tab)}
             isAdmin={isAdmin}
             unreadChat={unreadChat}
-            isPremium={isPremium}
+            isPremium={isPremium || isOwner}
             onPremiumClick={openPremiumCheckout}
           />
         </div>
@@ -159,7 +159,7 @@ export function AppCore({
         activeTab={activeTab}
         navParams={navParams}
         navigate={navigate}
-        isPremium={isPremium}
+        isPremium={isPremium || isOwner}
         isAdmin={isAdmin}
         onShowPremiumModal={openPremiumCheckout}
         userId={userId}

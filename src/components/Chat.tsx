@@ -353,7 +353,7 @@ export function Chat({
 
   const handleSend = async () => {
     if (!messageInput.trim() || !activeChat || !userId) return;
-    if (!isPremium) {
+    if (isPremium === false) {
       onShowPremiumModal?.();
       return;
     }
@@ -379,7 +379,7 @@ export function Chat({
   const handlePhoto = async (file: File) => {
     if (!userId || !activeChat) return;
     if (isDemoId(activeChat)) return;
-    if (!isPremium) {
+    if (isPremium === false) {
       onShowPremiumModal?.();
       return;
     }

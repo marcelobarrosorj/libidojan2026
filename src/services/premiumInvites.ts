@@ -32,7 +32,13 @@ export async function resgatarConvitePremium(
       ? new Date(Date.now() + inv.duration_hours * 3600000).toISOString()
       : null;
     // VITALICIO-FIX: aplica o premium verificando se a linha foi atingida
+    // VITALICIO-RPC: caminho principal via funcao security definer no banco,
+    // que nao depende de policy de UPDATE na tabela users.
     let aplicado = false;
+    try {
+      const { data: rpcOk } = await (supabase as any).rpc('resgatar_vitalicio', { p_user: userId, p_until: until });
+      if (rpcOk === true) aplicado = true;
+    } catch (eRpc) { console.error('VITALICIO-RPC falhou', eRpc); }
     for (let tent = 0; tent < 6 && !aplicado; tent++) {
       const { data: upd } = await (supabase as any)
         .from('users')
