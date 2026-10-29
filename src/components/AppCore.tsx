@@ -43,10 +43,16 @@ export function AppCore({
   const premiumUntilStr = (currentUser as any)?.premium_until || ''; // PREM-EXPIRA
   const premiumUntilMs = premiumUntilStr ? new Date(premiumUntilStr).getTime() : 0; // PREM-EXPIRA
   const premiumValido = !premiumUntilMs || premiumUntilMs > Date.now(); // PREM-EXPIRA: sem data = eterno
+  // FIX-ACESSO: premium booleano e a fonte de verdade; plano owner libera; data nula = eterno.
+  const temFlagPremium =
+    (currentUser as any)?.premium === true ||
+    String((currentUser as any)?.premium) === 'true';
   const isPremium =
     isOwner ||
-    hasActiveSubscription ||
-    (userPlan === 'premium' && premiumValido) || // PREM-EXPIRA: flag so vale dentro do prazo
+    temFlagPremium ||
+    !!hasActiveSubscription ||
+    (userPlan === 'premium' && premiumValido) ||
+    userPlan === 'owner' ||
     userPlan === 'admin' ||
     userRole === 'admin';
 
@@ -149,7 +155,7 @@ export function AppCore({
             onTabChange={(tab) => navigate(tab)}
             isAdmin={isAdmin}
             unreadChat={unreadChat}
-            isPremium={isPremium || isOwner}
+            isPremium={isPremium}
             onPremiumClick={openPremiumCheckout}
           />
         </div>
@@ -159,7 +165,7 @@ export function AppCore({
         activeTab={activeTab}
         navParams={navParams}
         navigate={navigate}
-        isPremium={isPremium || isOwner}
+        isPremium={isPremium}
         isAdmin={isAdmin}
         onShowPremiumModal={openPremiumCheckout}
         userId={userId}
@@ -181,4 +187,3 @@ export function AppCore({
     </AppShell>
   );
 }
-
