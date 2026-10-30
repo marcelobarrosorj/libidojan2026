@@ -47,14 +47,21 @@ export function AppCore({
   const temFlagPremium =
     (currentUser as any)?.premium === true ||
     String((currentUser as any)?.premium) === 'true';
+  // FUNIL-ACESSO: fonte unica de verdade. Espelha a funcao tem_acesso() do banco.
+  const _u = (currentUser as any) || {};
+  const _banido = _u.is_banned === true;
+  const _excluido = _u.is_deleted === true;
+  const _flagPremium = _u.premium === true || String(_u.premium) === 'true';
   const isPremium =
-    isOwner ||
-    temFlagPremium ||
-    !!hasActiveSubscription ||
-    (userPlan === 'premium' && premiumValido) ||
-    userPlan === 'owner' ||
-    userPlan === 'admin' ||
-    userRole === 'admin';
+    !_banido &&
+    !_excluido &&
+    (isOwner ||
+      _flagPremium ||
+      !!hasActiveSubscription ||
+      (userPlan === 'premium' && premiumValido) ||
+      userPlan === 'owner' ||
+      userPlan === 'admin' ||
+      userRole === 'admin');
 
   const isAdmin =
     isOwner ||
