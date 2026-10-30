@@ -354,6 +354,15 @@ export function Chat({
   const handleSend = async () => {
     if (!messageInput.trim() || !activeChat || !userId) return;
     if (isPremium === false) {
+      // ACESSO-NEGADO-MSG: diz o motivo real em vez de falhar em silencio
+      const _u: any = (currentUser as any) || {};
+      const _motivo = _u.is_banned === true
+        ? 'Sua conta esta suspensa. Fale com o suporte.'
+        : _u.is_deleted === true
+        ? 'Sua conta foi excluida. Crie uma nova ou fale com o suporte.'
+        : 'Seu acesso premium nao esta ativo. Ative com um convite ou assinatura.';
+      alert(_motivo);
+      return;
       onShowPremiumModal?.();
       return;
     }
@@ -380,6 +389,15 @@ export function Chat({
     if (!userId || !activeChat) return;
     if (isDemoId(activeChat)) return;
     if (isPremium === false) {
+      // ACESSO-NEGADO-MSG: diz o motivo real em vez de falhar em silencio
+      const _u: any = (currentUser as any) || {};
+      const _motivo = _u.is_banned === true
+        ? 'Sua conta esta suspensa. Fale com o suporte.'
+        : _u.is_deleted === true
+        ? 'Sua conta foi excluida. Crie uma nova ou fale com o suporte.'
+        : 'Seu acesso premium nao esta ativo. Ative com um convite ou assinatura.';
+      alert(_motivo);
+      return;
       onShowPremiumModal?.();
       return;
     }
