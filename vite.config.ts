@@ -5,6 +5,18 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+      build: {
+        chunkSizeWarningLimit: 900,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              react: ['react', 'react-dom'],
+              supabase: ['@supabase/supabase-js'],
+              leaflet: ['leaflet']
+            }
+          }
+        }
+      },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
