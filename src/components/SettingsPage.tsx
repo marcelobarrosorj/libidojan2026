@@ -16,7 +16,7 @@ export function SettingsPage({ onLogout, currentUser, isPremium }: SettingsPageP
   const alternarTema = () => {
     const novo = !temaClaro;
     setTemaClaro(novo);
-    try { localStorage.setItem('libido_tema', novo ? 'claro' : 'escuro'); } catch (eTema) {}
+    try { localStorage.setItem('libido_tema', novo ? 'claro' : 'escuro'); } catch (eTema) { console.error(eTema); }
     document.documentElement.classList.toggle('tema-claro', novo);
   };
   return (
@@ -37,7 +37,7 @@ export function SettingsPage({ onLogout, currentUser, isPremium }: SettingsPageP
             </div>
           </div>
           <button
-            onClick={() => { const novo = !notifications; setNotifications(novo); try { localStorage.setItem('libido_notifications', novo ? 'on' : 'off'); } catch (eN) {} }} // NOTIF-TOGGLE
+            onClick={() => { const novo = !notifications; setNotifications(novo); try { localStorage.setItem('libido_notifications', novo ? 'on' : 'off'); } catch (eN) { console.error(eN); } }} // NOTIF-TOGGLE
             className={`w-12 h-7 rounded-full transition-all flex items-center px-1 ${notifications ? 'bg-[var(--libido-accent)] justify-end' : 'bg-white/10 justify-start'}`}
           >
             <div className="w-5 h-5 bg-white rounded-full shadow-md transition-all" />

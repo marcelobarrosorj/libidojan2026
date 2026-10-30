@@ -179,7 +179,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
       }
 
       if (finalPhotoUrl) { try { await createPost({ id: '', userId: userId, image: finalPhotoUrl, text: '', likes: 0, createdAt: Date.now() }); } catch (eP) { console.error('ONBOARDING-POST falhou', eP); } }
-      try { localStorage.removeItem('libido_rascunho_' + userId); } catch (eLimpa) {}
+      try { localStorage.removeItem('libido_rascunho_' + userId); } catch (eLimpa) { console.error(eLimpa); }
       onComplete();
     } catch (err: any) {
       console.error('Erro técnico interno ao salvar:', err);
@@ -302,7 +302,7 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
             <label className="text-[10px] font-bold tracking-[0.15em] uppercase text-[var(--libido-muted)] ml-1">Foto de perfil (obrigatória)</label>
             <input type="file" accept="image/*" className="hidden" id="onboarding-photo" onChange={e => { const f = e.target.files?.[0]; if (f) { setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f)); } }} />
             <div className="flex items-center gap-3 mt-1.5">
-              <button type="button" onClick={() => { try { localStorage.setItem('libido_rascunho_' + userId, JSON.stringify({ relationshipStatus, nickname, bio, singleAge, singleGender, singleHeight, singleWeight, singleOrientation, singleBiotype, maleNickname, maleAge, maleHeight, maleWeight, maleOrientation, maleBiotype, femaleNickname, femaleAge, femaleHeight, femaleWeight, femaleOrientation, femaleBiotype, privacyAccepted })); } catch (eRasc) {} document.getElementById('onboarding-photo')?.click(); }} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
+              <button type="button" onClick={() => { try { localStorage.setItem('libido_rascunho_' + userId, JSON.stringify({ relationshipStatus, nickname, bio, singleAge, singleGender, singleHeight, singleWeight, singleOrientation, singleBiotype, maleNickname, maleAge, maleHeight, maleWeight, maleOrientation, maleBiotype, femaleNickname, femaleAge, femaleHeight, femaleWeight, femaleOrientation, femaleBiotype, privacyAccepted })); } catch (eRasc) { console.error(eRasc); } document.getElementById('onboarding-photo')?.click(); }} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-2xl px-4 py-3 text-xs text-[var(--libido-text)]">
                 {photoFile ? 'Trocar foto' : 'Escolher foto'}
               </button>
               {photoPreview && <img src={photoPreview} alt="previa" className="w-12 h-12 rounded-xl object-cover border border-[var(--libido-border)]" />}

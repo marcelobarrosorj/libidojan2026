@@ -26,7 +26,7 @@ export function desbloquearAudio(): void {
     src.connect(c.destination);
     src.start(0);
     desbloqueado = true;
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 function tocar(notas: Nota[], volume = 0.16): void {
@@ -48,7 +48,7 @@ function tocar(notas: Nota[], volume = 0.16): void {
       g.connect(c.destination);
       osc.start(t0 + n.inicio);
       osc.stop(t0 + n.inicio + n.dur + 0.05);
-    } catch {}
+    } catch (e) { console.error(e); }
   });
 }
 

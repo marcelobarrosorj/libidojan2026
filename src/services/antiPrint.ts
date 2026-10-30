@@ -150,7 +150,7 @@ function instalarNavegacao(): void {
       replaceOriginal(...args);
       atualizarMarca();
     } as History['replaceState'];
-  } catch {}
+  } catch (e) { console.error(e); }
 
   window.addEventListener('popstate', atualizarMarca);
   window.addEventListener('hashchange', atualizarMarca);
@@ -170,7 +170,7 @@ async function carregarIdentidade(): Promise<void> {
 
     textoMarca = ('LIBIDO ' + usuario.id.slice(0, 8) + ' ' + carimbo).toUpperCase();
     atualizarMarca();
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 export function iniciarAntiPrint(): void {
@@ -194,7 +194,7 @@ export function iniciarAntiPrint(): void {
       if (!sessao || !sessao.user || !sessao.user.id) return;
       void carregarIdentidade();
     });
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 export function pararAntiPrint(): void {

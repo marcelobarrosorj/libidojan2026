@@ -94,10 +94,10 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
           try {
             const us = await getUsersByIds(ids);
             (us || []).forEach((u: any) => { mapa[u.user_id || u.id] = u.nickname || u.name || 'Usuario'; });
-          } catch {}
+          } catch (e) { console.error(e); }
         }
         setComentarios(prev => ({ ...prev, [postId]: (lista || []).map((cm: any) => ({ ...cm, nickname: mapa[cm.user_id] || 'Usuario' })) }));
-      } catch {}
+      } catch (e) { console.error(e); }
       setCarregandoComentarios(prev => ({ ...prev, [postId]: false }));
     }
   };

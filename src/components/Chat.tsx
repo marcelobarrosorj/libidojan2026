@@ -117,7 +117,7 @@ const createTypingChannel = (
       try {
         const p = ch.send({ type: "broadcast", event: "typing", payload: { userId: meId } });
         if (p && typeof p.catch === "function") p.catch(() => {});
-      } catch {}
+      } catch (e) { console.error(e); }
     },
     cleanup: () => {
       supabase.removeChannel(ch);

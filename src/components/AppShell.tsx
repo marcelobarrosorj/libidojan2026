@@ -6,14 +6,14 @@ try {
   if (typeof window !== 'undefined' && localStorage.getItem('libido_tema') === 'claro') {
     document.documentElement.classList.add('tema-claro');
   }
-} catch (eTema) {}
+} catch (eTema) { console.error(eTema); }
 
 // SCROLL-RESET: impede o navegador de restaurar a rolagem antiga ao abrir o app
 try {
   if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
     window.history.scrollRestoration = 'manual';
   }
-} catch (eScroll) {}
+} catch (eScroll) { console.error(eScroll); }
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (

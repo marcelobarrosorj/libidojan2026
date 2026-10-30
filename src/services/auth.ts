@@ -68,7 +68,7 @@ export const register = async (email: string, password: string) => {
   // Mesmo se o servidor retornar sessao sem o clique no link, exigimos a confirmacao para novos cadastros:
   const confirmado = !!(data.user.email_confirmed_at && !data.session);
   if (!data.user.email_confirmed_at) {
-    try { localStorage.setItem('libido_novo_nao_confirmado_' + data.user.id, '1'); } catch {}
+    try { localStorage.setItem('libido_novo_nao_confirmado_' + data.user.id, '1'); } catch (e) { console.error(e); }
   }
 
   return {
@@ -93,7 +93,7 @@ export const getCurrentUser = (callback: (user: any) => void) => {
     if (session?.user) {
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
         if (window.location.hash.includes('access_token') || window.location.hash.includes('type=signup')) {
-          try { localStorage.removeItem('libido_novo_nao_confirmado_' + session.user.id); } catch {}
+          try { localStorage.removeItem('libido_novo_nao_confirmado_' + session.user.id); } catch (e) { console.error(e); }
         }
       }
       const bloqueadoNovo = localStorage.getItem('libido_novo_nao_confirmado_' + session.user.id) === '1';
@@ -110,7 +110,7 @@ export const getCurrentUser = (callback: (user: any) => void) => {
   supabase.auth.getSession().then(({ data: { session } }) => {
     if (session?.user) {
       if (window.location.hash.includes('access_token') || window.location.hash.includes('type=signup')) {
-        try { localStorage.removeItem('libido_novo_nao_confirmado_' + session.user.id); } catch {}
+        try { localStorage.removeItem('libido_novo_nao_confirmado_' + session.user.id); } catch (e) { console.error(e); }
       }
       const bloqueadoNovo = localStorage.getItem('libido_novo_nao_confirmado_' + session.user.id) === '1';
       callback({

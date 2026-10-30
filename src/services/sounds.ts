@@ -14,7 +14,7 @@ const pegarContexto = (): AudioContext | null => {
 };
 
 const tocar = (freq: number, duracao: number, atraso: number, tipo: OscillatorType = 'sine', volume = 0.12) => {
-  try { if (localStorage.getItem('libido_notifications') === 'off') return; } catch (eN) {} // NOTIF-CHECK
+  try { if (localStorage.getItem('libido_notifications') === 'off') return; } catch (eN) { console.error(eN); } // NOTIF-CHECK
   const ctx = pegarContexto();
   if (!ctx) return;
   try {

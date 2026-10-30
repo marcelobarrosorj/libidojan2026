@@ -26,7 +26,7 @@ function jaInstalado(): boolean {
     if (localStorage.getItem(CHAVE_INSTALADO) === '1') return true;
     if (window.matchMedia('(display-mode: standalone)').matches) return true;
     if ((window.navigator as any).standalone === true) return true;
-  } catch {}
+  } catch (e) { console.error(e); }
   return false;
 }
 
@@ -37,7 +37,7 @@ async function instaladoViaApi(): Promise<boolean> {
       const apps = await nav.getInstalledRelatedApps();
       if (Array.isArray(apps) && apps.length > 0) return true;
     }
-  } catch {}
+  } catch (e) { console.error(e); }
   return false;
 }
 
@@ -45,7 +45,7 @@ function dispensadoRecentemente(): boolean {
   try {
     const t = Number(localStorage.getItem(CHAVE_DISPENSADO) || '0');
     if (t > 0 && Date.now() - t < SETE_DIAS) return true;
-  } catch {}
+  } catch (e) { console.error(e); }
   return false;
 }
 
@@ -122,9 +122,9 @@ function acionarInstalacao() {
     try {
       evento.userChoice.then((escolha: any) => {
         if (escolha && escolha.outcome === 'accepted') {
-          try { localStorage.setItem(CHAVE_INSTALADO, '1'); } catch {}
+          try { localStorage.setItem(CHAVE_INSTALADO, '1'); } catch (e) { console.error(e); }
         } else {
-          try { localStorage.setItem(CHAVE_DISPENSADO, String(Date.now())); } catch {}
+          try { localStorage.setItem(CHAVE_DISPENSADO, String(Date.now())); } catch (e) { console.error(e); }
         }
         promptAdiado = null;
         promptEmAndamento = false;
@@ -219,7 +219,7 @@ function montarBanner(modo: 'prompt' | 'hint' | 'ios') {
   } as any);
   fechar.addEventListener('click', (ev) => {
     ev.stopPropagation();
-    try { localStorage.setItem(CHAVE_DISPENSADO, String(Date.now())); } catch {}
+    try { localStorage.setItem(CHAVE_DISPENSADO, String(Date.now())); } catch (e) { console.error(e); }
     esconderBanner();
   });
   banner.appendChild(fechar);
@@ -231,12 +231,12 @@ function montarBanner(modo: 'prompt' | 'hint' | 'ios') {
 
 async function talvezMostrar() {
   if (jaInstalado()) {
-    try { localStorage.setItem(CHAVE_INSTALADO, '1'); } catch {}
+    try { localStorage.setItem(CHAVE_INSTALADO, '1'); } catch (e) { console.error(e); }
     esconderBanner();
     return;
   }
   if (await instaladoViaApi()) {
-    try { localStorage.setItem(CHAVE_INSTALADO, '1'); } catch {}
+    try { localStorage.setItem(CHAVE_INSTALADO, '1'); } catch (e) { console.error(e); }
     esconderBanner();
     return;
   }
@@ -261,7 +261,7 @@ export function iniciarInstalarApp() {
     try {
       localStorage.setItem(CHAVE_INSTALADO, '1');
       localStorage.removeItem(CHAVE_DISPENSADO);
-    } catch {}
+    } catch (e) { console.error(e); }
     esconderBanner();
   });
 

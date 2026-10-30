@@ -27,9 +27,9 @@ async function gravar(userId: string, online: boolean): Promise<void> {
           .from('user_profiles')
           .update({ is_online: online })
           .eq('user_id', userId);
-      } catch {}
+      } catch (e) { console.error(e); }
     }
-  } catch {}
+  } catch (e) { console.error(e); }
 }
 
 export async function startPresence(userId: string): Promise<void> {

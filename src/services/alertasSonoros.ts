@@ -53,9 +53,9 @@ function mostrarAviso(titulo: string, sub: string): void {
     requestAnimationFrame(function () { el.style.opacity = '1'; });
     setTimeout(function () {
       el.style.opacity = '0';
-      setTimeout(function () { try { el.remove(); } catch (e) {} }, 320);
+      setTimeout(function () { try { el.remove(); } catch (e) { console.error(e); } }, 320);
     }, 5200);
-  } catch (e) {}
+  } catch (e) { console.error(e); }
 }
 
 function escutarMensagens(): void {
@@ -113,7 +113,7 @@ async function checarProximidade(): Promise<void> {
         return;
       }
     }
-  } catch (e) {}
+  } catch (e) { console.error(e); }
 }
 
 function iniciarGps(): void {
@@ -126,7 +126,7 @@ function iniciarGps(): void {
       function () {},
       { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
     );
-  } catch (e) {}
+  } catch (e) { console.error(e); }
 }
 
 export function iniciarAlertasSonoros(): void {
@@ -139,7 +139,7 @@ export function iniciarAlertasSonoros(): void {
     supabase.auth.onAuthStateChange(function (_ev: any, sess: any) {
       meuId = (sess && sess.user && sess.user.id) || null;
     });
-  } catch (e) {}
+  } catch (e) { console.error(e); }
   iniciarGps();
   escutarMensagens();
   setTimeout(function () { void checarProximidade(); }, 6000);
@@ -147,4 +147,4 @@ export function iniciarAlertasSonoros(): void {
   console.log('ALERTAS-SOM ativos');
 }
 
-try { iniciarAlertasSonoros(); } catch (e) {}
+try { iniciarAlertasSonoros(); } catch (e) { console.error(e); }

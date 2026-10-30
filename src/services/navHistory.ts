@@ -1,4 +1,4 @@
-﻿// NAV-HISTORY: faz o botao voltar do navegador/celular navegar dentro do app
+// NAV-HISTORY: faz o botao voltar do navegador/celular navegar dentro do app
 // AVISO-SAIDA: na tela inicial, o voltar mostra o aviso "Deseja mesmo sair?" antes de sair
 let navigateFn: ((tab: string, params?: any) => void) | null = null;
 let ouvinteInstalado = false;
@@ -18,7 +18,7 @@ const mostrarAvisoSaida = (): Promise<boolean> => {
     const decidir = (v: boolean) => {
       if (decidido) return;
       decidido = true;
-      try { const el = document.getElementById('libido-aviso-saida'); if (el) el.remove(); } catch (eR) {}
+      try { const el = document.getElementById('libido-aviso-saida'); if (el) el.remove(); } catch (eR) { console.error(eR); }
       resolve(v);
     };
     try {
@@ -81,7 +81,7 @@ export const initNavHistory = (fn: (tab: string, params?: any) => void) => {
       aguardandoDecisao = false;
       if (querSair) {
         saindoDeVerdade = true;
-        try { window.history.go(-2); } catch (eB) { try { window.history.back(); } catch (eB2) {} }
+        try { window.history.go(-2); } catch (eB) { try { window.history.back(); } catch (eB2) { console.error(eB2); } }
         setTimeout(() => { saindoDeVerdade = false; }, 800);
       }
     });

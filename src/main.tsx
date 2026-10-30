@@ -61,7 +61,7 @@ document.addEventListener('dragstart', (e) => {
           if (falhou) alert('Nao foi possivel resgatar o convite: ' + motivo);
           else alert('Convite resgatado! Premium ativado com sucesso.');
         }
-      } catch {}
+      } catch (e) { console.error(e); }
     };
     supabase.auth.onAuthStateChange(() => { tentar(); });
     tentar();
@@ -102,9 +102,9 @@ document.addEventListener('dragstart', (e) => {
       try {
         await supabase.rpc('registrar_indicacao', { p_slug: refPendente });
         localStorage.removeItem('libido_affiliate_ref');
-      } catch {}
+      } catch (e) { console.error(e); }
     };
     supabase.auth.onAuthStateChange(() => { void vincularAfiliado(); });
     void vincularAfiliado();
-  } catch {}
+  } catch (e) { console.error(e); }
 })();

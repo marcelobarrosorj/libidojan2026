@@ -148,7 +148,7 @@ export async function excluirPostPorFoto(userId: string, imageUrl: string): Prom
         const storagePath = decodeURIComponent(imageUrl.substring(idx + marcador.length));
         await supabase.storage.from('photos').remove([storagePath]);
       }
-    } catch {}
+    } catch (e) { console.error(e); }
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('feedUpdated'));
     }
@@ -198,7 +198,7 @@ export const toggleCurtida = async (postId: string) => {
         }
       }
     }
-  } catch (eT) {}
+  } catch (eT) { console.error(eT); }
 };
 
 export const getComentarios = async (postId: string): Promise<any[]> => {

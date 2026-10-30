@@ -25,7 +25,7 @@ export function iniciarNotificacoesGlobais(
       const w = window as any;
       clearTimeout(w.__libidoToastT);
       w.__libidoToastT = setTimeout(() => { if (t) t.style.opacity = '0'; }, 4000);
-    } catch (eT) {}
+    } catch (eT) { console.error(eT); }
   };
 
   const notificarSistema = (titulo: string, corpo: string) => {
@@ -36,12 +36,12 @@ export function iniciarNotificacoesGlobais(
       const opts: any = { body: corpo, tag: 'libido-' + Date.now() };
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then((reg: any) => {
-          try { reg.showNotification(titulo, opts); } catch (eN) {}
-        }).catch(() => { try { new N(titulo, opts); } catch (eN2) {} });
+          try { reg.showNotification(titulo, opts); } catch (eN) { console.error(eN); }
+        }).catch(() => { try { new N(titulo, opts); } catch (eN2) { console.error(eN2); } });
       } else {
-        try { new N(titulo, opts); } catch (eN3) {}
+        try { new N(titulo, opts); } catch (eN3) { console.error(eN3); }
       }
-    } catch (eN4) {}
+    } catch (eN4) { console.error(eN4); }
   };
 
   const pedirPermissao = () => {
@@ -49,7 +49,7 @@ export function iniciarNotificacoesGlobais(
       const N = (window as any).Notification;
       if (N && N.permission === 'default') { N.requestPermission(); }
       if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(() => {}); }
-    } catch (eP) {}
+    } catch (eP) { console.error(eP); }
     window.removeEventListener('click', pedirPermissao);
   };
   window.addEventListener('click', pedirPermissao);

@@ -63,7 +63,7 @@ export function PixCheckout({
           } else {
             sessionStorage.removeItem('libido_pix_checkout');
           }
-        } catch {}
+        } catch (e) { console.error(e); }
       }
     } else {
       document.body.classList.remove('payment-active');
@@ -92,7 +92,7 @@ export function PixCheckout({
             setSelectedPlanId((atual) => atual || (data.plans.find((p: any) => String(p?.name || '').toLowerCase().includes('premium'))?.id || data.plans[0]?.id));
           }
         }
-      } catch {}
+      } catch (e) { console.error(e); }
     })();
     return () => {
       ativo = false;

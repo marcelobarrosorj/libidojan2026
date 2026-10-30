@@ -13,10 +13,10 @@ function avisar(msg: string) {
   try {
     if (typeof window !== 'undefined') {
       window.setTimeout(function () {
-        try { window.alert('PUSH -> ' + msg); } catch (e) {}
+        try { window.alert('PUSH -> ' + msg); } catch (e) { console.error(e); }
       }, 2000);
     }
-  } catch (e) {}
+  } catch (e) { console.error(e); }
 }
 
 export function lerStatusPush(): string {
@@ -128,7 +128,7 @@ export function iniciarPush(): void {
         void ativarPush();
       }
     });
-  } catch (e) {}
+  } catch (e) { console.error(e); }
 }
 
-try { iniciarPush(); } catch (e) {}
+try { iniciarPush(); } catch (e) { console.error(e); }

@@ -17,7 +17,7 @@ function extrairTextoBio(b: any): string {
   if (!b || typeof b !== 'string') return '';
   const t = b.trim();
   if (t.startsWith('{') && t.includes('isCouple')) {
-    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch (eB) {}
+    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch (eB) { console.error(eB); }
   }
   return b;
 }

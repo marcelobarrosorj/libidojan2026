@@ -51,7 +51,7 @@ export default function App() {
     try {
       const pPromo = new URLSearchParams(window.location.search).get('promo');
       if (pPromo && pPromo.trim()) localStorage.setItem('libido_promo', pPromo.trim().toUpperCase());
-    } catch (ePromo) {}
+    } catch (ePromo) { console.error(ePromo); }
   }, []);
   // PROMO-APP: ativa os dias gratis quando surge uma sessao logada
   // Auto-suficiente: escuta o onAuthStateChange por conta propria
@@ -78,7 +78,7 @@ export default function App() {
       })();
     });
     return () => {
-      try { promoData?.subscription?.unsubscribe(); } catch (ePromo3) {}
+      try { promoData?.subscription?.unsubscribe(); } catch (ePromo3) { console.error(ePromo3); }
     };
   }, []);
   useEffect(() => {
@@ -212,7 +212,7 @@ export default function App() {
       recoverySubscription.unsubscribe();
       unsubscribe();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-    try { const mm = document.getElementById('libido-marca'); if (mm) mm.remove(); document.body.classList.remove('is-hidden'); } catch (eM2) {}
+    try { const mm = document.getElementById('libido-marca'); if (mm) mm.remove(); document.body.classList.remove('is-hidden'); } catch (eM2) { console.error(eM2); }
       window.removeEventListener('profileUpdated', handleProfileUpdate);
 
       if (blurTimeoutRef.current) {

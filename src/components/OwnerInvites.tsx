@@ -46,7 +46,7 @@ export function OwnerInvites() {
   };
 
   const copiar = async () => {
-    try { await navigator.clipboard.writeText(link); setCopiado(true); } catch (eC) {}
+    try { await navigator.clipboard.writeText(link); setCopiado(true); } catch (eC) { console.error(eC); }
   };
 
   const btnBase: any = { flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 12, fontWeight: 700, color: '#fff', cursor: 'pointer' };

@@ -55,7 +55,7 @@ export async function resgatarConvitePremium(
           .from('premium_invite_codes')
           .update({ used_count: inv.used_count || 0, used_by: null, used_at: null })
           .eq('code', code);
-      } catch (eRb) {}
+      } catch (eRb) { console.error(eRb); }
       return { ok: false, mensagem: 'Seu perfil ainda esta sendo criado. Tente resgatar novamente em alguns segundos.' };
     }
     return {

@@ -14,7 +14,7 @@ function extrairTextoBio(b: any): string {
   if (!b || typeof b !== 'string') return '';
   const t = b.trim();
   if (t.startsWith('{') && t.includes('isCouple')) {
-    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch {}
+    try { const p = JSON.parse(t); if (p && typeof p.text === 'string') return p.text; } catch (e) { console.error(e); }
   }
   return b;
 }
@@ -82,7 +82,7 @@ export function ViewProfile({ user, navigate, isPremium, currentUser }: ViewProf
           .eq('blocked_id', user.user_id)
           .maybeSingle();
         if (ativo) setIsBlocked(!!blockRow);
-      } catch {}
+      } catch (e) { console.error(e); }
     };
     carregar();
     return () => { ativo = false; };

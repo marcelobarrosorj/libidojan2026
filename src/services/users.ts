@@ -142,7 +142,7 @@ export const getUserById = async (userId: string): Promise<User | null> => {
         data.plan = roleData.role;
       }
     }
-  } catch {}
+  } catch (e) { console.error(e); }
 
   return mapSupabaseToUser(data);
 };
@@ -163,7 +163,7 @@ export const updateUserProfile = async (userId: string, data: Partial<User>) => 
       .from('user_profiles')
       .update(updateData)
       .eq('user_id', userId);
-  } catch {}
+  } catch (e) { console.error(e); }
 };
 
 export const getAllUsers = async (): Promise<User[]> => {
@@ -212,16 +212,16 @@ export const deleteUserProfile = async (userId: string) => {
       const caminhos = listaArquivos.map((f: any) => `${userId}/${f.name}`);
       await supabase.storage.from('photos').remove(caminhos);
     }
-  } catch {}
+  } catch (e) { console.error(e); }
 
-  try { await (supabase as any).from('posts').delete().eq('user_id', userId); } catch {}
-  try { await (supabase as any).from('post_comments').delete().eq('user_id', userId); } catch {}
-  try { await (supabase as any).from('post_likes').delete().eq('user_id', userId); } catch {}
-  try { await (supabase as any).from('follows').delete().or(`follower_id.eq.${userId},following_id.eq.${userId}`); } catch {}
-  try { await (supabase as any).from('profile_visits').delete().or(`visitor_id.eq.${userId},visited_id.eq.${userId}`); } catch {}
-  try { await (supabase as any).from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch {}
-  try { await (supabase as any).from('push_subscriptions').delete().eq('user_id', userId); } catch {}
-  try { await (supabase as any).from('user_profiles').delete().eq('user_id', userId); } catch {}
+  try { await (supabase as any).from('posts').delete().eq('user_id', userId); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('post_comments').delete().eq('user_id', userId); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('post_likes').delete().eq('user_id', userId); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('follows').delete().or(`follower_id.eq.${userId},following_id.eq.${userId}`); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('profile_visits').delete().or(`visitor_id.eq.${userId},visited_id.eq.${userId}`); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('push_subscriptions').delete().eq('user_id', userId); } catch (e) { console.error(e); }
+  try { await (supabase as any).from('user_profiles').delete().eq('user_id', userId); } catch (e) { console.error(e); }
 
   const { error } = await supabase
     .from('users')
@@ -230,7 +230,7 @@ export const deleteUserProfile = async (userId: string) => {
 
   try {
     await supabase.rpc('excluir_minha_conta');
-  } catch {}
+  } catch (e) { console.error(e); }
 
   if (error) {
     console.error('Error deleting user profile:', error);

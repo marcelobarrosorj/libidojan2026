@@ -49,7 +49,7 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
         });
       });
     }
-  } catch {}
+  } catch (e) { console.error(e); }
 
   // 2) Complementa com leitura direta de user_profiles / users para garantir que NENHUM usuario online com foto fique de fora
   try {
@@ -96,7 +96,7 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
         });
       }
     });
-  } catch {}
+  } catch (e) { console.error(e); }
 
   return Array.from(mapa.values()).filter((p) => p.latPin !== null && p.lonPin !== null).sort((a, b) => {
     if (a.online !== b.online) return a.online ? -1 : 1;
