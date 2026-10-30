@@ -138,9 +138,7 @@ export function GravadorAudio({ onEnviar, onCancelar }: Props) {
       if (midia.current && midia.current.state === 'recording') {
         try {
           midia.current.stop();
-        } catch {
-          // gravador ja parado
-        }
+        } catch (e) { console.error(e); }
       }
       liberarMicrofone();
     };

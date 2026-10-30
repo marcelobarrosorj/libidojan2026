@@ -29,9 +29,7 @@ const tocar = (freq: number, duracao: number, atraso: number, tipo: OscillatorTy
     ganho.connect(ctx.destination);
     osc.start(t0);
     osc.stop(t0 + duracao);
-  } catch (e) {
-    // som e opcional - nunca quebra o app
-  }
+  } catch (e) { console.error(e); }
 };
 
 // Mensagem nova recebida (pop de dois tons)
