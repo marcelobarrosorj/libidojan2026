@@ -536,7 +536,7 @@ export function Chat({
               Hoje
             </span>
           </div>
-          {activeChatMessages.map((msg) => (
+          {dedupeMensagens(activeChatMessages).map((msg) => (
             <div
               key={msg.id}
               className={`flex ${
