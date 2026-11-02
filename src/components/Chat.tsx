@@ -23,6 +23,7 @@ import { getUsersByIds } from "../services/users";
 import { markMessagesAsDelivered, markMessagesAsRead } from '../services/chat';
 import { playMessageSound } from '../services/sounds';
 import { supabase } from "../services/supabase";
+import { dedupeMensagens } from '../utils/dedupe';
 
 interface ChatProps {
   user?: User;
@@ -787,5 +788,4 @@ export function Chat({
     </div>
   );
 }
-
 

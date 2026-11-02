@@ -66,7 +66,7 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
       const foto = String(u.photo_url || galeria[0] || '').trim();
       if (!foto) return; // Proibido usuario sem foto
 
-      const ts = u.last_seen || u.updated_at;
+      const ts = u.is_online === true ? (u.updated_at || u.online_at) : null;
       const recente = ts ? (Date.now() - new Date(ts).getTime()) < janelaMs : true;
       const estaOnline = (u.is_online === true || u.isOnline === true) && recente;
 
@@ -118,4 +118,14 @@ export function posicaoNoRadar(p: PerfilRadar): PosicaoRadar {
 export function rotuloDistancia(p: PerfilRadar): string {
   if (p.online) return p.faixa || 'Online agora';
   return 'offline - ' + (p.faixa || 'na região');
+}
+/** Coordenada valida: numero finito dentro dos limites reais. */
+function coordValida(lat: any, lng: any): boolean {
+  const la = Number(lat);
+  const ln = Number(lng);
+  if (!isFinite(la) || !isFinite(ln)) return false;
+  if (la < -90 || la > 90) return false;
+  if (ln < -180 || ln > 180) return false;
+  if (la === 0 && ln === 0) return false;
+  return true;
 }
