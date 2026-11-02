@@ -62,12 +62,28 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
     let ultimaSalva = 0; // GPS-CONTINUO
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       watchIdGPS = navigator.geolocation.watchPosition(
-        (pos) => {
-          if (ativo) setMeuPonto({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude, is_online: true, updated_at: new Date().toISOString() }).eq('user_id', userId).then(() => {}); (supabase as any).from('user_profiles').update({ lat: pos.coords.latitude, lon: pos.coords.longitude, is_online: true }).eq('user_id', userId).then(() => {}); } // SALVA-COORD
-        },
-        () => usarBanco(),
-        { timeout: 20000, enableHighAccuracy: true, maximumAge: 0 }
+          (pos) => {
+            if (!ativo) return;
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const precisao = pos.coords.accuracy || 99999;
+            setMeuPonto({ lat, lon });
+            if (Date.now() - ultimaSalva > 30000 && precisao <= 500) {
+              ultimaSalva = Date.now();
+              const agoraISO = new Date().toISOString();
+              (supabase as any).from('users').update({
+                lat,
+                lon,
+                is_online: true,
+                last_seen: agoraISO,
+                updated_at: agoraISO
+              }).eq('user_id', userId).then((r: any) => {
+                if (r && r.error) console.error('SALVA-COORD:', r.error);
+              });
+            }
+          },
+          () => usarBanco(),
+          { timeout: 20000, enableHighAccuracy: true, maximumAge: 0 }
       );
     } else {
       usarBanco();
