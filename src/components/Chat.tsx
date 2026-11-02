@@ -14,7 +14,6 @@ import {
   Mic,
   Phone,
   MoreVertical,
-  Trash2,
 } from "lucide-react";
 import { User, Message } from "../types";
 import { ProtectedImage } from "./ProtectedImage";
@@ -39,498 +38,754 @@ interface ChatContact {
   userNumber?: number;
   id: string;
   name: string;
-  avatar?: string;
-  lastMessage?: string;
-  lastMessageTime?: string;
-  unread?: number;
-  online?: boolean;
-  isDemo?: boolean;
+  avatar: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+  online: boolean;
+  lastMessageTime: number;
 }
 
-type Confirmacao = { tipo: 'conversa' | 'mensagem'; alvo: string; modo: 'mim' | 'todos' } | null;
+interface ChatMessage {
+  id: string;
+  text: string;
+  time: string;
+  fromMe: boolean;
+  status: "sending" | "sent" | "delivered" | "read";
+}
 
-export function Chat({ user, userId, isPremium, currentUser, navigate, onShowPremiumModal }: ChatProps) {
-  const meuId = userId || currentUser?.id || user?.id || '';
+function MessageStatus({ status }: { status: string }) {
+  if (status === "sending")
+    return <Check size={14} className="text-[var(--libido-muted)] opacity-50" />;
+  if (status === "sent")
+    return <Check size={14} className="text-[var(--libido-muted)] opacity-60" />;
+  if (status === "delivered")
+    return <CheckCheck size={14} className="text-[var(--libido-muted)] opacity-60" />;
+  if (status === "read")
+    return <CheckCheck size={14} className="text-[#53bdeb]" />;
+  return null;
+}
 
-  const [contacts, setContacts] = useState<ChatContact[]>([]);
+// CHAT7-8: rotulo da ultima mensagem na lista de conversas
+const previewFor = (t: string, fromId?: string, meId?: string) => {
+  if (t === "[FOTO-REMOVIDA]") return "Foto removida";
+  if (t === "[FOTO1X-VISTA]") return fromId && meId && fromId === meId ? "Mensagem aberta" : "Foto visualizada";
+  if (t.startsWith("[FOTO1X]")) return "Foto (1x)";
+  if (t.startsWith("[FOTO]")) return "Foto";
+  return t;
+};
+
+// CHAT7-8: atualiza o conteudo de uma mensagem no banco
+const updateMessageContent = async (messageId: string, newContent: string) => {
+  const { error } = await supabase
+    .from("messages")
+    .update({ content: newContent })
+    .eq("id", messageId);
+  if (error) console.error("CHAT7-8 update falhou:", error.message);
+};
+
+// CHAT7-8: apaga o arquivo da foto de CHAT no Storage (funcao segura no banco)
+const deleteChatPhotoFile = async (url: string) => {
+  try {
+    const marker = "/object/public/photos/";
+    const idx = url.indexOf(marker);
+    if (idx === -1) return;
+    const path = url.substring(idx + marker.length);
+    const { error } = await supabase.rpc("libido_delete_chat_file", { p_path: path });
+    if (error) console.error("CHAT7-8 arquivo falhou:", error.message);
+  } catch (e: any) {
+    console.error("CHAT7-8 arquivo falhou:", e?.message || e);
+  }
+};
+
+// CHAT9: canal de "digitando..." em tempo real (sem banco e sem SQL)
+const createTypingChannel = (
+  meId: string,
+  partnerId: string,
+  onPartnerTyping: () => void
+) => {
+  if (isDemoId(meId) || isDemoId(partnerId)) {
+    return { notifyTyping: () => {}, cleanup: () => {} };
+  }
+  const name = "typing_" + [meId, partnerId].sort().join("_");
+  const ch = supabase.channel(name);
+  ch.on("broadcast", { event: "typing" }, (msg: any) => {
+    if (msg?.payload?.userId && msg.payload.userId !== meId) onPartnerTyping();
+  });
+  ch.subscribe();
+  return {
+    notifyTyping: () => {
+      try {
+        const p = ch.send({ type: "broadcast", event: "typing", payload: { userId: meId } });
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      } catch (e) { console.error(e); }
+    },
+    cleanup: () => {
+      supabase.removeChannel(ch);
+    },
+  };
+};
+
+export function Chat({
+  userId,
+  isPremium,
+  currentUser,
+  navigate,
+  user,
+  onShowPremiumModal,
+}: ChatProps) {
   const [activeChat, setActiveChat] = useState<string | null>(null);
+  const [messageInput, setMessageInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [allMessages, setAllMessages] = useState<Message[]>([]);
-  const [messageInput, setMessageInput] = useState('');
-  const [enviando, setEnviando] = useState(false);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
-  const [busca, setBusca] = useState('');
-  const [menuConversa, setMenuConversa] = useState<string | null>(null);
-  const [menuMensagem, setMenuMensagem] = useState<string | null>(null);
-  const [fotoAberta, setFotoAberta] = useState<Message | null>(null);
-  const [confirmacao, setConfirmacao] = useState<Confirmacao>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  // CHAT6-FONTE: tamanho da letra ajustavel, salvo no navegador
+  const [fontSize, setFontSize] = useState(() =>
+    Number(localStorage.getItem("libido_chat_font") || 15)
+  );
+  // CHAT6-FOTO: estado de envio de foto
+  const [sendingPhoto, setSendingPhoto] = useState(false);
+  // CHAT8: modo da proxima foto (normal ou visualizacao unica) + overlay
+  const pickOnceRef = useRef(false);
+  const [viewOnceUrl, setViewOnceUrl] = useState<string | null>(null);
+  // CHAT9: outro lado digitando
+  const [partnerTyping, setPartnerTyping] = useState(false);
+  const typingChannelRef = useRef<ReturnType<typeof createTypingChannel> | null>(null);
+  const typingHideRef = useRef<any>(null);
+  const lastTypingSentRef = useRef(0);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const lastReceivedAt = useRef(0); // SOM-NOVA
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  // TRAVA-FIX: abre a conversa apenas quando o alvo (id) realmente muda.
+  // Antes, qualquer mudanca de referencia em user reabria o chat e travava a tela.
+  const alvoAplicado = useRef<string | null>(null);
+  useEffect(() => {
+    const alvo = user ? (user.user_id || user.id) : null;
+    if (!alvo) return;
+    if (alvoAplicado.current === alvo) return;
+    alvoAplicado.current = alvo;
+    setActiveChat(alvo);
+  }, [user]);
 
-  const activeContact = contacts.find((c) => c.id === activeChat) || null;
+  const voltarParaLista = () => {
+    alvoAplicado.current = null;
+    setActiveChat(null);
+  };
 
-  const activeChatMessages = dedupeMensagens(
-    allMessages.filter(
-      (m: any) => (m.from === meuId && m.to === activeChat) || (m.from === activeChat && m.to === meuId)
-    )
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollTo({
+        top: messagesEndRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [allMessages, activeChat]);
+
+  useEffect(() => {
+    if (!userId) return;
+    const unsubscribe = listenAllUserMessages(userId, async (messages) => {
+      setAllMessages(messages);
+      // SOM-NOVA: toca quando chega mensagem nova de outra pessoa
+      const recebidas = messages.filter((m) => m.to === userId);
+      if (recebidas.length > 0) {
+        const maxT = Math.max(...recebidas.map((m) => m.createdAt));
+        if (lastReceivedAt.current > 0 && maxT > lastReceivedAt.current) playMessageSound();
+        lastReceivedAt.current = maxT;
+      }
+      const uniqueUserIds = new Set<string>();
+      messages.forEach((m) => {
+        if (m.from !== userId) uniqueUserIds.add(m.from);
+        if (m.to !== userId) uniqueUserIds.add(m.to);
+      });
+      const newUsers = await getUsersByIds(Array.from(uniqueUserIds));
+      setUsers(newUsers);
+    });
+    return () => unsubscribe();
+  }, [userId]);
+
+  // CHAT9-DIGITANDO: canal de tempo real da conversa aberta
+  useEffect(() => {
+    if (!userId || !activeChat) {
+      setPartnerTyping(false);
+      return;
+    }
+    typingChannelRef.current?.cleanup();
+    typingChannelRef.current = createTypingChannel(userId, activeChat, () => {
+      setPartnerTyping(true);
+      if (typingHideRef.current) clearTimeout(typingHideRef.current);
+      typingHideRef.current = setTimeout(() => setPartnerTyping(false), 3000);
+    });
+    return () => {
+      typingChannelRef.current?.cleanup();
+      typingChannelRef.current = null;
+    };
+  }, [userId, activeChat]);
+
+  // FOTO-CONTATO: busca o perfil real quando a conversa vem do Radar/Perfil e nao ha historico.
+  // Sem isso, quem nunca trocou mensagem caia no avatar generico do DiceBear.
+  const [contatoExtra, setContatoExtra] = useState<any>(null);
+  useEffect(() => {
+    if (!activeChat) { setContatoExtra(null); return; }
+    const jaTem = users.some((u) => (u.user_id || u.id) === activeChat);
+    if (jaTem) { setContatoExtra(null); return; }
+    let vivo = true;
+    getUsersByIds([activeChat])
+      .then((arr) => { if (vivo) setContatoExtra(arr && arr[0] ? arr[0] : null); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [activeChat, users]);
+
+  const otherUsers = users.filter((u) => (u.user_id || u.id) !== userId);
+
+  // TICKS-EFEITO: enquanto o chat esta aberto, marca recebidas como entregues
+  useEffect(() => {
+    if (!userId) return;
+    markMessagesAsDelivered(userId);
+    const t = setInterval(() => markMessagesAsDelivered(userId), 4000);
+    return () => clearInterval(t);
+  }, [userId]);
+
+  // TICKS-LEITURA: marca como LIDAS so quando ha pendentes e o conjunto mudou.
+  // Antes, o realtime devolvia um array novo, o efeito rodava de novo e travava o app.
+  const ultimaLeitura = useRef<string>("");
+  useEffect(() => {
+    if (!userId || !activeChat) return;
+    const pendentes = allMessages.filter(
+      (m) => m.from === activeChat && m.to === userId && m.status !== "read",
+    );
+    if (pendentes.length === 0) return;
+    const chave = userId + "|" + activeChat + "|" + pendentes.length + "|" + (pendentes[0] && pendentes[0].id ? pendentes[0].id : "");
+    if (ultimaLeitura.current === chave) return;
+    ultimaLeitura.current = chave;
+    markMessagesAsRead(userId, activeChat);
+  }, [userId, activeChat, allMessages]);
+
+  const contacts: ChatContact[] = otherUsers
+    .map((u) => {
+      const id = u.user_id || u.id || "";
+      const userMsgs = allMessages.filter(
+        (m) =>
+          (m.from === id && m.to === userId) ||
+          (m.to === id && m.from === userId),
+      );
+      const lastMsg =
+        userMsgs.length > 0 ? userMsgs[userMsgs.length - 1] : null;
+      return {
+        id,
+        name: u.nickname || u.name || "User",
+        userNumber: u.userNumber,
+        avatar:
+          u.photo_url || (u as any)?.photos?.[0] ||
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
+        lastMessage: lastMsg ? previewFor(lastMsg.text, lastMsg.from, userId) : "Iniciar conversa",
+        time: lastMsg
+          ? new Date(lastMsg.createdAt).toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "",
+        unread: userMsgs.filter((m) => m.to === userId && m.status !== "read").length,
+        online: !!u.isOnline,
+        lastMessageTime: lastMsg ? lastMsg.createdAt : 0,
+      };
+    })
+    .filter((c) => c.lastMessageTime > 0 || searchQuery.trim() !== "");
+
+  contacts.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
+
+  const filteredContacts = contacts.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const contactsFiltrados = busca.trim()
-    ? contacts.filter((c) => c.name.toLowerCase().includes(busca.trim().toLowerCase()))
-    : contacts;
+  let activeChatContact = contacts.find((c) => c.id === activeChat);
 
-  function scrollParaFim(force = false) {
-    const el = containerRef.current;
-    if (!el) return;
-    const perto = el.scrollHeight - el.scrollTop - el.clientHeight <= 150;
-    if (!perto && !force) return;
-    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+  // TELA-PRETA-FIX: garante que a conversa aberta sempre tenha um contato (ex: aberta pelo Radar/perfil sem historico)
+  if (!activeChatContact && activeChat) {
+    const uFb = users.find((u) => (u.user_id || u.id) === activeChat) || contatoExtra || ((user && (user.user_id || user.id) === activeChat) ? user : null);
+    activeChatContact = {
+      id: activeChat,
+      name: (uFb as any)?.nickname || (uFb as any)?.name || 'Usuario',
+      userNumber: (uFb as any)?.userNumber,
+      avatar: (uFb as any)?.photo_url || ((uFb as any)?.photos && (uFb as any).photos[0]) || 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback',
+      lastMessage: 'Iniciar conversa',
+      time: '',
+      unread: 0,
+      online: !!(uFb as any)?.isOnline,
+      lastMessageTime: 0,
+    };
   }
 
-  useEffect(() => {
-    if (!meuId) return;
-    let cancelado = false;
-    setCarregando(true);
-    setErro(null);
-
-    (async () => {
-      try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select('*')
-          .or(`from.eq.${meuId},to.eq.${meuId}`)
-          .order('created_at', { ascending: false })
-          .limit(500);
-        if (cancelado) return;
-        if (error) throw error;
-
-        const limpas = (data || []).filter((m: any) => m.apagada_para_todos !== true);
-        setAllMessages(limpas as Message[]);
-
-        const mapa = new Map<string, ChatContact>();
-        for (const m of limpas as any[]) {
-          const outro = m.from === meuId ? m.to : m.from;
-          if (!outro) continue;
-          if (!mapa.has(outro)) {
-            mapa.set(outro, {
-              id: outro,
-              name: outro.slice(0, 8),
-              lastMessage: m.content || (m.media_url ? 'Foto' : ''),
-              lastMessageTime: m.created_at,
-              unread: 0,
-            });
-          }
-          if (m.to === meuId && m.lida !== true) {
-            const c = mapa.get(outro)!;
-            c.unread = (c.unread || 0) + 1;
-          }
-        }
-
-        const ids = Array.from(mapa.keys());
-        if (ids.length > 0) {
-          try {
-            const perfis = await getUsersByIds(ids);
-            for (const p of perfis || []) {
-              const c = mapa.get(p.id);
-              if (c) {
-                c.name = (p as any).nickname || (p as any).name || c.name;
-                c.avatar = (p as any).avatar_url || (p as any).photo_url;
-                c.online = (p as any).is_online === true;
-              }
-            }
-          } catch (e) {
-            console.error('Erro ao carregar perfis:', e);
-          }
-        }
-
-        if (!cancelado) setContacts(Array.from(mapa.values()));
-      } catch (e: any) {
-        if (!cancelado) setErro('Nao foi possivel carregar as conversas.');
-        console.error(e);
-      } finally {
-        if (!cancelado) setCarregando(false);
-      }
-    })();
-
-    return () => { cancelado = true; };
-  }, [meuId]);
-
-  useEffect(() => {
-    if (!meuId) return;
-    let cancelado = false;
-
-    const parar = listenAllUserMessages(meuId, (msg: Message) => {
-      if (cancelado) return;
-      const m: any = msg;
-      if (m.apagada_para_todos === true) {
-        setAllMessages((prev) => prev.filter((x: any) => x.id !== m.id));
-        return;
-      }
-      setAllMessages((prev) => {
-        const semDup = prev.filter((x: any) => x.id !== m.id);
-        return [...semDup, m];
-      });
-      if (m.to === meuId && m.from !== activeChat) {
-        try { playMessageSound(); } catch {}
-      }
-    });
-
-    return () => {
-      cancelado = true;
-      if (typeof parar === 'function') parar();
+  if (!activeChatContact && user && activeChat === (user.user_id || user.id)) {
+    activeChatContact = {
+      id: user.user_id || user.id,
+      name: user.nickname || user.name || "User",
+      avatar:
+        user.photo_url ||
+        "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback",
+      lastMessage: "",
+      time: "",
+      unread: 0,
+      online: !!user.isOnline,
+      lastMessageTime: Date.now(),
     };
-  }, [meuId, activeChat]);
+  }
 
-  useEffect(() => {
-    if (!activeChat) return;
-    scrollParaFim(true);
-    const pendentes = activeChatMessages.filter((m: any) => m.to === meuId && m.lida !== true);
-    if (pendentes.length > 0) {
-      markMessagesAsRead(meuId, activeChat).catch(() => {});
-    }
-  }, [activeChat, activeChatMessages.length]);
+  const activeChatMessages: ChatMessage[] = allMessages
+    .filter(
+      (m) =>
+        (m.from === activeChat && m.to === userId) ||
+        (m.to === activeChat && m.from === userId),
+    )
+    .map((m) => ({
+      id: m.id,
+      text: m.text,
+      time: new Date(m.createdAt).toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      fromMe: m.from === userId,
+      status: (m.status as any) || "sent",
+    }));
 
-  async function enviar() {
-    const texto = messageInput.trim();
-    if (!texto || !activeChat || !meuId || enviando) return;
-
+  const handleSend = async () => {
+    if (!messageInput.trim() || !activeChat || !userId) return;
     if (isPremium === false) {
-      const u: any = currentUser || user || {};
-      const motivo = u.is_banned === true
+      // ACESSO-NEGADO-MSG: diz o motivo real em vez de falhar em silencio
+      const _u: any = (currentUser as any) || {};
+      const _motivo = _u.is_banned === true
         ? 'Sua conta esta suspensa. Fale com o suporte.'
-        : u.is_deleted === true
+        : _u.is_deleted === true
         ? 'Sua conta foi excluida. Crie uma nova ou fale com o suporte.'
         : 'Seu acesso premium nao esta ativo. Ative com um convite ou assinatura.';
-      alert(motivo);
+      alert(_motivo);
+      return;
       onShowPremiumModal?.();
       return;
     }
+    const text = messageInput;
+    setMessageInput("");
+    await sendMessage({
+      from: userId,
+      to: activeChat,
+      text: text,
+      createdAt: Date.now(),
+    });
+  };
 
-    setMessageInput('');
-    setEnviando(true);
+  // CHAT6-FONTE: cicla o tamanho da letra e salva a escolha
+  const FONT_SIZES = [13, 15, 17, 19];
+  const cycleFont = () => {
+    const next = FONT_SIZES[(FONT_SIZES.indexOf(fontSize) + 1) % FONT_SIZES.length];
+    setFontSize(next);
+    localStorage.setItem("libido_chat_font", String(next));
+  };
+
+  // CHAT6-FOTO: sobe a foto no Storage e envia como [FOTO]url ou [FOTO1X]url
+  const handlePhoto = async (file: File) => {
+    if (!userId || !activeChat) return;
+    if (isDemoId(activeChat)) return;
+    if (isPremium === false) {
+      // ACESSO-NEGADO-MSG: diz o motivo real em vez de falhar em silencio
+      const _u: any = (currentUser as any) || {};
+      const _motivo = _u.is_banned === true
+        ? 'Sua conta esta suspensa. Fale com o suporte.'
+        : _u.is_deleted === true
+        ? 'Sua conta foi excluida. Crie uma nova ou fale com o suporte.'
+        : 'Seu acesso premium nao esta ativo. Ative com um convite ou assinatura.';
+      alert(_motivo);
+      return;
+      onShowPremiumModal?.();
+      return;
+    }
+    const once = pickOnceRef.current;
+    pickOnceRef.current = false;
+    setSendingPhoto(true);
     try {
-      await sendMessage(meuId, activeChat, texto);
-      scrollParaFim(true);
+      const path = `${userId}/chat-${Date.now()}-${file.name}`;
+      const { error } = await supabase
+        .storage
+        .from("photos")
+        .upload(path, file, { contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("photos").getPublicUrl(path);
+      await sendMessage({
+        from: userId,
+        to: activeChat,
+        text: (once ? "[FOTO1X]" : "[FOTO]") + data.publicUrl,
+        createdAt: Date.now(),
+      });
     } catch (e: any) {
-      setMessageInput(texto);
-      alert('Nao foi possivel enviar. Verifique sua conexao.');
-      console.error(e);
+      alert("Falha ao enviar foto: " + (e?.message || e));
     } finally {
-      setEnviando(false);
+      setSendingPhoto(false);
     }
-  }
+  };
 
-  async function abrirFoto(msg: Message) {
-    const m: any = msg;
-    setFotoAberta(msg);
-    if (m.view_once === true && m.id && m.to === meuId && !m.viewed_at) {
-      try {
-        const agora = new Date().toISOString();
-        await supabase.from('messages').update({ viewed_at: agora }).eq('id', m.id);
-        setAllMessages((prev) => prev.map((x: any) => (x.id === m.id ? { ...x, viewed_at: agora } : x)));
-      } catch (e) {
-        console.error('Erro ao marcar visualizacao:', e);
-      }
+  // CHAT9: ao digitar, avisa o outro lado (no maximo 1x a cada 1,5s)
+  const handleInputChange = (v: string) => {
+    setMessageInput(v);
+    const now = Date.now();
+    if (v.trim() && now - lastTypingSentRef.current > 1500) {
+      lastTypingSentRef.current = now;
+      typingChannelRef.current?.notifyTyping();
     }
-  }
+  };
 
-  async function executarExclusao() {
-    if (!confirmacao) return;
-    const { tipo, alvo, modo } = confirmacao;
-    setConfirmacao(null);
+  // CHAT7: excluir a foto enviada para os dois lados (apaga do servidor)
+  const deletePhotoForAll = async (msg: ChatMessage) => {
+    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
+    if (!confirm("Excluir esta foto para os dois? Ela sera apagada do servidor.")) return;
+    const url = msg.text.substring(6);
+    await deleteChatPhotoFile(url);
+    await updateMessageContent(msg.id, "[FOTO-REMOVIDA]");
+  };
 
-    try {
-      if (tipo === 'conversa') {
-        if (modo === 'mim') {
-          const { error } = await supabase.from('conversas_ocultas').upsert(
-            { user_id: meuId, outro_id: alvo, ocultada_em: new Date().toISOString() },
-            { onConflict: 'user_id,outro_id' }
-          );
-          if (error) throw error;
-          setContacts((prev) => prev.filter((c) => c.id !== alvo));
-          if (activeChat === alvo) setActiveChat(null);
-        } else {
-          const { error } = await supabase.from('messages').update({
-            apagada_para_todos: true,
-            apagada_em: new Date().toISOString(),
-            apagada_por: meuId,
-          }).or(`and(from.eq.${meuId},to.eq.${alvo}),and(from.eq.${alvo},to.eq.${meuId})`);
-          if (error) throw error;
-          setAllMessages((prev) => prev.filter((m: any) => m.from !== alvo && m.to !== alvo));
-          setContacts((prev) => prev.filter((c) => c.id !== alvo));
-          if (activeChat === alvo) setActiveChat(null);
-        }
-      } else {
-        if (modo === 'todos') {
-          const { error } = await supabase.from('messages').update({
-            apagada_para_todos: true,
-            apagada_em: new Date().toISOString(),
-            apagada_por: meuId,
-          }).eq('id', alvo);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase.from('messages').update({ apagada_para_mim: true }).eq('id', alvo);
-          if (error) throw error;
-        }
-        setAllMessages((prev) => prev.filter((m: any) => m.id !== alvo));
-      }
-    } catch (e: any) {
-      alert('Nao foi possivel apagar agora. Tente novamente.');
-      console.error(e);
-    }
-  }
+  // CHAT8: abrir a foto de visualizacao unica (marca como vista; o arquivo e apagado ao fechar)
+  const openViewOnce = async (msg: ChatMessage) => {
+    if (!msg.text || !msg.text.startsWith("[FOTO1X]")) return;
+    const url = msg.text.substring(8);
+    setViewOnceUrl(url);
+    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
+    updateMessageContent(msg.id, "[FOTO1X-VISTA]");
+  };
 
-  if (!activeChat) {
+  // CHAT8-FIX: o arquivo da foto so e apagado quando a visualizacao e FECHADA
+  const closeViewOnce = () => {
+    if (viewOnceUrl) deleteChatPhotoFile(viewOnceUrl);
+    setViewOnceUrl(null);
+  };
+
+  if (activeChat && activeChatContact) {
     return (
-      <div style={{ background: '#16161a', minHeight: '100%', color: '#fff', padding: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontSize: 20 }}>Conversas</h2>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1f1f24', borderRadius: 999, padding: '10px 16px', marginBottom: 16 }}>
-          <Search size={18} color="#9ca3af" />
-          <input
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar conversa..."
-            style={{ flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: 15, outline: 'none' }}
-          />
-        </div>
-
-        {erro && (
-          <div style={{ background: 'rgba(239,68,68,.12)', borderRadius: 12, padding: 16, marginBottom: 16, fontSize: 14 }}>
-            {erro}
-          </div>
-        )}
-
-        {carregando && <div style={{ textAlign: 'center', padding: 32, color: '#9ca3af' }}>Carregando...</div>}
-
-        {!carregando && contactsFiltrados.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>
-            <p style={{ fontSize: 16, marginBottom: 8 }}>
-              {busca ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
-            </p>
-            <p style={{ fontSize: 13 }}>
-              {busca ? 'Tente outro nome.' : 'Abra um perfil no radar para comecar.'}
-            </p>
-          </div>
-        )}
-
-        {contactsFiltrados.map((c) => (
-          <div key={c.id} style={{ position: 'relative', marginBottom: 8 }}>
-            <button
-              onClick={() => setActiveChat(c.id)}
-              onContextMenu={(e) => { e.preventDefault(); setMenuConversa(c.id); }}
-              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, border: 'none', background: '#1f1f24', color: '#fff', width: '100%', textAlign: 'left', cursor: 'pointer' }}
-            >
-              <div style={{ position: 'relative', flex: '0 0 auto', width: 48, height: 48, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg,#7c3aed,#ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                {c.avatar ? (
-                  <ProtectedImage src={c.avatar} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  c.name.slice(0, 2).toUpperCase()
-                )}
-                {c.online && (
-                  <span style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', background: '#22c55e', border: '2px solid #1f1f24' }} />
-                )}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>{c.name}</div>
-                <div style={{ fontSize: 13, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {c.lastMessage || ''}
-                </div>
-              </div>
-              {(c.unread || 0) > 0 && (
-                <span style={{ background: '#ec4899', color: '#fff', fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 999 }}>
-                  {c.unread}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setMenuConversa(c.id)}
-              aria-label="Opcoes"
-              style={{ position: 'absolute', top: 8, right: 8, background: 'transparent', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: 4 }}
-            >
-              <MoreVertical size={18} />
-            </button>
-            {menuConversa === c.id && (
-              <div style={{ position: 'absolute', top: 44, right: 8, background: '#2a2a30', borderRadius: 10, padding: 6, zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,.5)', minWidth: 180 }}>
-                <button
-                  onClick={() => { setConfirmacao({ tipo: 'conversa', alvo: c.id, modo: 'mim' }); setMenuConversa(null); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'transparent', border: 'none', color: '#fff', textAlign: 'left', cursor: 'pointer', fontSize: 14, borderRadius: 6 }}
-                >
-                  <Trash2 size={16} /> Apagar para mim
-                </button>
-                <button
-                  onClick={() => { setConfirmacao({ tipo: 'conversa', alvo: c.id, modo: 'todos' }); setMenuConversa(null); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'transparent', border: 'none', color: '#f87171', textAlign: 'left', cursor: 'pointer', fontSize: 14, borderRadius: 6 }}
-                >
-                  <Trash2 size={16} /> Apagar para todos
-                </button>
-              </div>
+      <div className="fixed top-0 left-0 w-full h-[100dvh] z-[900] md:static md:w-full md:h-full md:flex-1 md:z-auto flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] md:pt-0 md:pb-0">
+        {/* HEADER DA CONVERSA */}
+        <div className="flex-none flex items-center gap-3 px-3 py-3 bg-[var(--libido-surface-2)] border-b border-[var(--libido-border)] w-full">
+          <button
+            type="button"
+            aria-label="Voltar para a lista de conversas"
+            onClick={voltarParaLista}
+            className="flex items-center justify-center w-10 h-10 -ml-1 rounded-full bg-white/5 text-[var(--libido-text)] active:scale-95 transition-transform flex-shrink-0"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div className="relative flex-shrink-0">
+            <ProtectedImage
+              currentUser={currentUser}
+              src={activeChatContact.avatar}
+              className="w-10 h-10 rounded-full border border-[var(--libido-border)]"
+              alt=""
+              semMarca
+            />
+            {activeChatContact.online && (
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#12121a]" />
             )}
           </div>
-        ))}
-
-        {confirmacao && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 24 }}>
-            <div style={{ background: '#1f1f24', borderRadius: 16, padding: 24, maxWidth: 360, width: '100%' }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 18 }}>
-                {confirmacao.modo === 'todos' ? 'Apagar para todos?' : 'Apagar para mim?'}
-              </h3>
-              <p style={{ margin: '0 0 20px', fontSize: 14, color: '#9ca3af', lineHeight: 1.5 }}>
-                {confirmacao.modo === 'todos'
-                  ? 'A conversa sera removida para voce e para a outra pessoa.'
-                  : 'A conversa sera removida apenas da sua lista. A outra pessoa continua vendo.'}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-bold text-[var(--libido-text)] truncate">
+              {activeChatContact.name}
+            </h3>
+            {/* CHAT9: status vira "digitando..." quando o outro esta escrevendo */}
+            <p
+              className={`text-[12px] ${
+                partnerTyping
+                  ? "text-[var(--libido-accent)] font-bold"
+                  : "text-[var(--libido-muted)] opacity-60"
+              }`}
+            >
+              {partnerTyping
+                ? "digitando..."
+                : activeChatContact.online
+                ? "online"
+                : "visto por ultimo recentemente"}
+            </p>
+          </div>
+          {/* CHAT6-FONTE: botao Aa para mudar o tamanho da letra */}
+          <button
+            onClick={cycleFont}
+            title="Tamanho da letra"
+            className="flex-shrink-0 w-9 h-9 rounded-full border border-[var(--libido-border)] text-[13px] font-bold text-[var(--libido-muted)] hover:text-[var(--libido-text)] flex items-center justify-center"
+          >
+            Aa
+          </button>
+        </div>
+        {/* AREA DE MENSAGENS */}
+        <div
+          ref={messagesEndRef}
+          className="flex-1 overflow-y-auto no-scrollbar px-3 py-4 space-y-1.5"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 50% 50%, rgba(255,179,0,0.02) 0%, transparent 70%)",
+          }}
+        >
+          {isDemoId(activeChat) && (
+            <div className="bg-orange-500/20 text-orange-400 text-[12px] font-bold text-center py-2 px-4 rounded-xl border border-orange-500/30 mb-4 mt-2">
+              <p className="uppercase tracking-widest">
+                Conversa de Demonstracao
               </p>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => setConfirmacao(null)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: 'none', background: '#2a2a30', color: '#fff', cursor: 'pointer' }}>
-                  Cancelar
-                </button>
-                <button onClick={executarExclusao} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: 'none', background: confirmacao.modo === 'todos' ? '#dc2626' : '#7c3aed', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
-                  Apagar
-                </button>
+              <p className="opacity-70 mt-1 font-semibold">
+                Respostas automaticas nao estao ativas.
+              </p>
+            </div>
+          )}
+          <div className="flex items-center justify-center my-3">
+            <span className="bg-[#1a1a2e] text-[var(--libido-muted)] opacity-60 text-[12px] font-bold px-3 py-1 rounded-lg">
+              Hoje
+            </span>
+          </div>
+          {dedupeMensagens(activeChatMessages).map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex ${
+                msg.fromMe ? "justify-end" : "justify-start"
+              } w-full`}
+            >
+              <div
+                className={`max-w-[78%] min-w-0 px-3 py-2 rounded-3xl relative flex-shrink-0 ${
+                  msg.fromMe
+                    ? "bg-gradient-to-br from-[#7b2ff7] to-[#f107a3] rounded-br-md"
+                    : "bg-[#26262e] rounded-bl-md"
+                }`}
+              >
+                {msg.text === "[FOTO-REMOVIDA]" ? (
+                  <p className="italic text-[var(--libido-muted)] text-[13px] py-1">
+                    Foto removida
+                  </p>
+                ) : msg.text === "[FOTO1X-VISTA]" ? (
+                    <div className="flex items-center gap-2 py-1">
+                      <EyeOff size={16} className="text-[var(--libido-muted)] flex-shrink-0" />
+                      <p className="italic text-[var(--libido-muted)] text-[13px]">
+                        {msg.fromMe ? "Mensagem aberta" : "Foto visualizada"}
+                      </p>
+                    </div>
+                ) : msg.text.startsWith("[FOTO1X]") ? (
+                  msg.fromMe ? (
+                    <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
+                      <span className="text-[var(--libido-muted)] text-[13px] font-bold">
+                        Foto — visualizacao unica
+                      </span>
+                      <span className="text-[var(--libido-muted)] opacity-50 text-[12px]">
+                        1x
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => openViewOnce(msg)}
+                      className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1 hover:bg-black/40"
+                    >
+                      <span className="text-[var(--libido-text)] text-[12px] font-bold">
+                        Foto
+                      </span>
+                      <span className="text-[var(--libido-muted)] text-[12px]">
+                        toque para ver (1x)
+                      </span>
+                    </button>
+                  )
+                ) : msg.text.startsWith("[FOTO]") ? (
+                  <div className="relative">
+                    <ProtectedImage
+                      currentUser={currentUser}
+                      src={msg.text.substring(6)}
+                      className="w-[220px] max-h-[300px] object-cover rounded-xl mb-1"
+                      alt="foto"
+                    />
+                    {msg.fromMe && (
+                      <button
+                        onClick={() => deletePhotoForAll(msg)}
+                        title="Excluir para os dois"
+                        className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <p
+                    className="text-[var(--libido-text)]/90 leading-relaxed break-words break-all whitespace-pre-wrap"
+                    style={{ fontSize: `${fontSize}px` }}
+                  >
+                    {msg.text}
+                  </p>
+                )}
+                <div
+                  className={`flex items-center gap-1 mt-1 ${
+                    msg.fromMe
+                      ? "justify-end"
+                      : "justify-start"
+                  }`}
+                >
+                  <span className="text-[11px] text-[var(--libido-muted)] opacity-50">
+                    {msg.time}
+                  </span>
+                  {msg.fromMe && (
+                    <MessageStatus status={msg.status} />
+                  )}
+                </div>
               </div>
+            </div>
+          ))}
+          {sendingPhoto && (
+            <div className="text-center text-[12px] text-[var(--libido-muted)] opacity-70 font-bold">
+              Enviando foto...
+            </div>
+          )}
+        </div>
+        {/* CAMPO DE ENVIO */}
+        <div className="flex-none flex items-center gap-2 px-2 py-2 bg-[var(--libido-bg)] border-t border-[var(--libido-border)] w-full">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handlePhoto(f);
+              e.target.value = "";
+            }}
+          />
+          <button
+            onClick={() => fileRef.current?.click()}
+            title="Enviar foto"
+            className="w-10 h-10 flex items-center justify-center flex-shrink-0 text-[var(--libido-muted)] hover:text-[var(--libido-text)]"
+          >
+            <Camera size={20} />
+          </button>
+          {/* CHAT8: botao olho 1x = a proxima foto sera de visualizacao unica */}
+          <button
+            onClick={() => {
+              pickOnceRef.current = true;
+              fileRef.current?.click();
+            }}
+            title="Foto de visualizacao unica (1x)"
+            className="w-10 h-10 flex flex-col items-center justify-center flex-shrink-0 text-[var(--libido-muted)] hover:text-[var(--libido-text)]"
+          >
+            <Eye size={16} />
+            <span className="text-[7px] font-black leading-none mt-0.5">1x</span>
+          </button>
+          <div className="flex-1 flex items-center bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-3xl px-4 py-2.5 gap-2 min-w-0">
+            <input
+              type="text"
+              value={messageInput}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              placeholder="Mensagem"
+              className="flex-1 bg-transparent text-[16px] text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20 min-w-0"
+            />
+          </div>
+            <button
+              onClick={handleSend}
+              className="w-11 h-11 bg-[var(--libido-accent)] rounded-full flex items-center justify-center flex-shrink-0 text-black hover:opacity-90 shadow-lg"
+            >
+              <Send size={16} />
+            </button>
+        </div>
+        {/* CHAT8: overlay da foto de visualizacao unica (abre 1x e some) */}
+        {viewOnceUrl && (
+          <div
+            className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center libido-lightbox"
+            onClick={closeViewOnce}
+          >
+            <ProtectedImage
+              currentUser={currentUser}
+              src={viewOnceUrl}
+              ajuste="contain"
+              className="max-w-full max-h-full object-contain"
+              alt="foto"
+            />
+            <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
+              Fechar ✕
             </div>
           </div>
         )}
       </div>
     );
   }
-
+  // TELA DE LISTA DE CONTATOS
   return (
-    <div style={{ background: '#16161a', minHeight: '100%', color: '#fff', display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderBottom: '1px solid #2a2a30' }}>
-        <button onClick={() => setActiveChat(null)} aria-label="Voltar" style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', padding: 4 }}>
-          <ArrowLeft size={22} />
-        </button>
-        <button
-          onClick={() => navigate?.('viewprofile', { user: activeContact })}
-          style={{ background: 'transparent', border: 'none', color: '#fff', fontWeight: 600, fontSize: 16, cursor: 'pointer', padding: 0 }}
-        >
-          {activeContact?.name || activeChat.slice(0, 8)}
-        </button>
+    <div className="flex-1 flex flex-col w-full h-full min-h-0 bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+      {/* HEADER LISTA */}
+      <div className="flex-none px-5 pt-5 pb-3 w-full">
+        <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">
+          Conversas
+        </h1>
+        <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold uppercase tracking-widest mt-0.5">
+          Criptografia Ponta-a-Ponta
+        </p>
       </div>
-
-      <div ref={containerRef} style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {activeChatMessages.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 40, color: '#6b7280', fontSize: 14 }}>
-            Nenhuma mensagem ainda. Diga oi.
-          </div>
-        )}
-
-        {activeChatMessages.map((msg: any) => {
-          const minha = msg.from === meuId;
-          const temFoto = !!msg.media_url;
-          const expirada = msg.view_once === true && msg.viewed_at && !minha;
-
-          return (
-            <div key={msg.id} style={{ display: 'flex', justifyContent: minha ? 'flex-end' : 'flex-start' }}>
-              <div
-                onContextMenu={(e) => { e.preventDefault(); setMenuMensagem(msg.id); }}
-                style={{ maxWidth: '78%', background: minha ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : '#1f1f24', padding: 10, borderRadius: 14, position: 'relative' }}
-              >
-                {temFoto && !expirada && (
-                  <button onClick={() => abrirFoto(msg)} style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' }}>
-                    <ProtectedImage src={msg.media_url} alt="foto" style={{ maxWidth: 220, borderRadius: 10, display: 'block' }} />
-                    {msg.view_once && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, opacity: 0.8, marginTop: 4 }}>
-                        <EyeOff size={12} /> ver uma vez
-                      </span>
-                    )}
-                  </button>
-                )}
-
-                {expirada && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, opacity: 0.7, fontStyle: 'italic' }}>
-                    <Eye size={14} /> Foto visualizada
-                  </div>
-                )}
-
-                {msg.content && <div style={{ fontSize: 15, lineHeight: 1.4 }}>{msg.content}</div>}
-
-                {minha && msg.view_once && msg.viewed_at && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, opacity: 0.8, marginTop: 4, justifyContent: 'flex-end' }}>
-                    <CheckCheck size={12} /> visualizada
-                  </div>
-                )}
-
-                {menuMensagem === msg.id && (
-                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: '#2a2a30', borderRadius: 10, padding: 6, zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,.5)', minWidth: 170 }}>
-                    <button
-                      onClick={() => { setConfirmacao({ tipo: 'mensagem', alvo: msg.id, modo: 'mim' }); setMenuMensagem(null); }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'transparent', border: 'none', color: '#fff', textAlign: 'left', cursor: 'pointer', fontSize: 14 }}
-                    >
-                      <Trash2 size={16} /> Apagar para mim
-                    </button>
-                    {minha && (
-                      <button
-                        onClick={() => { setConfirmacao({ tipo: 'mensagem', alvo: msg.id, modo: 'todos' }); setMenuMensagem(null); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'transparent', border: 'none', color: '#f87171', textAlign: 'left', cursor: 'pointer', fontSize: 14 }}
-                      >
-                        <Trash2 size={16} /> Apagar para todos
-                      </button>
-                    )}
-                  </div>
+      <div className="flex-none px-4 pb-3 w-full">
+        <div className="flex items-center gap-2 bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-2xl px-4 py-2.5">
+          <Search
+            size={14}
+            className="text-[var(--libido-muted)] opacity-50 flex-shrink-0"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Pesquisar conversas..."
+            className="flex-1 bg-transparent text-[16px] text-[var(--libido-text)] focus:outline-none placeholder:text-[var(--libido-text)]/20"
+          />
+        </div>
+      </div>
+      {/* AREA DE LISTA CONTATOS */}
+      <div className="flex-1 overflow-y-auto no-scrollbar w-full">
+        {filteredContacts.map((contact) => (
+          <button
+            key={contact.id}
+            onClick={() => setActiveChat(contact.id)}
+            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-white/[0.03] transition-colors border-b border-white/[0.03] text-left"
+          >
+            <div className="relative flex-shrink-0">
+              <ProtectedImage
+                currentUser={currentUser}
+                src={contact.avatar}
+                className="w-12 h-12 rounded-full border border-[var(--libido-border)]"
+                alt=""
+                semMarca
+              />
+              {contact.online && (
+                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[var(--libido-bg)]" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between min-w-0">
+                <h3 className="text-[13px] font-bold text-[var(--libido-text)] truncate">
+                  {contact.name}
+                  {contact.userNumber ? (
+                    <span className="text-[12px] text-[var(--libido-muted)] opacity-50 ml-1">
+                      #{formatUserNumber(contact.userNumber)}
+                    </span>
+                  ) : null}
+                </h3>
+                <span
+                  className={`text-[11px] flex-shrink-0 ml-2 ${
+                    contact.unread > 0
+                      ? "text-[var(--libido-accent)] font-bold"
+                      : "text-[var(--libido-muted)] opacity-50"
+                  }`}
+                >
+                  {contact.time}
+                </span>
+              </div>
+              <div className="flex items-center justify-between mt-0.5 min-w-0">
+                <p className={`text-[13px] truncate flex-1 mr-2 min-w-0 ${contact.unread > 0 ? "text-[var(--libido-text)] font-bold" : "text-[var(--libido-muted)] opacity-60"}`}>
+                  {contact.lastMessage}
+                </p>
+                {contact.unread > 0 && (
+                  <span className="bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-[9px] font-black min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 flex-shrink-0">
+                    {contact.unread}
+                  </span>
                 )}
               </div>
             </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+          </button>
+        ))}
       </div>
-
-      <div style={{ display: 'flex', gap: 8, padding: 12, borderTop: '1px solid #2a2a30' }}>
-        <input
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } }}
-          placeholder="Mensagem..."
-          disabled={enviando}
-          style={{ flex: 1, padding: '12px 16px', borderRadius: 999, border: 'none', background: '#1f1f24', color: '#fff', fontSize: 15, outline: 'none' }}
-        />
-        <button
-          onClick={enviar}
-          disabled={enviando || !messageInput.trim()}
-          style={{ padding: '12px 20px', borderRadius: 999, border: 'none', background: enviando || !messageInput.trim() ? '#3a3a42' : 'linear-gradient(135deg,#7c3aed,#ec4899)', color: '#fff', fontWeight: 600, cursor: enviando || !messageInput.trim() ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
-        >
-          {enviando ? '...' : <><Send size={16} /> Enviar</>}
-        </button>
-      </div>
-
-      {fotoAberta && (
-        <div
-          onClick={() => setFotoAberta(null)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}
-        >
-          <ProtectedImage src={(fotoAberta as any).media_url} alt="foto" style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 12 }} />
-        </div>
-      )}
-
-      {confirmacao && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 24 }}>
-          <div style={{ background: '#1f1f24', borderRadius: 16, padding: 24, maxWidth: 360, width: '100%' }}>
-            <h3 style={{ margin: '0 0 12px', fontSize: 18 }}>
-              {confirmacao.modo === 'todos' ? 'Apagar para todos?' : 'Apagar para mim?'}
-            </h3>
-            <p style={{ margin: '0 0 20px', fontSize: 14, color: '#9ca3af', lineHeight: 1.5 }}>
-              {confirmacao.modo === 'todos'
-                ? 'A mensagem sera removida para voce e para a outra pessoa.'
-                : 'A mensagem sera removida apenas para voce.'}
-            </p>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setConfirmacao(null)} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: 'none', background: '#2a2a30', color: '#fff', cursor: 'pointer' }}>
-                Cancelar
-              </button>
-              <button onClick={executarExclusao} style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: 'none', background: confirmacao.modo === 'todos' ? '#dc2626' : '#7c3aed', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
-                Apagar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-export default Chat;

@@ -13,6 +13,7 @@ interface RadarProps {
   currentUser?: User | null;
 }
 
+// Distancia em metros entre dois pontos (formula de Haversine)
 function distanciaMetros(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000;
   const rad = Math.PI / 180;
@@ -24,6 +25,7 @@ function distanciaMetros(lat1: number, lon1: number, lat2: number, lon2: number)
   return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// Arredonda a distancia para nunca expor posicao exata
 function formatarDistancia(metros: number): string {
   if (metros < 1000) {
     const passo = Math.max(100, Math.round(metros / 100) * 100);
@@ -33,216 +35,213 @@ function formatarDistancia(metros: number): string {
   return `~${km.toFixed(1).replace('.', ',')} km`;
 }
 
-function coordValida(lat: any, lng: any): boolean {
-  const la = Number(lat);
-  const ln = Number(lng);
-  if (!Number.isFinite(la) || !Number.isFinite(ln)) return false;
-  if (la < -90 || la > 90) return false;
-  if (ln < -180 || ln > 180) return false;
-  if (Math.abs(la) < 0.0001 && Math.abs(ln) < 0.0001) return false;
-  return true;
-}
-
 export function Radar({ userId, navigate, currentUser }: RadarProps) {
   const [operators, setOperators] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [aba, setAba] = useState<'mapa' | 'lista'>('mapa');
-  const [minhaPos, setMinhaPos] = useState<{ lat: number; lng: number } | null>(null);
-  const [erroGps, setErroGps] = useState<string | null>(null);
-
-  const meuId = userId || currentUser?.id || '';
+  const [modo, setModo] = useState<'mapa' | 'lista'>('mapa');
+  const [meuPonto, setMeuPonto] = useState<{ lat: number; lon: number } | null>(null);
 
   useEffect(() => {
-    if (!meuId) return;
-    let cancelado = false;
-    setLoading(true);
-
-    (async () => {
-      try {
-        const lista = await getActiveUsers(meuId);
-        if (!cancelado) setOperators((lista || []) as User[]);
-      } catch (e) {
-        console.error('Erro ao carregar usuarios:', e);
-      } finally {
-        if (!cancelado) setLoading(false);
-      }
-    })();
-
-    return () => { cancelado = true; };
-  }, [meuId]);
-
-  useEffect(() => {
-    if (!meuId) return;
-    if (!navigator.geolocation) {
-      setErroGps('Servico de localizacao indisponivel.');
-      return;
-    }
-
-    let ultimoSalvo = 0;
-
-    const salvarPosicao = async (lat: number, lng: number) => {
-      const agora = Date.now();
-      if (agora - ultimoSalvo < 30000) return;
-      ultimoSalvo = agora;
-      const agoraISO = new Date().toISOString();
-      try {
-        await supabase.from('users').update({
-          lat,
-          lon: lng,
-          is_online: true,
-          last_seen: agoraISO,
-          updated_at: agoraISO,
-        }).eq('id', meuId);
-      } catch (e) {
-        console.error('Erro ao salvar posicao:', e);
-      }
-    };
-
-    const aoMudar = (pos: GeolocationPosition) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      if (!coordValida(lat, lng)) {
-        setErroGps('Localizacao imprecisa. Aguarde o GPS estabilizar.');
+    let ativo = true;
+    const usarBanco = () => {
+      const cu = currentUser as any;
+      if (cu?.lat != null && cu?.lon != null) {
+        setMeuPonto({ lat: Number(cu.lat), lon: Number(cu.lon) });
         return;
       }
-      setMinhaPos({ lat, lng });
-      setErroGps(null);
-      void salvarPosicao(lat, lng);
-    };
-
-    const aoFalhar = (err: GeolocationPositionError) => {
-      if (err.code === err.PERMISSION_DENIED) setErroGps('Localizacao bloqueada. Autorize o acesso nas configuracoes.');
-      else if (err.code === err.POSITION_UNAVAILABLE) setErroGps('Servico de localizacao indisponivel.');
-      else setErroGps('Nao foi possivel obter sua localizacao a tempo.');
-    };
-
-    navigator.geolocation.getCurrentPosition(aoMudar, aoFalhar, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0,
-    });
-
-    const watchId = navigator.geolocation.watchPosition(aoMudar, aoFalhar, {
-      enableHighAccuracy: true,
-      timeout: 20000,
-      maximumAge: 5000,
-    });
-
-    return () => {
-      navigator.geolocation.clearWatch(watchId);
-    };
-  }, [meuId]);
-
-  useEffect(() => {
-    if (!meuId) return;
-    const marcarOffline = () => {
-      try {
-        supabase.from('users').update({
-          is_online: false,
-          last_seen: new Date().toISOString(),
-        }).eq('id', meuId);
-      } catch (e) {
-        console.error(e);
+      if (userId) {
+        supabaseQuery(userId).then((data: any) => {
+          if (!ativo) return;
+          if (data && data.lat != null && data.lon != null) {
+            setMeuPonto({ lat: Number(data.lat), lon: Number(data.lon) });
+          }
+        }).catch(() => {});
       }
     };
-    window.addEventListener('beforeunload', marcarOffline);
-    return () => window.removeEventListener('beforeunload', marcarOffline);
-  }, [meuId]);
+    let watchIdGPS: number | null = null; // GPS-CONTINUO
+    let ultimaSalva = 0; // GPS-CONTINUO
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      watchIdGPS = navigator.geolocation.watchPosition(
+        (pos) => {
+          if (ativo) setMeuPonto({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+          if (ativo && Date.now() - ultimaSalva > 30000) { ultimaSalva = Date.now(); (supabase as any).from('users').update({ lat: pos.coords.latitude, lon: pos.coords.longitude, is_online: true, updated_at: new Date().toISOString() }).eq('user_id', userId).then(() => {}); (supabase as any).from('user_profiles').update({ lat: pos.coords.latitude, lon: pos.coords.longitude, is_online: true }).eq('user_id', userId).then(() => {}); } // SALVA-COORD
+        },
+        () => usarBanco(),
+        { timeout: 20000, enableHighAccuracy: true, maximumAge: 0 }
+      );
+    } else {
+      usarBanco();
+    }
+    return () => {
+      ativo = false;
+      if (watchIdGPS !== null && typeof navigator !== 'undefined' && navigator.geolocation) navigator.geolocation.clearWatch(watchIdGPS); // GPS-CONTINUO
+    };
+  }, [currentUser, userId]);
 
-  const listaComDistancia = useMemo(() => {
+  // Lista de proximos: distancia real, do mais perto para o mais longe
+  const listaProximos = useMemo(() => {
     return operators
-      .filter((o: any) => {
-        const id = o.id ?? o.user_id;
-        if (meuId && id === meuId) return false;
-        if (o.is_deleted === true || o.is_banned === true) return false;
-        return true;
-      })
-      .map((o: any) => {
-        let metros: number | null = null;
-        if (minhaPos && coordValida(o.lat, o.lon)) {
-          metros = distanciaMetros(minhaPos.lat, minhaPos.lng, Number(o.lat), Number(o.lon));
-        }
-        return { ...o, _metros: metros };
-      })
-      .sort((a: any, b: any) => (a._metros ?? 999999) - (b._metros ?? 999999));
-  }, [operators, minhaPos, meuId]);
+      .map((u: any) => ({
+        user: u,
+        faixa: u?.faixa || '',
+        dist: 0,
+        ordem: typeof u?.ordem === 'number' ? u.ordem : 99
+      }))
+      .sort((a: any, b: any) => a.ordem - b.ordem);
+  }, [operators]);
+
+  useEffect(() => {
+    const fetchOperators = async () => {
+      if (!userId) return;
+      try {
+        const perfis = await carregarRadarMapa(50);
+        const mapeados = perfis.map((p) => ({
+          id: p.peerId,
+          user_id: p.peerId,
+          name: p.nickname,
+          nickname: p.nickname,
+          photo_url: p.foto,
+          isOnline: p.online,
+          is_online: p.online,
+          faixa: p.faixa,
+          ordem: p.ordem,
+          anelM: p.anelM,
+          angulo: p.angulo,
+          lat: p.latPin,
+          lon: p.lonPin,
+        }));
+        setOperators(mapeados);
+      } catch (err) {
+        console.error('Falha ao buscar usuários no Radar:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOperators();
+    const t = setInterval(fetchOperators, 15000); // RADAR-REFRESH
+    return () => clearInterval(t); // RADAR-REFRESH
+  }, [userId]);
 
   return (
-    <div style={{ background: '#16161a', minHeight: '100%', color: '#fff' }}>
-      <div style={{ display: 'flex', gap: 8, padding: 16 }}>
-        <button
-          onClick={() => setAba('mapa')}
-          style={{ flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', background: aba === 'mapa' ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : '#1f1f24', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-        >
-          <MapIcon size={16} /> Mapa
-        </button>
-        <button
-          onClick={() => setAba('lista')}
-          style={{ flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', background: aba === 'lista' ? 'linear-gradient(135deg,#7c3aed,#ec4899)' : '#1f1f24', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-        >
-          <ListIcon size={16} /> Lista
-        </button>
+    <div className="flex-1 flex flex-col bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden p-5 relative min-h-0">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">Radar</h1>
+          <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-bold uppercase tracking-widest mt-0.5">Pessoas perto de você</p>
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-1 bg-[var(--libido-surface-2)] border border-[var(--libido-border)] px-3 py-1.5 rounded-full">
+            <Users size={12} className="text-[var(--libido-accent)]" />
+            <span className="text-[10px] font-black text-[var(--libido-muted)]">{operators.length} ativos</span>
+          </div>
+          <div className="flex items-center bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-full p-0.5">
+            <button
+              onClick={() => setModo('mapa')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-colors ${modo === 'mapa' ? 'bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)]' : 'text-[var(--libido-muted)]'}`}
+            >
+              <MapIcon size={10} /> Mapa
+            </button>
+            <button
+              onClick={() => setModo('lista')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition-colors ${modo === 'lista' ? 'bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)]' : 'text-[var(--libido-muted)]'}`}
+            >
+              <ListIcon size={10} /> Lista
+            </button>
+          </div>
+        </div>
       </div>
 
-      {erroGps && (
-        <div style={{ margin: '0 16px 16px', background: 'rgba(239,68,68,.12)', border: '1px solid rgba(239,68,68,.4)', borderRadius: 12, padding: 16, fontSize: 14 }}>
-          {erroGps}
-        </div>
-      )}
-
-      {aba === 'mapa' && (
-        <RadarMap users={operators} currentUser={currentUser} userId={meuId} navigate={navigate} />
-      )}
-
-      {aba === 'lista' && (
-        <div style={{ padding: 16 }}>
-          {loading && <div style={{ textAlign: 'center', padding: 32, color: '#9ca3af' }}>Carregando...</div>}
-
-          {!loading && listaComDistancia.length === 0 && (
-            <div style={{ textAlign: 'center', padding: 40, color: '#6b7280' }}>
-              <Users size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
-              <p style={{ fontSize: 16, marginBottom: 8 }}>Ninguem por perto agora</p>
-              <p style={{ fontSize: 13 }}>Volte mais tarde ou amplie o raio.</p>
-            </div>
+      {modo === 'mapa' ? (
+        <RadarMap users={operators} currentUser={currentUser} userId={userId} navigate={navigate} />
+      ) : modo === 'lista' ? (
+        <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
+          {!meuPonto && (
+            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Obtendo sua localização...</p>
           )}
-
-          {listaComDistancia.map((o: any) => {
-            const id = String(o.id ?? o.user_id ?? '');
-            const nome = o.nickname || o.name || 'Sem nome';
-            const idade = o.idade ?? o.age ?? null;
-            const foto = o.avatar_url || o.photo_url || (Array.isArray(o.photos) && o.photos[0]) || null;
-            return (
-              <button
-                key={id}
-                onClick={() => navigate?.('viewprofile', { user: o })}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, border: 'none', background: '#1f1f24', color: '#fff', textAlign: 'left', cursor: 'pointer', width: '100%', marginBottom: 8 }}
+          {meuPonto && listaProximos.length === 0 && (
+            <p className="text-[9px] uppercase tracking-widest font-black text-[var(--libido-muted)] text-center pt-8">Nenhum usuário com localização ativa</p>
+          )}
+          <div className="space-y-2.5">
+            {listaProximos.map((p) => (
+              <div
+                key={p.user.id}
+                onClick={() => navigate?.('viewprofile', { user: p.user })}
+                className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] rounded-2xl p-3 flex items-center gap-3 cursor-pointer active:opacity-80"
               >
-                <div style={{ position: 'relative', flex: '0 0 auto', width: 56, height: 56, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(135deg,#7c3aed,#ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-                  {foto ? (
-                    <ProtectedImage src={foto} alt={nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    nome.slice(0, 2).toUpperCase()
-                  )}
-                  {o.is_online === true && (
-                    <span style={{ position: 'absolute', bottom: 0, right: 0, width: 14, height: 14, borderRadius: '50%', background: '#22c55e', border: '2px solid #1f1f24' }} />
-                  )}
+                <div className="w-11 h-11 rounded-full overflow-hidden border border-[var(--libido-border)] shrink-0">
+                  <ProtectedImage
+                    currentUser={currentUser}
+                    src={p.user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=64'}
+                    alt=""
+                    className="w-full h-full"
+                  />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 15 }}>
-                    {nome}{idade ? `, ${idade}` : ''}
-                  </div>
-                  <div style={{ fontSize: 13, color: '#9ca3af' }}>
-                    {o._metros != null ? formatarDistancia(o._metros) : 'distancia desconhecida'}
-                    {o.is_online === true ? ' · online' : ''}
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-[var(--libido-text)] truncate flex items-center gap-1.5">
+                    {p.user.name}
+                    {p.user.isOnline && (
+                      <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
+                    )}
+                  </p>
+                  <p className="text-[10px] font-black text-[var(--libido-muted)]">{p.user.isOnline ? p.faixa : 'offline - ' + p.faixa}</p>
                 </div>
-              </button>
-            );
-          })}
+                <span className="px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-xs font-black uppercase tracking-wide shrink-0">Ver perfil</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center relative min-h-[300px]">
+          <div className="absolute w-72 h-72 rounded-full border border-[var(--libido-border)] flex items-center justify-center">
+            <div className="w-52 h-52 rounded-full border border-[var(--libido-border)] flex items-center justify-center">
+              <div className="w-32 h-32 rounded-full border border-[var(--libido-border)]" />
+            </div>
+          </div>
+          <div className="absolute w-72 h-72 rounded-full overflow-hidden pointer-events-none">
+            <div className="w-full h-full bg-gradient-to-tr from-[var(--libido-accent)]/10 to-transparent origin-center rotate-sweep animate-[spin_5s_linear_infinite]" />
+          </div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+            <div className="w-14 h-14 rounded-full border-2 border-[var(--libido-accent)] shadow-[0_0_25px_rgba(255,179,0,0.3)] overflow-hidden">
+              <ProtectedImage currentUser={currentUser} src={currentUser?.photo_url || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=64&auto=format&fit=crop'} alt="Você" className="w-full h-full" />
+            </div>
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-[6px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
+              Você
+            </div>
+          </div>
+          {loading ? (
+            <div className="text-[10px] text-[var(--libido-muted)] opacity-50 uppercase tracking-widest font-black">Escaneando...</div>
+          ) : (
+            operators.map((u, i) => {
+              const angle = (i * 360) / Math.max(1, operators.length) + 45;
+              const dist = 70 + (i % 3) * 35;
+              const rad = (angle * Math.PI) / 180;
+              const left = `calc(50% + ${Math.cos(rad) * dist}px)`;
+              const top = `calc(50% + ${Math.sin(rad) * dist}px)`;
+              return (
+                <button
+                  key={u.id}
+                  onClick={() => navigate?.('viewprofile', { user: u })}
+                  className="absolute w-8 h-8 rounded-full border border-[var(--libido-accent)]/40 overflow-hidden shadow-lg hover:scale-110 active:scale-95 transition-transform z-10"
+                  style={{ left, top, transform: 'translate(-50%, -50%)' }}
+                >
+                  <ProtectedImage currentUser={currentUser} src={u.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=32'} alt="" className="w-full h-full" />
+                </button>
+              );
+            })
+          )}
         </div>
       )}
     </div>
   );
 }
 
-export default Radar;
+// Consulta direta ao banco pela posicao do usuario atual
+async function supabaseQuery(userId: string): Promise<any> {
+  const { supabase } = await import('../services/supabase');
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('lat, lon')
+    .eq('user_id', userId)
+    .maybeSingle();
+  return data;
+}
