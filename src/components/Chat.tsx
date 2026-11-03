@@ -20,6 +20,11 @@ import { ProtectedImage } from "./ProtectedImage";
 import { formatUserNumber } from "../utils/formatUserNumber";
 import { listenAllUserMessages, sendMessage } from "../services/chat";
 import { getUsersByIds } from "../services/users";
+import MidiaUnica from "./MidiaUnica";
+import {
+  listarConversas, apagarParaMim, apagarParaTodos, limparConversa,
+  apagarConversa, podeApagarParaTodos, type ConversaResumo,
+} from "../services/chatModeracao";
 import { markMessagesAsDelivered, markMessagesAsRead } from '../services/chat';
 import { playMessageSound } from '../services/sounds';
 import { supabase } from "../services/supabase";
@@ -139,6 +144,47 @@ export function Chat({
   const [searchQuery, setSearchQuery] = useState("");
   const [allMessages, setAllMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+
+  const [conversas, setConversas] = useState<ConversaResumo[]>([]);
+  const [midiaAberta, setMidiaAberta] = useState<string | null>(null);
+
+  const recarregarConversas = useCallback(async () => {
+    if (!userId) return;
+    try { setConversas(await listarConversas()); }
+    catch (e) { console.error("[chat] listarConversas", e); }
+  }, [userId]);
+
+  useEffect(() => {
+    recarregarConversas();
+    const t = setInterval(recarregarConversas, 15000);
+    return () => clearInterval(t);
+  }, [recarregarConversas]);
+
+  async function acoesMensagem(msg: any) {
+    const ops = ["Apagar para mim"];
+    if (podeApagarParaTodos(msg, userId)) ops.push("Apagar para todos");
+    const e = window.prompt("1 - " + ops[0] + (ops[1] ? "\n2 - " + ops[1] : ""), "1");
+    if (!e) return;
+    try {
+      if (e.trim() === "1") await apagarParaMim(msg.id);
+      else if (e.trim() === "2" && ops[1]) await apagarParaTodos(msg.id);
+      else return;
+      setAllMessages((p: any[]) => p.filter((m) => m.id !== msg.id));
+      recarregarConversas();
+    } catch (err) { console.error("[chat] apagar", err); }
+  }
+
+  async function acoesConversa(peerId: string) {
+    const e = window.prompt("1 - Limpar conversa\n2 - Apagar conversa", "1");
+    if (!e) return;
+    try {
+      if (e.trim() === "1") await limparConversa(peerId);
+      else if (e.trim() === "2") { await apagarConversa(peerId); setActiveChat(null); }
+      else return;
+      setAllMessages((p: any[]) => p.filter((m) => m.from !== peerId && m.to !== peerId));
+      recarregarConversas();
+    } catch (err) { console.error("[chat] conversa", err); }
+  }
   // CHAT6-FONTE: tamanho da letra ajustavel, salvo no navegador
   const [fontSize, setFontSize] = useState(() =>
     Number(localStorage.getItem("libido_chat_font") || 15)
@@ -538,6 +584,11 @@ export function Chat({
             </span>
           </div>
           {dedupeMensagens(activeChatMessages).map((msg) => (
+          <div
+            key={"w-" + msg.id}
+            style={{ display: "contents" }}
+            onContextMenu={(e) => { e.preventDefault(); acoesMensagem(msg); }}
+          >
             <div
               key={msg.id}
               className={`flex ${
@@ -566,7 +617,7 @@ export function Chat({
                   msg.fromMe ? (
                     <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
                       <span className="text-[var(--libido-muted)] text-[13px] font-bold">
-                        Foto — visualizacao unica
+                        Foto â€” visualizacao unica
                       </span>
                       <span className="text-[var(--libido-muted)] opacity-50 text-[12px]">
                         1x
@@ -599,7 +650,7 @@ export function Chat({
                         title="Excluir para os dois"
                         className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
                       >
-                        ✕
+                        âœ•
                       </button>
                     )}
                   </div>
@@ -627,7 +678,11 @@ export function Chat({
                 </div>
               </div>
             </div>
+          </div>
           ))}
+        {midiaAberta && (
+          <MidiaUnica messageId={midiaAberta} onFechar={() => setMidiaAberta(null)} />
+        )}
           {sendingPhoto && (
             <div className="text-center text-[12px] text-[var(--libido-muted)] opacity-70 font-bold">
               Enviando foto...
@@ -697,7 +752,7 @@ export function Chat({
               alt="foto"
             />
             <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
-              Fechar ✕
+              Fechar âœ•
             </div>
           </div>
         )}
@@ -788,4 +843,3 @@ export function Chat({
     </div>
   );
 }
-
