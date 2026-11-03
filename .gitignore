@@ -55,3 +55,8 @@ backend/.env.*
 
 .quarentena-*
 .backup-limpeza-*
+
+# autofix 2026-11-03
+.env.local
+*.autofix.bak
+

@@ -73,12 +73,12 @@ const fetchAndNotifyAll = async () => {
       .select('*')
       .or(`sender_id.eq.${lastUserId},receiver_id.eq.${lastUserId}`)
       .order('created_at', { ascending: false })
-      .limit(100);
+      .limit(2000);
 
     if (error) throw error;
 
     if (data) {
-      let msgs = data.map(mapSupabaseToMessage).reverse();
+      let msgs = data.map(mapSupabaseToExpandida).reverse();
       const relevantDemo = demoMessages.filter(
         m => m.from === lastUserId || m.to === lastUserId
       );
@@ -86,14 +86,11 @@ const fetchAndNotifyAll = async () => {
       notifyListeners(msgs);
     }
   } catch (err: any) {
-    console.error(
-      'Error fetching all user messages from supabase:',
-      err.message || err
-    );
+    console.error('[CHAT-FETCH] falha ao buscar mensagens:', err.message || err);
     const relevantDemo = demoMessages.filter(
       m => m.from === lastUserId || m.to === lastUserId
     );
-    notifyListeners(relevantDemo);
+    if (relevantDemo.length) notifyListeners(relevantDemo);
   }
 };
 
@@ -142,6 +139,8 @@ export const listenMessages = (
   userId2: string,
   callback: (messages: Message[]) => void
 ) => {
+  console.warn('[CHAT] listenMessages nao implementado - use listenAllUserMessages');
+  void userId1; void userId2; void callback;
   return () => {};
 };
 

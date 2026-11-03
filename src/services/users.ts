@@ -174,7 +174,9 @@ export const getAllUsers = async (): Promise<User[]> => {
     console.error('Error fetching all users:', error);
     return isDemoEnabled ? (demoProfiles as unknown as User[]) : [];
   }
-  const realUsers = (data || []).map(mapSupabaseToUser).filter(usuarioTemFotoValida);
+  const perfis = (data || []).map(mapSupabaseToUser);
+  const comFoto = perfis.filter(usuarioTemFotoValida);
+  const realUsers = comFoto.length ? comFoto : perfis;
   if (!isDemoEnabled) return realUsers;
 
   const validDemos = (demoProfiles as unknown as User[]).filter(u => isDemoId(u.id || ''));
@@ -194,7 +196,9 @@ export const getActiveUsersOriginal = async (currentUserId: string): Promise<Use
     console.error('Error fetching active users:', error);
     return isDemoEnabled ? (demoProfiles as unknown as User[]) : [];
   }
-  const realUsers = (data || []).map(mapSupabaseToUser).filter(usuarioTemFotoValida);
+  const perfis = (data || []).map(mapSupabaseToUser);
+  const comFoto = perfis.filter(usuarioTemFotoValida);
+  const realUsers = comFoto.length ? comFoto : perfis;
   if (!isDemoEnabled) return realUsers;
 
   const validDemos = (demoProfiles as unknown as User[]).filter(u => isDemoId(u.id || ''));
@@ -252,7 +256,9 @@ export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {
     console.error('Error fetching users by ids:', error);
     return demoUsers;
   }
-  const realUsers = (data || []).map(mapSupabaseToUser).filter(usuarioTemFotoValida);
+  const perfis = (data || []).map(mapSupabaseToUser);
+  const comFoto = perfis.filter(usuarioTemFotoValida);
+  const realUsers = comFoto.length ? comFoto : perfis;
 
   const map = new Map<string, User>();
   realUsers.forEach(u => { if (u.id) map.set(u.id, u); });
