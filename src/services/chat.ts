@@ -239,14 +239,23 @@ export const sendMessageComMidia = async (
   fetchAndNotifyAll();
 };
 
-export const marcarVisualizada = async (id: string) => {
-  const agora = new Date().toISOString();
-  const { error } = await supabase
-    .from('messages')
-    .update({ viewed_at: agora })
-    .eq('id', id);
-  if (error) console.error('marcarVisualizada falhou:', error);
-  return agora;
+export const marcarVisualizada = async (id: string): Promise<string | null> => {
+  // Mídia de visualização única: a reivindicação acontece no banco.
+  // abrir_midia_unica grava viewed_at, apaga media_url e devolve a URL UMA vez.
+  // Segundo acesso retorna { url: null, ja_aberta: true } e nada é exposto.
+  const { data, error } = await supabase.rpc('abrir_midia_unica', {
+    p_message: String(id),
+  });
+  if (error) {
+    console.error('marcarVisualizada: abrir_midia_unica falhou:', error.message);
+    return null;
+  }
+  const linha = Array.isArray(data) ? data[0] : data;
+  if (linha && linha.ja_aberta) {
+    console.warn('marcarVisualizada: foto ja consumida — acesso negado pela RPC');
+    return null;
+  }
+  return linha && linha.url ? String(linha.url) : null;
 };
 
 export const apagarMensagem = async (

@@ -237,21 +237,15 @@ export async function editarMensagem(id: string, novoTexto: string): Promise<voi
 }
 
 export async function apagarParaTodos(id: string): Promise<void> {
-  const eu = await meuId();
-  if (!eu) throw new Error('sem sessao ativa');
-
-  const { error } = await supabase
-    .from('messages')
-    .update({
-      apagada_geral: true,
-      content: null,
-      media_url: null,
-      media_meta: null,
-    })
-    .eq('id', id)
-    .eq('sender_id', eu);
-
-  if (error) throw new Error('falha ao apagar para todos: ' + error.message);
+  // A destruição de media_url/media_meta e o flag de exclusão acontecem no banco.
+  // O cliente não tem UPDATE nessas colunas após o endurecimento de permissões.
+  const { error } = await supabase.rpc('apagar_para_todos', {
+    p_message: String(id),
+  });
+  if (error) {
+    console.error('[CHAT-AVANCADO] apagar_para_todos falhou:', error.message);
+    throw new Error(error.message);
+  }
 }
 
 export async function apagarParaMim(id: string): Promise<void> {
