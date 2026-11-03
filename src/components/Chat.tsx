@@ -194,6 +194,7 @@ export function Chat({
   // CHAT8: modo da proxima foto (normal ou visualizacao unica) + overlay
   const pickOnceRef = useRef(false);
   const [viewOnceUrl, setViewOnceUrl] = useState<string | null>(null);
+  const viewOnceMsgId = useRef<string | null>(null);
   // CHAT9: outro lado digitando
   const [partnerTyping, setPartnerTyping] = useState(false);
   const typingChannelRef = useRef<ReturnType<typeof createTypingChannel> | null>(null);
@@ -492,18 +493,50 @@ export function Chat({
   };
 
   // CHAT8: abrir a foto de visualizacao unica (marca como vista; o arquivo e apagado ao fechar)
+  // CHAT8: a URL e reivindicada no servidor; a segunda tentativa nao devolve nada
   const openViewOnce = async (msg: ChatMessage) => {
     if (!msg.text || !msg.text.startsWith("[FOTO1X]")) return;
-    const url = msg.text.substring(8);
-    setViewOnceUrl(url);
-    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
-    updateMessageContent(msg.id, "[FOTO1X-VISTA]");
+
+    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) {
+      const demoUrl = msg.text.substring(8);
+      if (demoUrl) setViewOnceUrl(demoUrl);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.rpc("abrir_foto_unica", {
+        p_message: msg.id,
+      });
+      if (error) throw error;
+      const linha = Array.isArray(data) ? data[0] : data;
+      if (!linha || linha.ja_aberta || !linha.url) {
+        alert("Esta foto e de visualizacao unica e ja foi aberta.");
+        return;
+      }
+      viewOnceMsgId.current = msg.id;
+      setViewOnceUrl(String(linha.url));
+    } catch (e) {
+      console.error("[chat] abrir_foto_unica", e);
+      alert("Nao foi possivel abrir a foto.");
+    }
   };
 
   // CHAT8-FIX: o arquivo da foto so e apagado quando a visualizacao e FECHADA
+  // CHAT8-FIX: ao fechar, o consumo e confirmado no servidor
   const closeViewOnce = () => {
-    if (viewOnceUrl) deleteChatPhotoFile(viewOnceUrl);
+    const idPendente = viewOnceMsgId.current;
+    const urlAtual = viewOnceUrl;
+    viewOnceMsgId.current = null;
     setViewOnceUrl(null);
+    if (idPendente) {
+      supabase
+        .rpc("confirmar_midia_consumida", { p_message: idPendente })
+        .then(
+          () => undefined,
+          (e) => console.error("[chat] confirmar_midia_consumida", e),
+        );
+    }
+    if (urlAtual) deleteChatPhotoFile(urlAtual);
   };
 
   if (activeChat && activeChatContact) {
@@ -617,7 +650,7 @@ export function Chat({
                   msg.fromMe ? (
                     <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
                       <span className="text-[var(--libido-muted)] text-[13px] font-bold">
-                        Foto â€” visualizacao unica
+                        Foto Ã¢â‚¬â€ visualizacao unica
                       </span>
                       <span className="text-[var(--libido-muted)] opacity-50 text-[12px]">
                         1x
@@ -650,7 +683,7 @@ export function Chat({
                         title="Excluir para os dois"
                         className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
                       >
-                        âœ•
+                        Ã¢Å“â€¢
                       </button>
                     )}
                   </div>
@@ -752,7 +785,7 @@ export function Chat({
               alt="foto"
             />
             <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
-              Fechar âœ•
+              Fechar Ã¢Å“â€¢
             </div>
           </div>
         )}
