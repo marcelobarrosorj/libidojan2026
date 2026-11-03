@@ -57,6 +57,7 @@ interface ChatMessage {
   time: string;
   fromMe: boolean;
   status: "sending" | "sent" | "delivered" | "read";
+  viewed?: boolean;
 }
 
 function MessageStatus({ status }: { status: string }) {
@@ -396,7 +397,8 @@ export function Chat({
         minute: "2-digit",
       }),
       fromMe: m.from === userId,
-      status: (m.status as any) || "sent",
+            viewed: !!(m as any).viewedAt,
+status: (m.status as any) || "sent",
     }));
 
   const handleSend = async () => {
@@ -649,10 +651,10 @@ export function Chat({
                 {msg.text === "[FOTO1X]" ? (
                   <button
                     type="button"
-                    onClick={() => openViewOnce(msg)}
+                    onClick={() => { if (msg.viewed) { alert("Esta foto e de visualizacao unica e ja foi aberta."); return; } openViewOnce(msg); }}
                     className="flex items-center gap-2 text-[13px] font-bold px-3 py-2 rounded-2xl bg-black/30 text-[var(--libido-text)]"
                   >
-                    Foto (1x)
+                    {msg.viewed ? "Foto visualizada" : "Foto (1x)"}
                   </button>
                 ) : msg.text === "[FOTO-REMOVIDA]" ? (
                   <p className="italic text-[var(--libido-muted)] text-[13px] py-1">
@@ -669,7 +671,7 @@ export function Chat({
                   msg.fromMe ? (
                     <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
                       <span className="text-[var(--libido-muted)] text-[13px] font-bold">
-                        Foto ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â visualizacao unica
+                        Foto ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â visualizacao unica
                       </span>
                       <span className="text-[var(--libido-muted)] opacity-50 text-[12px]">
                         1x
@@ -677,7 +679,7 @@ export function Chat({
                     </div>
                   ) : (
                     <button
-                      onClick={() => openViewOnce(msg)}
+                      onClick={() => { if (msg.viewed) { alert("Esta foto e de visualizacao unica e ja foi aberta."); return; } openViewOnce(msg); }}
                       className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1 hover:bg-black/40"
                     >
                       <span className="text-[var(--libido-text)] text-[12px] font-bold">
@@ -702,7 +704,7 @@ export function Chat({
                         title="Excluir para os dois"
                         className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
                       >
-                        ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢
+                        ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢
                       </button>
                     )}
                   </div>
@@ -804,7 +806,7 @@ export function Chat({
               alt="foto"
             />
             <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
-              Fechar ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢
+              Fechar ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢
             </div>
           </div>
         )}
