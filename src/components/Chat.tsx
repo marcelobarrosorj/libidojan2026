@@ -484,12 +484,23 @@ export function Chat({
   };
 
   // CHAT7: excluir a foto enviada para os dois lados (apaga do servidor)
+  // CHAT9: exclusao para todos passa pela RPC, que destroi midia e midia_unica
   const deletePhotoForAll = async (msg: ChatMessage) => {
-    if (msg.id.startsWith("demo:") || msg.id.startsWith("fallback:")) return;
     if (!confirm("Excluir esta foto para os dois? Ela sera apagada do servidor.")) return;
-    const url = msg.text.substring(6);
-    await deleteChatPhotoFile(url);
-    await updateMessageContent(msg.id, "[FOTO-REMOVIDA]");
+    try {
+      const { data, error } = await supabase.rpc("apagar_para_todos", {
+        p_message: msg.id,
+      });
+      if (error) throw error;
+      if (data === false) {
+        alert("Nao foi possivel excluir: a mensagem tem mais de 48h ou nao e sua.");
+        return;
+      }
+      setAllMessages((prev) => prev.filter((x) => x.id !== msg.id));
+    } catch (e) {
+      console.error("[chat] apagar_para_todos", e);
+      alert("Nao foi possivel excluir a foto.");
+    }
   };
 
   // CHAT8: abrir a foto de visualizacao unica (marca como vista; o arquivo e apagado ao fechar)
@@ -650,7 +661,7 @@ export function Chat({
                   msg.fromMe ? (
                     <div className="w-[220px] h-[140px] rounded-xl mb-1 bg-black/30 border border-white/10 flex flex-col items-center justify-center gap-1">
                       <span className="text-[var(--libido-muted)] text-[13px] font-bold">
-                        Foto Ã¢â‚¬â€ visualizacao unica
+                        Foto ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â visualizacao unica
                       </span>
                       <span className="text-[var(--libido-muted)] opacity-50 text-[12px]">
                         1x
@@ -683,7 +694,7 @@ export function Chat({
                         title="Excluir para os dois"
                         className="absolute top-1 right-1 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center text-[12px] font-bold hover:bg-black/80"
                       >
-                        Ã¢Å“â€¢
+                        ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¢
                       </button>
                     )}
                   </div>
@@ -785,7 +796,7 @@ export function Chat({
               alt="foto"
             />
             <div className="absolute top-4 right-4 text-white/80 text-[12px] font-bold px-3 py-1.5 rounded-full bg-white/10">
-              Fechar Ã¢Å“â€¢
+              Fechar ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¢
             </div>
           </div>
         )}
