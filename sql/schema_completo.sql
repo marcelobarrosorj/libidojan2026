@@ -1,6 +1,5 @@
 -- Dump de schemas nao-sistema
--- Gerado: 2026-11-04 18:16
--- Fonte: banco de producao
+-- Gerado: 2026-11-04 19:31
 
 -- [auth] email()
 CREATE OR REPLACE FUNCTION auth.email()

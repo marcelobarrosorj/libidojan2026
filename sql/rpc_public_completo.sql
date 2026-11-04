@@ -1,5 +1,5 @@
 -- Funcoes de public
--- Gerado: 2026-11-04 18:16
+-- Gerado: 2026-11-04 19:31
 
 -- _midia_apagar_objeto(p_url text)
 CREATE OR REPLACE FUNCTION public._midia_apagar_objeto(p_url text)
