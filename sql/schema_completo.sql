@@ -1,7 +1,7 @@
 -- Dump de todos os schemas nao-sistema
--- Gerado: 2026-11-03 21:38
+-- Gerado: 2026-11-03 21:41
 
--- [auth auth auth auth cron cron cron cron cron cron cron extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions graphql_public net net net net net net net net net net net net pgbouncer public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage vault vault vault vault vault] email jwt role uid alter_job job_cache_invalidate schedule schedule schedule_in_database unschedule unschedule armor armor crypt dearmor decrypt decrypt_iv digest digest encrypt encrypt_iv gen_random_bytes gen_random_uuid gen_salt gen_salt grant_pg_cron_access grant_pg_graphql_access grant_pg_net_access hmac hmac pg_stat_statements pg_stat_statements_info pg_stat_statements_reset pgp_armor_headers pgp_key_id pgp_pub_decrypt pgp_pub_decrypt pgp_pub_decrypt pgp_pub_decrypt_bytea pgp_pub_decrypt_bytea pgp_pub_decrypt_bytea pgp_pub_encrypt pgp_pub_encrypt pgp_pub_encrypt_bytea pgp_pub_encrypt_bytea pgp_sym_decrypt pgp_sym_decrypt pgp_sym_decrypt_bytea pgp_sym_decrypt_bytea pgp_sym_encrypt pgp_sym_encrypt pgp_sym_encrypt_bytea pgp_sym_encrypt_bytea pgrst_ddl_watch pgrst_drop_watch set_graphql_placeholder uuid_generate_v1 uuid_generate_v1mc uuid_generate_v3 uuid_generate_v4 uuid_generate_v5 uuid_nil uuid_ns_dns uuid_ns_oid uuid_ns_url uuid_ns_x500 graphql _await_response _encode_url_with_params_array _http_collect_response _urlencode_string check_worker_is_up http_collect_response http_delete http_get http_post wait_until_running wake worker_restart get_auth _dump_funcoes _midia_apagar_objeto abrir_foto_unica abrir_midia_unica alternar_bloqueio alternar_seguir apagar_para_mim apagar_para_mim apagar_para_todos auto_confirm_new_users block_self_follow buscar_mensagens check_user_premium confirmar_midia_consumida contar_nao_lidas contar_seguidores curtir_post expirar_premium faixa_distancia garantir_perfil get_user_role handle_new_user increment_likes is_admin libido_delete_chat_file limpar_conversa limpar_feed_24h limpar_mensagens_expiradas limpar_midias_consumidas limpar_presenca_fantasma listar_conversas listar_mensagens marcar_conversa_lida marcar_presenca mark_messages_delivered mark_messages_read mensagens_foto_unica_guard mensagens_midia_unica_guard notificar_push_nova_mensagem perfis_proximos post_likes_sync process_payment protect_admin_fields protect_premium_downgrade protege_apagada_para_todos proteger_campos_perfil proteger_campos_post proteger_campos_usuario proteger_colunas_privilegiadas_users proteger_update_mensagem radar_mapa recalcular_likes reconciliar_premium registrar_indicacao registrar_premium salvar_onboarding salvar_perfil salvar_ultima_localizacao sync_premium_flag usar_promo validar_convite apply_rls authorize broadcast_changes build_prepared_statement_sql cast check_equality_op check_equality_op is_visible_through_filters list_changes list_changes_sync quote_wal2json send send_binary settled_changes subscription_check_filters to_regrole topic wal2json_escape_identifier allow_any_operation allow_only_operation can_insert_object delete_lifecycle_objects enforce_bucket_lifecycle_service_role enforce_bucket_name_length enforce_versioning_status_transition extension filename foldername get_common_prefix get_size_by_bucket list_multipart_uploads_with_delimiter list_objects_with_delimiter operation protect_active_lifecycle_states protect_bucket_control_columns protect_delete reconcile_lifecycle_state search search_by_timestamp search_v2 update_updated_at_column wake_lifecycle_state _crypto_aead_det_decrypt _crypto_aead_det_encrypt _crypto_aead_det_noncegen create_secret update_secret(    job_id bigint, schedule text, command text, database text, username text, active boolean  job_name text, schedule text, command text schedule text, command text job_name text, schedule text, command text, database text, username text, active boolean job_id bigint job_name text bytea bytea, text[], text[] text, text text bytea, bytea, text bytea, bytea, bytea, text bytea, text text, text bytea, bytea, text bytea, bytea, bytea, text integer  text text, integer    bytea, bytea, text text, text, text showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone OUT dealloc bigint, OUT stats_reset timestamp with time zone userid oid, dbid oid, queryid bigint, minmax_only boolean text, OUT key text, OUT value text bytea bytea, bytea bytea, bytea, text bytea, bytea, text, text bytea, bytea bytea, bytea, text bytea, bytea, text, text text, bytea text, bytea, text bytea, bytea bytea, bytea, text bytea, text bytea, text, text bytea, text bytea, text, text text, text text, text, text bytea, text bytea, text, text      namespace uuid, name text  namespace uuid, name text      "operationName" text, query text, variables jsonb, extensions jsonb request_id bigint url text, params_array text[] request_id bigint, async boolean string character varying  request_id bigint, async boolean url text, params jsonb, headers jsonb, timeout_milliseconds integer, body jsonb url text, params jsonb, headers jsonb, timeout_milliseconds integer url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer    p_usename text p_schema text p_url text p_message text p_message text p_target_id text p_target_id text p_message text p_msg uuid p_message text   p_peer uuid, p_termo text uid uuid p_message text  p_user_id text p_post_id text, p_delta integer  p_km double precision    post_id uuid  p_path text p_peer uuid, p_ocultar boolean   p_minutos integer   p_peer uuid, p_limit integer p_peer uuid  p_sender_id uuid p_sender_id uuid    p_raio_km numeric  p_user_id uuid, p_payment_id text, p_provider text, p_status text, p_amount numeric         p_raio_km double precision, p_celula double precision p_post_id uuid  p_slug text  p_apelido text, p_bio text, p_foto text, p_tipo_perfil text, p_casal jsonb, p_idade text, p_genero text p_payload jsonb   p_codigo text p_codigo text wal jsonb, max_record_bytes integer role_name text, topic_name text, claims text, sub text, headers text, read_extensions text[], write_extensions text[], OUT read_allowed boolean[], OUT write_allowed boolean[] topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text prepared_statement_name text, entity regclass, columns realtime.wal_column[] val text, type_ regtype op realtime.equality_op, type_ regtype, val_1 text, val_2 text op realtime.equality_op, type_ regtype, val_1 text, val_2 text, negate boolean columns realtime.wal_column[], filters realtime.user_defined_filter[] publication name, slot_name name, max_changes integer, max_record_bytes integer publication name, slot_name name, max_changes integer, max_record_bytes integer entity regclass payload jsonb, event text, topic text, private boolean payload bytea, event text, topic text, private boolean slot_name name, max_changes integer, VARIADIC opts text[]  role_name text  name text expected_operations text[] expected_operation text bucketid text, name text, owner uuid, metadata jsonb object_ids uuid[]    name text name text name text p_key text, p_prefix text, p_delimiter text noncurrent_versions text, delete_markers text bucket_id text, prefix_param text, delimiter_param text, max_keys integer, next_key_token text, next_upload_token text, raw_prefix_param text _bucket_id text, prefix_param text, delimiter_param text, max_keys integer, start_after text, next_token text, sort_order text, noncurrent_versions text, delete_markers text, next_token_archived_at timestamp with time zone, next_token_version text     target_bucket_id text, policy_changed boolean prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text, noncurrent_versions text, delete_markers text p_prefix text, p_bucket_id text, p_limit integer, p_level integer, p_start_after text, p_sort_order text, p_sort_column text, p_sort_column_after text, noncurrent_versions text, delete_markers text, p_start_after_version text prefix text, bucket_name text, limits integer, levels integer, start_after text, sort_order text, sort_column text, sort_column_after text, noncurrent_versions text, delete_markers text, start_after_archived_at timestamp with time zone, start_after_version text, start_after_is_continuation boolean   message bytea, additional bytea, key_id bigint, context bytea, nonce bytea message bytea, additional bytea, key_id bigint, context bytea, nonce bytea  new_secret text, new_name text, new_description text, new_key_id uuid secret_id uuid, new_secret text, new_name text, new_description text, new_key_id uuid)
+-- [auth auth auth auth cron cron cron cron cron cron cron extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions graphql_public net net net net net net net net net net net net pgbouncer public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage vault vault vault vault vault] email jwt role uid alter_job job_cache_invalidate schedule schedule schedule_in_database unschedule unschedule armor armor crypt dearmor decrypt decrypt_iv digest digest encrypt encrypt_iv gen_random_bytes gen_random_uuid gen_salt gen_salt grant_pg_cron_access grant_pg_graphql_access grant_pg_net_access hmac hmac pg_stat_statements pg_stat_statements_info pg_stat_statements_reset pgp_armor_headers pgp_key_id pgp_pub_decrypt pgp_pub_decrypt pgp_pub_decrypt pgp_pub_decrypt_bytea pgp_pub_decrypt_bytea pgp_pub_decrypt_bytea pgp_pub_encrypt pgp_pub_encrypt pgp_pub_encrypt_bytea pgp_pub_encrypt_bytea pgp_sym_decrypt pgp_sym_decrypt pgp_sym_decrypt_bytea pgp_sym_decrypt_bytea pgp_sym_encrypt pgp_sym_encrypt pgp_sym_encrypt_bytea pgp_sym_encrypt_bytea pgrst_ddl_watch pgrst_drop_watch set_graphql_placeholder uuid_generate_v1 uuid_generate_v1mc uuid_generate_v3 uuid_generate_v4 uuid_generate_v5 uuid_nil uuid_ns_dns uuid_ns_oid uuid_ns_url uuid_ns_x500 graphql _await_response _encode_url_with_params_array _http_collect_response _urlencode_string check_worker_is_up http_collect_response http_delete http_get http_post wait_until_running wake worker_restart get_auth _dump_all _midia_apagar_objeto abrir_foto_unica abrir_midia_unica alternar_bloqueio alternar_seguir apagar_para_mim apagar_para_mim apagar_para_todos auto_confirm_new_users block_self_follow buscar_mensagens check_user_premium confirmar_midia_consumida contar_nao_lidas contar_seguidores curtir_post expirar_premium faixa_distancia garantir_perfil get_user_role handle_new_user increment_likes is_admin libido_delete_chat_file limpar_conversa limpar_feed_24h limpar_mensagens_expiradas limpar_midias_consumidas limpar_presenca_fantasma listar_conversas listar_mensagens marcar_conversa_lida marcar_presenca mark_messages_delivered mark_messages_read mensagens_foto_unica_guard mensagens_midia_unica_guard notificar_push_nova_mensagem perfis_proximos post_likes_sync process_payment protect_admin_fields protect_premium_downgrade protege_apagada_para_todos proteger_campos_perfil proteger_campos_post proteger_campos_usuario proteger_colunas_privilegiadas_users proteger_update_mensagem radar_mapa recalcular_likes reconciliar_premium registrar_indicacao registrar_premium salvar_onboarding salvar_perfil salvar_ultima_localizacao sync_premium_flag usar_promo validar_convite apply_rls authorize broadcast_changes build_prepared_statement_sql cast check_equality_op check_equality_op is_visible_through_filters list_changes list_changes_sync quote_wal2json send send_binary settled_changes subscription_check_filters to_regrole topic wal2json_escape_identifier allow_any_operation allow_only_operation can_insert_object delete_lifecycle_objects enforce_bucket_lifecycle_service_role enforce_bucket_name_length enforce_versioning_status_transition extension filename foldername get_common_prefix get_size_by_bucket list_multipart_uploads_with_delimiter list_objects_with_delimiter operation protect_active_lifecycle_states protect_bucket_control_columns protect_delete reconcile_lifecycle_state search search_by_timestamp search_v2 update_updated_at_column wake_lifecycle_state _crypto_aead_det_decrypt _crypto_aead_det_encrypt _crypto_aead_det_noncegen create_secret update_secret(    job_id bigint, schedule text, command text, database text, username text, active boolean  schedule text, command text job_name text, schedule text, command text job_name text, schedule text, command text, database text, username text, active boolean job_id bigint job_name text bytea bytea, text[], text[] text, text text bytea, bytea, text bytea, bytea, bytea, text text, text bytea, text bytea, bytea, text bytea, bytea, bytea, text integer  text text, integer    text, text, text bytea, bytea, text showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone OUT dealloc bigint, OUT stats_reset timestamp with time zone userid oid, dbid oid, queryid bigint, minmax_only boolean text, OUT key text, OUT value text bytea bytea, bytea bytea, bytea, text bytea, bytea, text, text bytea, bytea, text, text bytea, bytea, text bytea, bytea text, bytea text, bytea, text bytea, bytea bytea, bytea, text bytea, text, text bytea, text bytea, text bytea, text, text text, text text, text, text bytea, text, text bytea, text      namespace uuid, name text  namespace uuid, name text      "operationName" text, query text, variables jsonb, extensions jsonb request_id bigint url text, params_array text[] request_id bigint, async boolean string character varying  request_id bigint, async boolean url text, params jsonb, headers jsonb, timeout_milliseconds integer, body jsonb url text, params jsonb, headers jsonb, timeout_milliseconds integer url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer    p_usename text  p_url text p_message text p_message text p_target_id text p_target_id text p_message text p_msg uuid p_message text   p_peer uuid, p_termo text uid uuid p_message text  p_user_id text p_post_id text, p_delta integer  p_km double precision    post_id uuid  p_path text p_peer uuid, p_ocultar boolean   p_minutos integer   p_peer uuid, p_limit integer p_peer uuid  p_sender_id uuid p_sender_id uuid    p_raio_km numeric  p_user_id uuid, p_payment_id text, p_provider text, p_status text, p_amount numeric         p_raio_km double precision, p_celula double precision p_post_id uuid  p_slug text  p_apelido text, p_bio text, p_foto text, p_tipo_perfil text, p_casal jsonb, p_idade text, p_genero text p_payload jsonb   p_codigo text p_codigo text wal jsonb, max_record_bytes integer role_name text, topic_name text, claims text, sub text, headers text, read_extensions text[], write_extensions text[], OUT read_allowed boolean[], OUT write_allowed boolean[] topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text prepared_statement_name text, entity regclass, columns realtime.wal_column[] val text, type_ regtype op realtime.equality_op, type_ regtype, val_1 text, val_2 text, negate boolean op realtime.equality_op, type_ regtype, val_1 text, val_2 text columns realtime.wal_column[], filters realtime.user_defined_filter[] publication name, slot_name name, max_changes integer, max_record_bytes integer publication name, slot_name name, max_changes integer, max_record_bytes integer entity regclass payload jsonb, event text, topic text, private boolean payload bytea, event text, topic text, private boolean slot_name name, max_changes integer, VARIADIC opts text[]  role_name text  name text expected_operations text[] expected_operation text bucketid text, name text, owner uuid, metadata jsonb object_ids uuid[]    name text name text name text p_key text, p_prefix text, p_delimiter text noncurrent_versions text, delete_markers text bucket_id text, prefix_param text, delimiter_param text, max_keys integer, next_key_token text, next_upload_token text, raw_prefix_param text _bucket_id text, prefix_param text, delimiter_param text, max_keys integer, start_after text, next_token text, sort_order text, noncurrent_versions text, delete_markers text, next_token_archived_at timestamp with time zone, next_token_version text     target_bucket_id text, policy_changed boolean prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text, noncurrent_versions text, delete_markers text p_prefix text, p_bucket_id text, p_limit integer, p_level integer, p_start_after text, p_sort_order text, p_sort_column text, p_sort_column_after text, noncurrent_versions text, delete_markers text, p_start_after_version text prefix text, bucket_name text, limits integer, levels integer, start_after text, sort_order text, sort_column text, sort_column_after text, noncurrent_versions text, delete_markers text, start_after_archived_at timestamp with time zone, start_after_version text, start_after_is_continuation boolean   message bytea, additional bytea, key_id bigint, context bytea, nonce bytea message bytea, additional bytea, key_id bigint, context bytea, nonce bytea  new_secret text, new_name text, new_description text, new_key_id uuid secret_id uuid, new_secret text, new_name text, new_description text, new_key_id uuid)
 CREATE OR REPLACE FUNCTION auth.email()
  RETURNS text
  LANGUAGE sql
@@ -48,14 +48,14 @@ $function$ CREATE OR REPLACE FUNCTION cron.alter_job(job_id bigint, schedule tex
 AS '$libdir/pg_cron', $function$cron_alter_job$function$ CREATE OR REPLACE FUNCTION cron.job_cache_invalidate()
  RETURNS trigger
  LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_job_cache_invalidate$function$ CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
- RETURNS bigint
- LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_schedule_named$function$ CREATE OR REPLACE FUNCTION cron.schedule(schedule text, command text)
+AS '$libdir/pg_cron', $function$cron_job_cache_invalidate$function$ CREATE OR REPLACE FUNCTION cron.schedule(schedule text, command text)
  RETURNS bigint
  LANGUAGE c
  STRICT
-AS '$libdir/pg_cron', $function$cron_schedule$function$ CREATE OR REPLACE FUNCTION cron.schedule_in_database(job_name text, schedule text, command text, database text, username text DEFAULT NULL::text, active boolean DEFAULT true)
+AS '$libdir/pg_cron', $function$cron_schedule$function$ CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
+ RETURNS bigint
+ LANGUAGE c
+AS '$libdir/pg_cron', $function$cron_schedule_named$function$ CREATE OR REPLACE FUNCTION cron.schedule_in_database(job_name text, schedule text, command text, database text, username text DEFAULT NULL::text, active boolean DEFAULT true)
  RETURNS bigint
  LANGUAGE c
 AS '$libdir/pg_cron', $function$cron_schedule_named$function$ CREATE OR REPLACE FUNCTION cron.unschedule(job_id bigint)
@@ -90,11 +90,11 @@ AS '$libdir/pgcrypto', $function$pg_decrypt$function$ CREATE OR REPLACE FUNCTION
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_decrypt_iv$function$ CREATE OR REPLACE FUNCTION extensions.digest(bytea, text)
+AS '$libdir/pgcrypto', $function$pg_decrypt_iv$function$ CREATE OR REPLACE FUNCTION extensions.digest(text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_digest$function$ CREATE OR REPLACE FUNCTION extensions.digest(text, text)
+AS '$libdir/pgcrypto', $function$pg_digest$function$ CREATE OR REPLACE FUNCTION extensions.digest(bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -243,11 +243,11 @@ BEGIN
     END IF;
   END IF;
 END;
-$function$ CREATE OR REPLACE FUNCTION extensions.hmac(bytea, bytea, text)
+$function$ CREATE OR REPLACE FUNCTION extensions.hmac(text, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_hmac$function$ CREATE OR REPLACE FUNCTION extensions.hmac(text, text, text)
+AS '$libdir/pgcrypto', $function$pg_hmac$function$ CREATE OR REPLACE FUNCTION extensions.hmac(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -283,7 +283,7 @@ AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$ CREATE OR REPLAC
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -291,7 +291,7 @@ AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$ CREATE OR REPLA
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -311,11 +311,11 @@ AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$ CREATE OR REPLA
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -335,11 +335,11 @@ AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$ CREATE OR REPLAC
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
@@ -746,23 +746,29 @@ AS $function$
       FROM pg_authid
       WHERE rolname=$1 and rolcanlogin;
   END;
-  $function$ CREATE OR REPLACE FUNCTION public._dump_funcoes(p_schema text DEFAULT NULL::text)
- RETURNS TABLE(schema_name text, nome text, tipo text, args text, definicao text)
+  $function$ CREATE OR REPLACE FUNCTION public._dump_all()
+ RETURNS text
  LANGUAGE sql
  SECURITY DEFINER
- SET search_path TO 'public', 'pg_catalog'
+ SET search_path TO 'pg_catalog', 'public'
 AS $function$
-  select n.nspname::text,
-         p.proname::text,
-         case p.prokind when 'p' then 'procedure' else 'function' end,
-         pg_get_function_identity_arguments(p.oid),
-         pg_get_functiondef(p.oid)
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'schema', n.nspname,
+        'nome',   p.proname,
+        'tipo',   case p.prokind when 'p' then 'procedure' else 'function' end,
+        'args',   pg_get_function_identity_arguments(p.oid),
+        'def',    pg_get_functiondef(p.oid)
+      )
+      order by n.nspname, p.proname
+    )::text,
+    '[]'
+  )
   from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
   where n.nspname not in ('pg_catalog','information_schema')
-    and p.prokind in ('f','p')
-    and (p_schema is null or n.nspname = p_schema)
-  order by 1,2,4;
+    and p.prokind in ('f','p');
 $function$ CREATE OR REPLACE FUNCTION public._midia_apagar_objeto(p_url text)
  RETURNS void
  LANGUAGE plpgsql
@@ -2994,40 +3000,6 @@ begin
   execute format('select to_jsonb(%L::'|| type_::text || ')', val) into res;
   return res;
 end
-$function$ CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text)
- RETURNS boolean
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-/*
-Casts *val_1* and *val_2* as type *type_* and check the *op* condition for truthiness
-*/
-declare
-    op_symbol text = (
-        case
-            when op = 'eq' then '='
-            when op = 'neq' then '!='
-            when op = 'lt' then '<'
-            when op = 'lte' then '<='
-            when op = 'gt' then '>'
-            when op = 'gte' then '>='
-            when op = 'in' then '= any'
-            else 'UNKNOWN OP'
-        end
-    );
-    res boolean;
-begin
-    execute format(
-        'select %L::'|| type_::text || ' ' || op_symbol
-        || ' ( %L::'
-        || (
-            case
-                when op = 'in' then type_::text || '[]'
-                else type_::text end
-        )
-        || ')', val_1, val_2) into res;
-    return res;
-end;
 $function$ CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text, negate boolean)
  RETURNS boolean
  LANGUAGE plpgsql
@@ -3094,6 +3066,40 @@ begin
     ) into res;
 
     return case when negate then not res else res end;
+end;
+$function$ CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+/*
+Casts *val_1* and *val_2* as type *type_* and check the *op* condition for truthiness
+*/
+declare
+    op_symbol text = (
+        case
+            when op = 'eq' then '='
+            when op = 'neq' then '!='
+            when op = 'lt' then '<'
+            when op = 'lte' then '<='
+            when op = 'gt' then '>'
+            when op = 'gte' then '>='
+            when op = 'in' then '= any'
+            else 'UNKNOWN OP'
+        end
+    );
+    res boolean;
+begin
+    execute format(
+        'select %L::'|| type_::text || ' ' || op_symbol
+        || ' ( %L::'
+        || (
+            case
+                when op = 'in' then type_::text || '[]'
+                else type_::text end
+        )
+        || ')', val_1, val_2) into res;
+    return res;
 end;
 $function$ CREATE OR REPLACE FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[])
  RETURNS boolean

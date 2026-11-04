@@ -1,5 +1,5 @@
 -- Funcoes de public
--- Gerado: 2026-11-03 21:38
+-- Gerado: 2026-11-03 21:41
 
 CREATE OR REPLACE FUNCTION auth.email()
  RETURNS text
@@ -59,16 +59,16 @@ CREATE OR REPLACE FUNCTION cron.job_cache_invalidate()
  LANGUAGE c
 AS '$libdir/pg_cron', $function$cron_job_cache_invalidate$function$
 
-CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
- RETURNS bigint
- LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_schedule_named$function$
-
 CREATE OR REPLACE FUNCTION cron.schedule(schedule text, command text)
  RETURNS bigint
  LANGUAGE c
  STRICT
 AS '$libdir/pg_cron', $function$cron_schedule$function$
+
+CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
+ RETURNS bigint
+ LANGUAGE c
+AS '$libdir/pg_cron', $function$cron_schedule_named$function$
 
 CREATE OR REPLACE FUNCTION cron.schedule_in_database(job_name text, schedule text, command text, database text, username text DEFAULT NULL::text, active boolean DEFAULT true)
  RETURNS bigint
@@ -123,13 +123,13 @@ CREATE OR REPLACE FUNCTION extensions.decrypt_iv(bytea, bytea, bytea, text)
  IMMUTABLE PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pg_decrypt_iv$function$
 
-CREATE OR REPLACE FUNCTION extensions.digest(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.digest(text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pg_digest$function$
 
-CREATE OR REPLACE FUNCTION extensions.digest(text, text)
+CREATE OR REPLACE FUNCTION extensions.digest(bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -298,13 +298,13 @@ BEGIN
 END;
 $function$
 
-CREATE OR REPLACE FUNCTION extensions.hmac(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.hmac(text, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pg_hmac$function$
 
-CREATE OR REPLACE FUNCTION extensions.hmac(text, text, text)
+CREATE OR REPLACE FUNCTION extensions.hmac(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -358,7 +358,7 @@ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text, text)
  IMMUTABLE PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$
 
-CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -370,7 +370,7 @@ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text)
  IMMUTABLE PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$
 
-CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -400,13 +400,13 @@ CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea, text)
  PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$
 
-CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$
 
-CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
@@ -436,13 +436,13 @@ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt(text, text, text)
  PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$
 
-CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
 AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$
 
-CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
@@ -905,23 +905,29 @@ AS $function$
   END;
   $function$
 
-CREATE OR REPLACE FUNCTION public._dump_funcoes(p_schema text DEFAULT NULL::text)
- RETURNS TABLE(schema_name text, nome text, tipo text, args text, definicao text)
+CREATE OR REPLACE FUNCTION public._dump_all()
+ RETURNS text
  LANGUAGE sql
  SECURITY DEFINER
- SET search_path TO 'public', 'pg_catalog'
+ SET search_path TO 'pg_catalog', 'public'
 AS $function$
-  select n.nspname::text,
-         p.proname::text,
-         case p.prokind when 'p' then 'procedure' else 'function' end,
-         pg_get_function_identity_arguments(p.oid),
-         pg_get_functiondef(p.oid)
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'schema', n.nspname,
+        'nome',   p.proname,
+        'tipo',   case p.prokind when 'p' then 'procedure' else 'function' end,
+        'args',   pg_get_function_identity_arguments(p.oid),
+        'def',    pg_get_functiondef(p.oid)
+      )
+      order by n.nspname, p.proname
+    )::text,
+    '[]'
+  )
   from pg_proc p
   join pg_namespace n on n.oid = p.pronamespace
   where n.nspname not in ('pg_catalog','information_schema')
-    and p.prokind in ('f','p')
-    and (p_schema is null or n.nspname = p_schema)
-  order by 1,2,4;
+    and p.prokind in ('f','p');
 $function$
 
 CREATE OR REPLACE FUNCTION public._midia_apagar_objeto(p_url text)
@@ -3285,42 +3291,6 @@ begin
 end
 $function$
 
-CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text)
- RETURNS boolean
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-/*
-Casts *val_1* and *val_2* as type *type_* and check the *op* condition for truthiness
-*/
-declare
-    op_symbol text = (
-        case
-            when op = 'eq' then '='
-            when op = 'neq' then '!='
-            when op = 'lt' then '<'
-            when op = 'lte' then '<='
-            when op = 'gt' then '>'
-            when op = 'gte' then '>='
-            when op = 'in' then '= any'
-            else 'UNKNOWN OP'
-        end
-    );
-    res boolean;
-begin
-    execute format(
-        'select %L::'|| type_::text || ' ' || op_symbol
-        || ' ( %L::'
-        || (
-            case
-                when op = 'in' then type_::text || '[]'
-                else type_::text end
-        )
-        || ')', val_1, val_2) into res;
-    return res;
-end;
-$function$
-
 CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text, negate boolean)
  RETURNS boolean
  LANGUAGE plpgsql
@@ -3387,6 +3357,42 @@ begin
     ) into res;
 
     return case when negate then not res else res end;
+end;
+$function$
+
+CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ IMMUTABLE
+AS $function$
+/*
+Casts *val_1* and *val_2* as type *type_* and check the *op* condition for truthiness
+*/
+declare
+    op_symbol text = (
+        case
+            when op = 'eq' then '='
+            when op = 'neq' then '!='
+            when op = 'lt' then '<'
+            when op = 'lte' then '<='
+            when op = 'gt' then '>'
+            when op = 'gte' then '>='
+            when op = 'in' then '= any'
+            else 'UNKNOWN OP'
+        end
+    );
+    res boolean;
+begin
+    execute format(
+        'select %L::'|| type_::text || ' ' || op_symbol
+        || ' ( %L::'
+        || (
+            case
+                when op = 'in' then type_::text || '[]'
+                else type_::text end
+        )
+        || ')', val_1, val_2) into res;
+    return res;
 end;
 $function$
 
