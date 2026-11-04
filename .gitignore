@@ -60,3 +60,5 @@ backend/.env.*
 .env.local
 *.autofix.bak
 
+
+tools/.supabase-token
