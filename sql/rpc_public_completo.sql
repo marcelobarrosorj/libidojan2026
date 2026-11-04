@@ -1,5 +1,5 @@
--- Funcoes public extraidas do banco
--- Gerado: 2026-11-03 21:30
+-- Funcoes e procedures de public extraidos do banco
+-- Gerado: 2026-11-03 21:34
 -- Nao editar a mao
 
 CREATE OR REPLACE FUNCTION public._dump_funcoes()
