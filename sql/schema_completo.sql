@@ -1,7 +1,7 @@
--- Dump de todos os schemas nao-sistema
--- Gerado: 2026-11-03 21:41
+-- Dump de todos os schemas
+-- Gerado: 2026-11-04 13:23
 
--- [auth auth auth auth cron cron cron cron cron cron cron extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions extensions graphql_public net net net net net net net net net net net net pgbouncer public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public public realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime realtime storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage storage vault vault vault vault vault] email jwt role uid alter_job job_cache_invalidate schedule schedule schedule_in_database unschedule unschedule armor armor crypt dearmor decrypt decrypt_iv digest digest encrypt encrypt_iv gen_random_bytes gen_random_uuid gen_salt gen_salt grant_pg_cron_access grant_pg_graphql_access grant_pg_net_access hmac hmac pg_stat_statements pg_stat_statements_info pg_stat_statements_reset pgp_armor_headers pgp_key_id pgp_pub_decrypt pgp_pub_decrypt pgp_pub_decrypt pgp_pub_decrypt_bytea pgp_pub_decrypt_bytea pgp_pub_decrypt_bytea pgp_pub_encrypt pgp_pub_encrypt pgp_pub_encrypt_bytea pgp_pub_encrypt_bytea pgp_sym_decrypt pgp_sym_decrypt pgp_sym_decrypt_bytea pgp_sym_decrypt_bytea pgp_sym_encrypt pgp_sym_encrypt pgp_sym_encrypt_bytea pgp_sym_encrypt_bytea pgrst_ddl_watch pgrst_drop_watch set_graphql_placeholder uuid_generate_v1 uuid_generate_v1mc uuid_generate_v3 uuid_generate_v4 uuid_generate_v5 uuid_nil uuid_ns_dns uuid_ns_oid uuid_ns_url uuid_ns_x500 graphql _await_response _encode_url_with_params_array _http_collect_response _urlencode_string check_worker_is_up http_collect_response http_delete http_get http_post wait_until_running wake worker_restart get_auth _dump_all _midia_apagar_objeto abrir_foto_unica abrir_midia_unica alternar_bloqueio alternar_seguir apagar_para_mim apagar_para_mim apagar_para_todos auto_confirm_new_users block_self_follow buscar_mensagens check_user_premium confirmar_midia_consumida contar_nao_lidas contar_seguidores curtir_post expirar_premium faixa_distancia garantir_perfil get_user_role handle_new_user increment_likes is_admin libido_delete_chat_file limpar_conversa limpar_feed_24h limpar_mensagens_expiradas limpar_midias_consumidas limpar_presenca_fantasma listar_conversas listar_mensagens marcar_conversa_lida marcar_presenca mark_messages_delivered mark_messages_read mensagens_foto_unica_guard mensagens_midia_unica_guard notificar_push_nova_mensagem perfis_proximos post_likes_sync process_payment protect_admin_fields protect_premium_downgrade protege_apagada_para_todos proteger_campos_perfil proteger_campos_post proteger_campos_usuario proteger_colunas_privilegiadas_users proteger_update_mensagem radar_mapa recalcular_likes reconciliar_premium registrar_indicacao registrar_premium salvar_onboarding salvar_perfil salvar_ultima_localizacao sync_premium_flag usar_promo validar_convite apply_rls authorize broadcast_changes build_prepared_statement_sql cast check_equality_op check_equality_op is_visible_through_filters list_changes list_changes_sync quote_wal2json send send_binary settled_changes subscription_check_filters to_regrole topic wal2json_escape_identifier allow_any_operation allow_only_operation can_insert_object delete_lifecycle_objects enforce_bucket_lifecycle_service_role enforce_bucket_name_length enforce_versioning_status_transition extension filename foldername get_common_prefix get_size_by_bucket list_multipart_uploads_with_delimiter list_objects_with_delimiter operation protect_active_lifecycle_states protect_bucket_control_columns protect_delete reconcile_lifecycle_state search search_by_timestamp search_v2 update_updated_at_column wake_lifecycle_state _crypto_aead_det_decrypt _crypto_aead_det_encrypt _crypto_aead_det_noncegen create_secret update_secret(    job_id bigint, schedule text, command text, database text, username text, active boolean  schedule text, command text job_name text, schedule text, command text job_name text, schedule text, command text, database text, username text, active boolean job_id bigint job_name text bytea bytea, text[], text[] text, text text bytea, bytea, text bytea, bytea, bytea, text text, text bytea, text bytea, bytea, text bytea, bytea, bytea, text integer  text text, integer    text, text, text bytea, bytea, text showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone OUT dealloc bigint, OUT stats_reset timestamp with time zone userid oid, dbid oid, queryid bigint, minmax_only boolean text, OUT key text, OUT value text bytea bytea, bytea bytea, bytea, text bytea, bytea, text, text bytea, bytea, text, text bytea, bytea, text bytea, bytea text, bytea text, bytea, text bytea, bytea bytea, bytea, text bytea, text, text bytea, text bytea, text bytea, text, text text, text text, text, text bytea, text, text bytea, text      namespace uuid, name text  namespace uuid, name text      "operationName" text, query text, variables jsonb, extensions jsonb request_id bigint url text, params_array text[] request_id bigint, async boolean string character varying  request_id bigint, async boolean url text, params jsonb, headers jsonb, timeout_milliseconds integer, body jsonb url text, params jsonb, headers jsonb, timeout_milliseconds integer url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer    p_usename text  p_url text p_message text p_message text p_target_id text p_target_id text p_message text p_msg uuid p_message text   p_peer uuid, p_termo text uid uuid p_message text  p_user_id text p_post_id text, p_delta integer  p_km double precision    post_id uuid  p_path text p_peer uuid, p_ocultar boolean   p_minutos integer   p_peer uuid, p_limit integer p_peer uuid  p_sender_id uuid p_sender_id uuid    p_raio_km numeric  p_user_id uuid, p_payment_id text, p_provider text, p_status text, p_amount numeric         p_raio_km double precision, p_celula double precision p_post_id uuid  p_slug text  p_apelido text, p_bio text, p_foto text, p_tipo_perfil text, p_casal jsonb, p_idade text, p_genero text p_payload jsonb   p_codigo text p_codigo text wal jsonb, max_record_bytes integer role_name text, topic_name text, claims text, sub text, headers text, read_extensions text[], write_extensions text[], OUT read_allowed boolean[], OUT write_allowed boolean[] topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text prepared_statement_name text, entity regclass, columns realtime.wal_column[] val text, type_ regtype op realtime.equality_op, type_ regtype, val_1 text, val_2 text, negate boolean op realtime.equality_op, type_ regtype, val_1 text, val_2 text columns realtime.wal_column[], filters realtime.user_defined_filter[] publication name, slot_name name, max_changes integer, max_record_bytes integer publication name, slot_name name, max_changes integer, max_record_bytes integer entity regclass payload jsonb, event text, topic text, private boolean payload bytea, event text, topic text, private boolean slot_name name, max_changes integer, VARIADIC opts text[]  role_name text  name text expected_operations text[] expected_operation text bucketid text, name text, owner uuid, metadata jsonb object_ids uuid[]    name text name text name text p_key text, p_prefix text, p_delimiter text noncurrent_versions text, delete_markers text bucket_id text, prefix_param text, delimiter_param text, max_keys integer, next_key_token text, next_upload_token text, raw_prefix_param text _bucket_id text, prefix_param text, delimiter_param text, max_keys integer, start_after text, next_token text, sort_order text, noncurrent_versions text, delete_markers text, next_token_archived_at timestamp with time zone, next_token_version text     target_bucket_id text, policy_changed boolean prefix text, bucketname text, limits integer, levels integer, offsets integer, search text, sortcolumn text, sortorder text, noncurrent_versions text, delete_markers text p_prefix text, p_bucket_id text, p_limit integer, p_level integer, p_start_after text, p_sort_order text, p_sort_column text, p_sort_column_after text, noncurrent_versions text, delete_markers text, p_start_after_version text prefix text, bucket_name text, limits integer, levels integer, start_after text, sort_order text, sort_column text, sort_column_after text, noncurrent_versions text, delete_markers text, start_after_archived_at timestamp with time zone, start_after_version text, start_after_is_continuation boolean   message bytea, additional bytea, key_id bigint, context bytea, nonce bytea message bytea, additional bytea, key_id bigint, context bytea, nonce bytea  new_secret text, new_name text, new_description text, new_key_id uuid secret_id uuid, new_secret text, new_name text, new_description text, new_key_id uuid)
+-- [auth] email()
 CREATE OR REPLACE FUNCTION auth.email()
  RETURNS text
  LANGUAGE sql
@@ -12,7 +12,10 @@ AS $function$
     nullif(current_setting('request.jwt.claim.email', true), ''),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'email')
   )::text
-$function$ CREATE OR REPLACE FUNCTION auth.jwt()
+$function$;
+
+-- [auth] jwt()
+CREATE OR REPLACE FUNCTION auth.jwt()
  RETURNS jsonb
  LANGUAGE sql
  STABLE
@@ -22,7 +25,10 @@ AS $function$
         nullif(current_setting('request.jwt.claim', true), ''),
         nullif(current_setting('request.jwt.claims', true), '')
     )::jsonb
-$function$ CREATE OR REPLACE FUNCTION auth.role()
+$function$;
+
+-- [auth] role()
+CREATE OR REPLACE FUNCTION auth.role()
  RETURNS text
  LANGUAGE sql
  STABLE
@@ -32,7 +38,10 @@ AS $function$
     nullif(current_setting('request.jwt.claim.role', true), ''),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role')
   )::text
-$function$ CREATE OR REPLACE FUNCTION auth.uid()
+$function$;
+
+-- [auth] uid()
+CREATE OR REPLACE FUNCTION auth.uid()
  RETURNS uuid
  LANGUAGE sql
  STABLE
@@ -42,87 +51,153 @@ AS $function$
     nullif(current_setting('request.jwt.claim.sub', true), ''),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')
   )::uuid
-$function$ CREATE OR REPLACE FUNCTION cron.alter_job(job_id bigint, schedule text DEFAULT NULL::text, command text DEFAULT NULL::text, database text DEFAULT NULL::text, username text DEFAULT NULL::text, active boolean DEFAULT NULL::boolean)
+$function$;
+
+-- [cron] alter_job(job_id bigint, schedule text, command text, database text, username text, active boolean)
+CREATE OR REPLACE FUNCTION cron.alter_job(job_id bigint, schedule text DEFAULT NULL::text, command text DEFAULT NULL::text, database text DEFAULT NULL::text, username text DEFAULT NULL::text, active boolean DEFAULT NULL::boolean)
  RETURNS void
  LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_alter_job$function$ CREATE OR REPLACE FUNCTION cron.job_cache_invalidate()
+AS '$libdir/pg_cron', $function$cron_alter_job$function$;
+
+-- [cron] job_cache_invalidate()
+CREATE OR REPLACE FUNCTION cron.job_cache_invalidate()
  RETURNS trigger
  LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_job_cache_invalidate$function$ CREATE OR REPLACE FUNCTION cron.schedule(schedule text, command text)
+AS '$libdir/pg_cron', $function$cron_job_cache_invalidate$function$;
+
+-- [cron] schedule(job_name text, schedule text, command text)
+CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
+ RETURNS bigint
+ LANGUAGE c
+AS '$libdir/pg_cron', $function$cron_schedule_named$function$;
+
+-- [cron] schedule(schedule text, command text)
+CREATE OR REPLACE FUNCTION cron.schedule(schedule text, command text)
  RETURNS bigint
  LANGUAGE c
  STRICT
-AS '$libdir/pg_cron', $function$cron_schedule$function$ CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
+AS '$libdir/pg_cron', $function$cron_schedule$function$;
+
+-- [cron] schedule_in_database(job_name text, schedule text, command text, database text, username text, active boolean)
+CREATE OR REPLACE FUNCTION cron.schedule_in_database(job_name text, schedule text, command text, database text, username text DEFAULT NULL::text, active boolean DEFAULT true)
  RETURNS bigint
  LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_schedule_named$function$ CREATE OR REPLACE FUNCTION cron.schedule_in_database(job_name text, schedule text, command text, database text, username text DEFAULT NULL::text, active boolean DEFAULT true)
- RETURNS bigint
- LANGUAGE c
-AS '$libdir/pg_cron', $function$cron_schedule_named$function$ CREATE OR REPLACE FUNCTION cron.unschedule(job_id bigint)
+AS '$libdir/pg_cron', $function$cron_schedule_named$function$;
+
+-- [cron] unschedule(job_id bigint)
+CREATE OR REPLACE FUNCTION cron.unschedule(job_id bigint)
  RETURNS boolean
  LANGUAGE c
  STRICT
-AS '$libdir/pg_cron', $function$cron_unschedule$function$ CREATE OR REPLACE FUNCTION cron.unschedule(job_name text)
+AS '$libdir/pg_cron', $function$cron_unschedule$function$;
+
+-- [cron] unschedule(job_name text)
+CREATE OR REPLACE FUNCTION cron.unschedule(job_name text)
  RETURNS boolean
  LANGUAGE c
  STRICT
-AS '$libdir/pg_cron', $function$cron_unschedule_named$function$ CREATE OR REPLACE FUNCTION extensions.armor(bytea)
+AS '$libdir/pg_cron', $function$cron_unschedule_named$function$;
+
+-- [extensions] armor(bytea)
+CREATE OR REPLACE FUNCTION extensions.armor(bytea)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_armor$function$ CREATE OR REPLACE FUNCTION extensions.armor(bytea, text[], text[])
+AS '$libdir/pgcrypto', $function$pg_armor$function$;
+
+-- [extensions] armor(bytea, text[], text[])
+CREATE OR REPLACE FUNCTION extensions.armor(bytea, text[], text[])
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_armor$function$ CREATE OR REPLACE FUNCTION extensions.crypt(text, text)
+AS '$libdir/pgcrypto', $function$pg_armor$function$;
+
+-- [extensions] crypt(text, text)
+CREATE OR REPLACE FUNCTION extensions.crypt(text, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_crypt$function$ CREATE OR REPLACE FUNCTION extensions.dearmor(text)
+AS '$libdir/pgcrypto', $function$pg_crypt$function$;
+
+-- [extensions] dearmor(text)
+CREATE OR REPLACE FUNCTION extensions.dearmor(text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_dearmor$function$ CREATE OR REPLACE FUNCTION extensions.decrypt(bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pg_dearmor$function$;
+
+-- [extensions] decrypt(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.decrypt(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_decrypt$function$ CREATE OR REPLACE FUNCTION extensions.decrypt_iv(bytea, bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pg_decrypt$function$;
+
+-- [extensions] decrypt_iv(bytea, bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.decrypt_iv(bytea, bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_decrypt_iv$function$ CREATE OR REPLACE FUNCTION extensions.digest(text, text)
+AS '$libdir/pgcrypto', $function$pg_decrypt_iv$function$;
+
+-- [extensions] digest(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.digest(bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_digest$function$ CREATE OR REPLACE FUNCTION extensions.digest(bytea, text)
+AS '$libdir/pgcrypto', $function$pg_digest$function$;
+
+-- [extensions] digest(text, text)
+CREATE OR REPLACE FUNCTION extensions.digest(text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_digest$function$ CREATE OR REPLACE FUNCTION extensions.encrypt(bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pg_digest$function$;
+
+-- [extensions] encrypt(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.encrypt(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_encrypt$function$ CREATE OR REPLACE FUNCTION extensions.encrypt_iv(bytea, bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pg_encrypt$function$;
+
+-- [extensions] encrypt_iv(bytea, bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.encrypt_iv(bytea, bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_encrypt_iv$function$ CREATE OR REPLACE FUNCTION extensions.gen_random_bytes(integer)
+AS '$libdir/pgcrypto', $function$pg_encrypt_iv$function$;
+
+-- [extensions] gen_random_bytes(integer)
+CREATE OR REPLACE FUNCTION extensions.gen_random_bytes(integer)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_random_bytes$function$ CREATE OR REPLACE FUNCTION extensions.gen_random_uuid()
+AS '$libdir/pgcrypto', $function$pg_random_bytes$function$;
+
+-- [extensions] gen_random_uuid()
+CREATE OR REPLACE FUNCTION extensions.gen_random_uuid()
  RETURNS uuid
  LANGUAGE c
  PARALLEL SAFE
-AS '$libdir/pgcrypto', $function$pg_random_uuid$function$ CREATE OR REPLACE FUNCTION extensions.gen_salt(text)
+AS '$libdir/pgcrypto', $function$pg_random_uuid$function$;
+
+-- [extensions] gen_salt(text)
+CREATE OR REPLACE FUNCTION extensions.gen_salt(text)
  RETURNS text
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_gen_salt$function$ CREATE OR REPLACE FUNCTION extensions.gen_salt(text, integer)
+AS '$libdir/pgcrypto', $function$pg_gen_salt$function$;
+
+-- [extensions] gen_salt(text, integer)
+CREATE OR REPLACE FUNCTION extensions.gen_salt(text, integer)
  RETURNS text
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_gen_salt_rounds$function$ CREATE OR REPLACE FUNCTION extensions.grant_pg_cron_access()
+AS '$libdir/pgcrypto', $function$pg_gen_salt_rounds$function$;
+
+-- [extensions] grant_pg_cron_access()
+CREATE OR REPLACE FUNCTION extensions.grant_pg_cron_access()
  RETURNS event_trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -155,7 +230,10 @@ BEGIN
     revoke trigger on cron.job_run_details from postgres;
   END IF;
 END;
-$function$ CREATE OR REPLACE FUNCTION extensions.grant_pg_graphql_access()
+$function$;
+
+-- [extensions] grant_pg_graphql_access()
+CREATE OR REPLACE FUNCTION extensions.grant_pg_graphql_access()
  RETURNS event_trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -197,7 +275,10 @@ begin
     grant usage on schema graphql to postgres with grant option;
     grant usage on schema graphql_public to postgres with grant option;
 end;
-$function$ CREATE OR REPLACE FUNCTION extensions.grant_pg_net_access()
+$function$;
+
+-- [extensions] grant_pg_net_access()
+CREATE OR REPLACE FUNCTION extensions.grant_pg_net_access()
  RETURNS event_trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -243,107 +324,185 @@ BEGIN
     END IF;
   END IF;
 END;
-$function$ CREATE OR REPLACE FUNCTION extensions.hmac(text, text, text)
+$function$;
+
+-- [extensions] hmac(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.hmac(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_hmac$function$ CREATE OR REPLACE FUNCTION extensions.hmac(bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pg_hmac$function$;
+
+-- [extensions] hmac(text, text, text)
+CREATE OR REPLACE FUNCTION extensions.hmac(text, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pg_hmac$function$ CREATE OR REPLACE FUNCTION extensions.pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone)
+AS '$libdir/pgcrypto', $function$pg_hmac$function$;
+
+-- [extensions] pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone)
+CREATE OR REPLACE FUNCTION extensions.pg_stat_statements(showtext boolean, OUT userid oid, OUT dbid oid, OUT toplevel boolean, OUT queryid bigint, OUT query text, OUT plans bigint, OUT total_plan_time double precision, OUT min_plan_time double precision, OUT max_plan_time double precision, OUT mean_plan_time double precision, OUT stddev_plan_time double precision, OUT calls bigint, OUT total_exec_time double precision, OUT min_exec_time double precision, OUT max_exec_time double precision, OUT mean_exec_time double precision, OUT stddev_exec_time double precision, OUT rows bigint, OUT shared_blks_hit bigint, OUT shared_blks_read bigint, OUT shared_blks_dirtied bigint, OUT shared_blks_written bigint, OUT local_blks_hit bigint, OUT local_blks_read bigint, OUT local_blks_dirtied bigint, OUT local_blks_written bigint, OUT temp_blks_read bigint, OUT temp_blks_written bigint, OUT shared_blk_read_time double precision, OUT shared_blk_write_time double precision, OUT local_blk_read_time double precision, OUT local_blk_write_time double precision, OUT temp_blk_read_time double precision, OUT temp_blk_write_time double precision, OUT wal_records bigint, OUT wal_fpi bigint, OUT wal_bytes numeric, OUT jit_functions bigint, OUT jit_generation_time double precision, OUT jit_inlining_count bigint, OUT jit_inlining_time double precision, OUT jit_optimization_count bigint, OUT jit_optimization_time double precision, OUT jit_emission_count bigint, OUT jit_emission_time double precision, OUT jit_deform_count bigint, OUT jit_deform_time double precision, OUT stats_since timestamp with time zone, OUT minmax_stats_since timestamp with time zone)
  RETURNS SETOF record
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pg_stat_statements', $function$pg_stat_statements_1_11$function$ CREATE OR REPLACE FUNCTION extensions.pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone)
+AS '$libdir/pg_stat_statements', $function$pg_stat_statements_1_11$function$;
+
+-- [extensions] pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone)
+CREATE OR REPLACE FUNCTION extensions.pg_stat_statements_info(OUT dealloc bigint, OUT stats_reset timestamp with time zone)
  RETURNS record
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pg_stat_statements', $function$pg_stat_statements_info$function$ CREATE OR REPLACE FUNCTION extensions.pg_stat_statements_reset(userid oid DEFAULT 0, dbid oid DEFAULT 0, queryid bigint DEFAULT 0, minmax_only boolean DEFAULT false)
+AS '$libdir/pg_stat_statements', $function$pg_stat_statements_info$function$;
+
+-- [extensions] pg_stat_statements_reset(userid oid, dbid oid, queryid bigint, minmax_only boolean)
+CREATE OR REPLACE FUNCTION extensions.pg_stat_statements_reset(userid oid DEFAULT 0, dbid oid DEFAULT 0, queryid bigint DEFAULT 0, minmax_only boolean DEFAULT false)
  RETURNS timestamp with time zone
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pg_stat_statements', $function$pg_stat_statements_reset_1_11$function$ CREATE OR REPLACE FUNCTION extensions.pgp_armor_headers(text, OUT key text, OUT value text)
+AS '$libdir/pg_stat_statements', $function$pg_stat_statements_reset_1_11$function$;
+
+-- [extensions] pgp_armor_headers(text, OUT key text, OUT value text)
+CREATE OR REPLACE FUNCTION extensions.pgp_armor_headers(text, OUT key text, OUT value text)
  RETURNS SETOF record
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_armor_headers$function$ CREATE OR REPLACE FUNCTION extensions.pgp_key_id(bytea)
+AS '$libdir/pgcrypto', $function$pgp_armor_headers$function$;
+
+-- [extensions] pgp_key_id(bytea)
+CREATE OR REPLACE FUNCTION extensions.pgp_key_id(bytea)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_key_id_w$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea)
+AS '$libdir/pgcrypto', $function$pgp_key_id_w$function$;
+
+-- [extensions] pgp_pub_decrypt(bytea, bytea)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$;
+
+-- [extensions] pgp_pub_decrypt(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$;
+
+-- [extensions] pgp_pub_decrypt(bytea, bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt(bytea, bytea, text, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_text$function$;
+
+-- [extensions] pgp_pub_decrypt_bytea(bytea, bytea)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$;
+
+-- [extensions] pgp_pub_decrypt_bytea(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$;
+
+-- [extensions] pgp_pub_decrypt_bytea(bytea, bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_decrypt_bytea(bytea, bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt(text, bytea)
+AS '$libdir/pgcrypto', $function$pgp_pub_decrypt_bytea$function$;
+
+-- [extensions] pgp_pub_encrypt(text, bytea)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt(text, bytea)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt(text, bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_text$function$;
+
+-- [extensions] pgp_pub_encrypt(text, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt(text, bytea, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea)
+AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_text$function$;
+
+-- [extensions] pgp_pub_encrypt_bytea(bytea, bytea)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$;
+
+-- [extensions] pgp_pub_encrypt_bytea(bytea, bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_pub_encrypt_bytea(bytea, bytea, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_pub_encrypt_bytea$function$;
+
+-- [extensions] pgp_sym_decrypt(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$;
+
+-- [extensions] pgp_sym_decrypt(bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt(bytea, text, text)
  RETURNS text
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_text$function$;
+
+-- [extensions] pgp_sym_decrypt_bytea(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_bytea$function$;
+
+-- [extensions] pgp_sym_decrypt_bytea(bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_decrypt_bytea(bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt(text, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_decrypt_bytea$function$;
+
+-- [extensions] pgp_sym_encrypt(text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt(text, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt(text, text, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$;
+
+-- [extensions] pgp_sym_encrypt(text, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt(text, text, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_text$function$;
+
+-- [extensions] pgp_sym_encrypt_bytea(bytea, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text)
+AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$;
+
+-- [extensions] pgp_sym_encrypt_bytea(bytea, text, text)
+CREATE OR REPLACE FUNCTION extensions.pgp_sym_encrypt_bytea(bytea, text, text)
  RETURNS bytea
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$ CREATE OR REPLACE FUNCTION extensions.pgrst_ddl_watch()
+AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$;
+
+-- [extensions] pgrst_ddl_watch()
+CREATE OR REPLACE FUNCTION extensions.pgrst_ddl_watch()
  RETURNS event_trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -371,7 +530,10 @@ BEGIN
       NOTIFY pgrst, 'reload schema';
     END IF;
   END LOOP;
-END; $function$ CREATE OR REPLACE FUNCTION extensions.pgrst_drop_watch()
+END; $function$;
+
+-- [extensions] pgrst_drop_watch()
+CREATE OR REPLACE FUNCTION extensions.pgrst_drop_watch()
  RETURNS event_trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -397,7 +559,10 @@ BEGIN
       NOTIFY pgrst, 'reload schema';
     END IF;
   END LOOP;
-END; $function$ CREATE OR REPLACE FUNCTION extensions.set_graphql_placeholder()
+END; $function$;
+
+-- [extensions] set_graphql_placeholder()
+CREATE OR REPLACE FUNCTION extensions.set_graphql_placeholder()
  RETURNS event_trigger
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -450,47 +615,80 @@ AS $function$
     END IF;
 
     END;
-$function$ CREATE OR REPLACE FUNCTION extensions.uuid_generate_v1()
+$function$;
+
+-- [extensions] uuid_generate_v1()
+CREATE OR REPLACE FUNCTION extensions.uuid_generate_v1()
  RETURNS uuid
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_generate_v1$function$ CREATE OR REPLACE FUNCTION extensions.uuid_generate_v1mc()
+AS '$libdir/uuid-ossp', $function$uuid_generate_v1$function$;
+
+-- [extensions] uuid_generate_v1mc()
+CREATE OR REPLACE FUNCTION extensions.uuid_generate_v1mc()
  RETURNS uuid
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_generate_v1mc$function$ CREATE OR REPLACE FUNCTION extensions.uuid_generate_v3(namespace uuid, name text)
+AS '$libdir/uuid-ossp', $function$uuid_generate_v1mc$function$;
+
+-- [extensions] uuid_generate_v3(namespace uuid, name text)
+CREATE OR REPLACE FUNCTION extensions.uuid_generate_v3(namespace uuid, name text)
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_generate_v3$function$ CREATE OR REPLACE FUNCTION extensions.uuid_generate_v4()
+AS '$libdir/uuid-ossp', $function$uuid_generate_v3$function$;
+
+-- [extensions] uuid_generate_v4()
+CREATE OR REPLACE FUNCTION extensions.uuid_generate_v4()
  RETURNS uuid
  LANGUAGE c
  PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_generate_v4$function$ CREATE OR REPLACE FUNCTION extensions.uuid_generate_v5(namespace uuid, name text)
+AS '$libdir/uuid-ossp', $function$uuid_generate_v4$function$;
+
+-- [extensions] uuid_generate_v5(namespace uuid, name text)
+CREATE OR REPLACE FUNCTION extensions.uuid_generate_v5(namespace uuid, name text)
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_generate_v5$function$ CREATE OR REPLACE FUNCTION extensions.uuid_nil()
+AS '$libdir/uuid-ossp', $function$uuid_generate_v5$function$;
+
+-- [extensions] uuid_nil()
+CREATE OR REPLACE FUNCTION extensions.uuid_nil()
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_nil$function$ CREATE OR REPLACE FUNCTION extensions.uuid_ns_dns()
+AS '$libdir/uuid-ossp', $function$uuid_nil$function$;
+
+-- [extensions] uuid_ns_dns()
+CREATE OR REPLACE FUNCTION extensions.uuid_ns_dns()
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_ns_dns$function$ CREATE OR REPLACE FUNCTION extensions.uuid_ns_oid()
+AS '$libdir/uuid-ossp', $function$uuid_ns_dns$function$;
+
+-- [extensions] uuid_ns_oid()
+CREATE OR REPLACE FUNCTION extensions.uuid_ns_oid()
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_ns_oid$function$ CREATE OR REPLACE FUNCTION extensions.uuid_ns_url()
+AS '$libdir/uuid-ossp', $function$uuid_ns_oid$function$;
+
+-- [extensions] uuid_ns_url()
+CREATE OR REPLACE FUNCTION extensions.uuid_ns_url()
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_ns_url$function$ CREATE OR REPLACE FUNCTION extensions.uuid_ns_x500()
+AS '$libdir/uuid-ossp', $function$uuid_ns_url$function$;
+
+-- [extensions] uuid_ns_x500()
+CREATE OR REPLACE FUNCTION extensions.uuid_ns_x500()
  RETURNS uuid
  LANGUAGE c
  IMMUTABLE PARALLEL SAFE STRICT
-AS '$libdir/uuid-ossp', $function$uuid_ns_x500$function$ CREATE OR REPLACE FUNCTION graphql_public.graphql("operationName" text DEFAULT NULL::text, query text DEFAULT NULL::text, variables jsonb DEFAULT NULL::jsonb, extensions jsonb DEFAULT NULL::jsonb)
+AS '$libdir/uuid-ossp', $function$uuid_ns_x500$function$;
+
+-- [graphql_public] graphql("operationName" text, query text, variables jsonb, extensions jsonb)
+CREATE OR REPLACE FUNCTION graphql_public.graphql("operationName" text DEFAULT NULL::text, query text DEFAULT NULL::text, variables jsonb DEFAULT NULL::jsonb, extensions jsonb DEFAULT NULL::jsonb)
  RETURNS jsonb
  LANGUAGE plpgsql
 AS $function$
@@ -517,7 +715,93 @@ AS $function$
                     );
                 END IF;
             END;
-        $function$ CREATE OR REPLACE FUNCTION net._await_response(request_id bigint)
+        $function$;
+
+-- [information_schema] _pg_char_max_length(typid oid, typmod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_char_max_length(typid oid, typmod integer)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (typmod = '-1'::integer) THEN NULL::integer WHEN (typid = ANY (ARRAY[(1042)::oid, (1043)::oid])) THEN (typmod - 4) WHEN (typid = ANY (ARRAY[(1560)::oid, (1562)::oid])) THEN typmod ELSE NULL::integer END;
+
+-- [information_schema] _pg_char_octet_length(typid oid, typmod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_char_octet_length(typid oid, typmod integer)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (typid = ANY (ARRAY[(25)::oid, (1042)::oid, (1043)::oid])) THEN CASE WHEN (typmod = '-1'::integer) THEN (((2)::double precision ^ (30)::double precision))::integer ELSE (information_schema._pg_char_max_length(typid, typmod) * pg_encoding_max_length((SELECT pg_database.encoding FROM pg_database WHERE (pg_database.datname = current_database())))) END ELSE NULL::integer END;
+
+-- [information_schema] _pg_datetime_precision(typid oid, typmod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_datetime_precision(typid oid, typmod integer)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (typid = (1082)::oid) THEN 0 WHEN (typid = ANY (ARRAY[(1083)::oid, (1114)::oid, (1184)::oid, (1266)::oid])) THEN CASE WHEN (typmod < 0) THEN 6 ELSE typmod END WHEN (typid = (1186)::oid) THEN CASE WHEN ((typmod < 0) OR ((typmod & 65535) = 65535)) THEN 6 ELSE (typmod & 65535) END ELSE NULL::integer END;
+
+-- [information_schema] _pg_expandarray(anyarray, OUT x anyelement, OUT n integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_expandarray(anyarray, OUT x anyelement, OUT n integer)
+ RETURNS SETOF record
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT ROWS 100 SUPPORT array_unnest_support
+AS $function$SELECT * FROM pg_catalog.unnest($1) WITH ORDINALITY$function$;
+
+-- [information_schema] _pg_index_position(oid, smallint)
+CREATE OR REPLACE FUNCTION information_schema._pg_index_position(oid, smallint)
+ RETURNS integer
+ LANGUAGE sql
+ STABLE STRICT
+BEGIN ATOMIC
+ SELECT (ss.a).n AS n
+    FROM ( SELECT information_schema._pg_expandarray(pg_index.indkey) AS a
+            FROM pg_index
+           WHERE (pg_index.indexrelid = $1)) ss
+   WHERE ((ss.a).x = $2);
+END;
+
+-- [information_schema] _pg_interval_type(typid oid, mod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_interval_type(typid oid, mod integer)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (typid = (1186)::oid) THEN upper(SUBSTRING(format_type(typid, mod) SIMILAR 'interval[()0-9]* #"%#"'::text ESCAPE '#'::text)) ELSE NULL::text END;
+
+-- [information_schema] _pg_numeric_precision(typid oid, typmod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_numeric_precision(typid oid, typmod integer)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE typid WHEN 21 THEN 16 WHEN 23 THEN 32 WHEN 20 THEN 64 WHEN 1700 THEN CASE WHEN (typmod = '-1'::integer) THEN NULL::integer ELSE (((typmod - 4) >> 16) & 65535) END WHEN 700 THEN 24 WHEN 701 THEN 53 ELSE NULL::integer END;
+
+-- [information_schema] _pg_numeric_precision_radix(typid oid, typmod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_numeric_precision_radix(typid oid, typmod integer)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (typid = ANY (ARRAY[(21)::oid, (23)::oid, (20)::oid, (700)::oid, (701)::oid])) THEN 2 WHEN (typid = (1700)::oid) THEN 10 ELSE NULL::integer END;
+
+-- [information_schema] _pg_numeric_scale(typid oid, typmod integer)
+CREATE OR REPLACE FUNCTION information_schema._pg_numeric_scale(typid oid, typmod integer)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (typid = ANY (ARRAY[(21)::oid, (23)::oid, (20)::oid])) THEN 0 WHEN (typid = (1700)::oid) THEN CASE WHEN (typmod = '-1'::integer) THEN NULL::integer ELSE ((typmod - 4) & 65535) END ELSE NULL::integer END;
+
+-- [information_schema] _pg_truetypid(pg_attribute, pg_type)
+CREATE OR REPLACE FUNCTION information_schema._pg_truetypid(pg_attribute, pg_type)
+ RETURNS oid
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (($2).typtype = 'd'::"char") THEN ($2).typbasetype ELSE ($1).atttypid END;
+
+-- [information_schema] _pg_truetypmod(pg_attribute, pg_type)
+CREATE OR REPLACE FUNCTION information_schema._pg_truetypmod(pg_attribute, pg_type)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT
+RETURN CASE WHEN (($2).typtype = 'd'::"char") THEN ($2).typtypmod ELSE ($1).atttypmod END;
+
+-- [net] _await_response(request_id bigint)
+CREATE OR REPLACE FUNCTION net._await_response(request_id bigint)
  RETURNS boolean
  LANGUAGE plpgsql
 AS $function$
@@ -538,11 +822,17 @@ begin
 
     return true;
 end;
-$function$ CREATE OR REPLACE FUNCTION net._encode_url_with_params_array(url text, params_array text[])
+$function$;
+
+-- [net] _encode_url_with_params_array(url text, params_array text[])
+CREATE OR REPLACE FUNCTION net._encode_url_with_params_array(url text, params_array text[])
  RETURNS text
  LANGUAGE c
  IMMUTABLE
-AS 'pg_net', $function$_encode_url_with_params_array$function$ CREATE OR REPLACE FUNCTION net._http_collect_response(request_id bigint, async boolean DEFAULT true)
+AS 'pg_net', $function$_encode_url_with_params_array$function$;
+
+-- [net] _http_collect_response(request_id bigint, async boolean)
+CREATE OR REPLACE FUNCTION net._http_collect_response(request_id bigint, async boolean DEFAULT true)
  RETURNS net.http_response_result
  LANGUAGE plpgsql
 AS $function$
@@ -585,11 +875,17 @@ begin
         )::net.http_response
     )::net.http_response_result;
 end;
-$function$ CREATE OR REPLACE FUNCTION net._urlencode_string(string character varying)
+$function$;
+
+-- [net] _urlencode_string(string character varying)
+CREATE OR REPLACE FUNCTION net._urlencode_string(string character varying)
  RETURNS text
  LANGUAGE c
  IMMUTABLE
-AS 'pg_net', $function$_urlencode_string$function$ CREATE OR REPLACE FUNCTION net.check_worker_is_up()
+AS 'pg_net', $function$_urlencode_string$function$;
+
+-- [net] check_worker_is_up()
+CREATE OR REPLACE FUNCTION net.check_worker_is_up()
  RETURNS void
  LANGUAGE plpgsql
 AS $function$
@@ -601,7 +897,10 @@ begin
     , hint    = 'make sure that you didn''t modify any of pg_net internal tables';
   end if;
 end
-$function$ CREATE OR REPLACE FUNCTION net.http_collect_response(request_id bigint, async boolean DEFAULT true)
+$function$;
+
+-- [net] http_collect_response(request_id bigint, async boolean)
+CREATE OR REPLACE FUNCTION net.http_collect_response(request_id bigint, async boolean DEFAULT true)
  RETURNS net.http_response_result
  LANGUAGE plpgsql
 AS $function$
@@ -609,7 +908,10 @@ begin
   raise notice 'The net.http_collect_response function is deprecated.';
   select net._http_collect_response(request_id, async);
 end;
-$function$ CREATE OR REPLACE FUNCTION net.http_delete(url text, params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{}'::jsonb, timeout_milliseconds integer DEFAULT 5000, body jsonb DEFAULT NULL::jsonb)
+$function$;
+
+-- [net] http_delete(url text, params jsonb, headers jsonb, timeout_milliseconds integer, body jsonb)
+CREATE OR REPLACE FUNCTION net.http_delete(url text, params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{}'::jsonb, timeout_milliseconds integer DEFAULT 5000, body jsonb DEFAULT NULL::jsonb)
  RETURNS bigint
  LANGUAGE plpgsql
 AS $function$
@@ -637,7 +939,10 @@ begin
 
     return request_id;
 end
-$function$ CREATE OR REPLACE FUNCTION net.http_get(url text, params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{}'::jsonb, timeout_milliseconds integer DEFAULT 5000)
+$function$;
+
+-- [net] http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer)
+CREATE OR REPLACE FUNCTION net.http_get(url text, params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{}'::jsonb, timeout_milliseconds integer DEFAULT 5000)
  RETURNS bigint
  LANGUAGE plpgsql
 AS $function$
@@ -664,7 +969,10 @@ begin
 
     return request_id;
 end
-$function$ CREATE OR REPLACE FUNCTION net.http_post(url text, body jsonb DEFAULT '{}'::jsonb, params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{"Content-Type": "application/json"}'::jsonb, timeout_milliseconds integer DEFAULT 5000)
+$function$;
+
+-- [net] http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer)
+CREATE OR REPLACE FUNCTION net.http_post(url text, body jsonb DEFAULT '{}'::jsonb, params jsonb DEFAULT '{}'::jsonb, headers jsonb DEFAULT '{"Content-Type": "application/json"}'::jsonb, timeout_milliseconds integer DEFAULT 5000)
  RETURNS bigint
  LANGUAGE plpgsql
 AS $function$
@@ -718,4788 +1026,6393 @@ begin
 
     return request_id;
 end
-$function$ CREATE OR REPLACE FUNCTION net.wait_until_running()
- RETURNS void
- LANGUAGE c
-AS 'pg_net', $function$wait_until_running$function$ CREATE OR REPLACE FUNCTION net.wake()
- RETURNS void
- LANGUAGE c
-AS 'pg_net', $function$wake$function$ CREATE OR REPLACE FUNCTION net.worker_restart()
- RETURNS boolean
- LANGUAGE c
-AS 'pg_net', $function$worker_restart$function$ CREATE OR REPLACE FUNCTION pgbouncer.get_auth(p_usename text)
- RETURNS TABLE(username text, password text)
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO ''
-AS $function$
-  BEGIN
-      RAISE DEBUG 'PgBouncer auth request: %', p_usename;
-
-      RETURN QUERY
-      SELECT
-          rolname::text,
-          CASE WHEN rolvaliduntil < now()
-              THEN null
-              ELSE rolpassword::text
-          END
-      FROM pg_authid
-      WHERE rolname=$1 and rolcanlogin;
-  END;
-  $function$ CREATE OR REPLACE FUNCTION public._dump_all()
- RETURNS text
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'pg_catalog', 'public'
-AS $function$
-  select coalesce(
-    jsonb_agg(
-      jsonb_build_object(
-        'schema', n.nspname,
-        'nome',   p.proname,
-        'tipo',   case p.prokind when 'p' then 'procedure' else 'function' end,
-        'args',   pg_get_function_identity_arguments(p.oid),
-        'def',    pg_get_functiondef(p.oid)
-      )
-      order by n.nspname, p.proname
-    )::text,
-    '[]'
-  )
-  from pg_proc p
-  join pg_namespace n on n.oid = p.pronamespace
-  where n.nspname not in ('pg_catalog','information_schema')
-    and p.prokind in ('f','p');
-$function$ CREATE OR REPLACE FUNCTION public._midia_apagar_objeto(p_url text)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'storage'
-AS $function$
-declare v_b text; v_o text;
-begin
-  if p_url is null or p_url = '' then return; end if;
-  if p_url ~ '/object/(public|sign|authenticated)/' then
-    v_b := substring(p_url from '/object/(?:public|sign|authenticated)/([^/]+)/');
-    v_o := substring(p_url from '/object/(?:public|sign|authenticated)/[^/]+/(.+?)(?:\?|$)');
-  else
-    v_b := 'midia-unica'; v_o := p_url;
-  end if;
-  if v_b is null or v_o is null then return; end if;
-  begin
-    delete from storage.objects o where o.bucket_id = v_b and o.name = v_o;
-  exception when others then null;
-  end;
-end $function$ CREATE OR REPLACE FUNCTION public.abrir_foto_unica(p_message text)
- RETURNS TABLE(url text, ja_aberta boolean)
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_uid uuid := auth.uid(); v_url text;
-begin
-  if v_uid is null then raise exception 'nao autenticado'; end if;
-
-  select u.url into v_url
-    from public.midia_unica u
-    join public.messages m on m.id::text = u.message_id
-   where u.message_id = p_message
-     and m.receiver_id = v_uid
-     and not m.apagada_para_todos
-     and m.content like '[FOTO1X]%'
-   for update of u;
-
-  if v_url is null then
-    return query select null::text, true;
-    return;
-  end if;
-
-  delete from public.midia_unica where message_id = p_message;
-
-  update public.messages
-     set media_path   = v_url,
-         consumida_em = now(),
-         viewed_at    = now()
-   where id::text = p_message;
-
-  return query select v_url, false;
-end $function$ CREATE OR REPLACE FUNCTION public.abrir_midia_unica(p_message text)
- RETURNS TABLE(url text, ja_aberta boolean)
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_uid uuid := auth.uid(); v_url text;
-begin
-  if v_uid is null then raise exception 'nao autenticado'; end if;
-
-  select u.url into v_url
-    from public.midia_unica u
-    join public.messages m on m.id::text = u.message_id
-   where u.message_id = p_message
-     and m.receiver_id = v_uid
-     and m.view_once = true
-     and m.viewed_at is null
-   for update of u;
-
-  if v_url is null then
-    return query select null::text, true;
-    return;
-  end if;
-
-  -- o registro some: segunda chamada nao tem de onde ler
-  delete from public.midia_unica where message_id = p_message;
-
-  update public.messages
-     set viewed_at    = now(),
-         consumida_em = now(),
-         media_path   = coalesce(media_path, v_url),
-         media_url    = null
-   where id::text = p_message;
-
-  return query select v_url, false;
-end $function$ CREATE OR REPLACE FUNCTION public.alternar_bloqueio(p_target_id text)
- RETURNS jsonb
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE
-  v_me text := (auth.uid())::text;
-  v_existe uuid;
-BEGIN
-  IF v_me IS NULL OR p_target_id IS NULL OR v_me = p_target_id THEN
-    RETURN jsonb_build_object('ok', false, 'erro', 'Operacao invalida.');
-  END IF;
-  SELECT id INTO v_existe FROM public.blocks WHERE blocker_id = v_me AND blocked_id = p_target_id LIMIT 1;
-  IF v_existe IS NOT NULL THEN
-    DELETE FROM public.blocks WHERE id = v_existe;
-    RETURN jsonb_build_object('ok', true, 'blocked', false);
-  ELSE
-    INSERT INTO public.blocks (blocker_id, blocked_id) VALUES (v_me, p_target_id) ON CONFLICT DO NOTHING;
-    DELETE FROM public.follows WHERE (follower_id = v_me AND following_id = p_target_id) OR (follower_id = p_target_id AND following_id = v_me);
-    RETURN jsonb_build_object('ok', true, 'blocked', true);
-  END IF;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.alternar_seguir(p_target_id text)
- RETURNS jsonb
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE
-  v_me text := (auth.uid())::text;
-  v_bloqueado boolean;
-  v_ja_segue boolean;
-  v_total integer;
-BEGIN
-  IF v_me IS NULL OR p_target_id IS NULL OR btrim(p_target_id) = '' OR v_me = p_target_id THEN
-    RETURN jsonb_build_object('ok', false, 'erro', 'Operacao invalida.');
-  END IF;
-  SELECT EXISTS (SELECT 1 FROM public.blocks WHERE (blocker_id = v_me AND blocked_id = p_target_id) OR (blocker_id = p_target_id AND blocked_id = v_me)) INTO v_bloqueado;
-  IF v_bloqueado THEN
-    RETURN jsonb_build_object('ok', false, 'erro', 'Perfil indisponivel.');
-  END IF;
-  SELECT EXISTS (SELECT 1 FROM public.follows WHERE follower_id = v_me AND following_id = p_target_id) INTO v_ja_segue;
-  IF v_ja_segue THEN
-    DELETE FROM public.follows WHERE follower_id = v_me AND following_id = p_target_id;
-    SELECT count(*)::integer INTO v_total FROM public.follows WHERE following_id = p_target_id;
-    RETURN jsonb_build_object('ok', true, 'following', false, 'count', v_total);
-  ELSE
-    INSERT INTO public.follows (follower_id, following_id) VALUES (v_me, p_target_id) ON CONFLICT DO NOTHING;
-    SELECT count(*)::integer INTO v_total FROM public.follows WHERE following_id = p_target_id;
-    RETURN jsonb_build_object('ok', true, 'following', true, 'count', v_total);
-  END IF;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.apagar_para_mim(p_message text)
- RETURNS boolean
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_uid uuid := auth.uid();
-begin
-  if v_uid is null then raise exception 'nao autenticado'; end if;
-  insert into public.mensagens_ocultas (user_id, message_id)
-  select v_uid, m.id::text from public.messages m
-   where m.id::text = p_message and (m.sender_id = v_uid or m.receiver_id = v_uid)
-  on conflict (user_id, message_id) do nothing;
-  return true;
-end $function$ CREATE OR REPLACE FUNCTION public.apagar_para_mim(p_msg uuid)
- RETURNS boolean
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu uuid := auth.uid();
-begin
-  if v_eu is null then
-    return false;
-  end if;
-
-  update public.messages
-     set apagada_para = array_append(apagada_para, v_eu)
-   where id = p_msg
-     and v_eu in (sender_id, receiver_id)
-     and not (v_eu = any(apagada_para));
-
-  return found;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.apagar_para_todos(p_message text)
- RETURNS boolean
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_uid uuid := auth.uid(); v_url text;
-begin
-  if v_uid is null then raise exception 'nao autenticado'; end if;
-
-  select coalesce(m.media_path, m.media_url,
-                  (select u.url from public.midia_unica u where u.message_id = m.id::text))
-    into v_url
-    from public.messages m
-   where m.id::text = p_message
-     and m.sender_id = v_uid
-     and not m.apagada_para_todos
-     and m.created_at > now() - interval '48 hours';
-
-  if not found then return false; end if;
-
-  perform public._midia_apagar_objeto(v_url);
-  delete from public.midia_unica where message_id = p_message;
-
-  update public.messages
-     set apagada_para_todos = true,
-         apagada_em         = now(),
-         apagada_por        = v_uid,
-         content            = '[FOTO-REMOVIDA]',
-         media_url          = null,
-         media_path         = null,
-         apagada_geral      = true,
-         media_meta         = null
-   where id::text = p_message and sender_id = v_uid;
-
-  return true;
-end $function$ CREATE OR REPLACE FUNCTION public.auto_confirm_new_users()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO ''
-AS $function$
-BEGIN
-  NEW.email_confirmed_at := now();
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.block_self_follow()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  IF NEW.follower_id = NEW.following_id THEN
-    RAISE EXCEPTION 'Nao pode seguir a si mesmo';
-  END IF;
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.buscar_mensagens(p_peer uuid, p_termo text)
- RETURNS SETOF messages
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  select
-    m.id,
-    m.sender_id,
-    m.receiver_id,
-    m.content,
-    m.created_at,
-    m.read_at,
-    m.status,
-    m.updated_at,
-    m.delivered_at,
-    m.edited_at,
-    m.apagada_geral,
-    '{}'::uuid[] as apagada_para,
-    m.reply_to_id,
-    m.tipo,
-    m.media_url,
-    m.media_meta,
-    m.fixada,
-    m.expires_at
-  from public.messages m
-  where p_termo is not null
-    and length(btrim(p_termo)) >= 2
-    and (
-      (m.sender_id = auth.uid() and m.receiver_id = p_peer)
-      or (m.receiver_id = auth.uid() and m.sender_id = p_peer)
-    )
-    and m.apagada_geral = false
-    and not (auth.uid() = any(m.apagada_para))
-    and to_tsvector('portuguese', coalesce(m.content, ''))
-        @@ plainto_tsquery('portuguese', p_termo)
-  order by m.created_at desc
-  limit 50;
-$function$ CREATE OR REPLACE FUNCTION public.check_user_premium(uid uuid)
- RETURNS boolean
- LANGUAGE sql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  SELECT EXISTS (
-    SELECT 1
-    FROM public.users u
-    WHERE u.user_id = uid::text
-      AND (
-        u.role IN ('owner','admin','moderator')
-        OR (u.premium_until IS NOT NULL AND u.premium_until > now())
-        OR (u.premium = true AND u.premium_until IS NULL)
-        OR EXISTS (
-          SELECT 1 FROM public.user_subscriptions s
-          WHERE s.user_id::text = u.user_id
-            AND s.status = 'active'
-            AND s.expires_at > now()
-        )
-      )
-  );
-$function$ CREATE OR REPLACE FUNCTION public.confirmar_midia_consumida(p_message text)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_uid uuid := auth.uid(); v_url text;
-begin
-  if v_uid is null then return; end if;
-  select m.media_path into v_url
-    from public.messages m
-   where m.id::text = p_message and m.receiver_id = v_uid and m.consumida_em is not null;
-  perform public._midia_apagar_objeto(v_url);
-end $function$ CREATE OR REPLACE FUNCTION public.contar_nao_lidas()
- RETURNS TABLE(peer_id uuid, qtd bigint)
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  select m.sender_id, count(*)::bigint
-    from public.messages m
-   where m.receiver_id = auth.uid()
-     and m.read_at is null
-     and m.apagada_geral = false
-     and not (auth.uid() = any(m.apagada_para))
-   group by m.sender_id;
-$function$ CREATE OR REPLACE FUNCTION public.contar_seguidores(p_user_id text)
- RETURNS integer
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  SELECT count(*)::integer FROM public.follows WHERE following_id = p_user_id;
-$function$ CREATE OR REPLACE FUNCTION public.curtir_post(p_post_id text, p_delta integer)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu   uuid := auth.uid();
-  v_post uuid;
-begin
-  if v_eu is null then
-    return;
-  end if;
-
-  if p_delta not in (1, -1) then
-    return;
-  end if;
-
-  if coalesce(p_post_id, '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
-    return;
-  end if;
-
-  v_post := p_post_id::uuid;
-
-  if not exists (select 1 from public.posts where id = v_post) then
-    return;
-  end if;
-
-  if p_delta = -1 then
-    delete from public.post_likes
-     where post_id = v_post
-       and user_id = v_eu::text;
-  else
-    insert into public.post_likes (post_id, user_id)
-    values (v_post, v_eu::text)
-    on conflict (post_id, user_id) do nothing;
-  end if;
-
-  perform public.recalcular_likes(v_post);
-end;
-$function$ CREATE OR REPLACE FUNCTION public.expirar_premium()
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_qtd integer := 0;
-begin
-  update public.users
-     set premium = false,
-         updated_at = now()
-   where premium is distinct from false
-     and premium_until is not null
-     and premium_until <= now()
-     and coalesce(is_banned, false) = false
-     and coalesce(is_deleted, false) = false;
-
-  get diagnostics v_qtd = row_count;
-  return v_qtd;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.faixa_distancia(p_km double precision)
- RETURNS TABLE(faixa text, ordem integer, anel_m integer)
- LANGUAGE sql
- IMMUTABLE
-AS $function$
-  select
-    case
-      when p_km is null then 'distancia indisponivel'
-      when p_km < 0.5  then 'ate 500 m'
-      when p_km < 1    then '500 m a 1 km'
-      when p_km < 2    then '1 a 2 km'
-      when p_km < 5    then '2 a 5 km'
-      when p_km < 10   then '5 a 10 km'
-      when p_km < 25   then '10 a 25 km'
-      when p_km < 50   then '25 a 50 km'
-      else 'mais de 50 km'
-    end,
-    case
-      when p_km is null then 99
-      when p_km < 0.5  then 1
-      when p_km < 1    then 2
-      when p_km < 2    then 3
-      when p_km < 5    then 4
-      when p_km < 10   then 5
-      when p_km < 25   then 6
-      when p_km < 50   then 7
-      else 8
-    end,
-    case
-      when p_km is null then null
-      when p_km < 0.5  then 500
-      when p_km < 1    then 1000
-      when p_km < 2    then 2000
-      when p_km < 5    then 5000
-      when p_km < 10   then 10000
-      when p_km < 25   then 25000
-      when p_km < 50   then 50000
-      else 50000
-    end;
-$function$ CREATE OR REPLACE FUNCTION public.garantir_perfil()
- RETURNS boolean
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu      uuid := auth.uid();
-  v_apelido text;
-  v_qtd     integer := 0;
-begin
-  if v_eu is null then
-    return false;
-  end if;
-
-  if exists (select 1 from public.users where user_id = v_eu::text) then
-    return false;
-  end if;
-
-  v_apelido := 'Membro ' || upper(right(replace(v_eu::text, '-', ''), 4));
-
-  insert into public.users (user_id, nickname, status, is_online, is_deleted, is_banned, updated_at)
-  select v_eu::text, v_apelido, 'active', false, false, false, now() at time zone 'UTC'
-  where not exists (select 1 from public.users where user_id = v_eu::text);
-
-  get diagnostics v_qtd = row_count;
-  return v_qtd > 0;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.get_user_role()
- RETURNS text
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  SELECT role
-  FROM public.user_roles
-  WHERE user_id = auth.uid()::text
-  LIMIT 1;
-$function$ CREATE OR REPLACE FUNCTION public.handle_new_user()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'auth'
-AS $function$
-BEGIN
-  INSERT INTO public.users (user_id, email, nickname)
-  VALUES (new.id::text, new.email, split_part(new.email, '@', 1))
-  ON CONFLICT (user_id) DO NOTHING;
-  RETURN new;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.increment_likes(post_id uuid)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-  if auth.uid() is null then
-    return;
-  end if;
-
-  perform public.recalcular_likes(post_id);
-end;
-$function$ CREATE OR REPLACE FUNCTION public.is_admin()
- RETURNS boolean
- LANGUAGE sql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  SELECT EXISTS (
-    SELECT 1 FROM public.users
-    WHERE user_id = auth.uid()::text
-      AND role IN ('owner', 'admin')
-  );
-$function$ CREATE OR REPLACE FUNCTION public.libido_delete_chat_file(p_path text)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-  if auth.uid() is null then
-    return;
-  end if;
-
-  delete from storage.objects
-  where bucket_id = 'photos'
-    and name = p_path
-    and name like '%/chat-%';
-end;
-$function$ CREATE OR REPLACE FUNCTION public.limpar_conversa(p_peer uuid, p_ocultar boolean DEFAULT false)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_uid uuid := auth.uid();
-begin
-  if v_uid is null then raise exception 'nao autenticado'; end if;
-  insert into public.conversas_ocultas (user_id, peer_id, limpar_ate, oculta_em, updated_at)
-  values (v_uid, p_peer, now(), case when p_ocultar then now() else null end, now())
-  on conflict (user_id, peer_id) do update
-    set limpar_ate = now(),
-        oculta_em  = case when p_ocultar then now() else null end,
-        updated_at = now();
-end $function$ CREATE OR REPLACE FUNCTION public.limpar_feed_24h()
- RETURNS void
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-  alvo record;
-  caminho text;
-BEGIN
-  FOR alvo IN SELECT id, image FROM public.posts WHERE created_at < now() - interval '24 hours' LOOP
-    caminho := regexp_replace(alvo.image, '^https://[^/]+/storage/v1/object/public/photos/', '');
-    IF caminho IS NOT NULL AND caminho <> alvo.image
-       AND NOT EXISTS (SELECT 1 FROM public.posts p2 WHERE p2.image = alvo.image AND p2.id <> alvo.id)
-       AND NOT EXISTS (SELECT 1 FROM public.users u
-                       WHERE u.photo_url = alvo.image
-                          OR u.photos::text LIKE '%' || alvo.image || '%')
-    THEN
-      BEGIN
-        DELETE FROM storage.objects WHERE bucket_id = 'photos' AND name = caminho;
-      EXCEPTION WHEN OTHERS THEN
-        NULL; -- Supabase bloqueia exclusao direta via SQL; o post expira
-              -- normalmente e o arquivo sai depois pela Storage API
-      END;
-    END IF;
-    DELETE FROM public.posts WHERE id = alvo.id;
-  END LOOP;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.limpar_mensagens_expiradas()
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_qtd integer := 0;
-begin
-  delete from public.messages
-   where expires_at is not null
-     and expires_at < now();
-
-  get diagnostics v_qtd = row_count;
-  return v_qtd;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.limpar_midias_consumidas(p_minutos integer DEFAULT 10)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare r record; n int := 0;
-begin
-  for r in select m.id::text as id, m.media_path from public.messages m
-            where m.view_once and m.consumida_em is not null and m.media_path is not null
-              and m.consumida_em < now() - (p_minutos || ' minutes')::interval
-  loop
-    perform public._midia_apagar_objeto(r.media_path);
-    update public.messages set media_path = null where id::text = r.id;
-    n := n + 1;
-  end loop;
-  return n;
-end $function$ CREATE OR REPLACE FUNCTION public.limpar_presenca_fantasma()
- RETURNS void
- LANGUAGE sql
-AS $function$
-  UPDATE public.users
-  SET is_online = false
-  WHERE is_online = true
-    AND (updated_at IS NULL OR updated_at < now() - interval '30 minutes');
-$function$ CREATE OR REPLACE FUNCTION public.listar_conversas()
- RETURNS TABLE(peer_id uuid, ultima_mensagem text, ultima_em timestamp with time zone, ultimo_de uuid, nao_lidas bigint, midia_pendente boolean)
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-with me as (select auth.uid() as uid),
-base as (
-  select m.*, case when m.sender_id = (select uid from me) then m.receiver_id else m.sender_id end as peer
-  from public.messages m
-  where (m.sender_id = (select uid from me) or m.receiver_id = (select uid from me))
-    and not exists (select 1 from public.mensagens_ocultas o
-                    where o.user_id = (select uid from me) and o.message_id = m.id::text)
-),
-filtrado as (
-  select b.* from base b
-  where b.created_at > coalesce((select c.limpar_ate from public.conversas_ocultas c
-      where c.user_id = (select uid from me) and c.peer_id = b.peer), '-infinity'::timestamptz)
-),
-ult as (
-  select distinct on (peer) peer, content, created_at, sender_id, apagada_para_todos, view_once, viewed_at
-  from filtrado order by peer, created_at desc
-)
-select u.peer,
-       case when u.apagada_para_todos then 'Mensagem apagada'
-            when u.view_once then 'Foto'
-            else coalesce(nullif(u.content,''), 'Mensagem') end,
-       u.created_at, u.sender_id,
-       (select count(*) from filtrado f
-         where f.peer = u.peer and f.receiver_id = (select uid from me)
-           and coalesce(f.status,'') <> 'read' and not f.apagada_para_todos),
-       exists (select 1 from filtrado f
-         where f.peer = u.peer and f.view_once
-           and f.receiver_id = (select uid from me) and f.viewed_at is null)
-from ult u
-where coalesce((select c.oculta_em from public.conversas_ocultas c
-    where c.user_id = (select uid from me) and c.peer_id = u.peer), '-infinity'::timestamptz) < u.created_at
-order by u.created_at desc;
-$function$ CREATE OR REPLACE FUNCTION public.listar_mensagens(p_peer uuid, p_limit integer DEFAULT 300)
- RETURNS TABLE(id text, sender_id uuid, receiver_id uuid, content text, created_at timestamp with time zone, status text, delivered_at timestamp with time zone, read_at timestamp with time zone, media_url text, media_type text, view_once boolean, viewed_at timestamp with time zone, apagada_para_todos boolean, apagada_em timestamp with time zone, midia_disponivel boolean)
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-with me as (select auth.uid() as uid),
-corte as (select coalesce((select c.limpar_ate from public.conversas_ocultas c
-    where c.user_id = (select uid from me) and c.peer_id = p_peer), '-infinity'::timestamptz) as t)
-select m.id::text, m.sender_id, m.receiver_id,
-       case when m.apagada_para_todos then '' else coalesce(m.content,'') end,
-       m.created_at, m.status, m.delivered_at, m.read_at,
-       -- view_once NUNCA expoe URL; foto comum continua normal
-       case when m.view_once then null else m.media_url end,
-       m.media_type, m.view_once, m.viewed_at, m.apagada_para_todos, m.apagada_em,
-       (case when m.view_once then
-               (m.viewed_at is null and m.receiver_id = me.uid
-                and exists (select 1 from public.midia_unica u where u.message_id = m.id::text))
-             else (m.media_url is not null and not m.apagada_para_todos)
-        end)
-from public.messages m, me, corte
-where (m.sender_id = me.uid or m.receiver_id = me.uid)
-  and (m.sender_id = p_peer or m.receiver_id = p_peer)
-  and m.created_at > corte.t
-  and not exists (select 1 from public.mensagens_ocultas o
-                  where o.user_id = me.uid and o.message_id = m.id::text)
-order by m.created_at desc
-limit greatest(1, least(p_limit, 1000));
-$function$ CREATE OR REPLACE FUNCTION public.marcar_conversa_lida(p_peer uuid)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu  uuid := auth.uid();
-  v_qtd integer := 0;
-begin
-  if v_eu is null or p_peer is null then
-    return 0;
-  end if;
-
-  update public.messages
-     set read_at      = now(),
-         delivered_at = coalesce(delivered_at, now())
-   where receiver_id = v_eu
-     and sender_id   = p_peer
-     and read_at is null;
-
-  get diagnostics v_qtd = row_count;
-  return v_qtd;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.marcar_presenca()
- RETURNS void
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  insert into public.user_presence (user_id, last_seen_at)
-  select auth.uid(), now()
-  where auth.uid() is not null
-  on conflict (user_id) do update
-     set last_seen_at = now();
-$function$ CREATE OR REPLACE FUNCTION public.mark_messages_delivered(p_sender_id uuid)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE affected integer;
-BEGIN
-  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'not authenticated'; END IF;
-  UPDATE public.messages
-     SET delivered_at = COALESCE(delivered_at, now()),
-         status = CASE WHEN read_at IS NOT NULL THEN 'read' ELSE 'delivered' END,
-         updated_at = now()
-   WHERE receiver_id = auth.uid()
-     AND sender_id = p_sender_id
-     AND delivered_at IS NULL;
-  GET DIAGNOSTICS affected = ROW_COUNT;
-  RETURN affected;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.mark_messages_read(p_sender_id uuid)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE affected integer;
-BEGIN
-  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'not authenticated'; END IF;
-  UPDATE public.messages
-     SET delivered_at = COALESCE(delivered_at, now()),
-         read_at = COALESCE(read_at, now()),
-         status = 'read',
-         updated_at = now()
-   WHERE receiver_id = auth.uid()
-     AND sender_id = p_sender_id
-     AND read_at IS NULL;
-  GET DIAGNOSTICS affected = ROW_COUNT;
-  RETURN affected;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.mensagens_foto_unica_guard()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare v_url text;
-begin
-  if new.content is null then return new; end if;
-
-  if new.content like '[FOTO1X]%' and length(new.content) > 8 then
-    v_url := substr(new.content, 9);
-    if v_url <> '' then
-      insert into public.midia_unica (message_id, url)
-      values (new.id::text, v_url)
-      on conflict (message_id) do update set url = excluded.url;
-      new.content := '[FOTO1X]';
-    end if;
-  end if;
-
-  return new;
-end $function$ CREATE OR REPLACE FUNCTION public.mensagens_midia_unica_guard()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-  if new.view_once and new.media_url is not null then
-    insert into public.midia_unica (message_id, url)
-    values (new.id::text, new.media_url)
-    on conflict (message_id) do update set url = excluded.url;
-  end if;
-  -- a URL nunca fica exposta em messages quando view_once = true
-  if new.view_once then
-    new.media_url := null;
-  end if;
-  return new;
-end $function$ CREATE OR REPLACE FUNCTION public.notificar_push_nova_mensagem()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public', 'net'
-AS $function$
-declare
-  v_segredo text;
-begin
-  if tg_op <> 'INSERT' then
-    return new;
-  end if;
-
-  if new.receiver_id is null then
-    return new;
-  end if;
-
-  select valor into v_segredo
-    from public.app_private_config
-   where chave = 'push_webhook_secret';
-
-  if v_segredo is null or v_segredo = 'TROCAR' or length(v_segredo) < 20 then
-    return new;
-  end if;
-
-  perform net.http_post(
-    url := 'https://www.libidoapp.com.br/api/send-push',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'x-webhook-secret', v_segredo
-    ),
-    body := jsonb_build_object(
-      'receiver_id', new.receiver_id,
-      'sender_id', new.sender_id
-    )
-  );
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.perfis_proximos(p_raio_km numeric DEFAULT 50)
- RETURNS TABLE(user_id text, nickname text, age text, photo_url text, photos jsonb, status text, couple_profile jsonb, is_online boolean, distancia_m double precision)
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  with eu as (
-    select uy.lat as minha_lat, uy.lon as minha_lon
-    from public.users uy
-    where uy.user_id = auth.uid()::text
-  ),
-  dist as (
-    select u.user_id,
-           u.nickname,
-           u.age,
-           u.photo_url,
-           u.photos,
-           u.status,
-           u.couple_profile,
-           u.is_online,
-           6371000 * 2 * asin(
-             least(1.0::double precision, sqrt(
-               power(sin(radians((u.lat - eu.minha_lat)::double precision) / 2), 2) +
-               cos(radians(eu.minha_lat::double precision)) *
-               cos(radians(u.lat::double precision)) *
-               power(sin(radians((u.lon - eu.minha_lon)::double precision) / 2), 2)
-             ))
-           ) as distancia_m
-    from public.users u
-    cross join eu
-    where auth.uid() is not null
-      and u.user_id <> auth.uid()::text
-      and coalesce(u.is_deleted, false) = false
-      and coalesce(u.is_banned, false) = false
-      and u.lat is not null
-      and u.lon is not null
-      and eu.minha_lat is not null
-      and eu.minha_lon is not null
-  )
-  select d.user_id, d.nickname, d.age, d.photo_url, d.photos,
-         d.status, d.couple_profile, d.is_online, d.distancia_m
-  from dist d
-  where d.distancia_m <= coalesce(p_raio_km, 50) * 1000
-  order by d.distancia_m
-  limit 100;
-$function$ CREATE OR REPLACE FUNCTION public.post_likes_sync()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-  if tg_op = 'DELETE' then
-    perform public.recalcular_likes(old.post_id);
-    return old;
-  end if;
-
-  if tg_op = 'UPDATE' and old.post_id is distinct from new.post_id then
-    perform public.recalcular_likes(old.post_id);
-  end if;
-
-  perform public.recalcular_likes(new.post_id);
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.process_payment(p_user_id uuid, p_payment_id text, p_provider text, p_status text, p_amount numeric)
- RETURNS boolean
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_tx_id    uuid;
-  v_plan_id  uuid;
-  v_duration int;
-  v_expires  timestamptz;
-  v_base     timestamptz;
-  v_novo     timestamptz;
-  v_centavos numeric := round(coalesce(p_amount, 0) * 100);
-begin
-  if p_status is null
-     or upper(btrim(p_status)) not in ('PAID','APPROVED','CONFIRMED','RECEIVED','COMPLETED') then
-    return false;
-  end if;
-
-  if p_user_id is null
-     or coalesce(btrim(p_payment_id), '') = ''
-     or coalesce(btrim(p_provider), '') = ''
-     or v_centavos <= 0 then
-    return false;
-  end if;
-
-  select id, plan_id
-    into v_tx_id, v_plan_id
-  from public.payment_transactions
-  where payment_id = btrim(p_payment_id)
-    and provider = btrim(p_provider)
-    and user_id = p_user_id::text
-    and round(amount * 100) = v_centavos
-  limit 1;
-
-  if v_tx_id is null then
-    return false;
-  end if;
-
-  if exists (
-    select 1 from public.payment_transactions
-    where id = v_tx_id
-      and upper(coalesce(status, '')) in ('PAID','APPROVED','CONFIRMED','RECEIVED','COMPLETED')
-  ) then
-    return false;
-  end if;
-
-  if not exists (select 1 from public.users where user_id = p_user_id::text) then
-    return false;
-  end if;
-
-  if v_plan_id is not null then
-    select duration_days into v_duration
-      from public.subscription_plans
-     where id = v_plan_id;
-  end if;
-
-  if v_duration is null or v_duration < 1 then
-    select sp.id, sp.duration_days
-      into v_plan_id, v_duration
-      from public.subscription_plans sp
-     where round(sp.price * 100) = v_centavos
-     order by sp.duration_days asc
-     limit 1;
-  end if;
-
-  if v_plan_id is null or v_duration is null or v_duration < 1 then
-    return false;
-  end if;
-
-  select expires_at
-    into v_expires
-  from public.user_subscriptions
-  where user_id = p_user_id
-  order by expires_at desc nulls last
-  limit 1;
-
-  v_base := now();
-  if v_expires is not null and v_expires > now() then
-    v_base := v_expires;
-  end if;
-
-  v_novo := v_base + make_interval(days => v_duration);
-
-  update public.payment_transactions
-     set status = 'PAID',
-         updated_at = now()
-   where id = v_tx_id
-     and upper(coalesce(status, '')) not in ('PAID','APPROVED','CONFIRMED','RECEIVED','COMPLETED');
-
-  if not found then
-    return false;
-  end if;
-
-  if v_expires is not null and v_expires > now() then
-    update public.user_subscriptions
-       set plan_id = v_plan_id,
-           status = 'active',
-           expires_at = v_novo,
-           updated_at = now()
-     where user_id = p_user_id
-       and expires_at = v_expires;
-
-    if not found then
-      insert into public.user_subscriptions (user_id, plan_id, status, started_at, expires_at)
-      values (p_user_id, v_plan_id, 'active', now(), v_novo);
-    end if;
-  else
-    insert into public.user_subscriptions (user_id, plan_id, status, started_at, expires_at)
-    values (p_user_id, v_plan_id, 'active', now(), v_novo);
-  end if;
-
-  perform set_config('app.concedendo_premium', 'on', true);
-
-  update public.users
-     set premium = true,
-         plan = 'premium',
-         premium_until = v_novo,
-         premium_ate = v_novo,
-         updated_at = now()
-   where user_id = p_user_id::text;
-
-  perform set_config('app.concedendo_premium', '', true);
-
-  return true;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.protect_admin_fields()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  actor_role text;
-begin
-  if coalesce(current_setting('app.concedendo_premium', true), '') = 'on' then
-    return new;
-  end if;
-
-  if auth.uid() is null then
-    return new;
-  end if;
-
-  select role into actor_role
-    from public.users
-   where user_id = auth.uid()::text;
-
-  if old.role = 'owner' and actor_role <> 'owner' then
-    raise exception 'owner account is protected';
-  end if;
-
-  if auth.uid()::text = new.user_id and actor_role not in ('owner', 'admin') then
-    new.plan := old.plan;
-    new.premium := old.premium;
-    new.role := old.role;
-    new.is_banned := old.is_banned;
-    new.is_deleted := old.is_deleted;
-  elsif actor_role = 'admin' then
-    new.role := old.role;
-    new.plan := old.plan;
-    new.premium := old.premium;
-  end if;
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.protect_premium_downgrade()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-  eterno boolean;
-  futuro boolean;
-BEGIN
-  eterno := (coalesce(OLD.premium, false) = true AND OLD.premium_until IS NULL);
-  futuro := (OLD.premium_until IS NOT NULL AND OLD.premium_until > now());
-
-  IF eterno THEN
-    -- Eterno e o estado mais alto: nenhuma escrita grava data por cima
-    IF NEW.premium_until IS NOT NULL THEN
-      NEW.premium_until := NULL;
-    END IF;
-    IF NEW.premium IS DISTINCT FROM true THEN
-      NEW.premium := true;
-    END IF;
-  ELSIF futuro THEN
-    -- Premium com data futura: mantem sempre o prazo mais longo
-    IF NEW.premium_until IS NOT NULL AND NEW.premium_until < OLD.premium_until THEN
-      NEW.premium_until := OLD.premium_until;
-    END IF;
-    IF NEW.premium IS DISTINCT FROM true THEN
-      NEW.premium := true;
-    END IF;
-  END IF;
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.protege_apagada_para_todos()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-BEGIN
-  IF NEW.apagada_para_todos IS DISTINCT FROM OLD.apagada_para_todos
-     AND auth.uid() IS DISTINCT FROM OLD.sender_id THEN
-    RAISE EXCEPTION 'Apenas o remetente pode apagar para todos';
-  END IF;
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.proteger_campos_perfil()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_old   jsonb := to_jsonb(old);
-  v_new   jsonb := to_jsonb(new);
-  v_chave text;
-  v_lista text[] := array[
-    'id',
-    'user_id',
-    'is_admin',
-    'role',
-    'status',
-    'is_banned',
-    'is_deleted',
-    'is_premium',
-    'subscription_status',
-    'subscription_current_period_end',
-    'stripe_customer_id',
-    'created_at'
-  ];
-begin
-  if auth.uid() is null then
-    return new;
-  end if;
-
-  if coalesce(public.is_admin(), false) then
-    return new;
-  end if;
-
-  foreach v_chave in array v_lista loop
-    if (v_new ? v_chave) or (v_old ? v_chave) then
-      if (v_new -> v_chave) is distinct from (v_old -> v_chave) then
-        raise exception 'campo protegido: %', v_chave;
-      end if;
-    end if;
-  end loop;
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.proteger_campos_post()
- RETURNS trigger
- LANGUAGE plpgsql
- SET search_path TO 'public'
-AS $function$
-declare
-  v_recalc text := coalesce(current_setting('app.recalculando_likes', true), '');
-begin
-  if auth.uid() is null then
-    return new;
-  end if;
-
-  if coalesce(public.is_admin(), false) then
-    return new;
-  end if;
-
-  if v_recalc = 'on' then
-    if tg_op = 'UPDATE'
-       and (new.id is distinct from old.id
-            or new.user_id is distinct from old.user_id
-            or new.created_at is distinct from old.created_at
-            or new.image is distinct from old.image
-            or new.text is distinct from old.text) then
-      raise exception 'recalculo nao altera outros campos';
-    end if;
-    return new;
-  end if;
-
-  if tg_op = 'INSERT' then
-    new.likes := 0;
-    return new;
-  end if;
-
-  if new.likes is distinct from old.likes then
-    raise exception 'contador de curtidas e somente leitura';
-  end if;
-
-  if new.id is distinct from old.id
-     or new.user_id is distinct from old.user_id
-     or new.created_at is distinct from old.created_at then
-    raise exception 'campos imutaveis do post';
-  end if;
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.proteger_campos_usuario()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_old   jsonb := to_jsonb(old);
-  v_new   jsonb := to_jsonb(new);
-  v_chave text;
-  v_lista text[] := array[
-    'user_id',
-    'role',
-    'status',
-    'is_banned',
-    'is_deleted',
-    'is_admin',
-    'is_premium',
-    'subscription_status',
-    'subscription_current_period_end',
-    'stripe_customer_id',
-    'premium_expires_at',
-    'premium_since',
-    'created_at'
-  ];
-begin
-  if auth.uid() is null then
-    return new;
-  end if;
-
-  if coalesce(public.is_admin(), false) then
-    return new;
-  end if;
-
-  foreach v_chave in array v_lista loop
-    if (v_new ? v_chave) or (v_old ? v_chave) then
-      if (v_new -> v_chave) is distinct from (v_old -> v_chave) then
-        raise exception 'campo protegido: %', v_chave;
-      end if;
-    end if;
-  end loop;
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.proteger_colunas_privilegiadas_users()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-BEGIN
-  IF current_setting('request.jwt.claim.role', true) = 'authenticated' AND TG_OP = 'UPDATE' THEN
-    NEW.premium := OLD.premium;
-    NEW.plan := OLD.plan;
-    NEW.premium_until := OLD.premium_until;
-    NEW.is_banned := OLD.is_banned;
-  END IF;
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.proteger_update_mensagem()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu        uuid := auth.uid();
-  v_remetente boolean;
-  v_destino   boolean;
-  v_com_midia boolean;
-begin
-  if v_eu is not null then
-
-    v_remetente := (old.sender_id is not null and v_eu = old.sender_id);
-    v_destino   := (old.receiver_id is not null and v_eu = old.receiver_id);
-    v_com_midia := (old.media_url is not null);
-
-    if not v_remetente and not v_destino then
-      raise exception 'sem permissao nesta mensagem';
-    end if;
-
-    if new.id is distinct from old.id
-       or new.sender_id is distinct from old.sender_id
-       or new.receiver_id is distinct from old.receiver_id
-       or new.created_at is distinct from old.created_at then
-      raise exception 'campos imutaveis nao podem ser alterados';
-    end if;
-
-    if new.tipo is distinct from old.tipo
-       or new.media_url is distinct from old.media_url
-       or new.edited_at is distinct from old.edited_at
-       or new.apagada_geral is distinct from old.apagada_geral
-       or new.reply_to_id is distinct from old.reply_to_id
-       or new.expires_at is distinct from old.expires_at then
-      if not v_remetente then
-        raise exception 'apenas o remetente altera estes campos';
-      end if;
-    end if;
-
-    if new.content is distinct from old.content
-       or new.media_meta is distinct from old.media_meta then
-      if not v_remetente and not (v_destino and v_com_midia) then
-        raise exception 'apenas o remetente altera o conteudo';
-      end if;
-    end if;
-
-    if new.read_at is distinct from old.read_at
-       or new.delivered_at is distinct from old.delivered_at then
-      if not v_destino then
-        raise exception 'apenas o destinatario marca entrega e leitura';
-      end if;
-    end if;
-
-    if new.apagada_para is distinct from old.apagada_para then
-      if v_eu = any(coalesce(old.apagada_para, '{}'::uuid[])) then
-        raise exception 'ja apagada para este usuario';
-      end if;
-      if new.apagada_para is distinct from (coalesce(old.apagada_para, '{}'::uuid[]) || v_eu) then
-        raise exception 'apagada_para so pode acrescentar o proprio usuario';
-      end if;
-    end if;
-
-  end if;
-
-  if new.read_at is not null then
-    new.status := 'read';
-  elsif new.delivered_at is not null then
-    new.status := 'delivered';
-  else
-    new.status := coalesce(old.status, 'sent');
-  end if;
-
-  new.updated_at := now();
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.radar_mapa(p_raio_km double precision DEFAULT 50, p_celula double precision DEFAULT 0.005)
- RETURNS TABLE(peer_id text, nickname text, photo_url text, online boolean, faixa text, ordem integer, anel_m integer, angulo double precision, lat_pin double precision, lon_pin double precision)
- LANGUAGE sql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-  select
-    b.user_id,
-    b.nickname,
-    b.foto,
-    b.online,
-    f.faixa,
-    f.ordem,
-    case when b.online then f.anel_m else b.anel_off end as anel_m,
-    b.angulo,
-    case when b.online then b.lat_pin end as lat_pin,
-    case when b.online then b.lon_pin end as lon_pin
-  from (
-    select
-      u.user_id,
-      u.nickname,
-      coalesce(u.photo_url, u.photos->>0) as foto,
-      coalesce(u.is_online, false) as online,
-      (6371 * acos(least(1, greatest(-1,
-        sin(radians(eu.lat)) * sin(radians(u.lat)) +
-        cos(radians(eu.lat)) * cos(radians(u.lat)) * cos(radians(u.lon - eu.lon))
-      )))) as km,
-      case when ((('x' || substr(md5(u.user_id || 'anel'), 1, 8))::bit(32)::int & 1) = 0)
-           then 1000 else 2000 end as anel_off,
-      (((('x' || substr(md5(u.user_id || 'ang'), 1, 8))::bit(32)::int & 65535) / 65535.0) * 360) as angulo,
-      (round(u.lat / p_celula) * p_celula
-        + (((('x' || substr(md5(u.user_id || 'x'), 1, 8))::bit(32)::int & 255) / 255.0) - 0.5) * p_celula) as lat_pin,
-      (round(u.lon / p_celula) * p_celula
-        + (((('x' || substr(md5(u.user_id || 'y'), 1, 8))::bit(32)::int & 255) / 255.0) - 0.5) * p_celula) as lon_pin
-    from public.users u
-    cross join (
-      select lat, lon from public.users where user_id = auth.uid()::text
-    ) eu
-    where u.user_id <> auth.uid()::text
-      and eu.lat is not null and eu.lon is not null
-      and u.lat is not null and u.lon is not null
-      and not coalesce(u.is_deleted, false)
-      and not coalesce(u.is_banned, false)
-  ) b
-  cross join lateral public.faixa_distancia(b.km) f
-  where b.km <= p_raio_km
-    and b.foto is not null
-  order by f.ordem asc, b.nickname asc
-  limit 200;
-$function$ CREATE OR REPLACE FUNCTION public.recalcular_likes(p_post_id uuid)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-  if p_post_id is null then
-    return;
-  end if;
-
-  perform set_config('app.recalculando_likes', 'on', true);
-
-  update public.posts p
-     set likes = (
-       select count(*)::int from public.post_likes pl where pl.post_id = p.id
-     )
-   where p.id = p_post_id;
-
-  perform set_config('app.recalculando_likes', '', true);
-end;
-$function$ CREATE OR REPLACE FUNCTION public.reconciliar_premium()
- RETURNS TABLE(rebaixados integer, reativados integer)
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_reb integer := 0;
-  v_rea integer := 0;
-begin
-  update public.users
-     set premium = false,
-         updated_at = now()
-   where premium is true
-     and premium_until is not null
-     and premium_until <= now();
-
-  get diagnostics v_reb = row_count;
-
-  update public.users u
-     set premium = true,
-         plan = 'premium',
-         premium_until = coalesce(u.premium_until, sub.exp),
-         premium_ate = coalesce(u.premium_until, sub.exp),
-         updated_at = now()
-  from (
-    select s.user_id::text as uid,
-           max(s.expires_at) as exp
-    from public.user_subscriptions s
-    where coalesce(s.status, 'active') = 'active'
-      and s.expires_at > now()
-    group by s.user_id::text
-  ) sub
-  where u.user_id = sub.uid
-    and coalesce(u.premium, false) = false;
-
-  get diagnostics v_rea = row_count;
-
-  return query select v_reb, v_rea;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.registrar_indicacao(p_slug text)
- RETURNS boolean
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE
-  v_uid text := (auth.uid())::text;
-  v_slug text := lower(btrim(COALESCE(p_slug, '')));
-BEGIN
-  IF v_uid IS NULL OR v_slug = '' OR length(v_slug) > 40 THEN RETURN false; END IF;
-  INSERT INTO public.affiliate_referrals (affiliate_slug, referred_user_id, created_at, commission_expires_at)
-  VALUES (v_slug, v_uid, now(), now() + interval '12 months') ON CONFLICT (referred_user_id) DO NOTHING;
-  RETURN true;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.registrar_premium()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-begin
-  if tg_op = 'UPDATE'
-     and new.premium is not distinct from old.premium
-     and new.premium_until is not distinct from old.premium_until then
-    return new;
-  end if;
-
-  begin
-    insert into public.premium_auditoria
-      (user_id, premium_de, premium_para, ate_de, ate_para, motivo, ator)
-    values (
-      new.user_id,
-      case when tg_op = 'UPDATE' then old.premium end,
-      new.premium,
-      case when tg_op = 'UPDATE' then old.premium_until end,
-      new.premium_until,
-      nullif(current_setting('app.motivo', true), ''),
-      coalesce(auth.uid()::text, current_user)
-    );
-  exception
-    when others then
-      null;
-  end;
-
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.salvar_onboarding(p_apelido text, p_bio text DEFAULT NULL::text, p_foto text DEFAULT NULL::text, p_tipo_perfil text DEFAULT 'solteiro'::text, p_casal jsonb DEFAULT NULL::jsonb, p_idade text DEFAULT NULL::text, p_genero text DEFAULT NULL::text)
- RETURNS jsonb
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu      uuid := auth.uid();
-  v_apelido text := btrim(coalesce(p_apelido, ''));
-  v_foto    text := btrim(coalesce(p_foto, ''));
-  v_linhas  integer := 0;
-begin
-  if v_eu is null then
-    return jsonb_build_object('ok', false, 'motivo', 'sem_sessao');
-  end if;
-
-  if length(v_apelido) < 3 then
-    return jsonb_build_object('ok', false, 'motivo', 'apelido_curto');
-  end if;
-
-  if length(v_apelido) > 30 then
-    return jsonb_build_object('ok', false, 'motivo', 'apelido_longo');
-  end if;
-
-  if v_foto = '' then
-    return jsonb_build_object('ok', false, 'motivo', 'foto_obrigatoria');
-  end if;
-
-  if v_apelido ~* '^membro [0-9a-f]{4}$' then
-    return jsonb_build_object('ok', false, 'motivo', 'apelido_provisorio');
-  end if;
-
-  insert into public.users as u (
-    user_id, nickname, bio, photo_url, couple_profile,
-    age, gender, status, is_online, is_deleted, is_banned, updated_at
-  )
-  values (
-    v_eu::text,
-    v_apelido,
-    nullif(btrim(coalesce(p_bio, '')), ''),
-    v_foto,
-    case when lower(coalesce(p_tipo_perfil, '')) = 'casal' then p_casal else null end,
-    nullif(btrim(coalesce(p_idade, '')), ''),
-    nullif(btrim(coalesce(p_genero, '')), ''),
-    'active',
-    true,
-    false,
-    false,
-    now()
-  )
-  on conflict (user_id) do update set
-    nickname       = excluded.nickname,
-    bio            = excluded.bio,
-    photo_url      = excluded.photo_url,
-    couple_profile = excluded.couple_profile,
-    age            = coalesce(excluded.age, u.age),
-    gender         = coalesce(excluded.gender, u.gender),
-    status         = 'active',
-    is_online      = true,
-    is_deleted     = false,
-    updated_at     = now();
-
-  get diagnostics v_linhas = row_count;
-
-  if v_linhas = 0 then
-    return jsonb_build_object('ok', false, 'motivo', 'nada_gravado');
-  end if;
-
-  return jsonb_build_object('ok', true, 'user_id', v_eu::text);
-
-exception
-  when others then
-    return jsonb_build_object(
-      'ok', false,
-      'motivo', 'erro_banco',
-      'detalhe', sqlerrm,
-      'sqlstate', sqlstate
-    );
-end;
-$function$ CREATE OR REPLACE FUNCTION public.salvar_perfil(p_payload jsonb)
- RETURNS jsonb
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_eu     text := auth.uid()::text;
-  v_limpo  jsonb := '{}'::jsonb;
-  v_antes  jsonb;
-  v_depois jsonb;
-  v_lista  text;
-  v_div    text;
-begin
-  if v_eu is null then
-    return jsonb_build_object('ok', false, 'motivo', 'sem_sessao');
-  end if;
-
-  if p_payload is null or jsonb_typeof(p_payload) <> 'object' then
-    return jsonb_build_object('ok', false, 'motivo', 'payload_invalido');
-  end if;
-
-  select coalesce(jsonb_object_agg(e.key, e.value), '{}'::jsonb)
-    into v_limpo
-  from jsonb_each(p_payload) e
-  join information_schema.columns c
-    on c.table_schema = 'public'
-   and c.table_name   = 'users'
-   and c.column_name  = e.key
-   and c.is_generated = 'NEVER'
-  where e.key not in (
-    'user_id','created_at','updated_at','role','plan','status',
-    'premium','premium_until','premium_ate','is_banned','is_deleted'
-  );
-
-  insert into public.users (user_id, status)
-  values (v_eu, 'active')
-  on conflict (user_id) do nothing;
-
-  select to_jsonb(u) into v_antes from public.users u where u.user_id = v_eu;
-
-  v_limpo := v_limpo || jsonb_build_object('updated_at', to_jsonb(now()));
-
-  select string_agg(format('%I = r.%I', k, k), ', ')
-    into v_lista
-  from jsonb_object_keys(v_limpo) k;
-
-  if v_lista is null then
-    return jsonb_build_object('ok', false, 'motivo', 'payload_vazio');
-  end if;
-
-  execute format(
-    'update public.users u set %s from jsonb_populate_record(null::public.users, %L::jsonb) r where u.user_id = $1',
-    v_lista, (v_antes || v_limpo)::text
-  ) using v_eu;
-
-  select to_jsonb(u) into v_depois from public.users u where u.user_id = v_eu;
-
-  if v_depois is null then
-    return jsonb_build_object('ok', false, 'motivo', 'nao_encontrado');
-  end if;
-
-  select string_agg(k, ', ')
-    into v_div
-  from jsonb_object_keys(v_limpo - 'updated_at') k
-  where v_depois->k is distinct from v_limpo->k;
-
-  if v_div is not null then
-    return jsonb_build_object('ok', false, 'motivo', 'bloqueado', 'campos', v_div);
-  end if;
-
-  return jsonb_build_object('ok', true);
-
-exception
-  when others then
-    return jsonb_build_object(
-      'ok', false, 'motivo', 'erro_banco',
-      'detalhe', sqlerrm, 'sqlstate', sqlstate
-    );
-end;
-$function$ CREATE OR REPLACE FUNCTION public.salvar_ultima_localizacao()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-begin
-  if new.lat is not null and new.lon is not null then
-    new.last_lat := new.lat;
-    new.last_lng := new.lon;
-    new.last_location_at := now();
-  end if;
-  return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.sync_premium_flag()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  IF NEW.plan = 'premium'
-     AND (NEW.premium_until IS NULL OR NEW.premium_until > now())
-     AND NEW.is_banned IS NOT TRUE
-     AND NEW.is_deleted IS NOT TRUE
-     AND NEW.premium IS DISTINCT FROM true THEN
-    NEW.premium := true;
-  END IF;
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION public.usar_promo(p_codigo text)
- RETURNS integer
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_dias integer;
-  v_uid  text := auth.uid()::text;
-  v_cod  text := upper(btrim(coalesce(p_codigo, '')));
-  v_ins  integer := 0;
-begin
-  if v_uid is null then
-    return -1;
-  end if;
-
-  if v_cod = '' then
-    return -3;
-  end if;
-
-  select dias_gratis into v_dias
-    from public.promo_links
-   where codigo = v_cod
-     and ativo = true
-     and (validade is null or validade > now())
-     and usos_feitos < limite_usos
-   for update;
-
-  if v_dias is null then
-    return -3;
-  end if;
-
-  insert into public.promo_usos (codigo, user_id)
-  values (v_cod, v_uid)
-  on conflict (user_id) do nothing;
-
-  get diagnostics v_ins = row_count;
-
-  if v_ins = 0 then
-    return -2;
-  end if;
-
-  update public.promo_links
-     set usos_feitos = usos_feitos + 1
-   where codigo = v_cod;
-
-  update public.users
-     set premium = true,
-         plan = 'premium',
-         premium_until = now() + make_interval(days => v_dias),
-         premium_ate = now() + make_interval(days => v_dias)
-   where user_id = v_uid;
-
-  return v_dias;
-end;
-$function$ CREATE OR REPLACE FUNCTION public.validar_convite(p_codigo text)
- RETURNS TABLE(valido boolean, duration_hours integer)
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-declare
-  v_cod text := upper(btrim(coalesce(p_codigo, '')));
-  v_h   integer;
-  v_ok  boolean := false;
-begin
-  if v_cod = '' or auth.uid() is null then
-    return query select false, null::integer;
-    return;
-  end if;
-
-  select c.duration_hours
-    into v_h
-    from public.premium_invite_codes c
-   where c.code = v_cod
-     and coalesce(c.active, true) = true
-     and coalesce(c.used_count, 0) < coalesce(c.max_uses, 1)
-   limit 1;
-
-  v_ok := found;
-
-  return query select v_ok, v_h;
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.apply_rls(wal jsonb, max_record_bytes integer DEFAULT (1024 * 1024))
- RETURNS SETOF realtime.wal_rls
- LANGUAGE plpgsql
-AS $function$
-declare
-    -- Regclass of the table e.g. public.notes
-    entity_ regclass = (quote_ident(wal ->> 'schema') || '.' || quote_ident(wal ->> 'table'))::regclass;
-
-    -- I, U, D, T: insert, update ...
-    action realtime.action = (
-        case wal ->> 'action'
-            when 'I' then 'INSERT'
-            when 'U' then 'UPDATE'
-            when 'D' then 'DELETE'
-            else 'ERROR'
-        end
-    );
-
-    -- Is row level security enabled for the table
-    is_rls_enabled bool = relrowsecurity from pg_class where oid = entity_;
-
-    subscriptions realtime.subscription[] = array_agg(subs)
-        from
-            realtime.subscription subs
-        where
-            subs.entity = entity_
-            -- Filter by action early - only get subscriptions interested in this action
-            -- action_filter column can be: '*' (all), 'INSERT', 'UPDATE', or 'DELETE'
-            and (subs.action_filter = '*' or subs.action_filter = action::text);
-
-    -- Subscription vars
-    working_role regrole;
-    working_selected_columns text[];
-    claimed_role regrole;
-    claims jsonb;
-
-    subscription_id uuid;
-    subscription_has_access bool;
-    visible_to_subscription_ids uuid[] = '{}';
-
-    -- structured info for wal's columns
-    columns realtime.wal_column[];
-    -- previous identity values for update/delete
-    old_columns realtime.wal_column[];
-
-    error_record_exceeds_max_size boolean = octet_length(wal::text) > max_record_bytes;
-
-    -- Primary jsonb output for record
-    output jsonb;
-
-    -- Loop record for iterating unique roles (outer loop)
-    role_record record;
-    -- Loop record for iterating unique selected_columns within a role (inner loop)
-    cols_record record;
-    -- Subscription ids visible at the role level (before fanning out by selected_columns)
-    visible_role_sub_ids uuid[] = '{}';
-
-begin
-    perform set_config('role', null, true);
-
-    columns =
-        array_agg(
-            (
-                x->>'name',
-                x->>'type',
-                x->>'typeoid',
-                realtime.cast(
-                    (x->'value') #>> '{}',
-                    coalesce(
-                        (x->>'typeoid')::regtype, -- null when wal2json version <= 2.4
-                        (x->>'type')::regtype
-                    )
-                ),
-                (pks ->> 'name') is not null,
-                true
-            )::realtime.wal_column
-        )
-        from
-            jsonb_array_elements(wal -> 'columns') x
-            left join jsonb_array_elements(wal -> 'pk') pks
-                on (x ->> 'name') = (pks ->> 'name');
-
-    old_columns =
-        array_agg(
-            (
-                x->>'name',
-                x->>'type',
-                x->>'typeoid',
-                realtime.cast(
-                    (x->'value') #>> '{}',
-                    coalesce(
-                        (x->>'typeoid')::regtype, -- null when wal2json version <= 2.4
-                        (x->>'type')::regtype
-                    )
-                ),
-                (pks ->> 'name') is not null,
-                true
-            )::realtime.wal_column
-        )
-        from
-            jsonb_array_elements(wal -> 'identity') x
-            left join jsonb_array_elements(wal -> 'pk') pks
-                on (x ->> 'name') = (pks ->> 'name');
-
-    for role_record in
-        select claims_role
-        from (select distinct claims_role from unnest(subscriptions)) t
-        order by claims_role::text
-    loop
-        working_role := role_record.claims_role;
-
-        -- Update `is_selectable` for columns and old_columns (once per role)
-        columns =
-            array_agg(
-                (
-                    c.name,
-                    c.type_name,
-                    c.type_oid,
-                    c.value,
-                    c.is_pkey,
-                    pg_catalog.has_column_privilege(working_role, entity_, c.name, 'SELECT')
-                )::realtime.wal_column
-            )
-            from
-                unnest(columns) c;
-
-        old_columns =
-                array_agg(
-                    (
-                        c.name,
-                        c.type_name,
-                        c.type_oid,
-                        c.value,
-                        c.is_pkey,
-                        pg_catalog.has_column_privilege(working_role, entity_, c.name, 'SELECT')
-                    )::realtime.wal_column
-                )
-                from
-                    unnest(old_columns) c;
-
-        if action <> 'DELETE' and count(1) = 0 from unnest(columns) c where c.is_pkey then
-            -- Fan out 400 error per distinct selected_columns for this role
-            for cols_record in
-                select selected_columns
-                from (select distinct selected_columns from unnest(subscriptions) s where s.claims_role = working_role) t
-                order by coalesce(array_to_string(selected_columns, ','), '')
-            loop
-                working_selected_columns := cols_record.selected_columns;
-                return next (
-                    jsonb_build_object(
-                        'schema', wal ->> 'schema',
-                        'table', wal ->> 'table',
-                        'type', action
-                    ),
-                    is_rls_enabled,
-                    (select array_agg(s.subscription_id) from unnest(subscriptions) as s where s.claims_role = working_role and (s.selected_columns is not distinct from working_selected_columns)),
-                    array['Error 400: Bad Request, no primary key']
-                )::realtime.wal_rls;
-            end loop;
-
-        -- The claims role does not have SELECT permission to the primary key of entity
-        elsif action <> 'DELETE' and sum(c.is_selectable::int) <> count(1) from unnest(columns) c where c.is_pkey then
-            -- Fan out 401 error per distinct selected_columns for this role
-            for cols_record in
-                select selected_columns
-                from (select distinct selected_columns from unnest(subscriptions) s where s.claims_role = working_role) t
-                order by coalesce(array_to_string(selected_columns, ','), '')
-            loop
-                working_selected_columns := cols_record.selected_columns;
-                return next (
-                    jsonb_build_object(
-                        'schema', wal ->> 'schema',
-                        'table', wal ->> 'table',
-                        'type', action
-                    ),
-                    is_rls_enabled,
-                    (select array_agg(s.subscription_id) from unnest(subscriptions) as s where s.claims_role = working_role and (s.selected_columns is not distinct from working_selected_columns)),
-                    array['Error 401: Unauthorized']
-                )::realtime.wal_rls;
-            end loop;
-
-        else
-            -- Create the prepared statement (once per role)
-            if is_rls_enabled and action <> 'DELETE' then
-                if (select 1 from pg_prepared_statements where name = 'walrus_rls_stmt' limit 1) > 0 then
-                    deallocate walrus_rls_stmt;
-                end if;
-                execute realtime.build_prepared_statement_sql('walrus_rls_stmt', entity_, columns);
-            end if;
-
-            -- Collect all visible subscription IDs for this role (filter check + RLS check)
-            visible_role_sub_ids = '{}';
-
-            for subscription_id, claims in (
-                    select
-                        subs.subscription_id,
-                        subs.claims
-                    from
-                        unnest(subscriptions) subs
-                    where
-                        subs.entity = entity_
-                        and subs.claims_role = working_role
-                        and (
-                            realtime.is_visible_through_filters(columns, subs.filters)
-                            or (
-                              action = 'DELETE'
-                              and realtime.is_visible_through_filters(old_columns, subs.filters)
-                            )
-                        )
-            ) loop
-
-                if not is_rls_enabled or action = 'DELETE' then
-                    visible_role_sub_ids = visible_role_sub_ids || subscription_id;
-                else
-                    -- Check if RLS allows the role to see the record
-                    perform
-                        -- Trim leading and trailing quotes from working_role because set_config
-                        -- doesn't recognize the role as valid if they are included
-                        set_config('role', trim(both '"' from working_role::text), true),
-                        set_config('request.jwt.claims', claims::text, true);
-
-                    execute 'execute walrus_rls_stmt' into subscription_has_access;
-
-                    -- Reset the role on every FOR..LOOP batch execution.
-                    -- The first batch of 10 rows is pre-fetched using the current connection role (PG internal behaviour)
-                    -- then we have to reset it again otherwise it would use the role defined in the `set_config` above
-                    -- to fetch the remaining rows when rows>10, which could be a user-defined role that lacks execution grants.
-                    -- The flow is:
-                    --   1. run batch with conn role
-                    --   2. set_config working_role
-                    --   3. execute walrus
-                    --   4. reset role (revert)
-                    --   5. repeat
-                    perform set_config('role', null, true);
-
-                    if subscription_has_access then
-                        visible_role_sub_ids = visible_role_sub_ids || subscription_id;
-                    end if;
-                end if;
-            end loop;
-
-            perform set_config('role', null, true);
-
-            -- Inner loop: per distinct selected_columns for this role
-            for cols_record in
-                select selected_columns
-                from (select distinct selected_columns from unnest(subscriptions) s where s.claims_role = working_role) t
-                order by coalesce(array_to_string(selected_columns, ','), '')
-            loop
-                working_selected_columns := cols_record.selected_columns;
-
-                output = jsonb_build_object(
-                    'schema', wal ->> 'schema',
-                    'table', wal ->> 'table',
-                    'type', action,
-                    'commit_timestamp', to_char(
-                        ((wal ->> 'timestamp')::timestamptz at time zone 'utc'),
-                        'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                    ),
-                    'columns', (
-                        select
-                            jsonb_agg(
-                                jsonb_build_object(
-                                    'name', pa.attname,
-                                    'type', pt.typname
-                                )
-                                order by pa.attnum asc
-                            )
-                        from
-                            pg_attribute pa
-                            join pg_type pt
-                                on pa.atttypid = pt.oid
-                            left join (
-                                select unnest(conkey) as pkey_attnum
-                                from pg_constraint
-                                where conrelid = entity_ and contype = 'p'
-                            ) pk on pk.pkey_attnum = pa.attnum
-                        where
-                            attrelid = entity_
-                            and attnum > 0
-                            and pg_catalog.has_column_privilege(working_role, entity_, pa.attname, 'SELECT')
-                            and (working_selected_columns is null or pa.attname = any(working_selected_columns) or pk.pkey_attnum is not null)
-                    )
-                )
-                -- Add "record" key for insert and update
-                || case
-                    when action in ('INSERT', 'UPDATE') then
-                        jsonb_build_object(
-                            'record',
-                            (
-                                select
-                                    jsonb_object_agg(
-                                        -- if unchanged toast, get column name and value from old record
-                                        coalesce((c).name, (oc).name),
-                                        case
-                                            when (c).name is null then (oc).value
-                                            else (c).value
-                                        end
-                                    )
-                                from
-                                    unnest(columns) c
-                                    full outer join unnest(old_columns) oc
-                                        on (c).name = (oc).name
-                                where
-                                    coalesce((c).is_selectable, (oc).is_selectable)
-                                    and (working_selected_columns is null or coalesce((c).name, (oc).name) = any(working_selected_columns) or coalesce((c).is_pkey, (oc).is_pkey))
-                                    and ( not error_record_exceeds_max_size or (octet_length((c).value::text) <= 64))
-                            )
-                        )
-                    else '{}'::jsonb
-                end
-                -- Add "old_record" key for update and delete
-                || case
-                    when action = 'UPDATE' then
-                        jsonb_build_object(
-                                'old_record',
-                                (
-                                    select jsonb_object_agg((c).name, (c).value)
-                                    from unnest(old_columns) c
-                                    where
-                                        (c).is_selectable
-                                        and (working_selected_columns is null or (c).name = any(working_selected_columns) or (c).is_pkey)
-                                        and ( not error_record_exceeds_max_size or (octet_length((c).value::text) <= 64))
-                                )
-                            )
-                    when action = 'DELETE' then
-                        jsonb_build_object(
-                            'old_record',
-                            (
-                                select jsonb_object_agg((c).name, (c).value)
-                                from unnest(old_columns) c
-                                where
-                                    (c).is_selectable
-                                    and (working_selected_columns is null or (c).name = any(working_selected_columns) or (c).is_pkey)
-                                    and ( not error_record_exceeds_max_size or (octet_length((c).value::text) <= 64))
-                                    and ( not is_rls_enabled or (c).is_pkey ) -- if RLS enabled, we can't secure deletes so filter to pkey
-                            )
-                        )
-                    else '{}'::jsonb
-                end;
-
-                -- Filter visible_role_sub_ids to those matching the current selected_columns group
-                visible_to_subscription_ids = coalesce(
-                    (
-                        select array_agg(s.subscription_id)
-                        from unnest(subscriptions) s
-                        where s.claims_role = working_role
-                          and (s.selected_columns is not distinct from working_selected_columns)
-                          and s.subscription_id = any(visible_role_sub_ids)
-                    ),
-                    '{}'::uuid[]
-                );
-
-                return next (
-                    output,
-                    is_rls_enabled,
-                    visible_to_subscription_ids,
-                    case
-                        when error_record_exceeds_max_size then array['Error 413: Payload Too Large']
-                        else '{}'
-                    end
-                )::realtime.wal_rls;
-            end loop;
-
-        end if;
-    end loop;
-
-    perform set_config('role', null, true);
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.authorize(role_name text, topic_name text, claims text, sub text, headers text, read_extensions text[], write_extensions text[], OUT read_allowed boolean[], OUT write_allowed boolean[])
- RETURNS record
- LANGUAGE plpgsql
-AS $function$
-declare
-  probe_ids uuid[];
-  probe_inserted_at timestamp := now() at time zone 'utc';
-  visible_ids uuid[];
-  ext text;
-  allowed boolean;
-begin
-  -- The probe inserts are rolled back, but they still give the transaction an xid, so it ends
-  -- in a commit. Nothing durable was written, so skip waiting on the WAL flush and sync standbys.
-  -- Set outside the block below, whose rollback would undo it.
-  perform set_config('synchronous_commit', 'off', true);
-
-  -- The RAISE at the end of this block rolls back everything in it.
-  begin
-    probe_ids := array(select gen_random_uuid() from unnest(read_extensions));
-
-    insert into realtime.messages (id, topic, extension, inserted_at, updated_at)
-    select p.id, topic_name, p.extension, probe_inserted_at, probe_inserted_at
-    from unnest(probe_ids, read_extensions) as p(id, extension);
-
-    perform set_config('role', role_name, true),
-            set_config('realtime.topic', topic_name, true),
-            set_config('request.jwt.claims', claims, true),
-            set_config('request.jwt.claim.sub', sub, true),
-            set_config('request.jwt.claim.role', role_name, true),
-            set_config('request.headers', headers, true);
-
-    -- One lookup for every probe, by the full primary key.
-    visible_ids := array(
-      select m.id
-      from realtime.messages m
-      where m.inserted_at = probe_inserted_at
-        and m.id = any(probe_ids));
-
-    read_allowed := array(
-      select p.id = any(visible_ids)
-      from unnest(probe_ids) with ordinality as p(id, n)
-      order by p.n);
-
-    write_allowed := '{}';
-
-    foreach ext in array write_extensions loop
-      begin
-        insert into realtime.messages (topic, extension, inserted_at, updated_at)
-        values (topic_name, ext, now() at time zone 'utc', now() at time zone 'utc');
-
-        allowed := true;
-      exception when insufficient_privilege then
-        allowed := false;
-      end;
-
-      write_allowed := write_allowed || allowed;
-    end loop;
-
-    raise sqlstate 'RTA01';
-  exception when sqlstate 'RTA01' then
-    null;
-  end;
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.broadcast_changes(topic_name text, event_name text, operation text, table_name text, table_schema text, new record, old record, level text DEFAULT 'ROW'::text)
- RETURNS void
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-    -- Declare a variable to hold the JSONB representation of the row
-    row_data jsonb := '{}'::jsonb;
-BEGIN
-    IF level = 'STATEMENT' THEN
-        RAISE EXCEPTION 'function can only be triggered for each row, not for each statement';
-    END IF;
-    -- Check the operation type and handle accordingly
-    IF operation = 'INSERT' OR operation = 'UPDATE' OR operation = 'DELETE' THEN
-        row_data := jsonb_build_object('old_record', OLD, 'record', NEW, 'operation', operation, 'table', table_name, 'schema', table_schema);
-        PERFORM realtime.send (row_data, event_name, topic_name);
-    ELSE
-        RAISE EXCEPTION 'Unexpected operation type: %', operation;
-    END IF;
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE EXCEPTION 'Failed to process the row: %', SQLERRM;
-END;
-
-$function$ CREATE OR REPLACE FUNCTION realtime.build_prepared_statement_sql(prepared_statement_name text, entity regclass, columns realtime.wal_column[])
- RETURNS text
- LANGUAGE sql
-AS $function$
-      /*
-      Builds a sql string that, if executed, creates a prepared statement to
-      tests retrive a row from *entity* by its primary key columns.
-      Example
-          select realtime.build_prepared_statement_sql('public.notes', '{"id"}'::text[], '{"bigint"}'::text[])
-      */
-          select
-      'prepare ' || prepared_statement_name || ' as
-          select
-              exists(
-                  select
-                      1
-                  from
-                      ' || entity || '
-                  where
-                      ' || string_agg(quote_ident(pkc.name) || '=' || quote_nullable(pkc.value #>> '{}') , ' and ') || '
-              )'
-          from
-              unnest(columns) pkc
-          where
-              pkc.is_pkey
-          group by
-              entity
-      $function$ CREATE OR REPLACE FUNCTION realtime."cast"(val text, type_ regtype)
- RETURNS jsonb
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-declare
-  res jsonb;
-begin
-  if type_::text = 'bytea' then
-    return to_jsonb(val);
-  end if;
-  execute format('select to_jsonb(%L::'|| type_::text || ')', val) into res;
-  return res;
-end
-$function$ CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text, negate boolean)
- RETURNS boolean
- LANGUAGE plpgsql
- STABLE
-AS $function$
-declare
-    op_symbol text;
-    res boolean;
-begin
-    -- IS DISTINCT FROM / IS NOT DISTINCT FROM: infix, both sides typed literals
-    if op = 'isdistinct' then
-        execute format(
-            'select %L::%s %s %L::%s',
-            val_1,
-            type_::text,
-            case when negate then 'IS NOT DISTINCT FROM' else 'IS DISTINCT FROM' end,
-            val_2,
-            type_::text
-        ) into res;
-        return res;
-    end if;
-
-    -- IS requires a keyword RHS (NULL, TRUE, FALSE, UNKNOWN), not a typed literal
-    if op = 'is' then
-        if val_2 not in ('null', 'true', 'false', 'unknown') then
-            raise exception 'invalid value for is filter: must be null, true, false, or unknown';
-        end if;
-        execute format(
-            'select %L::%s %s %s',
-            val_1,
-            type_::text,
-            case when negate then 'IS NOT' else 'IS' end,
-            upper(val_2)
-        ) into res;
-        return res;
-    end if;
-
-    op_symbol = case
-        when op = 'eq'    then '='
-        when op = 'neq'   then '!='
-        when op = 'lt'    then '<'
-        when op = 'lte'   then '<='
-        when op = 'gt'    then '>'
-        when op = 'gte'   then '>='
-        when op = 'in'    then '= any'
-        when op = 'like'   then 'LIKE'
-        when op = 'ilike'  then 'ILIKE'
-        when op = 'match'  then '~'
-        when op = 'imatch' then '~*'
-        else null
-    end;
-
-    if op_symbol is null then
-        raise exception 'unsupported equality operator: %', op::text;
-    end if;
-
-    execute format(
-        'select %L::%s %s (%L::%s)',
-        val_1,
-        type_::text,
-        op_symbol,
-        val_2,
-        case when op = 'in' then type_::text || '[]' else type_::text end
-    ) into res;
-
-    return case when negate then not res else res end;
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.check_equality_op(op realtime.equality_op, type_ regtype, val_1 text, val_2 text)
- RETURNS boolean
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-/*
-Casts *val_1* and *val_2* as type *type_* and check the *op* condition for truthiness
-*/
-declare
-    op_symbol text = (
-        case
-            when op = 'eq' then '='
-            when op = 'neq' then '!='
-            when op = 'lt' then '<'
-            when op = 'lte' then '<='
-            when op = 'gt' then '>'
-            when op = 'gte' then '>='
-            when op = 'in' then '= any'
-            else 'UNKNOWN OP'
-        end
-    );
-    res boolean;
-begin
-    execute format(
-        'select %L::'|| type_::text || ' ' || op_symbol
-        || ' ( %L::'
-        || (
-            case
-                when op = 'in' then type_::text || '[]'
-                else type_::text end
-        )
-        || ')', val_1, val_2) into res;
-    return res;
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.is_visible_through_filters(columns realtime.wal_column[], filters realtime.user_defined_filter[])
- RETURNS boolean
- LANGUAGE sql
- STABLE
-AS $function$
-    select
-        filters is null
-        or array_length(filters, 1) is null
-        or coalesce(
-            count(col.name) = count(1)
-            and sum(
-                realtime.check_equality_op(
-                    op:=f.op,
-                    type_:=coalesce(col.type_oid::regtype, col.type_name::regtype),
-                    val_1:=col.value #>> '{}',
-                    val_2:=f.value,
-                    negate:=coalesce(f.negate, false)
-                )::int
-            ) filter (where col.name is not null) = count(col.name),
-            false
-        )
-    from
-        unnest(filters) f
-        left join unnest(columns) col
-            on f.column_name = col.name;
-$function$ CREATE OR REPLACE FUNCTION realtime.list_changes(publication name, slot_name name, max_changes integer, max_record_bytes integer)
- RETURNS TABLE(wal jsonb, is_rls_enabled boolean, subscription_ids uuid[], errors text[], slot_changes_count bigint)
- LANGUAGE sql
- SET log_min_messages TO 'fatal'
-AS $function$
-  WITH pub AS (
-    SELECT
-      concat_ws(
-        ',',
-        CASE WHEN bool_or(pubinsert) THEN 'insert' ELSE NULL END,
-        CASE WHEN bool_or(pubupdate) THEN 'update' ELSE NULL END,
-        CASE WHEN bool_or(pubdelete) THEN 'delete' ELSE NULL END
-      ) AS w2j_actions,
-      coalesce(
-        string_agg(
-          realtime.quote_wal2json(format('%I.%I', schemaname, tablename)::regclass),
-          ','
-        ) filter (WHERE ppt.tablename IS NOT NULL),
-        ''
-      ) AS w2j_add_tables
-    FROM pg_publication pp
-    LEFT JOIN pg_publication_tables ppt ON pp.pubname = ppt.pubname
-    WHERE pp.pubname = publication
-    GROUP BY pp.pubname
-    LIMIT 1
-  ),
-  -- MATERIALIZED ensures pg_logical_slot_get_changes is called exactly once
-  w2j AS MATERIALIZED (
-    SELECT x.*, pub.w2j_add_tables
-    FROM pub,
-         pg_logical_slot_get_changes(
-           slot_name, null, max_changes,
-           'include-pk', 'true',
-           'include-transaction', 'false',
-           'include-timestamp', 'true',
-           'include-type-oids', 'true',
-           'format-version', '2',
-           'actions', pub.w2j_actions,
-           'add-tables', pub.w2j_add_tables
-         ) x
-  ),
-  slot_count AS (
-    SELECT count(*)::bigint AS cnt
-    FROM w2j
-    WHERE w2j.w2j_add_tables <> ''
-  ),
-  rls_filtered AS (
-    SELECT xyz.wal, xyz.is_rls_enabled, xyz.subscription_ids, xyz.errors
-    FROM w2j,
-         realtime.apply_rls(
-           wal := w2j.data::jsonb,
-           max_record_bytes := max_record_bytes
-         ) xyz(wal, is_rls_enabled, subscription_ids, errors)
-    WHERE w2j.w2j_add_tables <> ''
-      AND xyz.subscription_ids[1] IS NOT NULL
-  )
-  SELECT rf.wal, rf.is_rls_enabled, rf.subscription_ids, rf.errors, sc.cnt
-  FROM rls_filtered rf, slot_count sc
-
-  UNION ALL
-
-  SELECT null, null, null, null, sc.cnt
-  FROM slot_count sc
-  WHERE NOT EXISTS (SELECT 1 FROM rls_filtered)
-$function$ CREATE OR REPLACE FUNCTION realtime.list_changes_sync(publication name, slot_name name, max_changes integer, max_record_bytes integer)
- RETURNS TABLE(wal jsonb, is_rls_enabled boolean, subscription_ids uuid[], errors text[], slot_changes_count bigint)
- LANGUAGE sql
- SET log_min_messages TO 'fatal'
-AS $function$
-  WITH pub AS (
-    SELECT
-      concat_ws(
-        ',',
-        CASE WHEN bool_or(pubinsert) THEN 'insert' ELSE NULL END,
-        CASE WHEN bool_or(pubupdate) THEN 'update' ELSE NULL END,
-        CASE WHEN bool_or(pubdelete) THEN 'delete' ELSE NULL END
-      ) AS w2j_actions,
-      coalesce(
-        string_agg(
-          realtime.quote_wal2json(format('%I.%I', schemaname, tablename)::regclass),
-          ','
-        ) filter (WHERE ppt.tablename IS NOT NULL),
-        ''
-      ) AS w2j_add_tables
-    FROM pg_publication pp
-    LEFT JOIN pg_publication_tables ppt ON pp.pubname = ppt.pubname
-    WHERE pp.pubname = publication
-    GROUP BY pp.pubname
-    LIMIT 1
-  ),
-  -- MATERIALIZED ensures the slot is read exactly once.
-  consumed AS MATERIALIZED (
-    SELECT x.*, pub.w2j_add_tables
-    FROM pub,
-         realtime.settled_changes(
-           slot_name, max_changes,
-           'include-pk', 'true',
-           'include-transaction', 'false',
-           'include-timestamp', 'true',
-           'include-type-oids', 'true',
-           'format-version', '2',
-           'actions', pub.w2j_actions,
-           'add-tables', pub.w2j_add_tables
-         ) x
-  ),
-  slot_count AS (
-    SELECT count(*)::bigint AS cnt
-    FROM consumed
-    WHERE consumed.w2j_add_tables <> ''
-  ),
-  rls_filtered AS (
-    SELECT xyz.wal, xyz.is_rls_enabled, xyz.subscription_ids, xyz.errors
-    FROM consumed,
-         realtime.apply_rls(
-           wal := consumed.data::jsonb,
-           max_record_bytes := max_record_bytes
-         ) xyz(wal, is_rls_enabled, subscription_ids, errors)
-    WHERE consumed.w2j_add_tables <> ''
-      AND xyz.subscription_ids[1] IS NOT NULL
-  )
-  SELECT rf.wal, rf.is_rls_enabled, rf.subscription_ids, rf.errors, sc.cnt
-  FROM rls_filtered rf, slot_count sc
-
-  UNION ALL
-
-  SELECT null, null, null, null, sc.cnt
-  FROM slot_count sc
-  WHERE NOT EXISTS (SELECT 1 FROM rls_filtered)
-$function$ CREATE OR REPLACE FUNCTION realtime.quote_wal2json(entity regclass)
- RETURNS text
- LANGUAGE sql
- IMMUTABLE STRICT
-AS $function$
-  SELECT
-    realtime.wal2json_escape_identifier(nsp.nspname::text)
-    || '.'
-    || realtime.wal2json_escape_identifier(pc.relname::text)
-  FROM pg_class pc
-  JOIN pg_namespace nsp ON pc.relnamespace = nsp.oid
-  WHERE pc.oid = entity
-$function$ CREATE OR REPLACE FUNCTION realtime.send(payload jsonb, event text, topic text, private boolean DEFAULT true)
- RETURNS void
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-  generated_id uuid;
-  final_payload jsonb;
-BEGIN
-  BEGIN
-    generated_id := gen_random_uuid();
-
-    -- Check if payload has an 'id' key, if not, add the generated UUID
-    IF payload ? 'id' THEN
-      final_payload := payload;
-    ELSE
-      final_payload := jsonb_set(payload, '{id}', to_jsonb(generated_id));
-    END IF;
-
-    -- Set the topic configuration
-    EXECUTE format('SET LOCAL realtime.topic TO %L', topic);
-
-    INSERT INTO realtime.messages (id, payload, event, topic, private, extension)
-    VALUES (generated_id, final_payload, event, topic, private, 'broadcast');
-  EXCEPTION
-    WHEN OTHERS THEN
-      RAISE WARNING 'WarnSendingBroadcastMessage: %', SQLERRM;
-  END;
-END;
-$function$ CREATE OR REPLACE FUNCTION realtime.send_binary(payload bytea, event text, topic text, private boolean DEFAULT true)
- RETURNS void
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-  generated_id uuid;
-BEGIN
-  BEGIN
-    generated_id := gen_random_uuid();
-
-    EXECUTE format('SET LOCAL realtime.topic TO %L', topic);
-
-    INSERT INTO realtime.messages (id, binary_payload, event, topic, private, extension)
-    VALUES (generated_id, payload, event, topic, private, 'broadcast');
-  EXCEPTION
-    WHEN OTHERS THEN
-      RAISE WARNING 'WarnSendingBroadcastMessage: %', SQLERRM;
-  END;
-END;
-$function$ CREATE OR REPLACE FUNCTION realtime.settled_changes(slot_name name, max_changes integer, VARIADIC opts text[])
- RETURNS TABLE(lsn pg_lsn, xid xid, data text)
- LANGUAGE plpgsql
-AS $function$
-declare
-  upto pg_lsn;
-  total bigint;
-  xids xid[];
-  starts bigint[];
-  snapshot pg_snapshot;
-  running_xids xid[];
-  xmax_age int;
-  cut bigint;
-begin
-  -- Each statement in a volatile function takes its own snapshot, which is what lets the
-  -- check below see a writer that was still in flight when the peek ran. Under REPEATABLE
-  -- READ the snapshot never advances, so a deferred change would never be released.
-  if current_setting('transaction_isolation') <> 'read committed' then
-    raise exception 'realtime.settled_changes requires READ COMMITTED';
-  end if;
-
-  -- The peek and the read below cover the same WAL, so the read cannot reach a commit the
-  -- check never saw.
-  upto := pg_current_wal_flush_lsn();
-
-  -- One entry per transaction, in commit order: its xid and the position of its first
-  -- change. The peek uses the caller's own options, so max_changes counts exactly what the
-  -- read counts. A non-transactional logical message is emitted as soon as it is decoded,
-  -- tagged with the xid of whatever transaction wrote it, so it does not mark where that
-  -- transaction starts.
-  select coalesce(sum(g.n), 0),
-         array_agg(g.x order by g.first) filter (where g.first is not null),
-         array_agg(g.first order by g.first) filter (where g.first is not null)
-    into total, xids, starts
-    from (
-      select p.xid as x, count(*) as n,
-             min(p.ord) filter (where not case
-               when starts_with(p.data, '{"action":"M"') then (p.data::jsonb->>'transactional')::boolean is false
-               else false
-             end) as first
-      from pg_logical_slot_peek_changes(slot_name, upto, max_changes, variadic opts)
-           with ordinality as p(lsn, xid, data, ord)
-      group by p.xid
-    ) g;
-
-  -- Nothing for the caller, but the slot still has to move past what the peek covered.
-  if total = 0 then
-    perform pg_replication_slot_advance(slot_name, upto);
-    return;
-  end if;
-
-  if xids is not null then
-    -- Taken after the peek is materialized, so a writer that was still in flight during
-    -- decoding is guaranteed to show up here.
-    snapshot := pg_current_snapshot();
-
-    -- A commit record reaches the WAL before the writer leaves the proc array, so a change
-    -- can be decoded while its row is invisible. apply_rls would resolve a policy against a
-    -- row it cannot see and authorize it for nobody, while the read consumed it regardless.
-    --
-    -- xip lists transactions running when the snapshot was taken. It does not cover a writer
-    -- whose xid sits at or beyond xmax, which never appears there, so the horizon is checked
-    -- too. age() counts backwards from the current xid and so compares correctly across
-    -- wraparound.
-    select coalesce(array_agg(running.x::xid), array[]::xid[])
-      into running_xids
-      from pg_snapshot_xip(snapshot) running(x);
-    xmax_age := age(pg_snapshot_xmax(snapshot)::xid);
-
-    select min(u.s) into cut
-      from unnest(xids, starts) as u(x, s)
-      where u.x = any(running_xids) or age(u.x) <= xmax_age;
-  end if;
-
-  -- The read stops right after the commit that brings its count to upto_nchanges, so the
-  -- count of changes in front of the first unsettled transaction stops it just before that
-  -- transaction.
-  if cut is null then
-    return query
-      select p.* from pg_logical_slot_get_changes(slot_name, upto, max_changes, variadic opts) p;
-  elsif cut > 1 then
-    return query
-      select p.* from pg_logical_slot_get_changes(slot_name, upto, (cut - 1)::int, variadic opts) p;
-  end if;
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.subscription_check_filters()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-declare
-    col_names text[] = coalesce(
-            array_agg(a.attname order by a.attnum),
-            '{}'::text[]
-        )
-        from
-            pg_catalog.pg_attribute a
-        where
-            a.attrelid = new.entity
-            and a.attnum > 0
-            and not a.attisdropped
-            and pg_catalog.has_column_privilege(
-                (new.claims ->> 'role'),
-                a.attrelid,
-                a.attnum,
-                'SELECT'
-            );
-    filter realtime.user_defined_filter;
-    col_type regtype;
-    in_val jsonb;
-    selected_col text;
-begin
-    for filter in select * from unnest(new.filters) loop
-        if not filter.column_name = any(col_names) then
-            raise exception 'invalid column for filter %', filter.column_name;
-        end if;
-
-        col_type = (
-            select atttypid::regtype
-            from pg_catalog.pg_attribute
-            where attrelid = new.entity
-                  and attname = filter.column_name
-        );
-        if col_type is null then
-            raise exception 'failed to lookup type for column %', filter.column_name;
-        end if;
-
-        if filter.op = 'in'::realtime.equality_op then
-            in_val = realtime.cast(filter.value, (col_type::text || '[]')::regtype);
-            if coalesce(jsonb_array_length(in_val), 0) > 100 then
-                raise exception 'too many values for `in` filter. Maximum 100';
-            end if;
-        elsif filter.op = 'is'::realtime.equality_op then
-            -- `is` requires a keyword RHS rather than a typed literal
-            if filter.value not in ('null', 'true', 'false', 'unknown') then
-                raise exception 'invalid value for is filter: must be null, true, false, or unknown';
-            end if;
-            -- IS NULL works for any type, but IS TRUE/FALSE/UNKNOWN require a boolean
-            -- operand. Reject the non-null keywords on non-boolean columns here so they
-            -- don't abort apply_rls at WAL time.
-            if filter.value <> 'null' and col_type <> 'boolean'::regtype then
-                raise exception 'is % filter requires a boolean column, got %', filter.value, col_type::text;
-            end if;
-        elsif filter.op in ('like'::realtime.equality_op, 'ilike'::realtime.equality_op) then
-            -- like/ilike apply the text pattern operator (~~); reject column types that
-            -- have no such operator instead of failing at WAL time
-            if not exists (
-                select 1 from pg_catalog.pg_operator
-                where oprname = '~~' and oprleft = col_type
-            ) then
-                raise exception 'operator % requires a text-compatible column type, got %', filter.op::text, col_type::text;
-            end if;
-        elsif filter.op in ('match'::realtime.equality_op, 'imatch'::realtime.equality_op) then
-            -- match/imatch apply the regex operators ~ / ~*; reject column types that have
-            -- no such operator (e.g. integer) instead of failing at WAL time, mirroring the
-            -- like/ilike guard above.
-            if not exists (
-                select 1 from pg_catalog.pg_operator
-                where oprname = case when filter.op = 'imatch'::realtime.equality_op then '~*' else '~' end
-                  and oprleft = col_type
-                  and oprright = col_type
-                  and oprresult = 'boolean'::regtype
-            ) then
-                raise exception 'operator % requires a text-compatible column type, got %', filter.op::text, col_type::text;
-            end if;
-            -- validate the regex eagerly so a bad pattern is rejected here, not inside
-            -- apply_rls where it would abort the WAL stream for the entity
-            begin
-                perform '' ~ filter.value;
-            exception when others then
-                raise exception 'invalid regular expression for % filter: %', filter.op::text, sqlerrm;
-            end;
-        else
-            -- eq/neq/lt/lte/gt/gte: value must be coercable to the type
-            perform realtime.cast(filter.value, col_type);
-        end if;
-    end loop;
-
-    if new.selected_columns is not null then
-        for selected_col in select * from unnest(new.selected_columns) loop
-            if not selected_col = any(col_names) then
-                raise exception 'invalid column for select %', selected_col;
-            end if;
-        end loop;
-    end if;
-
-    -- Apply consistent order to filters so the unique constraint can't be tricked by a
-    -- different filter order. negate is part of the sort key.
-    new.filters = coalesce(
-        array_agg(f order by f.column_name, f.op, f.value, f.negate),
-        '{}'
-    ) from unnest(new.filters) f;
-
-    -- Normalize selected_columns order so ARRAY['a','b'] and ARRAY['b','a'] are treated
-    -- as the same subscription group in apply_rls. Preserve an empty array as '{}'
-    -- ("primary keys only") so it stays distinct from NULL ("all columns"); array_agg
-    -- over an empty set would otherwise collapse '{}' back to NULL.
-    if new.selected_columns is not null then
-        new.selected_columns = coalesce(
-            (
-                select array_agg(c order by c)
-                from unnest(new.selected_columns) c
-            ),
-            '{}'::text[]
-        );
-    end if;
-
-    return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION realtime.to_regrole(role_name text)
- RETURNS regrole
- LANGUAGE sql
- IMMUTABLE
-AS $function$ select role_name::regrole $function$ CREATE OR REPLACE FUNCTION realtime.topic()
- RETURNS text
- LANGUAGE sql
- STABLE
-AS $function$
-select nullif(current_setting('realtime.topic', true), '')::text;
-$function$ CREATE OR REPLACE FUNCTION realtime.wal2json_escape_identifier(name text)
- RETURNS text
- LANGUAGE sql
- IMMUTABLE STRICT
-AS $function$
-  -- Prefix `\`, `,`, `.`, and any whitespace with `\`
-  SELECT regexp_replace(name, '([\\,.[:space:]])', '\\\1', 'g')
-$function$ CREATE OR REPLACE FUNCTION storage.allow_any_operation(expected_operations text[])
- RETURNS boolean
- LANGUAGE sql
- STABLE
-AS $function$
-  WITH current_operation AS (
-    SELECT storage.operation() AS raw_operation
-  ),
-  normalized AS (
-    SELECT CASE
-      WHEN raw_operation LIKE 'storage.%' THEN substr(raw_operation, 9)
-      ELSE raw_operation
-    END AS current_operation
-    FROM current_operation
-  )
-  SELECT EXISTS (
-    SELECT 1
-    FROM normalized n
-    CROSS JOIN LATERAL unnest(expected_operations) AS expected_operation
-    WHERE expected_operation IS NOT NULL
-      AND expected_operation <> ''
-      AND n.current_operation = CASE
-        WHEN expected_operation LIKE 'storage.%' THEN substr(expected_operation, 9)
-        ELSE expected_operation
-      END
-  );
-$function$ CREATE OR REPLACE FUNCTION storage.allow_only_operation(expected_operation text)
- RETURNS boolean
- LANGUAGE sql
- STABLE
-AS $function$
-  WITH current_operation AS (
-    SELECT storage.operation() AS raw_operation
-  ),
-  normalized AS (
-    SELECT
-      CASE
-        WHEN raw_operation LIKE 'storage.%' THEN substr(raw_operation, 9)
-        ELSE raw_operation
-      END AS current_operation,
-      CASE
-        WHEN expected_operation LIKE 'storage.%' THEN substr(expected_operation, 9)
-        ELSE expected_operation
-      END AS requested_operation
-    FROM current_operation
-  )
-  SELECT CASE
-    WHEN requested_operation IS NULL OR requested_operation = '' THEN FALSE
-    ELSE COALESCE(current_operation = requested_operation, FALSE)
-  END
-  FROM normalized;
-$function$ CREATE OR REPLACE FUNCTION storage.can_insert_object(bucketid text, name text, owner uuid, metadata jsonb)
- RETURNS void
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  INSERT INTO "storage"."objects" ("bucket_id", "name", "owner", "metadata") VALUES (bucketid, name, owner, metadata);
-  -- hack to rollback the successful insert
-  RAISE sqlstate 'PT200' using
-  message = 'ROLLBACK',
-  detail = 'rollback successful insert';
-END
-$function$ CREATE OR REPLACE FUNCTION storage.delete_lifecycle_objects(object_ids uuid[])
- RETURNS TABLE(id uuid, is_delete_marker boolean, metadata jsonb)
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-    object_id uuid;
-    deleted_row storage.objects%ROWTYPE;
-    deleted_ids uuid[];
-    deleted_markers boolean[];
-    deleted_metadata jsonb[];
-    bulk_deleted boolean := false;
-BEGIN
-    -- Surface pre-existing deferred violations instead of treating them as blocked rows.
-    SET CONSTRAINTS ALL IMMEDIATE;
-    PERFORM set_config('storage.allow_delete_query', 'true', true);
-
-    -- One subxact keeps the subxid cache from overflowing; rows return only once it commits.
-    BEGIN
-        WITH deleted AS (
-            DELETE FROM storage.objects AS object_row
-              WHERE object_row.id = ANY(object_ids) AND object_row.archived_at IS NOT NULL
-              RETURNING object_row.id, object_row.is_delete_marker, object_row.metadata
-        )
-        SELECT array_agg(deleted.id), array_agg(deleted.is_delete_marker), array_agg(deleted.metadata)
-          INTO deleted_ids, deleted_markers, deleted_metadata
-          FROM deleted;
-        bulk_deleted := true;
-    EXCEPTION
-        WHEN OTHERS THEN
-            -- User triggers may use insufficient_privilege to block a row.
-            IF SQLSTATE <> '42501' AND left(SQLSTATE, 2) IN ('08', '40', '42', '53', '55', '57', '58', 'XX') THEN
-                RAISE;
-            END IF;
-    END;
-    IF bulk_deleted THEN
-        RETURN QUERY SELECT * FROM unnest(deleted_ids, deleted_markers, deleted_metadata);
-        RETURN;
-    END IF;
-
-    FOREACH object_id IN ARRAY object_ids LOOP
-        BEGIN
-            DELETE FROM storage.objects AS object_row
-              WHERE object_row.id = object_id AND object_row.archived_at IS NOT NULL
-              RETURNING object_row.* INTO deleted_row;
-            IF FOUND THEN
-                id := deleted_row.id;
-                is_delete_marker := deleted_row.is_delete_marker;
-                metadata := deleted_row.metadata;
-                RETURN NEXT;
-            END IF;
-        EXCEPTION
-            WHEN OTHERS THEN
-                IF SQLSTATE <> '42501' AND left(SQLSTATE, 2) IN ('08', '40', '42', '53', '55', '57', '58', 'XX') THEN
-                    RAISE;
-                END IF;
-        END;
-    END LOOP;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.enforce_bucket_lifecycle_service_role()
- RETURNS trigger
- LANGUAGE plpgsql
- SET search_path TO 'pg_catalog'
-AS $function$
-BEGIN
-  IF current_user::text IS DISTINCT FROM TG_ARGV[0] THEN
-    -- Keep this check AFTER caller RLS accepts the proposed row. The API
-    -- recognizes this exact signal after rolling back its permission probe.
-    RAISE EXCEPTION 'bucket control columns may only be changed by the configured storage service role'
-      USING ERRCODE = 'PST01',
-            SCHEMA = TG_TABLE_SCHEMA,
-            TABLE = TG_TABLE_NAME,
-            CONSTRAINT = TG_NAME;
-  END IF;
-
-  RETURN NULL;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.enforce_bucket_name_length()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-begin
-    if length(new.name) > 100 then
-        raise exception 'bucket name "%" is too long (% characters). Max is 100.', new.name, length(new.name);
-    end if;
-    return new;
-end;
-$function$ CREATE OR REPLACE FUNCTION storage.enforce_versioning_status_transition()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-    IF NEW.versioning_status = OLD.versioning_status THEN
-        RETURN NEW;
-    END IF;
-
-    IF NEW.versioning_status = 'DISABLED' OR
-       (OLD.versioning_status = 'DISABLED' AND NEW.versioning_status = 'SUSPENDED') THEN
-        RAISE EXCEPTION 'Cannot transition bucket versioning status from % to %',
-            OLD.versioning_status, NEW.versioning_status;
-    END IF;
-
-    RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.extension(name text)
- RETURNS text
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-DECLARE
-    _parts text[];
-    _filename text;
-BEGIN
-    -- Split on "/" to get path segments
-    SELECT string_to_array(name, '/') INTO _parts;
-    -- Get the last path segment (the actual filename)
-    SELECT _parts[array_length(_parts, 1)] INTO _filename;
-    -- Extract extension: reverse, split on '.', then reverse again
-    RETURN reverse(split_part(reverse(_filename), '.', 1));
-END
-$function$ CREATE OR REPLACE FUNCTION storage.filename(name text)
- RETURNS text
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-DECLARE
-    _parts text[];
-BEGIN
-    SELECT string_to_array(name, '/') INTO _parts;
-    RETURN _parts[array_length(_parts, 1)];
-END
-$function$ CREATE OR REPLACE FUNCTION storage.foldername(name text)
- RETURNS text[]
- LANGUAGE plpgsql
- IMMUTABLE
-AS $function$
-DECLARE
-    _parts text[];
-BEGIN
-    -- Split on "/" to get path segments
-    SELECT string_to_array(name, '/') INTO _parts;
-    -- Return everything except the last segment
-    RETURN _parts[1 : array_length(_parts,1) - 1];
-END
-$function$ CREATE OR REPLACE FUNCTION storage.get_common_prefix(p_key text, p_prefix text, p_delimiter text)
- RETURNS text
- LANGUAGE sql
- IMMUTABLE
-AS $function$
-SELECT CASE
-    WHEN p_delimiter <> ''
-         AND position(p_delimiter IN substring(p_key FROM length(p_prefix) + 1)) > 0
-    THEN left(
-        p_key,
-        length(p_prefix)
-            + position(p_delimiter IN substring(p_key FROM length(p_prefix) + 1))
-            + length(p_delimiter) - 1
-    )
-    ELSE NULL
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.get_size_by_bucket(noncurrent_versions text DEFAULT 'include'::text, delete_markers text DEFAULT 'include'::text)
- RETURNS TABLE(size bigint, bucket_id text)
- LANGUAGE plpgsql
- STABLE
-AS $function$
-BEGIN
-    -- COALESCE first: NULL NOT IN (...) evaluates to NULL (not TRUE), so a
-    -- bare NOT IN check silently leaves an explicit NULL argument unreset.
-    noncurrent_versions := COALESCE(noncurrent_versions, 'include');
-    delete_markers := COALESCE(delete_markers, 'include');
-    IF noncurrent_versions NOT IN ('exclude', 'only', 'include') THEN
-        noncurrent_versions := 'include';
-    END IF;
-    IF delete_markers NOT IN ('exclude', 'only', 'include') THEN
-        delete_markers := 'include';
-    END IF;
-
-    return query
-        select sum((metadata->>'size')::bigint)::bigint as size, obj.bucket_id
-        from "storage".objects as obj
-        where (noncurrent_versions != 'exclude' OR obj.archived_at IS NULL)
-          and (noncurrent_versions != 'only' OR obj.archived_at IS NOT NULL)
-          and (delete_markers != 'exclude' OR NOT obj.is_delete_marker)
-          and (delete_markers != 'only' OR obj.is_delete_marker)
-        group by obj.bucket_id;
-END
-$function$ CREATE OR REPLACE FUNCTION storage.list_multipart_uploads_with_delimiter(bucket_id text, prefix_param text, delimiter_param text, max_keys integer DEFAULT 100, next_key_token text DEFAULT ''::text, next_upload_token text DEFAULT ''::text, raw_prefix_param text DEFAULT NULL::text)
- RETURNS TABLE(key text, id text, created_at timestamp with time zone)
- LANGUAGE sql
- STABLE
-AS $function$
-WITH candidates AS (
-    SELECT
-        upload.key AS object_key,
-        CASE
-            WHEN position($3 IN substring(upload.key FROM length(coalesce($7, $2)) + 1)) > 0
-            THEN left(
-                upload.key,
-                length(coalesce($7, $2))
-                    + position($3 IN substring(upload.key FROM length(coalesce($7, $2)) + 1))
-                    + length($3) - 1
-            )
-            ELSE upload.key
-        END AS result_key,
-        upload.id,
-        upload.created_at,
-        position($3 IN substring(upload.key FROM length(coalesce($7, $2)) + 1)) > 0 AS is_common_prefix
-    FROM storage.s3_multipart_uploads AS upload
-    WHERE upload.bucket_id = $1
-      AND upload.key COLLATE "C" LIKE $2 || '%'
-), filtered AS (
-    SELECT candidate.*
-    FROM candidates AS candidate
-    WHERE $5 = ''
-       OR candidate.result_key COLLATE "C" > $5
-       OR (
-           candidate.result_key COLLATE "C" = $5
-           AND NOT candidate.is_common_prefix
-           AND $6 <> ''
-           -- A completed or aborted marker repeats the remaining same-key uploads.
-           AND COALESCE(
-               (candidate.created_at, candidate.id COLLATE "C") > (
-                   SELECT marker.created_at, marker.id COLLATE "C"
-                   FROM storage.s3_multipart_uploads AS marker
-                   WHERE marker.bucket_id = $1
-                     AND marker.key COLLATE "C" = $5
-                     AND marker.id = $6
-               ),
-               TRUE
-           )
-       )
-), ranked AS (
-    SELECT
-        filtered.*,
-        row_number() OVER (
-            PARTITION BY filtered.result_key COLLATE "C"
-            ORDER BY filtered.created_at, filtered.id COLLATE "C"
-        ) AS prefix_rank
-    FROM filtered
-)
-SELECT ranked.result_key, ranked.id, ranked.created_at
-FROM ranked
-WHERE NOT ranked.is_common_prefix OR ranked.prefix_rank = 1
-ORDER BY ranked.result_key COLLATE "C", ranked.created_at, ranked.id COLLATE "C"
-LIMIT $4;
-$function$ CREATE OR REPLACE FUNCTION storage.list_objects_with_delimiter(_bucket_id text, prefix_param text, delimiter_param text, max_keys integer DEFAULT 100, start_after text DEFAULT ''::text, next_token text DEFAULT ''::text, sort_order text DEFAULT 'asc'::text, noncurrent_versions text DEFAULT 'exclude'::text, delete_markers text DEFAULT 'exclude'::text, next_token_archived_at timestamp with time zone DEFAULT NULL::timestamp with time zone, next_token_version text DEFAULT ''::text)
- RETURNS TABLE(name text, id uuid, metadata jsonb, updated_at timestamp with time zone, created_at timestamp with time zone, last_accessed_at timestamp with time zone, version text, archived_at timestamp with time zone, is_delete_marker boolean, is_versioned boolean)
- LANGUAGE plpgsql
- STABLE
-AS $function$
-DECLARE
-    v_peek_name TEXT;
-    v_current RECORD;
-    v_common_prefix TEXT;
-
-    -- Configuration
-    v_is_asc BOOLEAN;
-    v_prefix TEXT;
-    v_start TEXT;
-    v_start_relative TEXT;
-    v_upper_bound TEXT;
-    v_file_batch_size INT;
-    v_version_filter TEXT;
-
-    -- true when noncurrent_versions can return >1 row per name; keeps them
-    -- ordered most-recent-first and lets pagination resume mid-key
-    v_multi_row BOOLEAN;
-    v_name_order TEXT;
-    v_exact_range_predicate TEXT;
-    v_strict_range_predicate TEXT;
-    v_inclusive_range_predicate TEXT;
-
-    -- Seek state for the current name. archived_at is normalized to JavaScript's
-    -- millisecond precision and version breaks ties within the same millisecond.
-    -- Current rows use 'infinity'; NULL means no tiebreak has been established.
-    v_next_seek TEXT;
-    v_next_seek_at TIMESTAMPTZ;
-    v_next_seek_version TEXT;
-    v_next_seek_strict BOOLEAN := false;
-    v_cursor_is_folder BOOLEAN;
-    v_count INT := 0;
-    v_previous_seek TEXT;
-    v_previous_seek_at TIMESTAMPTZ;
-    v_previous_seek_version TEXT;
-    v_previous_count INT;
-
-    -- Dynamic SQL for batch query only
-    v_batch_query TEXT;
-    v_batch_query_strict TEXT;
-    v_delete_marker_peek_query TEXT;
-    v_delete_marker_peek_query_strict TEXT;
-
-BEGIN
-    -- ========================================================================
-    -- INITIALIZATION
-    -- ========================================================================
-    v_is_asc := lower(coalesce(sort_order, 'asc')) = 'asc';
-    v_prefix := coalesce(prefix_param, '');
-    v_start := CASE WHEN coalesce(next_token, '') <> '' THEN next_token ELSE coalesce(start_after, '') END;
-    v_file_batch_size := LEAST(GREATEST(max_keys * 2, 100), 1000);
-    v_next_seek_at := NULL;
-    v_next_seek_version := '';
-
-    -- COALESCE first: NULL NOT IN (...) evaluates to NULL (not TRUE), so a
-    -- bare NOT IN check silently leaves an explicit NULL argument unreset.
-    noncurrent_versions := COALESCE(noncurrent_versions, 'exclude');
-    delete_markers := COALESCE(delete_markers, 'exclude');
-    IF noncurrent_versions NOT IN ('exclude', 'only', 'include') THEN
-        noncurrent_versions := 'exclude';
-    END IF;
-    IF delete_markers NOT IN ('exclude', 'only', 'include') THEN
-        delete_markers := 'exclude';
-    END IF;
-
-    v_multi_row := noncurrent_versions IN ('only', 'include');
-    v_name_order := CASE WHEN v_is_asc THEN 'ASC' ELSE 'DESC' END;
-
-    v_version_filter := '';
-    IF noncurrent_versions = 'exclude' THEN
-        v_version_filter := v_version_filter || ' AND o.archived_at IS NULL';
-    ELSIF noncurrent_versions = 'only' THEN
-        v_version_filter := v_version_filter || ' AND o.archived_at IS NOT NULL';
-    END IF;
-    IF delete_markers = 'exclude' THEN
-        v_version_filter := v_version_filter || ' AND NOT o.is_delete_marker';
-    ELSIF delete_markers = 'only' THEN
-        v_version_filter := v_version_filter || ' AND o.is_delete_marker';
-    END IF;
-
-    -- Calculate upper bound for prefix filtering (bytewise, using COLLATE "C")
-    IF v_prefix = '' THEN
-        v_upper_bound := NULL;
-    ELSE
-        v_upper_bound := left(v_prefix, -1) || chr(ascii(right(v_prefix, 1)) + 1);
-    END IF;
-
-    -- Keep caller-provided cursors inside the requested prefix range.
-    IF v_start <> '' AND v_upper_bound IS NOT NULL THEN
-        IF v_is_asc THEN
-            IF v_start COLLATE "C" < v_prefix COLLATE "C" THEN
-                v_start := '';
-            ELSIF v_start COLLATE "C" >= v_upper_bound COLLATE "C" THEN
-                RETURN;
-            END IF;
-        ELSE
-            IF v_start COLLATE "C" < v_prefix COLLATE "C" THEN
-                RETURN;
-            ELSIF v_start COLLATE "C" >= v_upper_bound COLLATE "C" THEN
-                v_start := '';
-            END IF;
-        END IF;
-    END IF;
-
-    v_start_relative := substring(v_start FROM length(v_prefix) + 1);
-
-    -- Direction affects only the indexed name range and its ordering. Cursor
-    -- state transitions and within-key version ordering stay shared.
-    IF v_is_asc THEN
-        v_exact_range_predicate := 'TRUE';
-        v_strict_range_predicate := 'o.name COLLATE "C" > $2';
-        v_inclusive_range_predicate := 'o.name COLLATE "C" >= $2';
-        IF v_upper_bound IS NOT NULL THEN
-            v_exact_range_predicate := 'o.name COLLATE "C" < $3';
-            v_strict_range_predicate := v_strict_range_predicate || ' AND o.name COLLATE "C" < $3';
-            v_inclusive_range_predicate := v_inclusive_range_predicate || ' AND o.name COLLATE "C" < $3';
-        END IF;
-    ELSE
-        v_exact_range_predicate := 'TRUE';
-        v_strict_range_predicate := 'o.name COLLATE "C" < $2';
-        v_inclusive_range_predicate := 'o.name COLLATE "C" < $2';
-        IF v_prefix <> '' THEN
-            v_exact_range_predicate := 'o.name COLLATE "C" >= $3';
-            v_strict_range_predicate := v_strict_range_predicate || ' AND o.name COLLATE "C" >= $3';
-            v_inclusive_range_predicate := v_inclusive_range_predicate || ' AND o.name COLLATE "C" >= $3';
-        END IF;
-    END IF;
-
-    -- Build batch query (dynamic SQL - called infrequently, amortized over many rows)
-    -- The multi-row order matches the externally serialized cursor exactly:
-    -- archived_at at millisecond precision, then version as the final tiebreak.
-    --
-    -- When v_multi_row, the seek is a keyset tuple comparison ("name > $2 OR
-    -- (name = $2 AND tiebreak)") - Postgres won't split that OR into indexable
-    -- form (confirmed even with fully literal values), so as one WHERE clause
-    -- it forces a full bucket scan filtered row-by-row. Splitting it into two
-    -- independently-indexable branches (exact name match with the tiebreak
-    -- filter, vs. strictly-past names) combined with UNION ALL lets each
-    -- branch keep name as a real index condition; the outer ORDER BY/LIMIT
-    -- re-merges them into the same page the single query used to produce.
-    IF v_multi_row THEN
-        v_batch_query := format(
-            $sql$
-            SELECT *
-            FROM (
-                (
-                    SELECT o.name, o.id, o.updated_at, o.created_at,
-                           o.last_accessed_at, o.metadata, o.version,
-                           o.archived_at, o.is_delete_marker, o.is_versioned
-                    FROM storage.objects o
-                    WHERE o.bucket_id = $1
-                      AND o.name COLLATE "C" = $2
-                      AND %s
-                      AND NOT $7::boolean
-                      AND (
-                          $5::timestamptz IS NULL
-                          OR COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) < $5
-                          OR (
-                              COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) = $5
-                              AND COALESCE(o.version, '') > $6
-                          )
-                      )
-                      %s
-                    ORDER BY
-                        COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) DESC,
-                        COALESCE(o.version, '') ASC
-                    LIMIT $4
-                )
-                UNION ALL
-                (
-                    SELECT o.name, o.id, o.updated_at, o.created_at,
-                           o.last_accessed_at, o.metadata, o.version,
-                           o.archived_at, o.is_delete_marker, o.is_versioned
-                    FROM storage.objects o
-                    WHERE o.bucket_id = $1
-                      AND %s
-                      %s
-                    ORDER BY
-                        o.name COLLATE "C" %s,
-                        COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) DESC,
-                        COALESCE(o.version, '') ASC
-                    LIMIT $4
-                )
-            ) sub
-            ORDER BY
-                sub.name COLLATE "C" %s,
-                COALESCE(date_trunc('milliseconds', sub.archived_at), 'infinity'::timestamptz) DESC,
-                COALESCE(sub.version, '') ASC
-            LIMIT $4
-            $sql$,
-            v_exact_range_predicate,
-            v_version_filter,
-            v_strict_range_predicate,
-            v_version_filter,
-            v_name_order,
-            v_name_order
-        );
-    ELSE
-        v_batch_query := format(
-            $sql$
-            SELECT o.name, o.id, o.updated_at, o.created_at,
-                   o.last_accessed_at, o.metadata, o.version,
-                   o.archived_at, o.is_delete_marker, o.is_versioned
-            FROM storage.objects o
-            WHERE o.bucket_id = $1
-              AND %s
-              %s
-            ORDER BY o.name COLLATE "C" %s, o.archived_at DESC
-            LIMIT $4
-            $sql$,
-            v_inclusive_range_predicate,
-            v_version_filter,
-            v_name_order
-        );
-
-        -- Strict counterpart of the query above: used once the single-row
-        -- ASC batch advance (below) has left v_next_seek pointing at the
-        -- last row already emitted, so an inclusive predicate would
-        -- re-match it forever. Only single-row mode ever sets strict mode,
-        -- so this variant is never needed when v_multi_row.
-        v_batch_query_strict := format(
-            $sql$
-            SELECT o.name, o.id, o.updated_at, o.created_at,
-                   o.last_accessed_at, o.metadata, o.version,
-                   o.archived_at, o.is_delete_marker, o.is_versioned
-            FROM storage.objects o
-            WHERE o.bucket_id = $1
-              AND %s
-              %s
-            ORDER BY o.name COLLATE "C" %s, o.archived_at DESC
-            LIMIT $4
-            $sql$,
-            v_strict_range_predicate,
-            v_version_filter,
-            v_name_order
-        );
-    END IF;
-
-    -- The static peek predicates cannot use the partial delete-marker index
-    -- once PL/pgSQL switches to a generic plan because whether
-    -- is_delete_marker is required remains parameter-dependent. Reuse the
-    -- already-specialized batch query with a one-row limit for this sparse
-    -- filter so the plan sees a literal `o.is_delete_marker` predicate.
-    IF delete_markers = 'only' THEN
-        v_delete_marker_peek_query :=
-            'SELECT marker_page.name FROM (' || v_batch_query || ') marker_page LIMIT 1';
-        IF NOT v_multi_row THEN
-            v_delete_marker_peek_query_strict :=
-                'SELECT marker_page.name FROM (' || v_batch_query_strict || ') marker_page LIMIT 1';
-        END IF;
-    END IF;
-
-    -- ========================================================================
-    -- SEEK INITIALIZATION: Determine starting position
-    -- ========================================================================
-    IF v_start = '' THEN
-        IF v_is_asc THEN
-            v_next_seek := v_prefix;
-        ELSE
-            -- DESC without cursor performs one specialized initial seek so
-            -- partial current-version and delete-marker indexes remain available.
-            EXECUTE format(
-                'SELECT o.name FROM storage.objects o WHERE o.bucket_id = $1%s%s ORDER BY o.name COLLATE "C" DESC LIMIT 1',
-                CASE WHEN v_upper_bound IS NOT NULL
-                    THEN ' AND o.name COLLATE "C" >= $2 AND o.name COLLATE "C" < $3'
-                    ELSE ''
-                END,
-                v_version_filter
-            )
-            INTO v_next_seek
-            USING _bucket_id, v_prefix, v_upper_bound;
-
-            IF v_next_seek IS NOT NULL THEN
-                v_next_seek := v_next_seek || delimiter_param;
-            ELSE
-                RETURN;
-            END IF;
-        END IF;
-    ELSE
-        -- Folder continuation tokens retain their trailing delimiter. A
-        -- delimiter-less startAfter is always a literal key boundary.
-        v_cursor_is_folder := delimiter_param <> ''
-            AND v_start_relative <> ''
-            AND right(v_start_relative, length(delimiter_param)) = delimiter_param;
-
-        IF v_cursor_is_folder THEN
-            v_next_seek := CASE
-                WHEN right(v_start, length(delimiter_param)) = delimiter_param
-                    THEN v_start
-                ELSE v_start || delimiter_param
-            END;
-            IF v_is_asc THEN
-                v_next_seek := left(v_next_seek, -1)
-                    || chr(ascii(right(v_next_seek, 1)) + 1);
-            END IF;
-            v_next_seek_strict := NOT v_is_asc;
-        ELSE
-            -- leaf object: when v_multi_row, stay on v_start with the
-            -- caller-supplied tiebreak so a page boundary mid-key resumes
-            -- that key's remaining rows instead of skipping them. Truncate
-            -- to milliseconds like every other v_next_seek_at assignment -
-            -- harmless today since object.ts's cursor always round-trips
-            -- through JS Date first, but this shouldn't rely on that.
-            IF v_multi_row THEN
-                v_next_seek := v_start;
-                v_next_seek_at := date_trunc('milliseconds', next_token_archived_at);
-                v_next_seek_version := coalesce(next_token_version, '');
-                v_next_seek_strict := coalesce(next_token, '') = '';
-            ELSIF v_is_asc THEN
-                v_next_seek := v_start;
-                v_next_seek_strict := true;
-            ELSE
-                v_next_seek := v_start;
-            END IF;
-        END IF;
-    END IF;
-
-    -- ========================================================================
-    -- MAIN LOOP: Hybrid peek-then-batch algorithm
-    -- Uses STATIC SQL for peek (hot path) and DYNAMIC SQL for batch
-    -- ========================================================================
-    LOOP
-        EXIT WHEN v_count >= max_keys;
-
-        v_previous_seek := v_next_seek;
-        v_previous_seek_at := v_next_seek_at;
-        v_previous_seek_version := v_next_seek_version;
-        v_previous_count := v_count;
-
-        -- STEP 1: PEEK using STATIC SQL (plan cached, very fast)
-        -- v_multi_row is branched here (rather than folded into the WHERE
-        -- clause as a bound parameter) so each concrete query keeps an
-        -- unconditional seek predicate - once PL/pgSQL switches to its
-        -- cached generic plan (after 5 calls), a parameter-gated
-        -- "(NOT v_multi_row AND name >= $x) OR (v_multi_row AND ...)"
-        -- predicate stops the planner from using name as an index
-        -- condition at all, degrading every subsequent peek to a full
-        -- index scan filtered row-by-row instead of a bounded range scan.
-        -- v_multi_row's seek predicate is a keyset tuple comparison
-        -- ("name > x OR (name = x AND tiebreak)") - Postgres does not
-        -- split this OR into indexable form even with fully literal
-        -- values, so it falls back to a full scan filtered row-by-row.
-        -- Splitting it into two independently-indexable branches (exact
-        -- name match with the tiebreak filter, vs. strictly-past name)
-        -- combined with UNION ALL lets each branch keep name as a real
-        -- index condition; the outer ORDER BY/LIMIT picks whichever of
-        -- the (at most 2) rows sorts first.
-        IF delete_markers = 'only' THEN
-            EXECUTE CASE WHEN v_next_seek_strict AND NOT v_multi_row
-                THEN v_delete_marker_peek_query_strict
-                ELSE v_delete_marker_peek_query
-            END
-                INTO v_peek_name
-                USING _bucket_id, v_next_seek,
-                    CASE WHEN v_is_asc THEN COALESCE(v_upper_bound, v_prefix) ELSE v_prefix END,
-                    1, v_next_seek_at, v_next_seek_version, v_next_seek_strict;
-        ELSIF v_multi_row THEN
-            IF v_is_asc THEN
-                IF v_upper_bound IS NOT NULL THEN
-                    SELECT sub.name INTO v_peek_name FROM (
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" = v_next_seek
-                           AND o.name COLLATE "C" < v_upper_bound
-                           AND NOT v_next_seek_strict
-                           AND (v_next_seek_at IS NULL
-                                OR COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) < v_next_seek_at
-                                OR (COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) = v_next_seek_at
-                                    AND COALESCE(o.version, '') > v_next_seek_version))
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) DESC, COALESCE(o.version, '') ASC LIMIT 1)
-                        UNION ALL
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" > v_next_seek AND o.name COLLATE "C" < v_upper_bound
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY o.name COLLATE "C" ASC LIMIT 1)
-                    ) sub ORDER BY sub.name COLLATE "C" ASC LIMIT 1;
-                ELSE
-                    SELECT sub.name INTO v_peek_name FROM (
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" = v_next_seek
-                           AND NOT v_next_seek_strict
-                           AND (v_next_seek_at IS NULL
-                                OR COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) < v_next_seek_at
-                                OR (COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) = v_next_seek_at
-                                    AND COALESCE(o.version, '') > v_next_seek_version))
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) DESC, COALESCE(o.version, '') ASC LIMIT 1)
-                        UNION ALL
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" > v_next_seek
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY o.name COLLATE "C" ASC LIMIT 1)
-                    ) sub ORDER BY sub.name COLLATE "C" ASC LIMIT 1;
-                END IF;
-            ELSE
-                IF v_upper_bound IS NOT NULL THEN
-                    SELECT sub.name INTO v_peek_name FROM (
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" = v_next_seek
-                           AND o.name COLLATE "C" >= v_prefix
-                           AND NOT v_next_seek_strict
-                           AND (v_next_seek_at IS NULL
-                                OR COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) < v_next_seek_at
-                                OR (COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) = v_next_seek_at
-                                    AND COALESCE(o.version, '') > v_next_seek_version))
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) DESC, COALESCE(o.version, '') ASC LIMIT 1)
-                        UNION ALL
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" < v_next_seek AND o.name COLLATE "C" >= v_prefix
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY o.name COLLATE "C" DESC LIMIT 1)
-                    ) sub ORDER BY sub.name COLLATE "C" DESC LIMIT 1;
-                ELSE
-                    SELECT sub.name INTO v_peek_name FROM (
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" = v_next_seek
-                           AND NOT v_next_seek_strict
-                           AND (v_next_seek_at IS NULL
-                                OR COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) < v_next_seek_at
-                                OR (COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) = v_next_seek_at
-                                    AND COALESCE(o.version, '') > v_next_seek_version))
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY COALESCE(date_trunc('milliseconds', o.archived_at), 'infinity'::timestamptz) DESC, COALESCE(o.version, '') ASC LIMIT 1)
-                        UNION ALL
-                        (SELECT o.name FROM storage.objects o
-                         WHERE o.bucket_id = _bucket_id AND o.name COLLATE "C" < v_next_seek
-                           AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                           AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                           AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                           AND (delete_markers != 'only' OR o.is_delete_marker)
-                         ORDER BY o.name COLLATE "C" DESC LIMIT 1)
-                    ) sub ORDER BY sub.name COLLATE "C" DESC LIMIT 1;
-                END IF;
-            END IF;
-        ELSE
-            -- Single-row mode is always noncurrent_versions='exclude'. Keep
-            -- this predicate literal so generic plans use the current index.
-            IF v_is_asc THEN
-                IF v_next_seek_strict AND v_upper_bound IS NOT NULL THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = _bucket_id
-                      AND o.name COLLATE "C" > v_next_seek
-                      AND o.name COLLATE "C" < v_upper_bound
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                      AND (delete_markers != 'only' OR o.is_delete_marker)
-                    ORDER BY o.name COLLATE "C" ASC LIMIT 1;
-                ELSIF v_next_seek_strict THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = _bucket_id
-                      AND o.name COLLATE "C" > v_next_seek
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                      AND (delete_markers != 'only' OR o.is_delete_marker)
-                    ORDER BY o.name COLLATE "C" ASC LIMIT 1;
-                ELSIF v_upper_bound IS NOT NULL THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = _bucket_id
-                      AND o.name COLLATE "C" >= v_next_seek
-                      AND o.name COLLATE "C" < v_upper_bound
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                      AND (delete_markers != 'only' OR o.is_delete_marker)
-                    ORDER BY o.name COLLATE "C" ASC LIMIT 1;
-                ELSE
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = _bucket_id
-                      AND o.name COLLATE "C" >= v_next_seek
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                      AND (delete_markers != 'only' OR o.is_delete_marker)
-                    ORDER BY o.name COLLATE "C" ASC LIMIT 1;
-                END IF;
-            ELSE
-                IF v_upper_bound IS NOT NULL THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = _bucket_id
-                      AND o.name COLLATE "C" < v_next_seek
-                      AND o.name COLLATE "C" >= v_prefix
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                      AND (delete_markers != 'only' OR o.is_delete_marker)
-                    ORDER BY o.name COLLATE "C" DESC LIMIT 1;
-                ELSE
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = _bucket_id
-                      AND o.name COLLATE "C" < v_next_seek
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                      AND (delete_markers != 'only' OR o.is_delete_marker)
-                    ORDER BY o.name COLLATE "C" DESC LIMIT 1;
-                END IF;
-            END IF;
-        END IF;
-
-        EXIT WHEN v_peek_name IS NULL;
-
-        -- STEP 2: Check if this is a FOLDER or FILE
-        v_common_prefix := storage.get_common_prefix(v_peek_name, v_prefix, delimiter_param);
-
-        IF v_common_prefix IS NOT NULL THEN
-            -- FOLDER: Emit and skip to next folder (no heap access needed)
-            name := v_common_prefix;
-            id := NULL;
-            updated_at := NULL;
-            created_at := NULL;
-            last_accessed_at := NULL;
-            metadata := NULL;
-            version := NULL;
-            archived_at := NULL;
-            is_delete_marker := NULL;
-            is_versioned := NULL;
-            RETURN NEXT;
-            v_count := v_count + 1;
-
-            -- Advance seek past the folder range
-            IF v_is_asc THEN
-                v_next_seek := left(v_common_prefix, -1)
-                    || chr(ascii(right(v_common_prefix, 1)) + 1);
-            ELSE
-                v_next_seek := v_common_prefix;
-            END IF;
-            v_next_seek_at := NULL;
-            v_next_seek_version := '';
-            v_next_seek_strict := NOT v_is_asc;
-        ELSE
-            -- FILE: Batch fetch using DYNAMIC SQL (overhead amortized over many rows)
-            -- For ASC: upper_bound is the exclusive upper limit (< condition)
-            -- For DESC: prefix is the inclusive lower limit (>= condition)
-            FOR v_current IN EXECUTE CASE WHEN v_next_seek_strict AND NOT v_multi_row THEN v_batch_query_strict ELSE v_batch_query END
-                USING _bucket_id, v_next_seek,
-                CASE WHEN v_is_asc THEN COALESCE(v_upper_bound, v_prefix) ELSE v_prefix END, v_file_batch_size, v_next_seek_at, v_next_seek_version,
-                v_next_seek_strict
-            LOOP
-                v_common_prefix := storage.get_common_prefix(v_current.name, v_prefix, delimiter_param);
-
-                IF v_common_prefix IS NOT NULL THEN
-                    -- Hit a folder: exit batch, let peek handle it. Reset
-                    -- strict mode too it may have been set by an earlier
-                    -- row in this same batch (see the single-row ASC advance
-                    -- below), and v_next_seek here is the folder-triggering
-                    -- row's own name, which the next peek must find inclusively.
-                    v_next_seek := CASE
-                        WHEN v_is_asc THEN v_current.name
-                        ELSE v_current.name || delimiter_param
-                    END;
-                    v_next_seek_at := NULL;
-                    v_next_seek_version := '';
-                    v_next_seek_strict := false;
-                    EXIT;
-                END IF;
-
-                -- Emit file
-                name := v_current.name;
-                id := v_current.id;
-                updated_at := v_current.updated_at;
-                created_at := v_current.created_at;
-                last_accessed_at := v_current.last_accessed_at;
-                metadata := v_current.metadata;
-                version := v_current.version;
-                archived_at := v_current.archived_at;
-                is_delete_marker := v_current.is_delete_marker;
-                is_versioned := v_current.is_versioned;
-                RETURN NEXT;
-                v_count := v_count + 1;
-
-                -- when v_multi_row, stay on this name and record its
-                -- archived_at as the new tiebreak so remaining rows for the
-                -- same key are picked up before moving to the next name
-                IF v_multi_row THEN
-                    v_next_seek := v_current.name;
-                    v_next_seek_at := COALESCE(date_trunc('milliseconds', v_current.archived_at), 'infinity'::timestamptz);
-                    v_next_seek_version := COALESCE(v_current.version, '');
-                    v_next_seek_strict := false;
-                ELSIF v_is_asc THEN
-                    -- Appending the delimiter as a fake lexical successor
-                    -- would skip a real key like `name || '!'` (or any
-                    -- character sorting below the delimiter), which sorts
-                    -- between `name` and `name || delimiter`. Track the real
-                    -- name and mark the next comparison strict instead.
-                    v_next_seek := v_current.name;
-                    v_next_seek_strict := true;
-                ELSE
-                    v_next_seek := v_current.name;
-                END IF;
-
-                EXIT WHEN v_count >= max_keys;
-            END LOOP;
-        END IF;
-
-        IF v_count = v_previous_count
-           AND v_next_seek IS NOT DISTINCT FROM v_previous_seek
-           AND v_next_seek_at IS NOT DISTINCT FROM v_previous_seek_at
-           AND v_next_seek_version IS NOT DISTINCT FROM v_previous_seek_version THEN
-            RAISE EXCEPTION 'storage.list_objects_with_delimiter made no progress at seek (%, %, %)',
-                v_next_seek, v_next_seek_at, v_next_seek_version;
-        END IF;
-    END LOOP;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.operation()
- RETURNS text
- LANGUAGE plpgsql
- STABLE
-AS $function$
-BEGIN
-    RETURN current_setting('storage.operation', true);
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.protect_active_lifecycle_states()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'pg_catalog'
-AS $function$
-BEGIN
-    IF EXISTS (
-        SELECT 1 FROM storage.bucket_lifecycle_states
-        WHERE bucket_id = OLD.id
-          AND NOT (
-              continuation IS NULL
-              OR (continuation @> '{"continuationVersion": 1}' AND continuation #> '{batch,inFlight}' IS NULL)
-          )
-    ) THEN
-        RAISE EXCEPTION 'update or delete on table "buckets" violates foreign key constraint "bucket_lifecycle_states_bucket_id_fkey" on table "bucket_lifecycle_states"'
-            USING ERRCODE = 'foreign_key_violation',
-                  DETAIL = format('Key (id)=(%s) is still referenced from table "bucket_lifecycle_states".', OLD.id),
-                  SCHEMA = 'storage',
-                  TABLE = 'bucket_lifecycle_states',
-                  CONSTRAINT = 'bucket_lifecycle_states_bucket_id_fkey';
-    END IF;
-    RETURN OLD;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.protect_bucket_control_columns()
- RETURNS trigger
- LANGUAGE plpgsql
- SET search_path TO 'pg_catalog'
-AS $function$
-DECLARE
-  configuration_changed boolean;
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    IF NEW.lifecycle_configuration IS NOT NULL
-       OR NEW.lifecycle_configuration_generation IS NOT NULL THEN
-      IF NOT pg_has_role(current_user, TG_ARGV[0], 'MEMBER') THEN
-        RAISE EXCEPTION 'only members of the configured storage service role may insert lifecycle policy state'
-          USING ERRCODE = '42501',
-                HINT = format(
-                  'Insert with both lifecycle columns NULL and configure lifecycle through the Storage API afterward, or insert as a member of %I.',
-                  TG_ARGV[0]
-                );
-      END IF;
-    END IF;
-
-    RETURN NEW;
-  END IF;
-
-  configuration_changed =
-    OLD.lifecycle_configuration IS DISTINCT FROM NEW.lifecycle_configuration
-    OR OLD.lifecycle_configuration_generation IS DISTINCT FROM NEW.lifecycle_configuration_generation;
-
-  IF NOT configuration_changed THEN
-    RETURN NEW;
-  END IF;
-
-  IF NEW.type IS DISTINCT FROM 'STANDARD' THEN
-    RAISE EXCEPTION 'bucket versioning and lifecycle controls require a Standard bucket'
-      USING ERRCODE = '0A000';
-  END IF;
-
-  IF NEW.lifecycle_configuration IS NULL
-     AND NEW.lifecycle_configuration_generation IS NULL THEN
-    RETURN NEW;
-  END IF;
-
-  IF NEW.lifecycle_configuration IS NULL
-     OR NEW.lifecycle_configuration_generation IS NULL
-     OR OLD.lifecycle_configuration IS NOT DISTINCT FROM NEW.lifecycle_configuration
-     OR OLD.lifecycle_configuration_generation IS NOT DISTINCT FROM NEW.lifecycle_configuration_generation THEN
-    RAISE EXCEPTION 'a changed lifecycle policy requires a new non-null generation'
-      USING ERRCODE = '22023';
-  END IF;
-
-  RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.protect_delete()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-    -- Check if storage.allow_delete_query is set to 'true'
-    IF COALESCE(current_setting('storage.allow_delete_query', true), 'false') != 'true' THEN
-        RAISE EXCEPTION 'Direct deletion from storage tables is not allowed. Use the Storage API instead.'
-            USING HINT = 'This prevents accidental data loss from orphaned objects.',
-                  ERRCODE = '42501';
-    END IF;
-    RETURN NULL;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.reconcile_lifecycle_state(target_bucket_id text, policy_changed boolean)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'pg_catalog'
-AS $function$
-DECLARE
-    bucket storage.buckets%ROWTYPE;
-    active boolean;
-    idle boolean;
-    state_generation uuid;
-BEGIN
-    SELECT * INTO bucket FROM storage.buckets WHERE id = target_bucket_id FOR NO KEY UPDATE;
-    IF NOT FOUND THEN
-        RETURN;
-    END IF;
-
-    SELECT continuation IS NULL OR (
-               continuation @> '{"continuationVersion": 1}'
-               AND continuation #> '{batch,inFlight}' IS NULL
-           ), generation
-    INTO idle, state_generation
-    FROM storage.bucket_lifecycle_states
-    WHERE bucket_id = target_bucket_id
-    FOR UPDATE;
-
-    IF bucket.lifecycle_configuration IS NULL THEN
-        DELETE FROM storage.bucket_lifecycle_states
-        WHERE bucket_id = target_bucket_id
-          AND idle IS TRUE;
-
-        UPDATE storage.bucket_lifecycle_states
-        SET next_run_at = clock_timestamp(), updated_at = clock_timestamp()
-        WHERE bucket_id = target_bucket_id
-          AND idle IS NOT TRUE;
-        RETURN;
-    END IF;
-
-    active := bucket.versioning_status <> 'DISABLED'
-        AND bucket.lifecycle_configuration @> '{"rules":[{"status":"Enabled"}]}'::jsonb;
-
-    -- The state row records the generation it was reconciled with so callers need not detect
-    -- policy changes. Rows without a recorded generation keep their work.
-    policy_changed := policy_changed OR (
-        state_generation IS NOT NULL AND state_generation <> bucket.lifecycle_configuration_generation
-    );
-
-    INSERT INTO storage.bucket_lifecycle_states AS state (bucket_id, generation, next_run_at)
-    VALUES (bucket.id, bucket.lifecycle_configuration_generation, CASE WHEN active THEN clock_timestamp() END)
-    ON CONFLICT (bucket_id) DO UPDATE
-    SET next_run_at = CASE
-            WHEN policy_changed THEN
-                CASE WHEN active OR idle IS NOT TRUE THEN clock_timestamp() END
-            ELSE EXCLUDED.next_run_at
-        END,
-        generation = EXCLUDED.generation,
-        claim_id = CASE WHEN policy_changed AND idle IS TRUE
-                        THEN NULL ELSE state.claim_id END,
-        claim_until = CASE WHEN policy_changed AND idle IS TRUE
-                           THEN NULL ELSE state.claim_until END,
-        continuation = CASE WHEN policy_changed AND idle IS TRUE
-                            THEN NULL ELSE state.continuation END,
-        failure_count = CASE WHEN policy_changed AND idle IS TRUE
-                             THEN 0 ELSE state.failure_count END,
-        last_error = CASE WHEN policy_changed AND idle IS TRUE
-                          THEN NULL ELSE state.last_error END,
-        updated_at = clock_timestamp()
-    WHERE policy_changed OR (state.next_run_at IS NULL AND EXCLUDED.next_run_at IS NOT NULL);
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.search(prefix text, bucketname text, limits integer DEFAULT 100, levels integer DEFAULT 1, offsets integer DEFAULT 0, search text DEFAULT ''::text, sortcolumn text DEFAULT 'name'::text, sortorder text DEFAULT 'asc'::text, noncurrent_versions text DEFAULT 'exclude'::text, delete_markers text DEFAULT 'exclude'::text)
- RETURNS TABLE(name text, id uuid, updated_at timestamp with time zone, created_at timestamp with time zone, last_accessed_at timestamp with time zone, metadata jsonb, version text, archived_at timestamp with time zone, is_delete_marker boolean, is_versioned boolean)
- LANGUAGE plpgsql
- STABLE
-AS $function$
-DECLARE
-    v_peek_name TEXT;
-    v_current RECORD;
-    v_common_prefix TEXT;
-    v_delimiter CONSTANT TEXT := '/';
-
-    -- Configuration
-    v_limit INT;
-    v_prefix TEXT;
-    v_prefix_lower TEXT;
-    v_prefix_len INT;
-    v_prefix_start INT;
-    v_combined_levels INT;
-    v_is_asc BOOLEAN;
-    v_order_by TEXT;
-    v_sort_order TEXT;
-    v_upper_bound TEXT;
-    v_file_batch_size INT;
-    v_version_filter TEXT;
-    v_multi_row BOOLEAN;
-
-    -- Dynamic SQL for batch query only
-    v_batch_query TEXT;
-    v_delete_marker_peek_query TEXT;
-    v_delete_marker_peek_query_strict TEXT;
-
-    -- Seek state
-    v_next_seek TEXT;
-    v_next_seek_at TIMESTAMPTZ;
-    v_next_seek_version TEXT;
-    v_next_seek_strict BOOLEAN := false;
-    v_count INT := 0;
-    v_skipped INT := 0;
-    v_previous_seek TEXT;
-    v_previous_seek_at TIMESTAMPTZ;
-    v_previous_seek_version TEXT;
-    v_previous_count INT;
-    v_previous_skipped INT;
-BEGIN
-    -- ========================================================================
-    -- INITIALIZATION
-    -- ========================================================================
-    v_limit := LEAST(coalesce(limits, 100), 1500);
-    v_prefix := coalesce(prefix, '') || coalesce(search, '');
-    v_prefix_lower := lower(v_prefix);
-    v_prefix_len := length(coalesce(prefix, ''));
-    v_prefix_start := coalesce(array_length(string_to_array(coalesce(prefix, ''), v_delimiter), 1), 1);
-    v_combined_levels := coalesce(array_length(string_to_array(v_prefix, v_delimiter), 1), 1);
-    v_is_asc := lower(coalesce(sortorder, 'asc')) = 'asc';
-    v_file_batch_size := LEAST(GREATEST(v_limit * 2, 100), 1000);
-    v_next_seek_at := NULL;
-    v_next_seek_version := '';
-
-    -- COALESCE first: NULL NOT IN (...) evaluates to NULL (not TRUE), so a
-    -- bare NOT IN check silently leaves an explicit NULL argument unreset.
-    noncurrent_versions := COALESCE(noncurrent_versions, 'exclude');
-    delete_markers := COALESCE(delete_markers, 'exclude');
-    IF noncurrent_versions NOT IN ('exclude', 'only', 'include') THEN
-        noncurrent_versions := 'exclude';
-    END IF;
-    IF delete_markers NOT IN ('exclude', 'only', 'include') THEN
-        delete_markers := 'exclude';
-    END IF;
-
-    v_multi_row := noncurrent_versions IN ('only', 'include');
-
-    v_version_filter := '';
-    IF noncurrent_versions = 'exclude' THEN
-        v_version_filter := v_version_filter || ' AND o.archived_at IS NULL';
-    ELSIF noncurrent_versions = 'only' THEN
-        v_version_filter := v_version_filter || ' AND o.archived_at IS NOT NULL';
-    END IF;
-    IF delete_markers = 'exclude' THEN
-        v_version_filter := v_version_filter || ' AND NOT o.is_delete_marker';
-    ELSIF delete_markers = 'only' THEN
-        v_version_filter := v_version_filter || ' AND o.is_delete_marker';
-    END IF;
-
-    -- Validate sort column
-    CASE lower(coalesce(sortcolumn, 'name'))
-        WHEN 'name' THEN v_order_by := 'name';
-        WHEN 'updated_at' THEN v_order_by := 'updated_at';
-        WHEN 'created_at' THEN v_order_by := 'created_at';
-        WHEN 'last_accessed_at' THEN v_order_by := 'last_accessed_at';
-        ELSE v_order_by := 'name';
-    END CASE;
-
-    v_sort_order := CASE WHEN v_is_asc THEN 'asc' ELSE 'desc' END;
-
-    -- ========================================================================
-    -- NON-NAME SORTING: Use path_tokens approach
-    -- ========================================================================
-    IF v_order_by != 'name' THEN
-        RETURN QUERY EXECUTE format(
-            $sql$
-            WITH folders AS (
-                SELECT array_to_string(path_tokens[$1:$2], '/') AS folder
-                FROM storage.objects
-                WHERE objects.name ILIKE $3 || '%%'
-                  AND bucket_id = $4
-                  AND array_length(objects.path_tokens, 1) <> $2
-                  AND ($7 != 'exclude' OR objects.archived_at IS NULL)
-                  AND ($7 != 'only' OR objects.archived_at IS NOT NULL)
-                  AND ($8 != 'exclude' OR NOT objects.is_delete_marker)
-                  AND ($8 != 'only' OR objects.is_delete_marker)
-                GROUP BY folder
-                ORDER BY folder %s
-            )
-            (SELECT folder AS "name",
-                   NULL::uuid AS id,
-                   NULL::timestamptz AS updated_at,
-                   NULL::timestamptz AS created_at,
-                   NULL::timestamptz AS last_accessed_at,
-                   NULL::jsonb AS metadata,
-                   NULL::text AS version,
-                   NULL::timestamptz AS archived_at,
-                   NULL::boolean AS is_delete_marker,
-                   NULL::boolean AS is_versioned FROM folders)
-            UNION ALL
-            (SELECT array_to_string(path_tokens[$1:$2], '/') AS "name",
-                   id, updated_at, created_at, last_accessed_at, metadata,
-                   version, archived_at, is_delete_marker, is_versioned
-             FROM storage.objects
-             WHERE objects.name ILIKE $3 || '%%'
-               AND bucket_id = $4
-               AND array_length(objects.path_tokens, 1) = $2
-               AND ($7 != 'exclude' OR objects.archived_at IS NULL)
-               AND ($7 != 'only' OR objects.archived_at IS NOT NULL)
-               AND ($8 != 'exclude' OR NOT objects.is_delete_marker)
-               AND ($8 != 'only' OR objects.is_delete_marker)
-             -- name, then version, as tiebreaks so two versions of the same
-             -- key tying on the sort column still sort deterministically
-             ORDER BY %I %s, name COLLATE "C" %s, COALESCE(version, '') %s)
-            LIMIT $5 OFFSET $6
-            $sql$, v_sort_order, v_order_by, v_sort_order, v_sort_order, v_sort_order
-        ) USING v_prefix_start, v_combined_levels, v_prefix, bucketname, v_limit, offsets, noncurrent_versions, delete_markers;
-        RETURN;
-    END IF;
-
-    -- ========================================================================
-    -- NAME SORTING: Hybrid skip-scan with batch optimization
-    -- ========================================================================
-
-    -- Calculate upper bound for prefix filtering
-    IF v_prefix_lower = '' THEN
-        v_upper_bound := NULL;
-    ELSIF right(v_prefix_lower, 1) = v_delimiter THEN
-        v_upper_bound := left(v_prefix_lower, -1) || chr(ascii(v_delimiter) + 1);
-    ELSE
-        v_upper_bound := left(v_prefix_lower, -1) || chr(ascii(right(v_prefix_lower, 1)) + 1);
-    END IF;
-
-    -- Build a resume-safe batch query. The exact-name branch returns remaining
-    -- versions after the current (archived_at, version) boundary; the strict
-    -- name branch returns subsequent keys. UNION ALL keeps both predicates
-    -- independently indexable.
-    IF v_is_asc THEN
-        IF v_upper_bound IS NOT NULL THEN
-            v_batch_query := 'SELECT * FROM (' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" = $2 AND ($5::timestamptz IS NULL OR COALESCE(o.archived_at, ''infinity''::timestamptz) < $5 OR (COALESCE(o.archived_at, ''infinity''::timestamptz) = $5 AND COALESCE(o.version, '''') > $6))' ||
-                v_version_filter || ' ORDER BY COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4) UNION ALL ' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" > $2 AND lower(o.name) COLLATE "C" < $3' || v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" ASC, COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4)' ||
-                ') sub ORDER BY lower(sub.name) COLLATE "C" ASC, COALESCE(sub.archived_at, ''infinity''::timestamptz) DESC, COALESCE(sub.version, '''') ASC LIMIT $4';
-        ELSE
-            v_batch_query := 'SELECT * FROM (' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" = $2 AND ($5::timestamptz IS NULL OR COALESCE(o.archived_at, ''infinity''::timestamptz) < $5 OR (COALESCE(o.archived_at, ''infinity''::timestamptz) = $5 AND COALESCE(o.version, '''') > $6))' ||
-                v_version_filter || ' ORDER BY COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4) UNION ALL ' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" > $2' || v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" ASC, COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4)' ||
-                ') sub ORDER BY lower(sub.name) COLLATE "C" ASC, COALESCE(sub.archived_at, ''infinity''::timestamptz) DESC, COALESCE(sub.version, '''') ASC LIMIT $4';
-        END IF;
-    ELSE
-        IF v_upper_bound IS NOT NULL THEN
-            v_batch_query := 'SELECT * FROM (' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" = $2 AND ($5::timestamptz IS NULL OR COALESCE(o.archived_at, ''infinity''::timestamptz) < $5 OR (COALESCE(o.archived_at, ''infinity''::timestamptz) = $5 AND COALESCE(o.version, '''') > $6))' ||
-                v_version_filter || ' ORDER BY COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4) UNION ALL ' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" < $2 AND lower(o.name) COLLATE "C" >= $3' || v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" DESC, COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4)' ||
-                ') sub ORDER BY lower(sub.name) COLLATE "C" DESC, COALESCE(sub.archived_at, ''infinity''::timestamptz) DESC, COALESCE(sub.version, '''') ASC LIMIT $4';
-        ELSE
-            v_batch_query := 'SELECT * FROM (' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" = $2 AND ($5::timestamptz IS NULL OR COALESCE(o.archived_at, ''infinity''::timestamptz) < $5 OR (COALESCE(o.archived_at, ''infinity''::timestamptz) = $5 AND COALESCE(o.version, '''') > $6))' ||
-                v_version_filter || ' ORDER BY COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4) UNION ALL ' ||
-                '(SELECT o.name, o.id, o.updated_at, o.created_at, o.last_accessed_at, o.metadata, o.version, o.archived_at, o.is_delete_marker, o.is_versioned FROM storage.objects o ' ||
-                'WHERE o.bucket_id = $1 AND lower(o.name) COLLATE "C" < $2' || v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" DESC, COALESCE(o.archived_at, ''infinity''::timestamptz) DESC, COALESCE(o.version, '''') ASC LIMIT $4)' ||
-                ') sub ORDER BY lower(sub.name) COLLATE "C" DESC, COALESCE(sub.archived_at, ''infinity''::timestamptz) DESC, COALESCE(sub.version, '''') ASC LIMIT $4';
-        END IF;
-    END IF;
-
-    -- Keep the delete-marker predicate literal so the cached generic
-    -- plan can use idx_objects_delete_markers during the main-loop peek.
-    IF delete_markers = 'only' THEN
-        IF v_multi_row THEN
-            v_delete_marker_peek_query :=
-                'SELECT marker_page.name FROM (' || v_batch_query || ') marker_page LIMIT 1';
-        ELSIF v_is_asc THEN
-            -- Two separate literal query strings, not one gated by a bound
-            -- boolean: folding "$n AND op1 OR NOT $n AND op2" into a single
-            -- query defeats the generic plan's ability to push either
-            -- comparison into the index. Branching in PL/pgSQL control flow
-            -- instead keeps each query's index condition intact.
-            v_delete_marker_peek_query :=
-                'SELECT o.name FROM storage.objects o WHERE o.bucket_id = $1 ' ||
-                'AND lower(o.name) COLLATE "C" >= $2' ||
-                CASE WHEN v_upper_bound IS NOT NULL
-                    THEN ' AND lower(o.name) COLLATE "C" < $3'
-                    ELSE ''
-                END ||
-                v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1';
-            -- Strict variant: used once the single-row ASC batch advance
-            -- (below) has left v_next_seek pointing at the last row already
-            -- emitted, so a plain >= would re-match it forever.
-            v_delete_marker_peek_query_strict :=
-                'SELECT o.name FROM storage.objects o WHERE o.bucket_id = $1 ' ||
-                'AND lower(o.name) COLLATE "C" > $2' ||
-                CASE WHEN v_upper_bound IS NOT NULL
-                    THEN ' AND lower(o.name) COLLATE "C" < $3'
-                    ELSE ''
-                END ||
-                v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1';
-        ELSE
-            v_delete_marker_peek_query :=
-                'SELECT o.name FROM storage.objects o WHERE o.bucket_id = $1 ' ||
-                'AND lower(o.name) COLLATE "C" < $2' ||
-                CASE WHEN v_upper_bound IS NOT NULL
-                    THEN ' AND lower(o.name) COLLATE "C" >= $3'
-                    ELSE ''
-                END ||
-                v_version_filter ||
-                ' ORDER BY lower(o.name) COLLATE "C" DESC LIMIT 1';
-        END IF;
-    END IF;
-
-    -- Initialize seek position
-    IF v_is_asc THEN
-        v_next_seek := v_prefix_lower;
-    ELSE
-        -- DESC performs one specialized initial seek so partial current-version
-        -- and delete-marker indexes remain available.
-        EXECUTE format(
-            'SELECT o.name FROM storage.objects o WHERE o.bucket_id = $1%s%s ORDER BY lower(o.name) COLLATE "C" DESC LIMIT 1',
-            CASE WHEN v_upper_bound IS NOT NULL
-                THEN ' AND lower(o.name) COLLATE "C" >= $2 AND lower(o.name) COLLATE "C" < $3'
-                ELSE ''
-            END,
-            v_version_filter
-        )
-        INTO v_peek_name
-        USING bucketname, v_prefix_lower, v_upper_bound;
-
-        IF v_peek_name IS NOT NULL THEN
-            v_next_seek := lower(v_peek_name) || v_delimiter;
-        ELSE
-            RETURN;
-        END IF;
-    END IF;
-
-    -- ========================================================================
-    -- MAIN LOOP: Hybrid peek-then-batch algorithm
-    -- Uses STATIC SQL for peek (hot path) and DYNAMIC SQL for batch and
-    -- the delete-marker-only path
-    -- ========================================================================
-    LOOP
-        EXIT WHEN v_count >= v_limit;
-
-        v_previous_seek := v_next_seek;
-        v_previous_seek_at := v_next_seek_at;
-        v_previous_seek_version := v_next_seek_version;
-        v_previous_count := v_count;
-        v_previous_skipped := v_skipped;
-
-        -- STEP 1: PEEK
-        v_peek_name := NULL;
-        IF delete_markers = 'only' THEN
-            EXECUTE CASE WHEN v_next_seek_strict
-                THEN v_delete_marker_peek_query_strict
-                ELSE v_delete_marker_peek_query
-            END
-                INTO v_peek_name
-                USING bucketname, v_next_seek,
-                    CASE WHEN v_is_asc THEN COALESCE(v_upper_bound, v_prefix_lower) ELSE v_prefix_lower END,
-                    1, v_next_seek_at, v_next_seek_version;
-        ELSIF v_multi_row AND v_next_seek_at IS NOT NULL THEN
-            SELECT o.name INTO v_peek_name
-            FROM storage.objects o
-            WHERE o.bucket_id = bucketname
-              AND lower(o.name) COLLATE "C" = v_next_seek
-              AND (COALESCE(o.archived_at, 'infinity'::timestamptz) < v_next_seek_at
-                   OR (COALESCE(o.archived_at, 'infinity'::timestamptz) = v_next_seek_at
-                       AND COALESCE(o.version, '') > v_next_seek_version))
-              AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-              AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-              AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-              AND (delete_markers != 'only' OR o.is_delete_marker)
-            ORDER BY COALESCE(o.archived_at, 'infinity'::timestamptz) DESC,
-                     COALESCE(o.version, '') ASC
-            LIMIT 1;
-
-            -- The current key is exhausted. Clear its version boundary and
-            -- make the following ASC name peek strict. Appending '/' is not a
-            -- valid lexical successor because keys ending in characters such
-            -- as '!' sort between the exhausted name and name || '/'.
-            IF v_peek_name IS NULL THEN
-                IF v_is_asc THEN
-                    v_next_seek_strict := true;
-                END IF;
-                v_next_seek_at := NULL;
-                v_next_seek_version := '';
-            END IF;
-        END IF;
-
-        -- Single-row mode is always noncurrent_versions='exclude'. Keep the
-        -- current-row predicate literal so generic plans use the current index.
-        IF delete_markers != 'only' AND v_peek_name IS NULL AND NOT v_multi_row THEN
-            IF v_is_asc THEN
-                IF v_next_seek_strict AND v_upper_bound IS NOT NULL THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" > v_next_seek AND lower(o.name) COLLATE "C" < v_upper_bound
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                    ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-                ELSIF v_next_seek_strict THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" > v_next_seek
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                    ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-                ELSIF v_upper_bound IS NOT NULL THEN
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" >= v_next_seek AND lower(o.name) COLLATE "C" < v_upper_bound
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                    ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-                ELSE
-                    SELECT o.name INTO v_peek_name FROM storage.objects o
-                    WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" >= v_next_seek
-                      AND o.archived_at IS NULL
-                      AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                    ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-                END IF;
-            ELSIF v_upper_bound IS NOT NULL THEN
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" < v_next_seek AND lower(o.name) COLLATE "C" >= v_prefix_lower
-                  AND o.archived_at IS NULL
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" DESC LIMIT 1;
-            ELSE
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" < v_next_seek
-                  AND o.archived_at IS NULL
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" DESC LIMIT 1;
-            END IF;
-        ELSIF delete_markers != 'only' AND v_peek_name IS NULL AND v_is_asc THEN
-            IF v_next_seek_strict AND v_upper_bound IS NOT NULL THEN
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" > v_next_seek AND lower(o.name) COLLATE "C" < v_upper_bound
-                  AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                  AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                  AND (delete_markers != 'only' OR o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-            ELSIF v_next_seek_strict THEN
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" > v_next_seek
-                  AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                  AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                  AND (delete_markers != 'only' OR o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-            ELSIF v_upper_bound IS NOT NULL THEN
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" >= v_next_seek AND lower(o.name) COLLATE "C" < v_upper_bound
-                  AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                  AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                  AND (delete_markers != 'only' OR o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-            ELSE
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" >= v_next_seek
-                  AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                  AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                  AND (delete_markers != 'only' OR o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" ASC LIMIT 1;
-            END IF;
-        ELSIF delete_markers != 'only' AND v_peek_name IS NULL THEN
-            IF v_upper_bound IS NOT NULL THEN
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" < v_next_seek AND lower(o.name) COLLATE "C" >= v_prefix_lower
-                  AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                  AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                  AND (delete_markers != 'only' OR o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" DESC LIMIT 1;
-            ELSE
-                SELECT o.name INTO v_peek_name FROM storage.objects o
-                WHERE o.bucket_id = bucketname AND lower(o.name) COLLATE "C" < v_next_seek
-                  AND (noncurrent_versions != 'exclude' OR o.archived_at IS NULL)
-                  AND (noncurrent_versions != 'only' OR o.archived_at IS NOT NULL)
-                  AND (delete_markers != 'exclude' OR NOT o.is_delete_marker)
-                  AND (delete_markers != 'only' OR o.is_delete_marker)
-                ORDER BY lower(o.name) COLLATE "C" DESC LIMIT 1;
-            END IF;
-        END IF;
-
-        EXIT WHEN v_peek_name IS NULL;
-
-        -- If the peek landed on a different key than we were tracking, any
-        -- version boundary belongs to the OLD key and must not leak into the
-        -- new one - e.g. the deleteMarkers='only' peek doesn't know or care
-        -- whether it's continuing the same key or jumping to a new one, so
-        -- it never clears these itself.
-        IF lower(v_peek_name) IS DISTINCT FROM v_next_seek THEN
-            v_next_seek_at := NULL;
-            v_next_seek_version := '';
-        END IF;
-
-        -- The peek is authoritative for the next key to process. This is
-        -- especially important after exhausting a multi-version key: the
-        -- version boundary has been cleared, so executing the batch against
-        -- a stale v_next_seek would replay every version of that old key.
-        v_next_seek := lower(v_peek_name);
-        v_next_seek_strict := false;
-
-        -- STEP 2: Check if this is a FOLDER or FILE
-        v_common_prefix := storage.get_common_prefix(lower(v_peek_name), v_prefix_lower, v_delimiter);
-
-        IF v_common_prefix IS NOT NULL THEN
-            -- FOLDER: Handle offset, emit if needed, skip to next folder
-            IF v_skipped < offsets THEN
-                v_skipped := v_skipped + 1;
-            ELSE
-                name := substring(rtrim(storage.get_common_prefix(v_peek_name, v_prefix, v_delimiter), v_delimiter) from v_prefix_len + 1);
-                id := NULL;
-                updated_at := NULL;
-                created_at := NULL;
-                last_accessed_at := NULL;
-                metadata := NULL;
-                version := NULL;
-                archived_at := NULL;
-                is_delete_marker := NULL;
-                is_versioned := NULL;
-                RETURN NEXT;
-                v_count := v_count + 1;
-            END IF;
-
-            -- Advance seek past the folder range
-            IF v_is_asc THEN
-                v_next_seek := lower(left(v_common_prefix, -1)) || chr(ascii(v_delimiter) + 1);
-            ELSE
-                v_next_seek := lower(v_common_prefix);
-            END IF;
-            v_next_seek_at := NULL;
-            v_next_seek_version := '';
-        ELSE
-            -- FILE: Batch fetch using DYNAMIC SQL (overhead amortized over many rows)
-            -- For ASC: upper_bound is the exclusive upper limit (< condition)
-            -- For DESC: prefix_lower is the inclusive lower limit (>= condition)
-            FOR v_current IN EXECUTE v_batch_query
-                USING bucketname, v_next_seek,
-                    CASE WHEN v_is_asc THEN COALESCE(v_upper_bound, v_prefix_lower) ELSE v_prefix_lower END, v_file_batch_size,
-                    v_next_seek_at, v_next_seek_version
-            LOOP
-                v_common_prefix := storage.get_common_prefix(lower(v_current.name), v_prefix_lower, v_delimiter);
-
-                IF v_common_prefix IS NOT NULL THEN
-                    -- Hit a folder: exit batch, let peek handle it. Reset
-                    -- strict mode too - it may have been set by an earlier
-                    -- row in this same batch (see the single-row ASC advance
-                    -- below), and v_next_seek here is the folder-triggering
-                    -- row's own name, which the next peek must find inclusively.
-                    v_next_seek := CASE
-                        WHEN v_is_asc THEN lower(v_current.name)
-                        ELSE lower(v_current.name) || v_delimiter
-                    END;
-                    v_next_seek_at := NULL;
-                    v_next_seek_version := '';
-                    v_next_seek_strict := false;
-                    EXIT;
-                END IF;
-
-                -- Handle offset skipping
-                IF v_skipped < offsets THEN
-                    v_skipped := v_skipped + 1;
-                ELSE
-                    -- Emit file
-                    name := substring(v_current.name from v_prefix_len + 1);
-                    id := v_current.id;
-                    updated_at := v_current.updated_at;
-                    created_at := v_current.created_at;
-                    last_accessed_at := v_current.last_accessed_at;
-                    metadata := v_current.metadata;
-                    version := v_current.version;
-                    archived_at := v_current.archived_at;
-                    is_delete_marker := v_current.is_delete_marker;
-                    is_versioned := v_current.is_versioned;
-                    RETURN NEXT;
-                    v_count := v_count + 1;
-                END IF;
-
-                -- Multi-row mode must remain on this key until all of its
-                -- versions have crossed the internal batch boundary.
-                IF v_multi_row THEN
-                    v_next_seek := lower(v_current.name);
-                    v_next_seek_at := COALESCE(v_current.archived_at, 'infinity'::timestamptz);
-                    v_next_seek_version := COALESCE(v_current.version, '');
-                ELSIF v_is_asc THEN
-                    -- Appending the delimiter as a fake lexical successor would
-                    -- skip a real key like `name || '!'` (or any character
-                    -- sorting below the delimiter), which sorts between `name`
-                    -- and `name || delimiter`. Track the real name and mark the
-                    -- next comparison strict instead - same fix as the
-                    -- exhausted-key case above.
-                    v_next_seek := lower(v_current.name);
-                    v_next_seek_strict := true;
-                ELSE
-                    v_next_seek := lower(v_current.name);
-                END IF;
-
-                EXIT WHEN v_count >= v_limit;
-            END LOOP;
-        END IF;
-
-        IF v_count = v_previous_count
-           AND v_skipped = v_previous_skipped
-           AND v_next_seek IS NOT DISTINCT FROM v_previous_seek
-           AND v_next_seek_at IS NOT DISTINCT FROM v_previous_seek_at
-           AND v_next_seek_version IS NOT DISTINCT FROM v_previous_seek_version THEN
-            RAISE EXCEPTION 'storage.search made no progress at seek (%, %, %)',
-                v_next_seek, v_next_seek_at, v_next_seek_version;
-        END IF;
-    END LOOP;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.search_by_timestamp(p_prefix text, p_bucket_id text, p_limit integer, p_level integer, p_start_after text, p_sort_order text, p_sort_column text, p_sort_column_after text, noncurrent_versions text DEFAULT 'exclude'::text, delete_markers text DEFAULT 'exclude'::text, p_start_after_version text DEFAULT ''::text)
- RETURNS TABLE(key text, name text, id uuid, updated_at timestamp with time zone, created_at timestamp with time zone, last_accessed_at timestamp with time zone, metadata jsonb, version text, archived_at timestamp with time zone, is_delete_marker boolean, is_versioned boolean)
- LANGUAGE plpgsql
- STABLE
-AS $function$
-DECLARE
-    v_cursor_op text;
-    v_query text;
-    v_prefix text;
-    v_prefix_pattern text;
-    v_sort_order text;
-    v_sort_column text;
-    v_version_tiebreak text;
-BEGIN
-    v_prefix := coalesce(p_prefix, '');
-    -- Keep the raw prefix for common-prefix calculations and escape only LIKE metacharacters.
-    v_prefix_pattern := replace(v_prefix, chr(92), chr(92) || chr(92));
-    v_prefix_pattern := replace(v_prefix_pattern, '%', chr(92) || '%');
-    v_prefix_pattern := replace(v_prefix_pattern, '_', chr(92) || '_');
-
-    -- COALESCE first: NULL NOT IN (...) evaluates to NULL (not TRUE), so a
-    -- bare NOT IN check silently leaves an explicit NULL argument unreset.
-    noncurrent_versions := COALESCE(noncurrent_versions, 'exclude');
-    delete_markers := COALESCE(delete_markers, 'exclude');
-    IF noncurrent_versions NOT IN ('exclude', 'only', 'include') THEN
-        noncurrent_versions := 'exclude';
-    END IF;
-    IF delete_markers NOT IN ('exclude', 'only', 'include') THEN
-        delete_markers := 'exclude';
-    END IF;
-
-    -- $9 is only populated in multi-row mode; it's always '' otherwise, so
-    -- only use each row's real version as a tiebreak in multi-row mode.
-    v_version_tiebreak := CASE WHEN noncurrent_versions IN ('only', 'include') THEN 'COALESCE(version, '''')' ELSE '''''' END;
-
-    -- Defense-in-depth: this function is independently reachable and must
-    -- not trust p_sort_order/p_sort_column to already be validated by a
-    -- caller. Normalize to the same strict allow-list storage.search_v2
-    -- uses before interpolating anything into dynamic SQL below.
-    v_sort_order := lower(coalesce(p_sort_order, 'asc'));
-    IF v_sort_order NOT IN ('asc', 'desc') THEN
-        v_sort_order := 'asc';
-    END IF;
-
-    v_sort_column := lower(coalesce(p_sort_column, 'updated_at'));
-    IF v_sort_column NOT IN ('updated_at', 'created_at') THEN
-        v_sort_column := 'updated_at';
-    END IF;
-
-    IF v_sort_order = 'asc' THEN
-        v_cursor_op := '>';
-    ELSE
-        v_cursor_op := '<';
-    END IF;
-
-    v_query := format($sql$
-        WITH raw_objects AS (
-            SELECT
-                o.name AS obj_name,
-                o.id AS obj_id,
-                o.updated_at AS obj_updated_at,
-                o.created_at AS obj_created_at,
-                o.last_accessed_at AS obj_last_accessed_at,
-                o.metadata AS obj_metadata,
-                o.version AS obj_version,
-                o.archived_at AS obj_archived_at,
-                o.is_delete_marker AS obj_is_delete_marker,
-                o.is_versioned AS obj_is_versioned,
-                storage.get_common_prefix(o.name, $1, '/') AS common_prefix
-            FROM storage.objects o
-            WHERE o.bucket_id = $2
-              AND o.name COLLATE "C" LIKE $10 || '%%'
-              AND ($7 != 'exclude' OR o.archived_at IS NULL)
-              AND ($7 != 'only' OR o.archived_at IS NOT NULL)
-              AND ($8 != 'exclude' OR NOT o.is_delete_marker)
-              AND ($8 != 'only' OR o.is_delete_marker)
-        ),
-        -- Aggregate common prefixes (folders)
-        -- Both created_at and updated_at use MIN(obj_created_at) to match the old prefixes table behavior
-        aggregated_prefixes AS (
-            SELECT
-                common_prefix AS name,
-                NULL::uuid AS id,
-                MIN(obj_created_at) AS updated_at,
-                MIN(obj_created_at) AS created_at,
-                NULL::timestamptz AS last_accessed_at,
-                NULL::jsonb AS metadata,
-                NULL::text AS version,
-                NULL::timestamptz AS archived_at,
-                NULL::boolean AS is_delete_marker,
-                NULL::boolean AS is_versioned,
-                TRUE AS is_prefix
-            FROM raw_objects
-            WHERE common_prefix IS NOT NULL
-            GROUP BY common_prefix
-        ),
-        leaf_objects AS (
-            SELECT
-                obj_name AS name,
-                obj_id AS id,
-                obj_updated_at AS updated_at,
-                obj_created_at AS created_at,
-                obj_last_accessed_at AS last_accessed_at,
-                obj_metadata AS metadata,
-                obj_version AS version,
-                obj_archived_at AS archived_at,
-                obj_is_delete_marker AS is_delete_marker,
-                obj_is_versioned AS is_versioned,
-                FALSE AS is_prefix
-            FROM raw_objects
-            WHERE common_prefix IS NULL
-        ),
-        combined AS (
-            SELECT * FROM aggregated_prefixes
-            UNION ALL
-            SELECT * FROM leaf_objects
-        ),
-        filtered AS (
-            SELECT *
-            FROM combined
-            WHERE (
-                $5 = ''
-                OR ROW(
-                    COALESCE(date_trunc('milliseconds', %I), 'epoch'::timestamptz),
-                    name COLLATE "C",
-                    %s
-                ) %s ROW(
-                    -- truncated the same way as the stored value above
-                    date_trunc('milliseconds', COALESCE(NULLIF($6, '')::timestamptz, 'epoch'::timestamptz)),
-                    $5,
-                    $9
-                )
-            )
-        )
-        SELECT
-            split_part(name, '/', $3) AS key,
-            name,
-            id,
-            updated_at,
-            created_at,
-            last_accessed_at,
-            metadata,
-            version,
-            archived_at,
-            is_delete_marker,
-            is_versioned
-        FROM filtered
-        ORDER BY
-            COALESCE(date_trunc('milliseconds', %I), 'epoch'::timestamptz) %s,
-            name COLLATE "C" %s,
-            COALESCE(version, '') %s
-        LIMIT $4
-    $sql$,
-        v_sort_column,
-        v_version_tiebreak,
-        v_cursor_op,
-        v_sort_column,
-        v_sort_order,
-        v_sort_order,
-        v_sort_order
-    );
-
-    -- version is the third tiebreak component for two versions of the same
-    -- key tying on both timestamp and name (see filtered CTE / ORDER BY above)
-    RETURN QUERY EXECUTE v_query
-    USING v_prefix, p_bucket_id, p_level, p_limit, p_start_after, p_sort_column_after, noncurrent_versions, delete_markers, coalesce(p_start_after_version, ''), v_prefix_pattern;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.search_v2(prefix text, bucket_name text, limits integer DEFAULT 100, levels integer DEFAULT 1, start_after text DEFAULT ''::text, sort_order text DEFAULT 'asc'::text, sort_column text DEFAULT 'name'::text, sort_column_after text DEFAULT ''::text, noncurrent_versions text DEFAULT 'exclude'::text, delete_markers text DEFAULT 'exclude'::text, start_after_archived_at timestamp with time zone DEFAULT NULL::timestamp with time zone, start_after_version text DEFAULT ''::text, start_after_is_continuation boolean DEFAULT false)
- RETURNS TABLE(key text, name text, id uuid, updated_at timestamp with time zone, created_at timestamp with time zone, last_accessed_at timestamp with time zone, metadata jsonb, version text, archived_at timestamp with time zone, is_delete_marker boolean, is_versioned boolean)
- LANGUAGE plpgsql
- STABLE
-AS $function$
-DECLARE
-    v_sort_col text;
-    v_sort_ord text;
-    v_limit int;
-BEGIN
-    -- Cap limit to maximum of 1500 records
-    v_limit := LEAST(coalesce(limits, 100), 1500);
-
-    -- Validate and normalize sort_order
-    v_sort_ord := lower(coalesce(sort_order, 'asc'));
-    IF v_sort_ord NOT IN ('asc', 'desc') THEN
-        v_sort_ord := 'asc';
-    END IF;
-
-    -- Validate and normalize sort_column
-    v_sort_col := lower(coalesce(sort_column, 'name'));
-    IF v_sort_col NOT IN ('name', 'updated_at', 'created_at') THEN
-        v_sort_col := 'name';
-    END IF;
-
-    -- Route to appropriate implementation
-    IF v_sort_col = 'name' THEN
-        -- Use list_objects_with_delimiter for name sorting (most efficient: O(k * log n))
-        RETURN QUERY
-        SELECT
-            split_part(l.name, '/', levels) AS key,
-            l.name AS name,
-            l.id,
-            l.updated_at,
-            l.created_at,
-            l.last_accessed_at,
-            l.metadata,
-            l.version,
-            l.archived_at,
-            l.is_delete_marker,
-            l.is_versioned
-        FROM storage.list_objects_with_delimiter(
-            bucket_name,
-            coalesce(prefix, ''),
-            '/',
-            v_limit,
-            CASE WHEN start_after_is_continuation THEN '' ELSE start_after END,
-            CASE WHEN start_after_is_continuation THEN start_after ELSE '' END,
-            v_sort_ord,
-            noncurrent_versions,
-            delete_markers,
-            start_after_archived_at,
-            start_after_version
-        ) l;
-    ELSE
-        -- Use aggregation approach for timestamp sorting
-        -- Not efficient for large datasets but supports correct pagination
-        RETURN QUERY SELECT * FROM storage.search_by_timestamp(
-            prefix, bucket_name, v_limit, levels, start_after,
-            v_sort_ord, v_sort_col, sort_column_after,
-            noncurrent_versions, delete_markers, start_after_version
-        );
-    END IF;
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.update_updated_at_column()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-    NEW.updated_at = now();
-    RETURN NEW; 
-END;
-$function$ CREATE OR REPLACE FUNCTION storage.wake_lifecycle_state()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'pg_catalog'
-AS $function$
-BEGIN
-    IF TG_OP = 'INSERT' AND NEW.lifecycle_configuration IS NULL THEN
-        RETURN NEW;
-    END IF;
-
-    PERFORM storage.reconcile_lifecycle_state(NEW.id, false);
-    RETURN NEW;
-END;
-$function$ CREATE OR REPLACE FUNCTION vault._crypto_aead_det_decrypt(message bytea, additional bytea, key_id bigint, context bytea DEFAULT '\x7067736f6469756d'::bytea, nonce bytea DEFAULT NULL::bytea)
- RETURNS bytea
- LANGUAGE c
- IMMUTABLE
-AS '$libdir/supabase_vault', $function$pgsodium_crypto_aead_det_decrypt_by_id$function$ CREATE OR REPLACE FUNCTION vault._crypto_aead_det_encrypt(message bytea, additional bytea, key_id bigint, context bytea DEFAULT '\x7067736f6469756d'::bytea, nonce bytea DEFAULT NULL::bytea)
- RETURNS bytea
- LANGUAGE c
- IMMUTABLE
-AS '$libdir/supabase_vault', $function$pgsodium_crypto_aead_det_encrypt_by_id$function$ CREATE OR REPLACE FUNCTION vault._crypto_aead_det_noncegen()
- RETURNS bytea
- LANGUAGE c
- IMMUTABLE
-AS '$libdir/supabase_vault', $function$pgsodium_crypto_aead_det_noncegen$function$ CREATE OR REPLACE FUNCTION vault.create_secret(new_secret text, new_name text DEFAULT NULL::text, new_description text DEFAULT ''::text, new_key_id uuid DEFAULT NULL::uuid)
- RETURNS uuid
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO ''
-AS $function$
-DECLARE
-  rec record;
-BEGIN
-  INSERT INTO vault.secrets (secret, name, description)
-  VALUES (
-    new_secret,
-    new_name,
-    new_description
-  )
-  RETURNING * INTO rec;
-  UPDATE vault.secrets s
-  SET secret = encode(vault._crypto_aead_det_encrypt(
-    message := convert_to(rec.secret, 'utf8'),
-    additional := convert_to(s.id::text, 'utf8'),
-    key_id := 0,
-    context := 'pgsodium'::bytea,
-    nonce := rec.nonce
-  ), 'base64')
-  WHERE id = rec.id;
-  RETURN rec.id;
-END
-$function$ CREATE OR REPLACE FUNCTION vault.update_secret(secret_id uuid, new_secret text DEFAULT NULL::text, new_name text DEFAULT NULL::text, new_description text DEFAULT NULL::text, new_key_id uuid DEFAULT NULL::uuid)
- RETURNS void
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO ''
-AS $function$
-DECLARE
-  decrypted_secret text := (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE id = secret_id);
-BEGIN
-  UPDATE vault.secrets s
-  SET
-    secret = CASE WHEN new_secret IS NULL THEN s.secret
-                  ELSE encode(vault._crypto_aead_det_encrypt(
-                    message := convert_to(new_secret, 'utf8'),
-                    additional := convert_to(s.id::text, 'utf8'),
-                    key_id := 0,
-                    context := 'pgsodium'::bytea,
-                    nonce := s.nonce
-                  ), 'base64') END,
-    name = coalesce(new_name, s.name),
-    description = coalesce(new_description, s.description),
-    updated_at = now()
-  WHERE s.id = secret_id;
-END
 $function$;
+
+-- [net] wait_until_running()
+CREATE OR REPLACE FUNCTION net.wait_until_running()
+ RETURNS void
+ LANGUAGE c
+AS 'pg_net', $function$wait_until_running$function$;
+
+-- [net] wake()
+CREATE OR REPLACE FUNCTION net.wake()
+ RETURNS void
+ LANGUAGE c
+AS 'pg_net', $function$wake$function$;
+
+-- [net] worker_restart()
+CREATE OR REPLACE FUNCTION net.worker_restart()
+ RETURNS boolean
+ LANGUAGE c
+AS 'pg_net', $function$worker_restart$function$;
+
+-- [pg_catalog] RI_FKey_cascade_del()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_cascade_del"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_cascade_del$function$;
+
+-- [pg_catalog] RI_FKey_cascade_upd()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_cascade_upd"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_cascade_upd$function$;
+
+-- [pg_catalog] RI_FKey_check_ins()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_check_ins"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_check_ins$function$;
+
+-- [pg_catalog] RI_FKey_check_upd()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_check_upd"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_check_upd$function$;
+
+-- [pg_catalog] RI_FKey_noaction_del()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_noaction_del"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_noaction_del$function$;
+
+-- [pg_catalog] RI_FKey_noaction_upd()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_noaction_upd"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_noaction_upd$function$;
+
+-- [pg_catalog] RI_FKey_restrict_del()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_restrict_del"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_restrict_del$function$;
+
+-- [pg_catalog] RI_FKey_restrict_upd()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_restrict_upd"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_restrict_upd$function$;
+
+-- [pg_catalog] RI_FKey_setdefault_del()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_setdefault_del"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_setdefault_del$function$;
+
+-- [pg_catalog] RI_FKey_setdefault_upd()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_setdefault_upd"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_setdefault_upd$function$;
+
+-- [pg_catalog] RI_FKey_setnull_del()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_setnull_del"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_setnull_del$function$;
+
+-- [pg_catalog] RI_FKey_setnull_upd()
+CREATE OR REPLACE FUNCTION pg_catalog."RI_FKey_setnull_upd"()
+ RETURNS trigger
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$RI_FKey_setnull_upd$function$;
+
+-- [pg_catalog] abbrev(cidr)
+CREATE OR REPLACE FUNCTION pg_catalog.abbrev(cidr)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidr_abbrev$function$;
+
+-- [pg_catalog] abbrev(inet)
+CREATE OR REPLACE FUNCTION pg_catalog.abbrev(inet)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$inet_abbrev$function$;
+
+-- [pg_catalog] abs(bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.abs(bigint)
+ RETURNS bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$int8abs$function$;
+
+-- [pg_catalog] abs(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.abs(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8abs$function$;
+
+-- [pg_catalog] abs(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.abs(integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$int4abs$function$;
+
+-- [pg_catalog] abs(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.abs(numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_abs$function$;
+
+-- [pg_catalog] abs(real)
+CREATE OR REPLACE FUNCTION pg_catalog.abs(real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4abs$function$;
+
+-- [pg_catalog] abs(smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.abs(smallint)
+ RETURNS smallint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$int2abs$function$;
+
+-- [pg_catalog] aclcontains(aclitem[], aclitem)
+CREATE OR REPLACE FUNCTION pg_catalog.aclcontains(aclitem[], aclitem)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$aclcontains$function$;
+
+-- [pg_catalog] acldefault("char", oid)
+CREATE OR REPLACE FUNCTION pg_catalog.acldefault("char", oid)
+ RETURNS aclitem[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$acldefault_sql$function$;
+
+-- [pg_catalog] aclexplode(acl aclitem[], OUT grantor oid, OUT grantee oid, OUT privilege_type text, OUT is_grantable boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.aclexplode(acl aclitem[], OUT grantor oid, OUT grantee oid, OUT privilege_type text, OUT is_grantable boolean)
+ RETURNS SETOF record
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT ROWS 10
+AS $function$aclexplode$function$;
+
+-- [pg_catalog] aclinsert(aclitem[], aclitem)
+CREATE OR REPLACE FUNCTION pg_catalog.aclinsert(aclitem[], aclitem)
+ RETURNS aclitem[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$aclinsert$function$;
+
+-- [pg_catalog] aclitemeq(aclitem, aclitem)
+CREATE OR REPLACE FUNCTION pg_catalog.aclitemeq(aclitem, aclitem)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$aclitem_eq$function$;
+
+-- [pg_catalog] aclitemin(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.aclitemin(cstring)
+ RETURNS aclitem
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$aclitemin$function$;
+
+-- [pg_catalog] aclitemout(aclitem)
+CREATE OR REPLACE FUNCTION pg_catalog.aclitemout(aclitem)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$aclitemout$function$;
+
+-- [pg_catalog] aclremove(aclitem[], aclitem)
+CREATE OR REPLACE FUNCTION pg_catalog.aclremove(aclitem[], aclitem)
+ RETURNS aclitem[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$aclremove$function$;
+
+-- [pg_catalog] acos(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.acos(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dacos$function$;
+
+-- [pg_catalog] acosd(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.acosd(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dacosd$function$;
+
+-- [pg_catalog] acosh(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.acosh(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dacosh$function$;
+
+-- [pg_catalog] age(timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp with time zone)
+ RETURNS interval
+ LANGUAGE sql
+ STABLE PARALLEL SAFE STRICT COST 1
+RETURN age((CURRENT_DATE)::timestamp with time zone, $1);
+
+-- [pg_catalog] age(timestamp with time zone, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp with time zone, timestamp with time zone)
+ RETURNS interval
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_age$function$;
+
+-- [pg_catalog] age(timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp without time zone)
+ RETURNS interval
+ LANGUAGE sql
+ STABLE PARALLEL SAFE STRICT COST 1
+RETURN age((CURRENT_DATE)::timestamp without time zone, $1);
+
+-- [pg_catalog] age(timestamp without time zone, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp without time zone, timestamp without time zone)
+ RETURNS interval
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamp_age$function$;
+
+-- [pg_catalog] age(xid)
+CREATE OR REPLACE FUNCTION pg_catalog.age(xid)
+ RETURNS integer
+ LANGUAGE internal
+ STABLE PARALLEL RESTRICTED STRICT
+AS $function$xid_age$function$;
+
+-- [pg_catalog] amvalidate(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.amvalidate(oid)
+ RETURNS boolean
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$amvalidate$function$;
+
+-- [pg_catalog] any_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.any_in(cstring)
+ RETURNS "any"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$any_in$function$;
+
+-- [pg_catalog] any_out("any")
+CREATE OR REPLACE FUNCTION pg_catalog.any_out("any")
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$any_out$function$;
+
+-- [pg_catalog] any_value_transfn(anyelement, anyelement)
+CREATE OR REPLACE FUNCTION pg_catalog.any_value_transfn(anyelement, anyelement)
+ RETURNS anyelement
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$any_value_transfn$function$;
+
+-- [pg_catalog] anyarray_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anyarray_in(cstring)
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anyarray_in$function$;
+
+-- [pg_catalog] anyarray_out(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.anyarray_out(anyarray)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anyarray_out$function$;
+
+-- [pg_catalog] anyarray_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.anyarray_recv(internal)
+ RETURNS anyarray
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anyarray_recv$function$;
+
+-- [pg_catalog] anyarray_send(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.anyarray_send(anyarray)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anyarray_send$function$;
+
+-- [pg_catalog] anycompatible_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatible_in(cstring)
+ RETURNS anycompatible
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anycompatible_in$function$;
+
+-- [pg_catalog] anycompatible_out(anycompatible)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatible_out(anycompatible)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anycompatible_out$function$;
+
+-- [pg_catalog] anycompatiblearray_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblearray_in(cstring)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblearray_in$function$;
+
+-- [pg_catalog] anycompatiblearray_out(anycompatiblearray)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblearray_out(anycompatiblearray)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblearray_out$function$;
+
+-- [pg_catalog] anycompatiblearray_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblearray_recv(internal)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblearray_recv$function$;
+
+-- [pg_catalog] anycompatiblearray_send(anycompatiblearray)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblearray_send(anycompatiblearray)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblearray_send$function$;
+
+-- [pg_catalog] anycompatiblemultirange_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblemultirange_in(cstring, oid, integer)
+ RETURNS anycompatiblemultirange
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblemultirange_in$function$;
+
+-- [pg_catalog] anycompatiblemultirange_out(anycompatiblemultirange)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblemultirange_out(anycompatiblemultirange)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblemultirange_out$function$;
+
+-- [pg_catalog] anycompatiblenonarray_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblenonarray_in(cstring)
+ RETURNS anycompatiblenonarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblenonarray_in$function$;
+
+-- [pg_catalog] anycompatiblenonarray_out(anycompatiblenonarray)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblenonarray_out(anycompatiblenonarray)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblenonarray_out$function$;
+
+-- [pg_catalog] anycompatiblerange_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblerange_in(cstring, oid, integer)
+ RETURNS anycompatiblerange
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblerange_in$function$;
+
+-- [pg_catalog] anycompatiblerange_out(anycompatiblerange)
+CREATE OR REPLACE FUNCTION pg_catalog.anycompatiblerange_out(anycompatiblerange)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anycompatiblerange_out$function$;
+
+-- [pg_catalog] anyelement_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anyelement_in(cstring)
+ RETURNS anyelement
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anyelement_in$function$;
+
+-- [pg_catalog] anyelement_out(anyelement)
+CREATE OR REPLACE FUNCTION pg_catalog.anyelement_out(anyelement)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anyelement_out$function$;
+
+-- [pg_catalog] anyenum_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anyenum_in(cstring)
+ RETURNS anyenum
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anyenum_in$function$;
+
+-- [pg_catalog] anyenum_out(anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.anyenum_out(anyenum)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anyenum_out$function$;
+
+-- [pg_catalog] anymultirange_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.anymultirange_in(cstring, oid, integer)
+ RETURNS anymultirange
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anymultirange_in$function$;
+
+-- [pg_catalog] anymultirange_out(anymultirange)
+CREATE OR REPLACE FUNCTION pg_catalog.anymultirange_out(anymultirange)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anymultirange_out$function$;
+
+-- [pg_catalog] anynonarray_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.anynonarray_in(cstring)
+ RETURNS anynonarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anynonarray_in$function$;
+
+-- [pg_catalog] anynonarray_out(anynonarray)
+CREATE OR REPLACE FUNCTION pg_catalog.anynonarray_out(anynonarray)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$anynonarray_out$function$;
+
+-- [pg_catalog] anyrange_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.anyrange_in(cstring, oid, integer)
+ RETURNS anyrange
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anyrange_in$function$;
+
+-- [pg_catalog] anyrange_out(anyrange)
+CREATE OR REPLACE FUNCTION pg_catalog.anyrange_out(anyrange)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$anyrange_out$function$;
+
+-- [pg_catalog] anytextcat(anynonarray, text)
+CREATE OR REPLACE FUNCTION pg_catalog.anytextcat(anynonarray, text)
+ RETURNS text
+ LANGUAGE sql
+ STABLE PARALLEL SAFE STRICT COST 1
+AS $function$select $1::pg_catalog.text operator(pg_catalog.||) $2$function$;
+
+-- [pg_catalog] area(box)
+CREATE OR REPLACE FUNCTION pg_catalog.area(box)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_area$function$;
+
+-- [pg_catalog] area(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.area(circle)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_area$function$;
+
+-- [pg_catalog] area(path)
+CREATE OR REPLACE FUNCTION pg_catalog.area(path)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$path_area$function$;
+
+-- [pg_catalog] areajoinsel(internal, oid, internal, smallint, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.areajoinsel(internal, oid, internal, smallint, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$areajoinsel$function$;
+
+-- [pg_catalog] areasel(internal, oid, internal, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.areasel(internal, oid, internal, integer)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$areasel$function$;
+
+-- [pg_catalog] array_agg_array_combine(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_array_combine(internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_agg_array_combine$function$;
+
+-- [pg_catalog] array_agg_array_deserialize(bytea, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_array_deserialize(bytea, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_agg_array_deserialize$function$;
+
+-- [pg_catalog] array_agg_array_finalfn(internal, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_array_finalfn(internal, anyarray)
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_agg_array_finalfn$function$;
+
+-- [pg_catalog] array_agg_array_serialize(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_array_serialize(internal)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_agg_array_serialize$function$;
+
+-- [pg_catalog] array_agg_array_transfn(internal, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_array_transfn(internal, anyarray)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_agg_array_transfn$function$;
+
+-- [pg_catalog] array_agg_combine(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_combine(internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_agg_combine$function$;
+
+-- [pg_catalog] array_agg_deserialize(bytea, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_deserialize(bytea, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_agg_deserialize$function$;
+
+-- [pg_catalog] array_agg_finalfn(internal, anynonarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_finalfn(internal, anynonarray)
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_agg_finalfn$function$;
+
+-- [pg_catalog] array_agg_serialize(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_serialize(internal)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_agg_serialize$function$;
+
+-- [pg_catalog] array_agg_transfn(internal, anynonarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_agg_transfn(internal, anynonarray)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_agg_transfn$function$;
+
+-- [pg_catalog] array_append(anycompatiblearray, anycompatible)
+CREATE OR REPLACE FUNCTION pg_catalog.array_append(anycompatiblearray, anycompatible)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_append$function$;
+
+-- [pg_catalog] array_cat(anycompatiblearray, anycompatiblearray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_cat(anycompatiblearray, anycompatiblearray)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_cat$function$;
+
+-- [pg_catalog] array_dims(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_dims(anyarray)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_dims$function$;
+
+-- [pg_catalog] array_eq(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_eq(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_eq$function$;
+
+-- [pg_catalog] array_fill(anyelement, integer[])
+CREATE OR REPLACE FUNCTION pg_catalog.array_fill(anyelement, integer[])
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_fill$function$;
+
+-- [pg_catalog] array_fill(anyelement, integer[], integer[])
+CREATE OR REPLACE FUNCTION pg_catalog.array_fill(anyelement, integer[], integer[])
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_fill_with_lower_bounds$function$;
+
+-- [pg_catalog] array_ge(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_ge(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_ge$function$;
+
+-- [pg_catalog] array_gt(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_gt(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_gt$function$;
+
+-- [pg_catalog] array_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_in(cstring, oid, integer)
+ RETURNS anyarray
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_in$function$;
+
+-- [pg_catalog] array_larger(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_larger(anyarray, anyarray)
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_larger$function$;
+
+-- [pg_catalog] array_le(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_le(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_le$function$;
+
+-- [pg_catalog] array_length(anyarray, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_length(anyarray, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_length$function$;
+
+-- [pg_catalog] array_lower(anyarray, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_lower(anyarray, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_lower$function$;
+
+-- [pg_catalog] array_lt(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_lt(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_lt$function$;
+
+-- [pg_catalog] array_ndims(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_ndims(anyarray)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_ndims$function$;
+
+-- [pg_catalog] array_ne(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_ne(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_ne$function$;
+
+-- [pg_catalog] array_out(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_out(anyarray)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_out$function$;
+
+-- [pg_catalog] array_position(anycompatiblearray, anycompatible)
+CREATE OR REPLACE FUNCTION pg_catalog.array_position(anycompatiblearray, anycompatible)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_position$function$;
+
+-- [pg_catalog] array_position(anycompatiblearray, anycompatible, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_position(anycompatiblearray, anycompatible, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_position_start$function$;
+
+-- [pg_catalog] array_positions(anycompatiblearray, anycompatible)
+CREATE OR REPLACE FUNCTION pg_catalog.array_positions(anycompatiblearray, anycompatible)
+ RETURNS integer[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_positions$function$;
+
+-- [pg_catalog] array_prepend(anycompatible, anycompatiblearray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_prepend(anycompatible, anycompatiblearray)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_prepend$function$;
+
+-- [pg_catalog] array_recv(internal, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_recv(internal, oid, integer)
+ RETURNS anyarray
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_recv$function$;
+
+-- [pg_catalog] array_remove(anycompatiblearray, anycompatible)
+CREATE OR REPLACE FUNCTION pg_catalog.array_remove(anycompatiblearray, anycompatible)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_remove$function$;
+
+-- [pg_catalog] array_replace(anycompatiblearray, anycompatible, anycompatible)
+CREATE OR REPLACE FUNCTION pg_catalog.array_replace(anycompatiblearray, anycompatible, anycompatible)
+ RETURNS anycompatiblearray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$array_replace$function$;
+
+-- [pg_catalog] array_sample(anyarray, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_sample(anyarray, integer)
+ RETURNS anyarray
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$array_sample$function$;
+
+-- [pg_catalog] array_send(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_send(anyarray)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_send$function$;
+
+-- [pg_catalog] array_shuffle(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_shuffle(anyarray)
+ RETURNS anyarray
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$array_shuffle$function$;
+
+-- [pg_catalog] array_smaller(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_smaller(anyarray, anyarray)
+ RETURNS anyarray
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_smaller$function$;
+
+-- [pg_catalog] array_subscript_handler(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_subscript_handler(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_subscript_handler$function$;
+
+-- [pg_catalog] array_to_json(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.array_to_json(anyarray)
+ RETURNS json
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_to_json$function$;
+
+-- [pg_catalog] array_to_json(anyarray, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.array_to_json(anyarray, boolean)
+ RETURNS json
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_to_json_pretty$function$;
+
+-- [pg_catalog] array_to_string(anyarray, text)
+CREATE OR REPLACE FUNCTION pg_catalog.array_to_string(anyarray, text)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_to_text$function$;
+
+-- [pg_catalog] array_to_string(anyarray, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.array_to_string(anyarray, text, text)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$array_to_text_null$function$;
+
+-- [pg_catalog] array_to_tsvector(text[])
+CREATE OR REPLACE FUNCTION pg_catalog.array_to_tsvector(text[])
+ RETURNS tsvector
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_to_tsvector$function$;
+
+-- [pg_catalog] array_typanalyze(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_typanalyze(internal)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$array_typanalyze$function$;
+
+-- [pg_catalog] array_unnest_support(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.array_unnest_support(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_unnest_support$function$;
+
+-- [pg_catalog] array_upper(anyarray, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.array_upper(anyarray, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_upper$function$;
+
+-- [pg_catalog] arraycontained(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.arraycontained(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$arraycontained$function$;
+
+-- [pg_catalog] arraycontains(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.arraycontains(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$arraycontains$function$;
+
+-- [pg_catalog] arraycontjoinsel(internal, oid, internal, smallint, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.arraycontjoinsel(internal, oid, internal, smallint, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$arraycontjoinsel$function$;
+
+-- [pg_catalog] arraycontsel(internal, oid, internal, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.arraycontsel(internal, oid, internal, integer)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$arraycontsel$function$;
+
+-- [pg_catalog] arrayoverlap(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.arrayoverlap(anyarray, anyarray)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$arrayoverlap$function$;
+
+-- [pg_catalog] ascii(text)
+CREATE OR REPLACE FUNCTION pg_catalog.ascii(text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$ascii$function$;
+
+-- [pg_catalog] asin(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.asin(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dasin$function$;
+
+-- [pg_catalog] asind(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.asind(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dasind$function$;
+
+-- [pg_catalog] asinh(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.asinh(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dasinh$function$;
+
+-- [pg_catalog] atan(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.atan(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datan$function$;
+
+-- [pg_catalog] atan2(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.atan2(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datan2$function$;
+
+-- [pg_catalog] atan2d(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.atan2d(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datan2d$function$;
+
+-- [pg_catalog] atand(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.atand(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datand$function$;
+
+-- [pg_catalog] atanh(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.atanh(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datanh$function$;
+
+-- [pg_catalog] bernoulli(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bernoulli(internal)
+ RETURNS tsm_handler
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$tsm_bernoulli_handler$function$;
+
+-- [pg_catalog] big5_to_euc_tw(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.big5_to_euc_tw(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_tw_and_big5', $function$big5_to_euc_tw$function$;
+
+-- [pg_catalog] big5_to_mic(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.big5_to_mic(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_tw_and_big5', $function$big5_to_mic$function$;
+
+-- [pg_catalog] big5_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.big5_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_big5', $function$big5_to_utf8$function$;
+
+-- [pg_catalog] binary_upgrade_add_sub_rel_state(text, oid, "char", pg_lsn)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_add_sub_rel_state(text, oid, "char", pg_lsn)
+ RETURNS void
+ LANGUAGE internal
+AS $function$binary_upgrade_add_sub_rel_state$function$;
+
+-- [pg_catalog] binary_upgrade_create_empty_extension(text, text, boolean, text, oid[], text[], text[])
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_create_empty_extension(text, text, boolean, text, oid[], text[], text[])
+ RETURNS void
+ LANGUAGE internal
+AS $function$binary_upgrade_create_empty_extension$function$;
+
+-- [pg_catalog] binary_upgrade_logical_slot_has_caught_up(name)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_logical_slot_has_caught_up(name)
+ RETURNS boolean
+ LANGUAGE internal
+ STRICT
+AS $function$binary_upgrade_logical_slot_has_caught_up$function$;
+
+-- [pg_catalog] binary_upgrade_replorigin_advance(text, pg_lsn)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_replorigin_advance(text, pg_lsn)
+ RETURNS void
+ LANGUAGE internal
+AS $function$binary_upgrade_replorigin_advance$function$;
+
+-- [pg_catalog] binary_upgrade_set_missing_value(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_missing_value(oid, text, text)
+ RETURNS void
+ LANGUAGE internal
+ STRICT
+AS $function$binary_upgrade_set_missing_value$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_array_pg_type_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_array_pg_type_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_array_pg_type_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_heap_pg_class_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_heap_pg_class_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_heap_pg_class_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_heap_relfilenode(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_heap_relfilenode(oid)
+ RETURNS void
+ LANGUAGE internal
+ STRICT
+AS $function$binary_upgrade_set_next_heap_relfilenode$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_index_pg_class_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_index_pg_class_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_index_pg_class_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_index_relfilenode(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_index_relfilenode(oid)
+ RETURNS void
+ LANGUAGE internal
+ STRICT
+AS $function$binary_upgrade_set_next_index_relfilenode$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_multirange_array_pg_type_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_multirange_array_pg_type_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_multirange_array_pg_type_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_multirange_pg_type_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_multirange_pg_type_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_multirange_pg_type_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_pg_authid_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_pg_authid_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_pg_authid_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_pg_enum_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_pg_enum_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_pg_enum_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_pg_tablespace_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_pg_tablespace_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ STRICT
+AS $function$binary_upgrade_set_next_pg_tablespace_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_pg_type_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_pg_type_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_pg_type_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_toast_pg_class_oid(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_toast_pg_class_oid(oid)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_next_toast_pg_class_oid$function$;
+
+-- [pg_catalog] binary_upgrade_set_next_toast_relfilenode(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_next_toast_relfilenode(oid)
+ RETURNS void
+ LANGUAGE internal
+ STRICT
+AS $function$binary_upgrade_set_next_toast_relfilenode$function$;
+
+-- [pg_catalog] binary_upgrade_set_record_init_privs(boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.binary_upgrade_set_record_init_privs(boolean)
+ RETURNS void
+ LANGUAGE internal
+ PARALLEL RESTRICTED STRICT
+AS $function$binary_upgrade_set_record_init_privs$function$;
+
+-- [pg_catalog] bit(bigint, integer)
+CREATE OR REPLACE FUNCTION pg_catalog."bit"(bigint, integer)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitfromint8$function$;
+
+-- [pg_catalog] bit(bit, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog."bit"(bit, integer, boolean)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit$function$;
+
+-- [pg_catalog] bit(integer, integer)
+CREATE OR REPLACE FUNCTION pg_catalog."bit"(integer, integer)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitfromint4$function$;
+
+-- [pg_catalog] bit_count(bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_count(bit)
+ RETURNS bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_bit_count$function$;
+
+-- [pg_catalog] bit_count(bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_count(bytea)
+ RETURNS bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bytea_bit_count$function$;
+
+-- [pg_catalog] bit_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_in(cstring, oid, integer)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_in$function$;
+
+-- [pg_catalog] bit_length(bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_length(bit)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT COST 1
+RETURN length($1);
+
+-- [pg_catalog] bit_length(bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_length(bytea)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT COST 1
+RETURN (octet_length($1) * 8);
+
+-- [pg_catalog] bit_length(text)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_length(text)
+ RETURNS integer
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT COST 1
+RETURN (octet_length($1) * 8);
+
+-- [pg_catalog] bit_out(bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_out(bit)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_out$function$;
+
+-- [pg_catalog] bit_recv(internal, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_recv(internal, oid, integer)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_recv$function$;
+
+-- [pg_catalog] bit_send(bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bit_send(bit)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_send$function$;
+
+-- [pg_catalog] bitand(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitand(bit, bit)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_and$function$;
+
+-- [pg_catalog] bitcat(bit varying, bit varying)
+CREATE OR REPLACE FUNCTION pg_catalog.bitcat(bit varying, bit varying)
+ RETURNS bit varying
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitcat$function$;
+
+-- [pg_catalog] bitcmp(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitcmp(bit, bit)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bitcmp$function$;
+
+-- [pg_catalog] biteq(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.biteq(bit, bit)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$biteq$function$;
+
+-- [pg_catalog] bitge(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitge(bit, bit)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bitge$function$;
+
+-- [pg_catalog] bitgt(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitgt(bit, bit)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bitgt$function$;
+
+-- [pg_catalog] bitle(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitle(bit, bit)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bitle$function$;
+
+-- [pg_catalog] bitlt(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitlt(bit, bit)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bitlt$function$;
+
+-- [pg_catalog] bitne(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitne(bit, bit)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bitne$function$;
+
+-- [pg_catalog] bitnot(bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitnot(bit)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitnot$function$;
+
+-- [pg_catalog] bitor(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitor(bit, bit)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bit_or$function$;
+
+-- [pg_catalog] bitshiftleft(bit, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bitshiftleft(bit, integer)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitshiftleft$function$;
+
+-- [pg_catalog] bitshiftright(bit, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bitshiftright(bit, integer)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitshiftright$function$;
+
+-- [pg_catalog] bittypmodin(cstring[])
+CREATE OR REPLACE FUNCTION pg_catalog.bittypmodin(cstring[])
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bittypmodin$function$;
+
+-- [pg_catalog] bittypmodout(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bittypmodout(integer)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bittypmodout$function$;
+
+-- [pg_catalog] bitxor(bit, bit)
+CREATE OR REPLACE FUNCTION pg_catalog.bitxor(bit, bit)
+ RETURNS bit
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitxor$function$;
+
+-- [pg_catalog] bool(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bool(integer)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$int4_bool$function$;
+
+-- [pg_catalog] bool(jsonb)
+CREATE OR REPLACE FUNCTION pg_catalog.bool(jsonb)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$jsonb_bool$function$;
+
+-- [pg_catalog] bool_accum(internal, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.bool_accum(internal, boolean)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$bool_accum$function$;
+
+-- [pg_catalog] bool_accum_inv(internal, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.bool_accum_inv(internal, boolean)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$bool_accum_inv$function$;
+
+-- [pg_catalog] bool_alltrue(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bool_alltrue(internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bool_alltrue$function$;
+
+-- [pg_catalog] bool_anytrue(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bool_anytrue(internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bool_anytrue$function$;
+
+-- [pg_catalog] booland_statefunc(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.booland_statefunc(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$booland_statefunc$function$;
+
+-- [pg_catalog] booleq(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.booleq(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$booleq$function$;
+
+-- [pg_catalog] boolge(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolge(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$boolge$function$;
+
+-- [pg_catalog] boolgt(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolgt(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$boolgt$function$;
+
+-- [pg_catalog] boolin(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.boolin(cstring)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$boolin$function$;
+
+-- [pg_catalog] boolle(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolle(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$boolle$function$;
+
+-- [pg_catalog] boollt(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boollt(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$boollt$function$;
+
+-- [pg_catalog] boolne(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolne(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$boolne$function$;
+
+-- [pg_catalog] boolor_statefunc(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolor_statefunc(boolean, boolean)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$boolor_statefunc$function$;
+
+-- [pg_catalog] boolout(boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolout(boolean)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$boolout$function$;
+
+-- [pg_catalog] boolrecv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.boolrecv(internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$boolrecv$function$;
+
+-- [pg_catalog] boolsend(boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.boolsend(boolean)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$boolsend$function$;
+
+-- [pg_catalog] bound_box(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.bound_box(box, box)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$boxes_bound_box$function$;
+
+-- [pg_catalog] box(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.box(circle)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_box$function$;
+
+-- [pg_catalog] box(point)
+CREATE OR REPLACE FUNCTION pg_catalog.box(point)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$point_box$function$;
+
+-- [pg_catalog] box(point, point)
+CREATE OR REPLACE FUNCTION pg_catalog.box(point, point)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$points_box$function$;
+
+-- [pg_catalog] box(polygon)
+CREATE OR REPLACE FUNCTION pg_catalog.box(polygon)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$poly_box$function$;
+
+-- [pg_catalog] box_above(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_above(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_above$function$;
+
+-- [pg_catalog] box_above_eq(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_above_eq(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_above_eq$function$;
+
+-- [pg_catalog] box_add(box, point)
+CREATE OR REPLACE FUNCTION pg_catalog.box_add(box, point)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_add$function$;
+
+-- [pg_catalog] box_below(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_below(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_below$function$;
+
+-- [pg_catalog] box_below_eq(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_below_eq(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_below_eq$function$;
+
+-- [pg_catalog] box_center(box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_center(box)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_center$function$;
+
+-- [pg_catalog] box_contain(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_contain(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_contain$function$;
+
+-- [pg_catalog] box_contain_pt(box, point)
+CREATE OR REPLACE FUNCTION pg_catalog.box_contain_pt(box, point)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_contain_pt$function$;
+
+-- [pg_catalog] box_contained(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_contained(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_contained$function$;
+
+-- [pg_catalog] box_distance(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_distance(box, box)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_distance$function$;
+
+-- [pg_catalog] box_div(box, point)
+CREATE OR REPLACE FUNCTION pg_catalog.box_div(box, point)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_div$function$;
+
+-- [pg_catalog] box_eq(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_eq(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_eq$function$;
+
+-- [pg_catalog] box_ge(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_ge(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_ge$function$;
+
+-- [pg_catalog] box_gt(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_gt(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_gt$function$;
+
+-- [pg_catalog] box_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.box_in(cstring)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_in$function$;
+
+-- [pg_catalog] box_intersect(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_intersect(box, box)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_intersect$function$;
+
+-- [pg_catalog] box_le(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_le(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_le$function$;
+
+-- [pg_catalog] box_left(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_left(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_left$function$;
+
+-- [pg_catalog] box_lt(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_lt(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_lt$function$;
+
+-- [pg_catalog] box_mul(box, point)
+CREATE OR REPLACE FUNCTION pg_catalog.box_mul(box, point)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_mul$function$;
+
+-- [pg_catalog] box_out(box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_out(box)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_out$function$;
+
+-- [pg_catalog] box_overabove(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_overabove(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_overabove$function$;
+
+-- [pg_catalog] box_overbelow(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_overbelow(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_overbelow$function$;
+
+-- [pg_catalog] box_overlap(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_overlap(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_overlap$function$;
+
+-- [pg_catalog] box_overleft(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_overleft(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_overleft$function$;
+
+-- [pg_catalog] box_overright(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_overright(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_overright$function$;
+
+-- [pg_catalog] box_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.box_recv(internal)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_recv$function$;
+
+-- [pg_catalog] box_right(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_right(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_right$function$;
+
+-- [pg_catalog] box_same(box, box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_same(box, box)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_same$function$;
+
+-- [pg_catalog] box_send(box)
+CREATE OR REPLACE FUNCTION pg_catalog.box_send(box)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_send$function$;
+
+-- [pg_catalog] box_sub(box, point)
+CREATE OR REPLACE FUNCTION pg_catalog.box_sub(box, point)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_sub$function$;
+
+-- [pg_catalog] bpchar("char")
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar("char")
+ RETURNS character
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$char_bpchar$function$;
+
+-- [pg_catalog] bpchar(character, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar(character, integer, boolean)
+ RETURNS character
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpchar$function$;
+
+-- [pg_catalog] bpchar(name)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar(name)
+ RETURNS character
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$name_bpchar$function$;
+
+-- [pg_catalog] bpchar_larger(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_larger(character, character)
+ RETURNS character
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchar_larger$function$;
+
+-- [pg_catalog] bpchar_pattern_ge(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_pattern_ge(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchar_pattern_ge$function$;
+
+-- [pg_catalog] bpchar_pattern_gt(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_pattern_gt(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchar_pattern_gt$function$;
+
+-- [pg_catalog] bpchar_pattern_le(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_pattern_le(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchar_pattern_le$function$;
+
+-- [pg_catalog] bpchar_pattern_lt(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_pattern_lt(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchar_pattern_lt$function$;
+
+-- [pg_catalog] bpchar_smaller(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_smaller(character, character)
+ RETURNS character
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchar_smaller$function$;
+
+-- [pg_catalog] bpchar_sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchar_sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpchar_sortsupport$function$;
+
+-- [pg_catalog] bpcharcmp(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharcmp(character, character)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpcharcmp$function$;
+
+-- [pg_catalog] bpchareq(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchareq(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchareq$function$;
+
+-- [pg_catalog] bpcharge(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharge(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpcharge$function$;
+
+-- [pg_catalog] bpchargt(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchargt(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpchargt$function$;
+
+-- [pg_catalog] bpchariclike(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchariclike(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT texticlike_support
+AS $function$texticlike$function$;
+
+-- [pg_catalog] bpcharicnlike(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharicnlike(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$texticnlike$function$;
+
+-- [pg_catalog] bpcharicregexeq(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharicregexeq(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT texticregexeq_support
+AS $function$texticregexeq$function$;
+
+-- [pg_catalog] bpcharicregexne(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharicregexne(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$texticregexne$function$;
+
+-- [pg_catalog] bpcharin(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharin(cstring, oid, integer)
+ RETURNS character
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpcharin$function$;
+
+-- [pg_catalog] bpcharle(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharle(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpcharle$function$;
+
+-- [pg_catalog] bpcharlike(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharlike(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT textlike_support
+AS $function$textlike$function$;
+
+-- [pg_catalog] bpcharlt(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharlt(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpcharlt$function$;
+
+-- [pg_catalog] bpcharne(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharne(character, character)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bpcharne$function$;
+
+-- [pg_catalog] bpcharnlike(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharnlike(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$textnlike$function$;
+
+-- [pg_catalog] bpcharout(character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharout(character)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpcharout$function$;
+
+-- [pg_catalog] bpcharrecv(internal, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharrecv(internal, oid, integer)
+ RETURNS character
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$bpcharrecv$function$;
+
+-- [pg_catalog] bpcharregexeq(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharregexeq(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT textregexeq_support
+AS $function$textregexeq$function$;
+
+-- [pg_catalog] bpcharregexne(character, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharregexne(character, text)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$textregexne$function$;
+
+-- [pg_catalog] bpcharsend(character)
+CREATE OR REPLACE FUNCTION pg_catalog.bpcharsend(character)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$bpcharsend$function$;
+
+-- [pg_catalog] bpchartypmodin(cstring[])
+CREATE OR REPLACE FUNCTION pg_catalog.bpchartypmodin(cstring[])
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpchartypmodin$function$;
+
+-- [pg_catalog] bpchartypmodout(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.bpchartypmodout(integer)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpchartypmodout$function$;
+
+-- [pg_catalog] brin_bloom_add_value(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_add_value(internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_add_value$function$;
+
+-- [pg_catalog] brin_bloom_consistent(internal, internal, internal, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_consistent(internal, internal, internal, integer)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_consistent$function$;
+
+-- [pg_catalog] brin_bloom_opcinfo(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_opcinfo(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_opcinfo$function$;
+
+-- [pg_catalog] brin_bloom_options(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_options(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$brin_bloom_options$function$;
+
+-- [pg_catalog] brin_bloom_summary_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_summary_in(cstring)
+ RETURNS pg_brin_bloom_summary
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_summary_in$function$;
+
+-- [pg_catalog] brin_bloom_summary_out(pg_brin_bloom_summary)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_summary_out(pg_brin_bloom_summary)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_summary_out$function$;
+
+-- [pg_catalog] brin_bloom_summary_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_summary_recv(internal)
+ RETURNS pg_brin_bloom_summary
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_summary_recv$function$;
+
+-- [pg_catalog] brin_bloom_summary_send(pg_brin_bloom_summary)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_summary_send(pg_brin_bloom_summary)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_summary_send$function$;
+
+-- [pg_catalog] brin_bloom_union(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_bloom_union(internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_bloom_union$function$;
+
+-- [pg_catalog] brin_desummarize_range(regclass, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_desummarize_range(regclass, bigint)
+ RETURNS void
+ LANGUAGE internal
+ STRICT
+AS $function$brin_desummarize_range$function$;
+
+-- [pg_catalog] brin_inclusion_add_value(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_inclusion_add_value(internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_inclusion_add_value$function$;
+
+-- [pg_catalog] brin_inclusion_consistent(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_inclusion_consistent(internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_inclusion_consistent$function$;
+
+-- [pg_catalog] brin_inclusion_opcinfo(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_inclusion_opcinfo(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_inclusion_opcinfo$function$;
+
+-- [pg_catalog] brin_inclusion_union(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_inclusion_union(internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_inclusion_union$function$;
+
+-- [pg_catalog] brin_minmax_add_value(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_add_value(internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_add_value$function$;
+
+-- [pg_catalog] brin_minmax_consistent(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_consistent(internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_consistent$function$;
+
+-- [pg_catalog] brin_minmax_multi_add_value(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_add_value(internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_add_value$function$;
+
+-- [pg_catalog] brin_minmax_multi_consistent(internal, internal, internal, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_consistent(internal, internal, internal, integer)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_consistent$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_date(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_date(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_date$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_float4(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_float4(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_float4$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_float8(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_float8(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_float8$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_inet(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_inet(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_inet$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_int2(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_int2(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_int2$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_int4(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_int4(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_int4$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_int8(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_int8(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_int8$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_interval(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_interval(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_interval$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_macaddr(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_macaddr(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_macaddr$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_macaddr8(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_macaddr8(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_macaddr8$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_numeric(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_numeric(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_numeric$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_pg_lsn(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_pg_lsn(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_pg_lsn$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_tid(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_tid(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_tid$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_time(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_time(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_time$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_timestamp(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_timestamp(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_timestamp$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_timetz(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_timetz(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_timetz$function$;
+
+-- [pg_catalog] brin_minmax_multi_distance_uuid(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_distance_uuid(internal, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_distance_uuid$function$;
+
+-- [pg_catalog] brin_minmax_multi_opcinfo(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_opcinfo(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_opcinfo$function$;
+
+-- [pg_catalog] brin_minmax_multi_options(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_options(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$brin_minmax_multi_options$function$;
+
+-- [pg_catalog] brin_minmax_multi_summary_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_summary_in(cstring)
+ RETURNS pg_brin_minmax_multi_summary
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_summary_in$function$;
+
+-- [pg_catalog] brin_minmax_multi_summary_out(pg_brin_minmax_multi_summary)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_summary_out(pg_brin_minmax_multi_summary)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_summary_out$function$;
+
+-- [pg_catalog] brin_minmax_multi_summary_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_summary_recv(internal)
+ RETURNS pg_brin_minmax_multi_summary
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_summary_recv$function$;
+
+-- [pg_catalog] brin_minmax_multi_summary_send(pg_brin_minmax_multi_summary)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_summary_send(pg_brin_minmax_multi_summary)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_summary_send$function$;
+
+-- [pg_catalog] brin_minmax_multi_union(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_multi_union(internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_multi_union$function$;
+
+-- [pg_catalog] brin_minmax_opcinfo(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_opcinfo(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_opcinfo$function$;
+
+-- [pg_catalog] brin_minmax_union(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_minmax_union(internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$brin_minmax_union$function$;
+
+-- [pg_catalog] brin_summarize_new_values(regclass)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_summarize_new_values(regclass)
+ RETURNS integer
+ LANGUAGE internal
+ STRICT
+AS $function$brin_summarize_new_values$function$;
+
+-- [pg_catalog] brin_summarize_range(regclass, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.brin_summarize_range(regclass, bigint)
+ RETURNS integer
+ LANGUAGE internal
+ STRICT
+AS $function$brin_summarize_range$function$;
+
+-- [pg_catalog] brinhandler(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.brinhandler(internal)
+ RETURNS index_am_handler
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$brinhandler$function$;
+
+-- [pg_catalog] broadcast(inet)
+CREATE OR REPLACE FUNCTION pg_catalog.broadcast(inet)
+ RETURNS inet
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$network_broadcast$function$;
+
+-- [pg_catalog] btarraycmp(anyarray, anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.btarraycmp(anyarray, anyarray)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btarraycmp$function$;
+
+-- [pg_catalog] btboolcmp(boolean, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.btboolcmp(boolean, boolean)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btboolcmp$function$;
+
+-- [pg_catalog] btbpchar_pattern_cmp(character, character)
+CREATE OR REPLACE FUNCTION pg_catalog.btbpchar_pattern_cmp(character, character)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btbpchar_pattern_cmp$function$;
+
+-- [pg_catalog] btbpchar_pattern_sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btbpchar_pattern_sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btbpchar_pattern_sortsupport$function$;
+
+-- [pg_catalog] btcharcmp("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.btcharcmp("char", "char")
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btcharcmp$function$;
+
+-- [pg_catalog] btequalimage(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.btequalimage(oid)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btequalimage$function$;
+
+-- [pg_catalog] btfloat48cmp(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.btfloat48cmp(real, double precision)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btfloat48cmp$function$;
+
+-- [pg_catalog] btfloat4cmp(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.btfloat4cmp(real, real)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btfloat4cmp$function$;
+
+-- [pg_catalog] btfloat4sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btfloat4sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btfloat4sortsupport$function$;
+
+-- [pg_catalog] btfloat84cmp(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.btfloat84cmp(double precision, real)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btfloat84cmp$function$;
+
+-- [pg_catalog] btfloat8cmp(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.btfloat8cmp(double precision, double precision)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btfloat8cmp$function$;
+
+-- [pg_catalog] btfloat8sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btfloat8sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btfloat8sortsupport$function$;
+
+-- [pg_catalog] bthandler(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bthandler(internal)
+ RETURNS index_am_handler
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$bthandler$function$;
+
+-- [pg_catalog] btint24cmp(smallint, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.btint24cmp(smallint, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint24cmp$function$;
+
+-- [pg_catalog] btint28cmp(smallint, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.btint28cmp(smallint, bigint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint28cmp$function$;
+
+-- [pg_catalog] btint2cmp(smallint, smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.btint2cmp(smallint, smallint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint2cmp$function$;
+
+-- [pg_catalog] btint2sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btint2sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btint2sortsupport$function$;
+
+-- [pg_catalog] btint42cmp(integer, smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.btint42cmp(integer, smallint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint42cmp$function$;
+
+-- [pg_catalog] btint48cmp(integer, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.btint48cmp(integer, bigint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint48cmp$function$;
+
+-- [pg_catalog] btint4cmp(integer, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.btint4cmp(integer, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint4cmp$function$;
+
+-- [pg_catalog] btint4sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btint4sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btint4sortsupport$function$;
+
+-- [pg_catalog] btint82cmp(bigint, smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.btint82cmp(bigint, smallint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint82cmp$function$;
+
+-- [pg_catalog] btint84cmp(bigint, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.btint84cmp(bigint, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint84cmp$function$;
+
+-- [pg_catalog] btint8cmp(bigint, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.btint8cmp(bigint, bigint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btint8cmp$function$;
+
+-- [pg_catalog] btint8sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btint8sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btint8sortsupport$function$;
+
+-- [pg_catalog] btnamecmp(name, name)
+CREATE OR REPLACE FUNCTION pg_catalog.btnamecmp(name, name)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btnamecmp$function$;
+
+-- [pg_catalog] btnamesortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btnamesortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btnamesortsupport$function$;
+
+-- [pg_catalog] btnametextcmp(name, text)
+CREATE OR REPLACE FUNCTION pg_catalog.btnametextcmp(name, text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btnametextcmp$function$;
+
+-- [pg_catalog] btoidcmp(oid, oid)
+CREATE OR REPLACE FUNCTION pg_catalog.btoidcmp(oid, oid)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btoidcmp$function$;
+
+-- [pg_catalog] btoidsortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.btoidsortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btoidsortsupport$function$;
+
+-- [pg_catalog] btoidvectorcmp(oidvector, oidvector)
+CREATE OR REPLACE FUNCTION pg_catalog.btoidvectorcmp(oidvector, oidvector)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$btoidvectorcmp$function$;
+
+-- [pg_catalog] btrecordcmp(record, record)
+CREATE OR REPLACE FUNCTION pg_catalog.btrecordcmp(record, record)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btrecordcmp$function$;
+
+-- [pg_catalog] btrecordimagecmp(record, record)
+CREATE OR REPLACE FUNCTION pg_catalog.btrecordimagecmp(record, record)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btrecordimagecmp$function$;
+
+-- [pg_catalog] btrim(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.btrim(bytea, bytea)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteatrim$function$;
+
+-- [pg_catalog] btrim(text)
+CREATE OR REPLACE FUNCTION pg_catalog.btrim(text)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btrim1$function$;
+
+-- [pg_catalog] btrim(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.btrim(text, text)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btrim$function$;
+
+-- [pg_catalog] bttext_pattern_cmp(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bttext_pattern_cmp(text, text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bttext_pattern_cmp$function$;
+
+-- [pg_catalog] bttext_pattern_sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bttext_pattern_sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bttext_pattern_sortsupport$function$;
+
+-- [pg_catalog] bttextcmp(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.bttextcmp(text, text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bttextcmp$function$;
+
+-- [pg_catalog] bttextnamecmp(text, name)
+CREATE OR REPLACE FUNCTION pg_catalog.bttextnamecmp(text, name)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bttextnamecmp$function$;
+
+-- [pg_catalog] bttextsortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bttextsortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bttextsortsupport$function$;
+
+-- [pg_catalog] bttidcmp(tid, tid)
+CREATE OR REPLACE FUNCTION pg_catalog.bttidcmp(tid, tid)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bttidcmp$function$;
+
+-- [pg_catalog] btvarstrequalimage(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.btvarstrequalimage(oid)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$btvarstrequalimage$function$;
+
+-- [pg_catalog] bytea_sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bytea_sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bytea_sortsupport$function$;
+
+-- [pg_catalog] bytea_string_agg_finalfn(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bytea_string_agg_finalfn(internal)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$bytea_string_agg_finalfn$function$;
+
+-- [pg_catalog] bytea_string_agg_transfn(internal, bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.bytea_string_agg_transfn(internal, bytea, bytea)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$bytea_string_agg_transfn$function$;
+
+-- [pg_catalog] byteacat(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteacat(bytea, bytea)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteacat$function$;
+
+-- [pg_catalog] byteacmp(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteacmp(bytea, bytea)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$byteacmp$function$;
+
+-- [pg_catalog] byteaeq(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteaeq(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$byteaeq$function$;
+
+-- [pg_catalog] byteage(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteage(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$byteage$function$;
+
+-- [pg_catalog] byteagt(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteagt(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$byteagt$function$;
+
+-- [pg_catalog] byteain(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.byteain(cstring)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteain$function$;
+
+-- [pg_catalog] byteale(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteale(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$byteale$function$;
+
+-- [pg_catalog] bytealike(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.bytealike(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT textlike_support
+AS $function$bytealike$function$;
+
+-- [pg_catalog] bytealt(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.bytealt(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$bytealt$function$;
+
+-- [pg_catalog] byteane(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteane(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$byteane$function$;
+
+-- [pg_catalog] byteanlike(bytea, bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteanlike(bytea, bytea)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteanlike$function$;
+
+-- [pg_catalog] byteaout(bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteaout(bytea)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteaout$function$;
+
+-- [pg_catalog] bytearecv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.bytearecv(internal)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bytearecv$function$;
+
+-- [pg_catalog] byteasend(bytea)
+CREATE OR REPLACE FUNCTION pg_catalog.byteasend(bytea)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteasend$function$;
+
+-- [pg_catalog] cardinality(anyarray)
+CREATE OR REPLACE FUNCTION pg_catalog.cardinality(anyarray)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$array_cardinality$function$;
+
+-- [pg_catalog] cash_cmp(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_cmp(money, money)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_cmp$function$;
+
+-- [pg_catalog] cash_div_cash(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_div_cash(money, money)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_div_cash$function$;
+
+-- [pg_catalog] cash_div_flt4(money, real)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_div_flt4(money, real)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_div_flt4$function$;
+
+-- [pg_catalog] cash_div_flt8(money, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_div_flt8(money, double precision)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_div_flt8$function$;
+
+-- [pg_catalog] cash_div_int2(money, smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_div_int2(money, smallint)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_div_int2$function$;
+
+-- [pg_catalog] cash_div_int4(money, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_div_int4(money, integer)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_div_int4$function$;
+
+-- [pg_catalog] cash_div_int8(money, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_div_int8(money, bigint)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_div_int8$function$;
+
+-- [pg_catalog] cash_eq(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_eq(money, money)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_eq$function$;
+
+-- [pg_catalog] cash_ge(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_ge(money, money)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_ge$function$;
+
+-- [pg_catalog] cash_gt(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_gt(money, money)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_gt$function$;
+
+-- [pg_catalog] cash_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_in(cstring)
+ RETURNS money
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$cash_in$function$;
+
+-- [pg_catalog] cash_le(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_le(money, money)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_le$function$;
+
+-- [pg_catalog] cash_lt(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_lt(money, money)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_lt$function$;
+
+-- [pg_catalog] cash_mi(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_mi(money, money)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_mi$function$;
+
+-- [pg_catalog] cash_mul_flt4(money, real)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_mul_flt4(money, real)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_mul_flt4$function$;
+
+-- [pg_catalog] cash_mul_flt8(money, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_mul_flt8(money, double precision)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_mul_flt8$function$;
+
+-- [pg_catalog] cash_mul_int2(money, smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_mul_int2(money, smallint)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_mul_int2$function$;
+
+-- [pg_catalog] cash_mul_int4(money, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_mul_int4(money, integer)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_mul_int4$function$;
+
+-- [pg_catalog] cash_mul_int8(money, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_mul_int8(money, bigint)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_mul_int8$function$;
+
+-- [pg_catalog] cash_ne(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_ne(money, money)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cash_ne$function$;
+
+-- [pg_catalog] cash_out(money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_out(money)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$cash_out$function$;
+
+-- [pg_catalog] cash_pl(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_pl(money, money)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_pl$function$;
+
+-- [pg_catalog] cash_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_recv(internal)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_recv$function$;
+
+-- [pg_catalog] cash_send(money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_send(money)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_send$function$;
+
+-- [pg_catalog] cash_words(money)
+CREATE OR REPLACE FUNCTION pg_catalog.cash_words(money)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cash_words$function$;
+
+-- [pg_catalog] cashlarger(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cashlarger(money, money)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cashlarger$function$;
+
+-- [pg_catalog] cashsmaller(money, money)
+CREATE OR REPLACE FUNCTION pg_catalog.cashsmaller(money, money)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cashsmaller$function$;
+
+-- [pg_catalog] cbrt(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cbrt(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcbrt$function$;
+
+-- [pg_catalog] ceil(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.ceil(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dceil$function$;
+
+-- [pg_catalog] ceil(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.ceil(numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_ceil$function$;
+
+-- [pg_catalog] ceiling(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.ceiling(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dceil$function$;
+
+-- [pg_catalog] ceiling(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.ceiling(numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_ceil$function$;
+
+-- [pg_catalog] center(box)
+CREATE OR REPLACE FUNCTION pg_catalog.center(box)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_center$function$;
+
+-- [pg_catalog] center(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.center(circle)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_center$function$;
+
+-- [pg_catalog] char(integer)
+CREATE OR REPLACE FUNCTION pg_catalog."char"(integer)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$i4tochar$function$;
+
+-- [pg_catalog] char(text)
+CREATE OR REPLACE FUNCTION pg_catalog."char"(text)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$text_char$function$;
+
+-- [pg_catalog] char_length(character)
+CREATE OR REPLACE FUNCTION pg_catalog.char_length(character)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpcharlen$function$;
+
+-- [pg_catalog] char_length(text)
+CREATE OR REPLACE FUNCTION pg_catalog.char_length(text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$textlen$function$;
+
+-- [pg_catalog] character_length(character)
+CREATE OR REPLACE FUNCTION pg_catalog.character_length(character)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bpcharlen$function$;
+
+-- [pg_catalog] character_length(text)
+CREATE OR REPLACE FUNCTION pg_catalog.character_length(text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$textlen$function$;
+
+-- [pg_catalog] chareq("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.chareq("char", "char")
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$chareq$function$;
+
+-- [pg_catalog] charge("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.charge("char", "char")
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$charge$function$;
+
+-- [pg_catalog] chargt("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.chargt("char", "char")
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$chargt$function$;
+
+-- [pg_catalog] charin(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.charin(cstring)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$charin$function$;
+
+-- [pg_catalog] charle("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.charle("char", "char")
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$charle$function$;
+
+-- [pg_catalog] charlt("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.charlt("char", "char")
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$charlt$function$;
+
+-- [pg_catalog] charne("char", "char")
+CREATE OR REPLACE FUNCTION pg_catalog.charne("char", "char")
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$charne$function$;
+
+-- [pg_catalog] charout("char")
+CREATE OR REPLACE FUNCTION pg_catalog.charout("char")
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$charout$function$;
+
+-- [pg_catalog] charrecv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.charrecv(internal)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$charrecv$function$;
+
+-- [pg_catalog] charsend("char")
+CREATE OR REPLACE FUNCTION pg_catalog.charsend("char")
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$charsend$function$;
+
+-- [pg_catalog] chr(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.chr(integer)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$chr$function$;
+
+-- [pg_catalog] cideq(cid, cid)
+CREATE OR REPLACE FUNCTION pg_catalog.cideq(cid, cid)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$cideq$function$;
+
+-- [pg_catalog] cidin(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.cidin(cstring)
+ RETURNS cid
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidin$function$;
+
+-- [pg_catalog] cidout(cid)
+CREATE OR REPLACE FUNCTION pg_catalog.cidout(cid)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidout$function$;
+
+-- [pg_catalog] cidr(inet)
+CREATE OR REPLACE FUNCTION pg_catalog.cidr(inet)
+ RETURNS cidr
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$inet_to_cidr$function$;
+
+-- [pg_catalog] cidr_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.cidr_in(cstring)
+ RETURNS cidr
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidr_in$function$;
+
+-- [pg_catalog] cidr_out(cidr)
+CREATE OR REPLACE FUNCTION pg_catalog.cidr_out(cidr)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidr_out$function$;
+
+-- [pg_catalog] cidr_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.cidr_recv(internal)
+ RETURNS cidr
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidr_recv$function$;
+
+-- [pg_catalog] cidr_send(cidr)
+CREATE OR REPLACE FUNCTION pg_catalog.cidr_send(cidr)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidr_send$function$;
+
+-- [pg_catalog] cidrecv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.cidrecv(internal)
+ RETURNS cid
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidrecv$function$;
+
+-- [pg_catalog] cidsend(cid)
+CREATE OR REPLACE FUNCTION pg_catalog.cidsend(cid)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cidsend$function$;
+
+-- [pg_catalog] circle(box)
+CREATE OR REPLACE FUNCTION pg_catalog.circle(box)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_circle$function$;
+
+-- [pg_catalog] circle(point, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.circle(point, double precision)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cr_circle$function$;
+
+-- [pg_catalog] circle(polygon)
+CREATE OR REPLACE FUNCTION pg_catalog.circle(polygon)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$poly_circle$function$;
+
+-- [pg_catalog] circle_above(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_above(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_above$function$;
+
+-- [pg_catalog] circle_add_pt(circle, point)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_add_pt(circle, point)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_add_pt$function$;
+
+-- [pg_catalog] circle_below(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_below(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_below$function$;
+
+-- [pg_catalog] circle_center(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_center(circle)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_center$function$;
+
+-- [pg_catalog] circle_contain(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_contain(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_contain$function$;
+
+-- [pg_catalog] circle_contain_pt(circle, point)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_contain_pt(circle, point)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_contain_pt$function$;
+
+-- [pg_catalog] circle_contained(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_contained(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_contained$function$;
+
+-- [pg_catalog] circle_distance(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_distance(circle, circle)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_distance$function$;
+
+-- [pg_catalog] circle_div_pt(circle, point)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_div_pt(circle, point)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_div_pt$function$;
+
+-- [pg_catalog] circle_eq(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_eq(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$circle_eq$function$;
+
+-- [pg_catalog] circle_ge(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_ge(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$circle_ge$function$;
+
+-- [pg_catalog] circle_gt(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_gt(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$circle_gt$function$;
+
+-- [pg_catalog] circle_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_in(cstring)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_in$function$;
+
+-- [pg_catalog] circle_le(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_le(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$circle_le$function$;
+
+-- [pg_catalog] circle_left(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_left(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_left$function$;
+
+-- [pg_catalog] circle_lt(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_lt(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$circle_lt$function$;
+
+-- [pg_catalog] circle_mul_pt(circle, point)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_mul_pt(circle, point)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_mul_pt$function$;
+
+-- [pg_catalog] circle_ne(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_ne(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$circle_ne$function$;
+
+-- [pg_catalog] circle_out(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_out(circle)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_out$function$;
+
+-- [pg_catalog] circle_overabove(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_overabove(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_overabove$function$;
+
+-- [pg_catalog] circle_overbelow(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_overbelow(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_overbelow$function$;
+
+-- [pg_catalog] circle_overlap(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_overlap(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_overlap$function$;
+
+-- [pg_catalog] circle_overleft(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_overleft(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_overleft$function$;
+
+-- [pg_catalog] circle_overright(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_overright(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_overright$function$;
+
+-- [pg_catalog] circle_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_recv(internal)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_recv$function$;
+
+-- [pg_catalog] circle_right(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_right(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_right$function$;
+
+-- [pg_catalog] circle_same(circle, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_same(circle, circle)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_same$function$;
+
+-- [pg_catalog] circle_send(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_send(circle)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_send$function$;
+
+-- [pg_catalog] circle_sub_pt(circle, point)
+CREATE OR REPLACE FUNCTION pg_catalog.circle_sub_pt(circle, point)
+ RETURNS circle
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_sub_pt$function$;
+
+-- [pg_catalog] clock_timestamp()
+CREATE OR REPLACE FUNCTION pg_catalog.clock_timestamp()
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$clock_timestamp$function$;
+
+-- [pg_catalog] close_ls(line, lseg)
+CREATE OR REPLACE FUNCTION pg_catalog.close_ls(line, lseg)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$close_ls$function$;
+
+-- [pg_catalog] close_lseg(lseg, lseg)
+CREATE OR REPLACE FUNCTION pg_catalog.close_lseg(lseg, lseg)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$close_lseg$function$;
+
+-- [pg_catalog] close_pb(point, box)
+CREATE OR REPLACE FUNCTION pg_catalog.close_pb(point, box)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$close_pb$function$;
+
+-- [pg_catalog] close_pl(point, line)
+CREATE OR REPLACE FUNCTION pg_catalog.close_pl(point, line)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$close_pl$function$;
+
+-- [pg_catalog] close_ps(point, lseg)
+CREATE OR REPLACE FUNCTION pg_catalog.close_ps(point, lseg)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$close_ps$function$;
+
+-- [pg_catalog] close_sb(lseg, box)
+CREATE OR REPLACE FUNCTION pg_catalog.close_sb(lseg, box)
+ RETURNS point
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$close_sb$function$;
+
+-- [pg_catalog] col_description(oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.col_description(oid, integer)
+ RETURNS text
+ LANGUAGE sql
+ STABLE PARALLEL SAFE STRICT
+BEGIN ATOMIC
+ SELECT pg_description.description
+    FROM pg_description
+   WHERE ((pg_description.objoid = $1) AND (pg_description.classoid = ('pg_class'::regclass)::oid) AND (pg_description.objsubid = $2));
+END;
+
+-- [pg_catalog] concat(VARIADIC "any")
+CREATE OR REPLACE FUNCTION pg_catalog.concat(VARIADIC "any")
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$text_concat$function$;
+
+-- [pg_catalog] concat_ws(text, VARIADIC "any")
+CREATE OR REPLACE FUNCTION pg_catalog.concat_ws(text, VARIADIC "any")
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$text_concat_ws$function$;
+
+-- [pg_catalog] contjoinsel(internal, oid, internal, smallint, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.contjoinsel(internal, oid, internal, smallint, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$contjoinsel$function$;
+
+-- [pg_catalog] contsel(internal, oid, internal, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.contsel(internal, oid, internal, integer)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$contsel$function$;
+
+-- [pg_catalog] convert(bytea, name, name)
+CREATE OR REPLACE FUNCTION pg_catalog.convert(bytea, name, name)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$pg_convert$function$;
+
+-- [pg_catalog] convert_from(bytea, name)
+CREATE OR REPLACE FUNCTION pg_catalog.convert_from(bytea, name)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$pg_convert_from$function$;
+
+-- [pg_catalog] convert_to(text, name)
+CREATE OR REPLACE FUNCTION pg_catalog.convert_to(text, name)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$pg_convert_to$function$;
+
+-- [pg_catalog] cos(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cos(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcos$function$;
+
+-- [pg_catalog] cosd(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cosd(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcosd$function$;
+
+-- [pg_catalog] cosh(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cosh(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcosh$function$;
+
+-- [pg_catalog] cot(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cot(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcot$function$;
+
+-- [pg_catalog] cotd(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.cotd(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcotd$function$;
+
+-- [pg_catalog] cstring_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.cstring_in(cstring)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cstring_in$function$;
+
+-- [pg_catalog] cstring_out(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.cstring_out(cstring)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$cstring_out$function$;
+
+-- [pg_catalog] cstring_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.cstring_recv(internal)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$cstring_recv$function$;
+
+-- [pg_catalog] cstring_send(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.cstring_send(cstring)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$cstring_send$function$;
+
+-- [pg_catalog] cume_dist_final(internal, VARIADIC "any")
+CREATE OR REPLACE FUNCTION pg_catalog.cume_dist_final(internal, VARIADIC "any")
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$hypothetical_cume_dist_final$function$;
+
+-- [pg_catalog] current_database()
+CREATE OR REPLACE FUNCTION pg_catalog.current_database()
+ RETURNS name
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$current_database$function$;
+
+-- [pg_catalog] current_query()
+CREATE OR REPLACE FUNCTION pg_catalog.current_query()
+ RETURNS text
+ LANGUAGE internal
+ PARALLEL RESTRICTED
+AS $function$current_query$function$;
+
+-- [pg_catalog] current_schema()
+CREATE OR REPLACE FUNCTION pg_catalog."current_schema"()
+ RETURNS name
+ LANGUAGE internal
+ STABLE STRICT
+AS $function$current_schema$function$;
+
+-- [pg_catalog] current_schemas(boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.current_schemas(boolean)
+ RETURNS name[]
+ LANGUAGE internal
+ STABLE STRICT
+AS $function$current_schemas$function$;
+
+-- [pg_catalog] current_setting(text)
+CREATE OR REPLACE FUNCTION pg_catalog.current_setting(text)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$show_config_by_name$function$;
+
+-- [pg_catalog] current_setting(text, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.current_setting(text, boolean)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$show_config_by_name_missing_ok$function$;
+
+-- [pg_catalog] current_user()
+CREATE OR REPLACE FUNCTION pg_catalog."current_user"()
+ RETURNS name
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$current_user$function$;
+
+-- [pg_catalog] currtid2(text, tid)
+CREATE OR REPLACE FUNCTION pg_catalog.currtid2(text, tid)
+ RETURNS tid
+ LANGUAGE internal
+ STRICT
+AS $function$currtid_byrelname$function$;
+
+-- [pg_catalog] currval(regclass)
+CREATE OR REPLACE FUNCTION pg_catalog.currval(regclass)
+ RETURNS bigint
+ LANGUAGE internal
+ STRICT
+AS $function$currval_oid$function$;
+
+-- [pg_catalog] cursor_to_xml(cursor refcursor, count integer, nulls boolean, tableforest boolean, targetns text)
+CREATE OR REPLACE FUNCTION pg_catalog.cursor_to_xml(cursor refcursor, count integer, nulls boolean, tableforest boolean, targetns text)
+ RETURNS xml
+ LANGUAGE internal
+ STRICT COST 100
+AS $function$cursor_to_xml$function$;
+
+-- [pg_catalog] cursor_to_xmlschema(cursor refcursor, nulls boolean, tableforest boolean, targetns text)
+CREATE OR REPLACE FUNCTION pg_catalog.cursor_to_xmlschema(cursor refcursor, nulls boolean, tableforest boolean, targetns text)
+ RETURNS xml
+ LANGUAGE internal
+ STRICT COST 100
+AS $function$cursor_to_xmlschema$function$;
+
+-- [pg_catalog] database_to_xml(nulls boolean, tableforest boolean, targetns text)
+CREATE OR REPLACE FUNCTION pg_catalog.database_to_xml(nulls boolean, tableforest boolean, targetns text)
+ RETURNS xml
+ LANGUAGE internal
+ STABLE PARALLEL RESTRICTED STRICT COST 100
+AS $function$database_to_xml$function$;
+
+-- [pg_catalog] database_to_xml_and_xmlschema(nulls boolean, tableforest boolean, targetns text)
+CREATE OR REPLACE FUNCTION pg_catalog.database_to_xml_and_xmlschema(nulls boolean, tableforest boolean, targetns text)
+ RETURNS xml
+ LANGUAGE internal
+ STABLE PARALLEL RESTRICTED STRICT COST 100
+AS $function$database_to_xml_and_xmlschema$function$;
+
+-- [pg_catalog] database_to_xmlschema(nulls boolean, tableforest boolean, targetns text)
+CREATE OR REPLACE FUNCTION pg_catalog.database_to_xmlschema(nulls boolean, tableforest boolean, targetns text)
+ RETURNS xml
+ LANGUAGE internal
+ STABLE PARALLEL RESTRICTED STRICT COST 100
+AS $function$database_to_xmlschema$function$;
+
+-- [pg_catalog] date(timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date(timestamp with time zone)
+ RETURNS date
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_date$function$;
+
+-- [pg_catalog] date(timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date(timestamp without time zone)
+ RETURNS date
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamp_date$function$;
+
+-- [pg_catalog] date_add(timestamp with time zone, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.date_add(timestamp with time zone, interval)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_pl_interval$function$;
+
+-- [pg_catalog] date_add(timestamp with time zone, interval, text)
+CREATE OR REPLACE FUNCTION pg_catalog.date_add(timestamp with time zone, interval, text)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_pl_interval_at_zone$function$;
+
+-- [pg_catalog] date_bin(interval, timestamp with time zone, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_bin(interval, timestamp with time zone, timestamp with time zone)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_bin$function$;
+
+-- [pg_catalog] date_bin(interval, timestamp without time zone, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_bin(interval, timestamp without time zone, timestamp without time zone)
+ RETURNS timestamp without time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamp_bin$function$;
+
+-- [pg_catalog] date_cmp(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_cmp(date, date)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_cmp$function$;
+
+-- [pg_catalog] date_cmp_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_cmp_timestamp(date, timestamp without time zone)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_cmp_timestamp$function$;
+
+-- [pg_catalog] date_cmp_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_cmp_timestamptz(date, timestamp with time zone)
+ RETURNS integer
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_cmp_timestamptz$function$;
+
+-- [pg_catalog] date_eq(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_eq(date, date)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_eq$function$;
+
+-- [pg_catalog] date_eq_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_eq_timestamp(date, timestamp without time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_eq_timestamp$function$;
+
+-- [pg_catalog] date_eq_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_eq_timestamptz(date, timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_eq_timestamptz$function$;
+
+-- [pg_catalog] date_ge(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_ge(date, date)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_ge$function$;
+
+-- [pg_catalog] date_ge_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_ge_timestamp(date, timestamp without time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_ge_timestamp$function$;
+
+-- [pg_catalog] date_ge_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_ge_timestamptz(date, timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_ge_timestamptz$function$;
+
+-- [pg_catalog] date_gt(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_gt(date, date)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_gt$function$;
+
+-- [pg_catalog] date_gt_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_gt_timestamp(date, timestamp without time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_gt_timestamp$function$;
+
+-- [pg_catalog] date_gt_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_gt_timestamptz(date, timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_gt_timestamptz$function$;
+
+-- [pg_catalog] date_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.date_in(cstring)
+ RETURNS date
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_in$function$;
+
+-- [pg_catalog] date_larger(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_larger(date, date)
+ RETURNS date
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_larger$function$;
+
+-- [pg_catalog] date_le(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_le(date, date)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_le$function$;
+
+-- [pg_catalog] date_le_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_le_timestamp(date, timestamp without time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_le_timestamp$function$;
+
+-- [pg_catalog] date_le_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_le_timestamptz(date, timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_le_timestamptz$function$;
+
+-- [pg_catalog] date_lt(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_lt(date, date)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_lt$function$;
+
+-- [pg_catalog] date_lt_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_lt_timestamp(date, timestamp without time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_lt_timestamp$function$;
+
+-- [pg_catalog] date_lt_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_lt_timestamptz(date, timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_lt_timestamptz$function$;
+
+-- [pg_catalog] date_mi(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_mi(date, date)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_mi$function$;
+
+-- [pg_catalog] date_mi_interval(date, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.date_mi_interval(date, interval)
+ RETURNS timestamp without time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_mi_interval$function$;
+
+-- [pg_catalog] date_mii(date, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.date_mii(date, integer)
+ RETURNS date
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_mii$function$;
+
+-- [pg_catalog] date_ne(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_ne(date, date)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$date_ne$function$;
+
+-- [pg_catalog] date_ne_timestamp(date, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_ne_timestamp(date, timestamp without time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_ne_timestamp$function$;
+
+-- [pg_catalog] date_ne_timestamptz(date, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_ne_timestamptz(date, timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_ne_timestamptz$function$;
+
+-- [pg_catalog] date_out(date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_out(date)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$date_out$function$;
+
+-- [pg_catalog] date_part(text, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, date)
+ RETURNS double precision
+ LANGUAGE sql
+ IMMUTABLE PARALLEL SAFE STRICT COST 1
+RETURN date_part($1, ($2)::timestamp without time zone);
+
+-- [pg_catalog] date_part(text, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, interval)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$interval_part$function$;
+
+-- [pg_catalog] date_part(text, time with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, time with time zone)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timetz_part$function$;
+
+-- [pg_catalog] date_part(text, time without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, time without time zone)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$time_part$function$;
+
+-- [pg_catalog] date_part(text, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, timestamp with time zone)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_part$function$;
+
+-- [pg_catalog] date_part(text, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_part(text, timestamp without time zone)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamp_part$function$;
+
+-- [pg_catalog] date_pl_interval(date, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.date_pl_interval(date, interval)
+ RETURNS timestamp without time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_pl_interval$function$;
+
+-- [pg_catalog] date_pli(date, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.date_pli(date, integer)
+ RETURNS date
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_pli$function$;
+
+-- [pg_catalog] date_recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.date_recv(internal)
+ RETURNS date
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_recv$function$;
+
+-- [pg_catalog] date_send(date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_send(date)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_send$function$;
+
+-- [pg_catalog] date_smaller(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.date_smaller(date, date)
+ RETURNS date
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_smaller$function$;
+
+-- [pg_catalog] date_sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.date_sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$date_sortsupport$function$;
+
+-- [pg_catalog] date_subtract(timestamp with time zone, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.date_subtract(timestamp with time zone, interval)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_mi_interval$function$;
+
+-- [pg_catalog] date_subtract(timestamp with time zone, interval, text)
+CREATE OR REPLACE FUNCTION pg_catalog.date_subtract(timestamp with time zone, interval, text)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_mi_interval_at_zone$function$;
+
+-- [pg_catalog] date_trunc(text, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.date_trunc(text, interval)
+ RETURNS interval
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$interval_trunc$function$;
+
+-- [pg_catalog] date_trunc(text, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_trunc(text, timestamp with time zone)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_trunc$function$;
+
+-- [pg_catalog] date_trunc(text, timestamp with time zone, text)
+CREATE OR REPLACE FUNCTION pg_catalog.date_trunc(text, timestamp with time zone, text)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamptz_trunc_zone$function$;
+
+-- [pg_catalog] date_trunc(text, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.date_trunc(text, timestamp without time zone)
+ RETURNS timestamp without time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$timestamp_trunc$function$;
+
+-- [pg_catalog] datemultirange()
+CREATE OR REPLACE FUNCTION pg_catalog.datemultirange()
+ RETURNS datemultirange
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$multirange_constructor0$function$;
+
+-- [pg_catalog] datemultirange(daterange)
+CREATE OR REPLACE FUNCTION pg_catalog.datemultirange(daterange)
+ RETURNS datemultirange
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$multirange_constructor1$function$;
+
+-- [pg_catalog] datemultirange(VARIADIC daterange[])
+CREATE OR REPLACE FUNCTION pg_catalog.datemultirange(VARIADIC daterange[])
+ RETURNS datemultirange
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$multirange_constructor2$function$;
+
+-- [pg_catalog] daterange(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.daterange(date, date)
+ RETURNS daterange
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$range_constructor2$function$;
+
+-- [pg_catalog] daterange(date, date, text)
+CREATE OR REPLACE FUNCTION pg_catalog.daterange(date, date, text)
+ RETURNS daterange
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$range_constructor3$function$;
+
+-- [pg_catalog] daterange_canonical(daterange)
+CREATE OR REPLACE FUNCTION pg_catalog.daterange_canonical(daterange)
+ RETURNS daterange
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$daterange_canonical$function$;
+
+-- [pg_catalog] daterange_subdiff(date, date)
+CREATE OR REPLACE FUNCTION pg_catalog.daterange_subdiff(date, date)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$daterange_subdiff$function$;
+
+-- [pg_catalog] datetime_pl(date, time without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.datetime_pl(date, time without time zone)
+ RETURNS timestamp without time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datetime_timestamp$function$;
+
+-- [pg_catalog] datetimetz_pl(date, time with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog.datetimetz_pl(date, time with time zone)
+ RETURNS timestamp with time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$datetimetz_timestamptz$function$;
+
+-- [pg_catalog] dcbrt(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dcbrt(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dcbrt$function$;
+
+-- [pg_catalog] decode(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.decode(text, text)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$binary_decode$function$;
+
+-- [pg_catalog] degrees(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.degrees(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$degrees$function$;
+
+-- [pg_catalog] dense_rank_final(internal, VARIADIC "any")
+CREATE OR REPLACE FUNCTION pg_catalog.dense_rank_final(internal, VARIADIC "any")
+ RETURNS bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$hypothetical_dense_rank_final$function$;
+
+-- [pg_catalog] dexp(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dexp(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dexp$function$;
+
+-- [pg_catalog] diagonal(box)
+CREATE OR REPLACE FUNCTION pg_catalog.diagonal(box)
+ RETURNS lseg
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$box_diagonal$function$;
+
+-- [pg_catalog] diameter(circle)
+CREATE OR REPLACE FUNCTION pg_catalog.diameter(circle)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$circle_diameter$function$;
+
+-- [pg_catalog] dispell_init(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dispell_init(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dispell_init$function$;
+
+-- [pg_catalog] dispell_lexize(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dispell_lexize(internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dispell_lexize$function$;
+
+-- [pg_catalog] dist_bp(box, point)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_bp(box, point)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_bp$function$;
+
+-- [pg_catalog] dist_bs(box, lseg)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_bs(box, lseg)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_bs$function$;
+
+-- [pg_catalog] dist_cpoint(circle, point)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_cpoint(circle, point)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_cpoint$function$;
+
+-- [pg_catalog] dist_cpoly(circle, polygon)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_cpoly(circle, polygon)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_cpoly$function$;
+
+-- [pg_catalog] dist_lp(line, point)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_lp(line, point)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_lp$function$;
+
+-- [pg_catalog] dist_ls(line, lseg)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_ls(line, lseg)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_ls$function$;
+
+-- [pg_catalog] dist_pathp(path, point)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_pathp(path, point)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_pathp$function$;
+
+-- [pg_catalog] dist_pb(point, box)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_pb(point, box)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_pb$function$;
+
+-- [pg_catalog] dist_pc(point, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_pc(point, circle)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_pc$function$;
+
+-- [pg_catalog] dist_pl(point, line)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_pl(point, line)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_pl$function$;
+
+-- [pg_catalog] dist_polyc(polygon, circle)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_polyc(polygon, circle)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_polyc$function$;
+
+-- [pg_catalog] dist_polyp(polygon, point)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_polyp(polygon, point)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_polyp$function$;
+
+-- [pg_catalog] dist_ppath(point, path)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_ppath(point, path)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_ppath$function$;
+
+-- [pg_catalog] dist_ppoly(point, polygon)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_ppoly(point, polygon)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_ppoly$function$;
+
+-- [pg_catalog] dist_ps(point, lseg)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_ps(point, lseg)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_ps$function$;
+
+-- [pg_catalog] dist_sb(lseg, box)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_sb(lseg, box)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_sb$function$;
+
+-- [pg_catalog] dist_sl(lseg, line)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_sl(lseg, line)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_sl$function$;
+
+-- [pg_catalog] dist_sp(lseg, point)
+CREATE OR REPLACE FUNCTION pg_catalog.dist_sp(lseg, point)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dist_sp$function$;
+
+-- [pg_catalog] div(numeric, numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.div(numeric, numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_div_trunc$function$;
+
+-- [pg_catalog] dlog1(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dlog1(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dlog1$function$;
+
+-- [pg_catalog] dlog10(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dlog10(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dlog10$function$;
+
+-- [pg_catalog] domain_in(cstring, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.domain_in(cstring, oid, integer)
+ RETURNS "any"
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$domain_in$function$;
+
+-- [pg_catalog] domain_recv(internal, oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.domain_recv(internal, oid, integer)
+ RETURNS "any"
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$domain_recv$function$;
+
+-- [pg_catalog] dpow(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dpow(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dpow$function$;
+
+-- [pg_catalog] dround(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dround(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dround$function$;
+
+-- [pg_catalog] dsimple_init(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dsimple_init(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dsimple_init$function$;
+
+-- [pg_catalog] dsimple_lexize(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dsimple_lexize(internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dsimple_lexize$function$;
+
+-- [pg_catalog] dsnowball_init(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dsnowball_init(internal)
+ RETURNS internal
+ LANGUAGE c
+ STRICT
+AS '$libdir/dict_snowball', $function$dsnowball_init$function$;
+
+-- [pg_catalog] dsnowball_lexize(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dsnowball_lexize(internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE c
+ STRICT
+AS '$libdir/dict_snowball', $function$dsnowball_lexize$function$;
+
+-- [pg_catalog] dsqrt(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dsqrt(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dsqrt$function$;
+
+-- [pg_catalog] dsynonym_init(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dsynonym_init(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dsynonym_init$function$;
+
+-- [pg_catalog] dsynonym_lexize(internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.dsynonym_lexize(internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dsynonym_lexize$function$;
+
+-- [pg_catalog] dtrunc(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.dtrunc(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dtrunc$function$;
+
+-- [pg_catalog] elem_contained_by_multirange(anyelement, anymultirange)
+CREATE OR REPLACE FUNCTION pg_catalog.elem_contained_by_multirange(anyelement, anymultirange)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$elem_contained_by_multirange$function$;
+
+-- [pg_catalog] elem_contained_by_range(anyelement, anyrange)
+CREATE OR REPLACE FUNCTION pg_catalog.elem_contained_by_range(anyelement, anyrange)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT elem_contained_by_range_support
+AS $function$elem_contained_by_range$function$;
+
+-- [pg_catalog] elem_contained_by_range_support(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.elem_contained_by_range_support(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$elem_contained_by_range_support$function$;
+
+-- [pg_catalog] encode(bytea, text)
+CREATE OR REPLACE FUNCTION pg_catalog.encode(bytea, text)
+ RETURNS text
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$binary_encode$function$;
+
+-- [pg_catalog] enum_cmp(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_cmp(anyenum, anyenum)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_cmp$function$;
+
+-- [pg_catalog] enum_eq(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_eq(anyenum, anyenum)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_eq$function$;
+
+-- [pg_catalog] enum_first(anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_first(anyenum)
+ RETURNS anyenum
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$enum_first$function$;
+
+-- [pg_catalog] enum_ge(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_ge(anyenum, anyenum)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_ge$function$;
+
+-- [pg_catalog] enum_gt(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_gt(anyenum, anyenum)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_gt$function$;
+
+-- [pg_catalog] enum_in(cstring, oid)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_in(cstring, oid)
+ RETURNS anyenum
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$enum_in$function$;
+
+-- [pg_catalog] enum_larger(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_larger(anyenum, anyenum)
+ RETURNS anyenum
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_larger$function$;
+
+-- [pg_catalog] enum_last(anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_last(anyenum)
+ RETURNS anyenum
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$enum_last$function$;
+
+-- [pg_catalog] enum_le(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_le(anyenum, anyenum)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_le$function$;
+
+-- [pg_catalog] enum_lt(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_lt(anyenum, anyenum)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_lt$function$;
+
+-- [pg_catalog] enum_ne(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_ne(anyenum, anyenum)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_ne$function$;
+
+-- [pg_catalog] enum_out(anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_out(anyenum)
+ RETURNS cstring
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$enum_out$function$;
+
+-- [pg_catalog] enum_range(anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_range(anyenum)
+ RETURNS anyarray
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$enum_range_all$function$;
+
+-- [pg_catalog] enum_range(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_range(anyenum, anyenum)
+ RETURNS anyarray
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$enum_range_bounds$function$;
+
+-- [pg_catalog] enum_recv(internal, oid)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_recv(internal, oid)
+ RETURNS anyenum
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$enum_recv$function$;
+
+-- [pg_catalog] enum_send(anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_send(anyenum)
+ RETURNS bytea
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$enum_send$function$;
+
+-- [pg_catalog] enum_smaller(anyenum, anyenum)
+CREATE OR REPLACE FUNCTION pg_catalog.enum_smaller(anyenum, anyenum)
+ RETURNS anyenum
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$enum_smaller$function$;
+
+-- [pg_catalog] eqjoinsel(internal, oid, internal, smallint, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.eqjoinsel(internal, oid, internal, smallint, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$eqjoinsel$function$;
+
+-- [pg_catalog] eqsel(internal, oid, internal, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.eqsel(internal, oid, internal, integer)
+ RETURNS double precision
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$eqsel$function$;
+
+-- [pg_catalog] erf(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.erf(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$derf$function$;
+
+-- [pg_catalog] erfc(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.erfc(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$derfc$function$;
+
+-- [pg_catalog] euc_cn_to_mic(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_cn_to_mic(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_cn_and_mic', $function$euc_cn_to_mic$function$;
+
+-- [pg_catalog] euc_cn_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_cn_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_euc_cn', $function$euc_cn_to_utf8$function$;
+
+-- [pg_catalog] euc_jis_2004_to_shift_jis_2004(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_jis_2004_to_shift_jis_2004(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc2004_sjis2004', $function$euc_jis_2004_to_shift_jis_2004$function$;
+
+-- [pg_catalog] euc_jis_2004_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_jis_2004_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_euc2004', $function$euc_jis_2004_to_utf8$function$;
+
+-- [pg_catalog] euc_jp_to_mic(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_jp_to_mic(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_jp_and_sjis', $function$euc_jp_to_mic$function$;
+
+-- [pg_catalog] euc_jp_to_sjis(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_jp_to_sjis(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_jp_and_sjis', $function$euc_jp_to_sjis$function$;
+
+-- [pg_catalog] euc_jp_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_jp_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_euc_jp', $function$euc_jp_to_utf8$function$;
+
+-- [pg_catalog] euc_kr_to_mic(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_kr_to_mic(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_kr_and_mic', $function$euc_kr_to_mic$function$;
+
+-- [pg_catalog] euc_kr_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_kr_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_euc_kr', $function$euc_kr_to_utf8$function$;
+
+-- [pg_catalog] euc_tw_to_big5(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_tw_to_big5(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_tw_and_big5', $function$euc_tw_to_big5$function$;
+
+-- [pg_catalog] euc_tw_to_mic(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_tw_to_mic(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/euc_tw_and_big5', $function$euc_tw_to_mic$function$;
+
+-- [pg_catalog] euc_tw_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.euc_tw_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_euc_tw', $function$euc_tw_to_utf8$function$;
+
+-- [pg_catalog] event_trigger_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.event_trigger_in(cstring)
+ RETURNS event_trigger
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$event_trigger_in$function$;
+
+-- [pg_catalog] event_trigger_out(event_trigger)
+CREATE OR REPLACE FUNCTION pg_catalog.event_trigger_out(event_trigger)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$event_trigger_out$function$;
+
+-- [pg_catalog] exp(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.exp(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dexp$function$;
+
+-- [pg_catalog] exp(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.exp(numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_exp$function$;
+
+-- [pg_catalog] extract(text, date)
+CREATE OR REPLACE FUNCTION pg_catalog."extract"(text, date)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$extract_date$function$;
+
+-- [pg_catalog] extract(text, interval)
+CREATE OR REPLACE FUNCTION pg_catalog."extract"(text, interval)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$extract_interval$function$;
+
+-- [pg_catalog] extract(text, time with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog."extract"(text, time with time zone)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$extract_timetz$function$;
+
+-- [pg_catalog] extract(text, time without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog."extract"(text, time without time zone)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$extract_time$function$;
+
+-- [pg_catalog] extract(text, timestamp with time zone)
+CREATE OR REPLACE FUNCTION pg_catalog."extract"(text, timestamp with time zone)
+ RETURNS numeric
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$extract_timestamptz$function$;
+
+-- [pg_catalog] extract(text, timestamp without time zone)
+CREATE OR REPLACE FUNCTION pg_catalog."extract"(text, timestamp without time zone)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$extract_timestamp$function$;
+
+-- [pg_catalog] factorial(bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.factorial(bigint)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_fac$function$;
+
+-- [pg_catalog] family(inet)
+CREATE OR REPLACE FUNCTION pg_catalog.family(inet)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$network_family$function$;
+
+-- [pg_catalog] fdw_handler_in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.fdw_handler_in(cstring)
+ RETURNS fdw_handler
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$fdw_handler_in$function$;
+
+-- [pg_catalog] fdw_handler_out(fdw_handler)
+CREATE OR REPLACE FUNCTION pg_catalog.fdw_handler_out(fdw_handler)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$fdw_handler_out$function$;
+
+-- [pg_catalog] float4(bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.float4(bigint)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$i8tof$function$;
+
+-- [pg_catalog] float4(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float4(double precision)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dtof$function$;
+
+-- [pg_catalog] float4(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.float4(integer)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$i4tof$function$;
+
+-- [pg_catalog] float4(jsonb)
+CREATE OR REPLACE FUNCTION pg_catalog.float4(jsonb)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$jsonb_float4$function$;
+
+-- [pg_catalog] float4(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.float4(numeric)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_float4$function$;
+
+-- [pg_catalog] float4(smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.float4(smallint)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$i2tof$function$;
+
+-- [pg_catalog] float48div(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48div(real, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float48div$function$;
+
+-- [pg_catalog] float48eq(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48eq(real, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float48eq$function$;
+
+-- [pg_catalog] float48ge(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48ge(real, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float48ge$function$;
+
+-- [pg_catalog] float48gt(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48gt(real, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float48gt$function$;
+
+-- [pg_catalog] float48le(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48le(real, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float48le$function$;
+
+-- [pg_catalog] float48lt(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48lt(real, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float48lt$function$;
+
+-- [pg_catalog] float48mi(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48mi(real, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float48mi$function$;
+
+-- [pg_catalog] float48mul(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48mul(real, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float48mul$function$;
+
+-- [pg_catalog] float48ne(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48ne(real, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float48ne$function$;
+
+-- [pg_catalog] float48pl(real, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float48pl(real, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float48pl$function$;
+
+-- [pg_catalog] float4_accum(double precision[], real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4_accum(double precision[], real)
+ RETURNS double precision[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4_accum$function$;
+
+-- [pg_catalog] float4abs(real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4abs(real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4abs$function$;
+
+-- [pg_catalog] float4div(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4div(real, real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4div$function$;
+
+-- [pg_catalog] float4eq(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4eq(real, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float4eq$function$;
+
+-- [pg_catalog] float4ge(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4ge(real, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float4ge$function$;
+
+-- [pg_catalog] float4gt(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4gt(real, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float4gt$function$;
+
+-- [pg_catalog] float4in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.float4in(cstring)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4in$function$;
+
+-- [pg_catalog] float4larger(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4larger(real, real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4larger$function$;
+
+-- [pg_catalog] float4le(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4le(real, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float4le$function$;
+
+-- [pg_catalog] float4lt(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4lt(real, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float4lt$function$;
+
+-- [pg_catalog] float4mi(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4mi(real, real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4mi$function$;
+
+-- [pg_catalog] float4mul(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4mul(real, real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4mul$function$;
+
+-- [pg_catalog] float4ne(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4ne(real, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float4ne$function$;
+
+-- [pg_catalog] float4out(real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4out(real)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4out$function$;
+
+-- [pg_catalog] float4pl(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4pl(real, real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4pl$function$;
+
+-- [pg_catalog] float4recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.float4recv(internal)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4recv$function$;
+
+-- [pg_catalog] float4send(real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4send(real)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4send$function$;
+
+-- [pg_catalog] float4smaller(real, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4smaller(real, real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4smaller$function$;
+
+-- [pg_catalog] float4um(real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4um(real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4um$function$;
+
+-- [pg_catalog] float4up(real)
+CREATE OR REPLACE FUNCTION pg_catalog.float4up(real)
+ RETURNS real
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float4up$function$;
+
+-- [pg_catalog] float8(bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.float8(bigint)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$i8tod$function$;
+
+-- [pg_catalog] float8(integer)
+CREATE OR REPLACE FUNCTION pg_catalog.float8(integer)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$i4tod$function$;
+
+-- [pg_catalog] float8(jsonb)
+CREATE OR REPLACE FUNCTION pg_catalog.float8(jsonb)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$jsonb_float8$function$;
+
+-- [pg_catalog] float8(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.float8(numeric)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_float8$function$;
+
+-- [pg_catalog] float8(real)
+CREATE OR REPLACE FUNCTION pg_catalog.float8(real)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$ftod$function$;
+
+-- [pg_catalog] float8(smallint)
+CREATE OR REPLACE FUNCTION pg_catalog.float8(smallint)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$i2tod$function$;
+
+-- [pg_catalog] float84div(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84div(double precision, real)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float84div$function$;
+
+-- [pg_catalog] float84eq(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84eq(double precision, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float84eq$function$;
+
+-- [pg_catalog] float84ge(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84ge(double precision, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float84ge$function$;
+
+-- [pg_catalog] float84gt(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84gt(double precision, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float84gt$function$;
+
+-- [pg_catalog] float84le(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84le(double precision, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float84le$function$;
+
+-- [pg_catalog] float84lt(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84lt(double precision, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float84lt$function$;
+
+-- [pg_catalog] float84mi(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84mi(double precision, real)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float84mi$function$;
+
+-- [pg_catalog] float84mul(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84mul(double precision, real)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float84mul$function$;
+
+-- [pg_catalog] float84ne(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84ne(double precision, real)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float84ne$function$;
+
+-- [pg_catalog] float84pl(double precision, real)
+CREATE OR REPLACE FUNCTION pg_catalog.float84pl(double precision, real)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float84pl$function$;
+
+-- [pg_catalog] float8_accum(double precision[], double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8_accum(double precision[], double precision)
+ RETURNS double precision[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_accum$function$;
+
+-- [pg_catalog] float8_avg(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_avg(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_avg$function$;
+
+-- [pg_catalog] float8_combine(double precision[], double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_combine(double precision[], double precision[])
+ RETURNS double precision[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_combine$function$;
+
+-- [pg_catalog] float8_corr(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_corr(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_corr$function$;
+
+-- [pg_catalog] float8_covar_pop(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_covar_pop(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_covar_pop$function$;
+
+-- [pg_catalog] float8_covar_samp(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_covar_samp(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_covar_samp$function$;
+
+-- [pg_catalog] float8_regr_accum(double precision[], double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_accum(double precision[], double precision, double precision)
+ RETURNS double precision[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_accum$function$;
+
+-- [pg_catalog] float8_regr_avgx(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_avgx(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_avgx$function$;
+
+-- [pg_catalog] float8_regr_avgy(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_avgy(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_avgy$function$;
+
+-- [pg_catalog] float8_regr_combine(double precision[], double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_combine(double precision[], double precision[])
+ RETURNS double precision[]
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_combine$function$;
+
+-- [pg_catalog] float8_regr_intercept(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_intercept(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_intercept$function$;
+
+-- [pg_catalog] float8_regr_r2(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_r2(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_r2$function$;
+
+-- [pg_catalog] float8_regr_slope(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_slope(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_slope$function$;
+
+-- [pg_catalog] float8_regr_sxx(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_sxx(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_sxx$function$;
+
+-- [pg_catalog] float8_regr_sxy(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_sxy(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_sxy$function$;
+
+-- [pg_catalog] float8_regr_syy(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_regr_syy(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_regr_syy$function$;
+
+-- [pg_catalog] float8_stddev_pop(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_stddev_pop(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_stddev_pop$function$;
+
+-- [pg_catalog] float8_stddev_samp(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_stddev_samp(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_stddev_samp$function$;
+
+-- [pg_catalog] float8_var_pop(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_var_pop(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_var_pop$function$;
+
+-- [pg_catalog] float8_var_samp(double precision[])
+CREATE OR REPLACE FUNCTION pg_catalog.float8_var_samp(double precision[])
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8_var_samp$function$;
+
+-- [pg_catalog] float8abs(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8abs(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8abs$function$;
+
+-- [pg_catalog] float8div(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8div(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8div$function$;
+
+-- [pg_catalog] float8eq(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8eq(double precision, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float8eq$function$;
+
+-- [pg_catalog] float8ge(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8ge(double precision, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float8ge$function$;
+
+-- [pg_catalog] float8gt(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8gt(double precision, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float8gt$function$;
+
+-- [pg_catalog] float8in(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.float8in(cstring)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8in$function$;
+
+-- [pg_catalog] float8larger(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8larger(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8larger$function$;
+
+-- [pg_catalog] float8le(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8le(double precision, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float8le$function$;
+
+-- [pg_catalog] float8lt(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8lt(double precision, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float8lt$function$;
+
+-- [pg_catalog] float8mi(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8mi(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8mi$function$;
+
+-- [pg_catalog] float8mul(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8mul(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8mul$function$;
+
+-- [pg_catalog] float8ne(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8ne(double precision, double precision)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $function$float8ne$function$;
+
+-- [pg_catalog] float8out(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8out(double precision)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8out$function$;
+
+-- [pg_catalog] float8pl(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8pl(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8pl$function$;
+
+-- [pg_catalog] float8recv(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.float8recv(internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8recv$function$;
+
+-- [pg_catalog] float8send(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8send(double precision)
+ RETURNS bytea
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8send$function$;
+
+-- [pg_catalog] float8smaller(double precision, double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8smaller(double precision, double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8smaller$function$;
+
+-- [pg_catalog] float8um(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8um(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8um$function$;
+
+-- [pg_catalog] float8up(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.float8up(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$float8up$function$;
+
+-- [pg_catalog] floor(double precision)
+CREATE OR REPLACE FUNCTION pg_catalog.floor(double precision)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$dfloor$function$;
+
+-- [pg_catalog] floor(numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.floor(numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_floor$function$;
+
+-- [pg_catalog] flt4_mul_cash(real, money)
+CREATE OR REPLACE FUNCTION pg_catalog.flt4_mul_cash(real, money)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$flt4_mul_cash$function$;
+
+-- [pg_catalog] flt8_mul_cash(double precision, money)
+CREATE OR REPLACE FUNCTION pg_catalog.flt8_mul_cash(double precision, money)
+ RETURNS money
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$flt8_mul_cash$function$;
+
+-- [pg_catalog] fmgr_c_validator(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.fmgr_c_validator(oid)
+ RETURNS void
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$fmgr_c_validator$function$;
+
+-- [pg_catalog] fmgr_internal_validator(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.fmgr_internal_validator(oid)
+ RETURNS void
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$fmgr_internal_validator$function$;
+
+-- [pg_catalog] fmgr_sql_validator(oid)
+CREATE OR REPLACE FUNCTION pg_catalog.fmgr_sql_validator(oid)
+ RETURNS void
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$fmgr_sql_validator$function$;
+
+-- [pg_catalog] format(text)
+CREATE OR REPLACE FUNCTION pg_catalog.format(text)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$text_format_nv$function$;
+
+-- [pg_catalog] format(text, VARIADIC "any")
+CREATE OR REPLACE FUNCTION pg_catalog.format(text, VARIADIC "any")
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$text_format$function$;
+
+-- [pg_catalog] format_type(oid, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.format_type(oid, integer)
+ RETURNS text
+ LANGUAGE internal
+ STABLE PARALLEL SAFE
+AS $function$format_type$function$;
+
+-- [pg_catalog] gb18030_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.gb18030_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_gb18030', $function$gb18030_to_utf8$function$;
+
+-- [pg_catalog] gbk_to_utf8(integer, integer, cstring, internal, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.gbk_to_utf8(integer, integer, cstring, internal, integer, boolean)
+ RETURNS integer
+ LANGUAGE c
+ IMMUTABLE PARALLEL SAFE STRICT
+AS '$libdir/utf8_and_gbk', $function$gbk_to_utf8$function$;
+
+-- [pg_catalog] gcd(bigint, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.gcd(bigint, bigint)
+ RETURNS bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$int8gcd$function$;
+
+-- [pg_catalog] gcd(integer, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.gcd(integer, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$int4gcd$function$;
+
+-- [pg_catalog] gcd(numeric, numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.gcd(numeric, numeric)
+ RETURNS numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$numeric_gcd$function$;
+
+-- [pg_catalog] gen_random_uuid()
+CREATE OR REPLACE FUNCTION pg_catalog.gen_random_uuid()
+ RETURNS uuid
+ LANGUAGE internal
+ PARALLEL SAFE STRICT LEAKPROOF
+AS $function$gen_random_uuid$function$;
+
+-- [pg_catalog] generate_series(bigint, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(bigint, bigint)
+ RETURNS SETOF bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT generate_series_int8_support
+AS $function$generate_series_int8$function$;
+
+-- [pg_catalog] generate_series(bigint, bigint, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(bigint, bigint, bigint)
+ RETURNS SETOF bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT generate_series_int8_support
+AS $function$generate_series_step_int8$function$;
+
+-- [pg_catalog] generate_series(integer, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(integer, integer)
+ RETURNS SETOF integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT generate_series_int4_support
+AS $function$generate_series_int4$function$;
+
+-- [pg_catalog] generate_series(integer, integer, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(integer, integer, integer)
+ RETURNS SETOF integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT SUPPORT generate_series_int4_support
+AS $function$generate_series_step_int4$function$;
+
+-- [pg_catalog] generate_series(numeric, numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(numeric, numeric)
+ RETURNS SETOF numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_series_numeric$function$;
+
+-- [pg_catalog] generate_series(numeric, numeric, numeric)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(numeric, numeric, numeric)
+ RETURNS SETOF numeric
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_series_step_numeric$function$;
+
+-- [pg_catalog] generate_series(timestamp with time zone, timestamp with time zone, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(timestamp with time zone, timestamp with time zone, interval)
+ RETURNS SETOF timestamp with time zone
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$generate_series_timestamptz$function$;
+
+-- [pg_catalog] generate_series(timestamp with time zone, timestamp with time zone, interval, text)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(timestamp with time zone, timestamp with time zone, interval, text)
+ RETURNS SETOF timestamp with time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_series_timestamptz_at_zone$function$;
+
+-- [pg_catalog] generate_series(timestamp without time zone, timestamp without time zone, interval)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series(timestamp without time zone, timestamp without time zone, interval)
+ RETURNS SETOF timestamp without time zone
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_series_timestamp$function$;
+
+-- [pg_catalog] generate_series_int4_support(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series_int4_support(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_series_int4_support$function$;
+
+-- [pg_catalog] generate_series_int8_support(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_series_int8_support(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_series_int8_support$function$;
+
+-- [pg_catalog] generate_subscripts(anyarray, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_subscripts(anyarray, integer)
+ RETURNS SETOF integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_subscripts_nodir$function$;
+
+-- [pg_catalog] generate_subscripts(anyarray, integer, boolean)
+CREATE OR REPLACE FUNCTION pg_catalog.generate_subscripts(anyarray, integer, boolean)
+ RETURNS SETOF integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$generate_subscripts$function$;
+
+-- [pg_catalog] get_bit(bit, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.get_bit(bit, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$bitgetbit$function$;
+
+-- [pg_catalog] get_bit(bytea, bigint)
+CREATE OR REPLACE FUNCTION pg_catalog.get_bit(bytea, bigint)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteaGetBit$function$;
+
+-- [pg_catalog] get_byte(bytea, integer)
+CREATE OR REPLACE FUNCTION pg_catalog.get_byte(bytea, integer)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$byteaGetByte$function$;
+
+-- [pg_catalog] get_current_ts_config()
+CREATE OR REPLACE FUNCTION pg_catalog.get_current_ts_config()
+ RETURNS regconfig
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$get_current_ts_config$function$;
+
+-- [pg_catalog] getdatabaseencoding()
+CREATE OR REPLACE FUNCTION pg_catalog.getdatabaseencoding()
+ RETURNS name
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$getdatabaseencoding$function$;
+
+-- [pg_catalog] getpgusername()
+CREATE OR REPLACE FUNCTION pg_catalog.getpgusername()
+ RETURNS name
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$current_user$function$;
+
+-- [pg_catalog] gin_clean_pending_list(regclass)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_clean_pending_list(regclass)
+ RETURNS bigint
+ LANGUAGE internal
+ STRICT
+AS $function$gin_clean_pending_list$function$;
+
+-- [pg_catalog] gin_cmp_prefix(text, text, smallint, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_cmp_prefix(text, text, smallint, internal)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_cmp_prefix$function$;
+
+-- [pg_catalog] gin_cmp_tslexeme(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_cmp_tslexeme(text, text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_cmp_tslexeme$function$;
+
+-- [pg_catalog] gin_compare_jsonb(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_compare_jsonb(text, text)
+ RETURNS integer
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_compare_jsonb$function$;
+
+-- [pg_catalog] gin_consistent_jsonb(internal, smallint, jsonb, integer, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_consistent_jsonb(internal, smallint, jsonb, integer, internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_consistent_jsonb$function$;
+
+-- [pg_catalog] gin_consistent_jsonb_path(internal, smallint, jsonb, integer, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_consistent_jsonb_path(internal, smallint, jsonb, integer, internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_consistent_jsonb_path$function$;
+
+-- [pg_catalog] gin_extract_jsonb(jsonb, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_jsonb(jsonb, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_jsonb$function$;
+
+-- [pg_catalog] gin_extract_jsonb_path(jsonb, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_jsonb_path(jsonb, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_jsonb_path$function$;
+
+-- [pg_catalog] gin_extract_jsonb_query(jsonb, internal, smallint, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_jsonb_query(jsonb, internal, smallint, internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_jsonb_query$function$;
+
+-- [pg_catalog] gin_extract_jsonb_query_path(jsonb, internal, smallint, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_jsonb_query_path(jsonb, internal, smallint, internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_jsonb_query_path$function$;
+
+-- [pg_catalog] gin_extract_tsquery(tsquery, internal, smallint, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_tsquery(tsquery, internal, smallint, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_tsquery_5args$function$;
+
+-- [pg_catalog] gin_extract_tsquery(tsquery, internal, smallint, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_tsquery(tsquery, internal, smallint, internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_tsquery_oldsig$function$;
+
+-- [pg_catalog] gin_extract_tsquery(tsvector, internal, smallint, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_tsquery(tsvector, internal, smallint, internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_tsquery$function$;
+
+-- [pg_catalog] gin_extract_tsvector(tsvector, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_tsvector(tsvector, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_tsvector_2args$function$;
+
+-- [pg_catalog] gin_extract_tsvector(tsvector, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_extract_tsvector(tsvector, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_extract_tsvector$function$;
+
+-- [pg_catalog] gin_triconsistent_jsonb(internal, smallint, jsonb, integer, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_triconsistent_jsonb(internal, smallint, jsonb, integer, internal, internal, internal)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_triconsistent_jsonb$function$;
+
+-- [pg_catalog] gin_triconsistent_jsonb_path(internal, smallint, jsonb, integer, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_triconsistent_jsonb_path(internal, smallint, jsonb, integer, internal, internal, internal)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_triconsistent_jsonb_path$function$;
+
+-- [pg_catalog] gin_tsquery_consistent(internal, smallint, tsquery, integer, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_tsquery_consistent(internal, smallint, tsquery, integer, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_tsquery_consistent_6args$function$;
+
+-- [pg_catalog] gin_tsquery_consistent(internal, smallint, tsquery, integer, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_tsquery_consistent(internal, smallint, tsquery, integer, internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_tsquery_consistent_oldsig$function$;
+
+-- [pg_catalog] gin_tsquery_consistent(internal, smallint, tsvector, integer, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_tsquery_consistent(internal, smallint, tsvector, integer, internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_tsquery_consistent$function$;
+
+-- [pg_catalog] gin_tsquery_triconsistent(internal, smallint, tsvector, integer, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gin_tsquery_triconsistent(internal, smallint, tsvector, integer, internal, internal, internal)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gin_tsquery_triconsistent$function$;
+
+-- [pg_catalog] ginarrayconsistent(internal, smallint, anyarray, integer, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.ginarrayconsistent(internal, smallint, anyarray, integer, internal, internal, internal, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$ginarrayconsistent$function$;
+
+-- [pg_catalog] ginarrayextract(anyarray, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.ginarrayextract(anyarray, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$ginarrayextract_2args$function$;
+
+-- [pg_catalog] ginarrayextract(anyarray, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.ginarrayextract(anyarray, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$ginarrayextract$function$;
+
+-- [pg_catalog] ginarraytriconsistent(internal, smallint, anyarray, integer, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.ginarraytriconsistent(internal, smallint, anyarray, integer, internal, internal, internal)
+ RETURNS "char"
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$ginarraytriconsistent$function$;
+
+-- [pg_catalog] ginhandler(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.ginhandler(internal)
+ RETURNS index_am_handler
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$ginhandler$function$;
+
+-- [pg_catalog] ginqueryarrayextract(anyarray, internal, smallint, internal, internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.ginqueryarrayextract(anyarray, internal, smallint, internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$ginqueryarrayextract$function$;
+
+-- [pg_catalog] gist_box_consistent(internal, box, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_box_consistent(internal, box, smallint, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_box_consistent$function$;
+
+-- [pg_catalog] gist_box_distance(internal, box, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_box_distance(internal, box, smallint, oid, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_box_distance$function$;
+
+-- [pg_catalog] gist_box_penalty(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_box_penalty(internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_box_penalty$function$;
+
+-- [pg_catalog] gist_box_picksplit(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_box_picksplit(internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_box_picksplit$function$;
+
+-- [pg_catalog] gist_box_same(box, box, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_box_same(box, box, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_box_same$function$;
+
+-- [pg_catalog] gist_box_union(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_box_union(internal, internal)
+ RETURNS box
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_box_union$function$;
+
+-- [pg_catalog] gist_circle_compress(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_circle_compress(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_circle_compress$function$;
+
+-- [pg_catalog] gist_circle_consistent(internal, circle, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_circle_consistent(internal, circle, smallint, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_circle_consistent$function$;
+
+-- [pg_catalog] gist_circle_distance(internal, circle, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_circle_distance(internal, circle, smallint, oid, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_circle_distance$function$;
+
+-- [pg_catalog] gist_point_compress(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_point_compress(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_point_compress$function$;
+
+-- [pg_catalog] gist_point_consistent(internal, point, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_point_consistent(internal, point, smallint, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_point_consistent$function$;
+
+-- [pg_catalog] gist_point_distance(internal, point, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_point_distance(internal, point, smallint, oid, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_point_distance$function$;
+
+-- [pg_catalog] gist_point_fetch(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_point_fetch(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_point_fetch$function$;
+
+-- [pg_catalog] gist_point_sortsupport(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_point_sortsupport(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_point_sortsupport$function$;
+
+-- [pg_catalog] gist_poly_compress(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_poly_compress(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_poly_compress$function$;
+
+-- [pg_catalog] gist_poly_consistent(internal, polygon, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_poly_consistent(internal, polygon, smallint, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_poly_consistent$function$;
+
+-- [pg_catalog] gist_poly_distance(internal, polygon, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gist_poly_distance(internal, polygon, smallint, oid, internal)
+ RETURNS double precision
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gist_poly_distance$function$;
+
+-- [pg_catalog] gisthandler(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gisthandler(internal)
+ RETURNS index_am_handler
+ LANGUAGE internal
+ PARALLEL SAFE STRICT
+AS $function$gisthandler$function$;
+
+-- [pg_catalog] gtsquery_compress(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_compress(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_compress$function$;
+
+-- [pg_catalog] gtsquery_consistent(internal, internal, integer, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_consistent(internal, internal, integer, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_consistent_oldsig$function$;
+
+-- [pg_catalog] gtsquery_consistent(internal, tsquery, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_consistent(internal, tsquery, smallint, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_consistent$function$;
+
+-- [pg_catalog] gtsquery_penalty(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_penalty(internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_penalty$function$;
+
+-- [pg_catalog] gtsquery_picksplit(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_picksplit(internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_picksplit$function$;
+
+-- [pg_catalog] gtsquery_same(bigint, bigint, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_same(bigint, bigint, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_same$function$;
+
+-- [pg_catalog] gtsquery_union(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsquery_union(internal, internal)
+ RETURNS bigint
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsquery_union$function$;
+
+-- [pg_catalog] gtsvector_compress(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_compress(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_compress$function$;
+
+-- [pg_catalog] gtsvector_consistent(internal, gtsvector, integer, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_consistent(internal, gtsvector, integer, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_consistent_oldsig$function$;
+
+-- [pg_catalog] gtsvector_consistent(internal, tsvector, smallint, oid, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_consistent(internal, tsvector, smallint, oid, internal)
+ RETURNS boolean
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_consistent$function$;
+
+-- [pg_catalog] gtsvector_decompress(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_decompress(internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_decompress$function$;
+
+-- [pg_catalog] gtsvector_options(internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_options(internal)
+ RETURNS void
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE
+AS $function$gtsvector_options$function$;
+
+-- [pg_catalog] gtsvector_penalty(internal, internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_penalty(internal, internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_penalty$function$;
+
+-- [pg_catalog] gtsvector_picksplit(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_picksplit(internal, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_picksplit$function$;
+
+-- [pg_catalog] gtsvector_same(gtsvector, gtsvector, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_same(gtsvector, gtsvector, internal)
+ RETURNS internal
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_same$function$;
+
+-- [pg_catalog] gtsvector_union(internal, internal)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvector_union(internal, internal)
+ RETURNS gtsvector
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvector_union$function$;
+
+-- [pg_catalog] gtsvectorin(cstring)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvectorin(cstring)
+ RETURNS gtsvector
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvectorin$function$;
+
+-- [pg_catalog] gtsvectorout(gtsvector)
+CREATE OR REPLACE FUNCTION pg_catalog.gtsvectorout(gtsvector)
+ RETURNS cstring
+ LANGUAGE internal
+ IMMUTABLE PARALLEL SAFE STRICT
+AS $function$gtsvectorout$function$;
+
+-- [pg_catalog] has_any_column_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_any_column_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT COST 10
+AS $function$has_any_column_privilege_name_id$function$;
+
+-- [pg_catalog] has_any_column_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_any_column_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT COST 10
+AS $function$has_any_column_privilege_name_name$function$;
+
+-- [pg_catalog] has_any_column_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_any_column_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT COST 10
+AS $function$has_any_column_privilege_id_id$function$;
+
+-- [pg_catalog] has_any_column_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_any_column_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT COST 10
+AS $function$has_any_column_privilege_id$function$;
+
+-- [pg_catalog] has_any_column_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_any_column_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT COST 10
+AS $function$has_any_column_privilege_id_name$function$;
+
+-- [pg_catalog] has_any_column_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_any_column_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT COST 10
+AS $function$has_any_column_privilege_name$function$;
+
+-- [pg_catalog] has_column_privilege(name, oid, smallint, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(name, oid, smallint, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_name_id_attnum$function$;
+
+-- [pg_catalog] has_column_privilege(name, oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(name, oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_name_id_name$function$;
+
+-- [pg_catalog] has_column_privilege(name, text, smallint, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(name, text, smallint, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_name_name_attnum$function$;
+
+-- [pg_catalog] has_column_privilege(name, text, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(name, text, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_name_name_name$function$;
+
+-- [pg_catalog] has_column_privilege(oid, oid, smallint, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(oid, oid, smallint, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_id_id_attnum$function$;
+
+-- [pg_catalog] has_column_privilege(oid, oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(oid, oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_id_id_name$function$;
+
+-- [pg_catalog] has_column_privilege(oid, smallint, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(oid, smallint, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_id_attnum$function$;
+
+-- [pg_catalog] has_column_privilege(oid, text, smallint, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(oid, text, smallint, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_id_name_attnum$function$;
+
+-- [pg_catalog] has_column_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_id_name$function$;
+
+-- [pg_catalog] has_column_privilege(oid, text, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(oid, text, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_id_name_name$function$;
+
+-- [pg_catalog] has_column_privilege(text, smallint, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(text, smallint, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_name_attnum$function$;
+
+-- [pg_catalog] has_column_privilege(text, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_column_privilege(text, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_column_privilege_name_name$function$;
+
+-- [pg_catalog] has_database_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_database_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_database_privilege_name_id$function$;
+
+-- [pg_catalog] has_database_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_database_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_database_privilege_name_name$function$;
+
+-- [pg_catalog] has_database_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_database_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_database_privilege_id_id$function$;
+
+-- [pg_catalog] has_database_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_database_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_database_privilege_id$function$;
+
+-- [pg_catalog] has_database_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_database_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_database_privilege_id_name$function$;
+
+-- [pg_catalog] has_database_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_database_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_database_privilege_name$function$;
+
+-- [pg_catalog] has_foreign_data_wrapper_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_foreign_data_wrapper_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_foreign_data_wrapper_privilege_name_id$function$;
+
+-- [pg_catalog] has_foreign_data_wrapper_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_foreign_data_wrapper_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_foreign_data_wrapper_privilege_name_name$function$;
+
+-- [pg_catalog] has_foreign_data_wrapper_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_foreign_data_wrapper_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_foreign_data_wrapper_privilege_id_id$function$;
+
+-- [pg_catalog] has_foreign_data_wrapper_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_foreign_data_wrapper_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_foreign_data_wrapper_privilege_id$function$;
+
+-- [pg_catalog] has_foreign_data_wrapper_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_foreign_data_wrapper_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_foreign_data_wrapper_privilege_id_name$function$;
+
+-- [pg_catalog] has_foreign_data_wrapper_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_foreign_data_wrapper_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_foreign_data_wrapper_privilege_name$function$;
+
+-- [pg_catalog] has_function_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_function_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_function_privilege_name_id$function$;
+
+-- [pg_catalog] has_function_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_function_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_function_privilege_name_name$function$;
+
+-- [pg_catalog] has_function_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_function_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_function_privilege_id_id$function$;
+
+-- [pg_catalog] has_function_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_function_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_function_privilege_id$function$;
+
+-- [pg_catalog] has_function_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_function_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_function_privilege_id_name$function$;
+
+-- [pg_catalog] has_function_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_function_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_function_privilege_name$function$;
+
+-- [pg_catalog] has_language_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_language_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_language_privilege_name_id$function$;
+
+-- [pg_catalog] has_language_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_language_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_language_privilege_name_name$function$;
+
+-- [pg_catalog] has_language_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_language_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_language_privilege_id_id$function$;
+
+-- [pg_catalog] has_language_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_language_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_language_privilege_id$function$;
+
+-- [pg_catalog] has_language_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_language_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_language_privilege_id_name$function$;
+
+-- [pg_catalog] has_language_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_language_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_language_privilege_name$function$;
+
+-- [pg_catalog] has_parameter_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_parameter_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_parameter_privilege_name_name$function$;
+
+-- [pg_catalog] has_parameter_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_parameter_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_parameter_privilege_id_name$function$;
+
+-- [pg_catalog] has_parameter_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_parameter_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_parameter_privilege_name$function$;
+
+-- [pg_catalog] has_schema_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_schema_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_schema_privilege_name_id$function$;
+
+-- [pg_catalog] has_schema_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_schema_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_schema_privilege_name_name$function$;
+
+-- [pg_catalog] has_schema_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_schema_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_schema_privilege_id_id$function$;
+
+-- [pg_catalog] has_schema_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_schema_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_schema_privilege_id$function$;
+
+-- [pg_catalog] has_schema_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_schema_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_schema_privilege_id_name$function$;
+
+-- [pg_catalog] has_schema_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_schema_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_schema_privilege_name$function$;
+
+-- [pg_catalog] has_sequence_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_sequence_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_sequence_privilege_name_id$function$;
+
+-- [pg_catalog] has_sequence_privilege(name, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_sequence_privilege(name, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_sequence_privilege_name_name$function$;
+
+-- [pg_catalog] has_sequence_privilege(oid, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_sequence_privilege(oid, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_sequence_privilege_id_id$function$;
+
+-- [pg_catalog] has_sequence_privilege(oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_sequence_privilege(oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_sequence_privilege_id$function$;
+
+-- [pg_catalog] has_sequence_privilege(oid, text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_sequence_privilege(oid, text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_sequence_privilege_id_name$function$;
+
+-- [pg_catalog] has_sequence_privilege(text, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_sequence_privilege(text, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_sequence_privilege_name$function$;
+
+-- [pg_catalog] has_server_privilege(name, oid, text)
+CREATE OR REPLACE FUNCTION pg_catalog.has_server_privilege(name, oid, text)
+ RETURNS boolean
+ LANGUAGE internal
+ STABLE PARALLEL SAFE STRICT
+AS $function$has_server_privilege_name_id$function$;
