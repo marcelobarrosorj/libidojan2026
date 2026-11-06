@@ -64,3 +64,5 @@ backend/.env.*
 tools/.supabase-token
 
 reports/
+sql/backups
+_deploy.ps1

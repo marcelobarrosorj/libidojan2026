@@ -9,6 +9,7 @@ interface PinScreenProps {
 }
 
 export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
+  void userId;
   const [step, setStep] = useState<'enter' | 'confirm'>('enter');
   const [pin, setPin] = useState(['', '', '', '']);
   const [confirmPin, setConfirmPin] = useState(['', '', '', '']);
@@ -97,10 +98,7 @@ export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
 
   const savePin = async (pinCode: string) => {
     try {
-      const { error: dbError } = await supabase
-        .from('users')
-        .update({ pin: pinCode })
-        .eq('user_id', userId);
+      const { error: dbError } = await (supabase as any).rpc('definir_pin', { p_pin: pinCode });
 
       if (dbError) throw dbError;
       onSuccess();
@@ -111,15 +109,11 @@ export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
 
   const verifyPin = async (pinCode: string) => {
     try {
-      const { data, error: dbError } = await supabase
-        .from('users')
-        .select('pin')
-        .eq('user_id', userId)
-        .maybeSingle();
+      const { data, error: dbError } = await (supabase as any).rpc('verificar_pin', { p_pin: pinCode });
 
       if (dbError) throw dbError;
 
-      if (data && data.pin === pinCode) {
+      if (data && (data as any)?.ok === true) {
         onSuccess();
       } else {
         setError('PIN incorreto. Tente novamente.');
