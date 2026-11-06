@@ -1,10 +1,22 @@
-drop function if exists public.excluir_minha_conta();
+do $dd$
+declare r record;
+begin
+  for r in
+    select p.oid::regprocedure::text as sig
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = 'excluir_minha_conta'
+  loop
+    execute 'drop function if exists ' || r.sig || ' cascade';
+  end loop;
+end;
+$dd$;
+
 create function public.excluir_minha_conta()
 returns void
 language plpgsql
 security definer
 set search_path = public, auth, storage
-as $fn$
+as $body$
 declare
   v_uid uuid := auth.uid();
   r record;
@@ -22,26 +34,6 @@ begin
     where c.contype = 'f' and n.nspname = 'public' and t.relname = 'users'
   loop
     if r.tbl <> 'public.users' then
-      begin
-        execute format('delete from %s where %I = $1', r.tbl, r.col) using v_uid;
-      exception when others then
-        begin
-          execute format('delete from %s where %I::text = $1::text', r.tbl, r.col) using v_uid;
-        exception when others then null;
-        end;
-      end;
-    end if;
-  end loop;
-
-  for r in
-    select c.conrelid::regclass::text as tbl, a.attname as col
-    from pg_constraint c
-    join pg_attribute a on a.attrelid = c.conrelid and a.attnum = any(c.conkey)
-    join pg_class t on t.oid = c.confrelid
-    join pg_namespace n on n.oid = t.relnamespace
-    where c.contype = 'f' and n.nspname = 'auth' and t.relname = 'users'
-  loop
-    if r.tbl not in ('public.users','auth.users') then
       begin
         execute format('delete from %s where %I = $1', r.tbl, r.col) using v_uid;
       exception when others then
@@ -78,6 +70,6 @@ begin
 
   delete from auth.users where id = v_uid;
 end;
-$fn$;
+$body$;
+
 grant execute on function public.excluir_minha_conta() to authenticated;
-notify pgrst, 'reload schema';
