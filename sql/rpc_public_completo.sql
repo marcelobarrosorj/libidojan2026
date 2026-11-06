@@ -1,5 +1,5 @@
 -- Funcoes de public
--- Gerado: 2026-11-04 19:33
+-- Gerado: 2026-11-06 08:30
 
 -- _midia_apagar_objeto(p_url text)
 CREATE OR REPLACE FUNCTION public._midia_apagar_objeto(p_url text)
@@ -411,6 +411,26 @@ begin
   end if;
 
   perform public.recalcular_likes(v_post);
+end;
+$function$;
+
+-- excluir_minha_conta()
+CREATE OR REPLACE FUNCTION public.excluir_minha_conta()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare v_uid uuid := auth.uid();
+begin
+  if v_uid is null then raise exception 'nao autenticado'; end if;
+  delete from public.mensagens where remetente_id = v_uid or destinatario_id = v_uid;
+  delete from public.conversas where usuario1_id = v_uid or usuario2_id = v_uid;
+  delete from public.posts where user_id = v_uid;
+  delete from public.likes where user_id = v_uid;
+  delete from public.seguidores where seguidor_id = v_uid or seguido_id = v_uid;
+  delete from public.bloqueios where bloqueador_id = v_uid or bloqueado_id = v_uid;
+  delete from public.users where user_id = v_uid;
 end;
 $function$;
 
@@ -1627,6 +1647,22 @@ begin
   end;
 
   return new;
+end;
+$function$;
+
+-- resgatar_vitalicio(p_user text, p_until timestamp with time zone)
+CREATE OR REPLACE FUNCTION public.resgatar_vitalicio(p_user text, p_until timestamp with time zone)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  update public.users
+     set vitalicio = true,
+         vitalicio_ate = p_until
+   where user_id = p_user;
+  return found;
 end;
 $function$;
 
