@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Shield, Lock } from 'lucide-react';
+import { PinRecovery } from './PinRecovery';
 import { supabase } from '../services/supabase';
 
 interface PinScreenProps {
@@ -9,6 +10,7 @@ interface PinScreenProps {
 }
 
 export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
+  const [recuperar, setRecuperar] = useState(false);
   void userId;
   const [step, setStep] = useState<'enter' | 'confirm'>('enter');
   const [pin, setPin] = useState(['', '', '', '']);
@@ -147,6 +149,10 @@ export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
   );
 
   const isCreateMode = mode === 'create';
+  if (recuperar) {
+    return <PinRecovery onDone={() => { setRecuperar(false); onSuccess(); }} onCancel={() => setRecuperar(false)} />;
+  }
+
   const title = isCreateMode
     ? (step === 'enter' ? 'Crie seu PIN' : 'Confirme o PIN')
     : 'Digite seu PIN';
@@ -173,7 +179,12 @@ export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
           <p className="text-red-400 text-[10px] font-black uppercase tracking-wider bg-red-500/10 py-3 px-4 rounded-2xl border border-red-500/20 text-center w-full">{error}</p>
         )}
 
-        {step === 'confirm' && isCreateMode && (
+                {!isCreateMode && (
+          <button onClick={() => setRecuperar(true)} className="text-[10px] text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] font-bold uppercase tracking-widest">
+            Esqueci meu PIN
+          </button>
+        )}
+{step === 'confirm' && isCreateMode && (
           <button
             onClick={() => { setStep('enter'); setPin(['', '', '', '']); setConfirmPin(['', '', '', '']); }}
             className="text-[10px] text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] font-bold uppercase tracking-widest"
