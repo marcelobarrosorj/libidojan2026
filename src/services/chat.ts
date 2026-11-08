@@ -69,7 +69,7 @@ export const invalidarOcultas = () => { _ocultasCache = { uid: "", at: 0, ids: n
 
 const ocultasDoUsuario = async (uid: string): Promise<Set<string>> => {
   const agora = Date.now();
-  if (_ocultasCache.uid === uid && agora - _ocultasCache.at < 15000) return _ocultasCache.ids;
+  if (_ocultasCache.uid === uid && agora - _ocultasCache.at < 3000) return _ocultasCache.ids;
   try {
     const ids = await mensagensOcultasIds(uid);
     _ocultasCache = { uid, at: agora, ids: new Set<string>(ids.map(String)) };
@@ -101,7 +101,12 @@ const fetchAndNotifyAll = async () => {
     if (error) throw error;
 
     if (data) {
-      let msgs = data.map(mapSupabaseToExpandida).reverse();
+      const ocultas = await ocultasDoUsuario(lastUserId);
+      let msgs = data
+        .filter((r: any) => !r.apagada_para_todos)
+        .map(mapSupabaseToExpandida)
+        .filter((m: any) => !ocultas.has(String(m.id)))
+        .reverse();
       const relevantDemo = demoMessages.filter(
         m => m.from === lastUserId || m.to === lastUserId
       );

@@ -124,9 +124,12 @@ export function podeApagarParaTodos(
   msg: { sender_id?: string; created_at?: string },
   userId: string
 ): boolean {
-  if (!msg || !msg.sender_id || String(msg.sender_id) !== String(userId)) return false;
-  if (!msg.created_at) return false;
-  const t = new Date(msg.created_at).getTime();
+  if (!msg) return false;
+  const dono = (msg as any).sender_id ?? (msg as any).from;
+  if (!dono || String(dono) !== String(userId)) return false;
+  const quando = (msg as any).created_at ?? (msg as any).createdAt;
+  if (!quando) return false;
+  const t = new Date(quando).getTime();
   if (Number.isNaN(t)) return false;
   return Date.now() - t < 48 * 60 * 60 * 1000;
 }
