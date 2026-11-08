@@ -164,13 +164,19 @@ export function Chat({
   async function acoesMensagem(msg: any) {
     const ops = ["Apagar para mim"];
     if (podeApagarParaTodos(msg, userId)) ops.push("Apagar para todos");
-    const e = window.prompt("1 - " + ops[0] + (ops[1] ? "\n2 - " + ops[1] : ""), "1");
+    let e: string | null = null;
+    try {
+      e = window.prompt("1 - " + ops[0] + (ops[1] ? "\n2 - " + ops[1] : ""), "1");
+    } catch (perr) {
+      console.error("[chat] prompt bloqueado neste ambiente:", perr);
+      return;
+    }
     if (!e) return;
     try {
       if (e.trim() === "1") await apagarParaMim(msg.id);
       else if (e.trim() === "2" && ops[1]) await apagarParaTodos(msg.id);
       else return;
-      setAllMessages((p: any[]) => p.filter((m) => m.id !== msg.id));
+      setAllMessages((p: any[]) => p.filter((m) => String(m.id) !== String(msg.id)));
       recarregarConversas();
     } catch (err) { console.error("[chat] apagar", err); }
   }
@@ -221,23 +227,54 @@ export function Chat({
     setActiveChat(null);
   };
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTo({
         top: messagesEndRef.current.scrollHeight,
-        behavior: "smooth",
+        behavior,
       });
     }
   };
 
+  // SCROLL-TRAVA: o poll de 5s recria o array. A chave abaixo so muda com
+  // mensagem nova (id ou quantidade), nunca com mudanca de status.
+  const chaveScroll = useRef<string>("");
+  const pertoDoFim = useRef<boolean>(true);
+  const assinaturaMsgs = useRef<string>("");
+
   useEffect(() => {
-    scrollToBottom();
+    const el = messagesEndRef.current;
+    if (!el) return;
+    const aoRolar = () => {
+      pertoDoFim.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    };
+    el.addEventListener("scroll", aoRolar, { passive: true });
+    aoRolar();
+    return () => el.removeEventListener("scroll", aoRolar);
+  }, [activeChat]);
+
+  useEffect(() => {
+    const lista = (allMessages || []) as any[];
+    const ultima = lista.length ? String(lista[lista.length - 1]?.id ?? "") : "";
+    const chave = (activeChat || "") + "|" + lista.length + "|" + ultima;
+    if (chaveScroll.current === chave) return;
+    const primeiro = chaveScroll.current === "";
+    chaveScroll.current = chave;
+    if (primeiro || pertoDoFim.current) {
+      scrollToBottom(primeiro ? "auto" : "smooth");
+    }
   }, [allMessages, activeChat]);
 
   useEffect(() => {
     if (!userId) return;
     const unsubscribe = listenAllUserMessages(userId, async (messages) => {
-      setAllMessages(messages);
+      const assinatura = (messages || [])
+        .map((m: any) => String(m.id) + ":" + (m.status || "") + ":" + (m.apagada_para_todos ? 1 : 0))
+        .join("|");
+      if (assinatura !== assinaturaMsgs.current) {
+        assinaturaMsgs.current = assinatura;
+        setAllMessages(messages);
+      }
       // SOM-NOVA: toca quando chega mensagem nova de outra pessoa
       const recebidas = messages.filter((m) => m.to === userId);
       if (recebidas.length > 0) {
