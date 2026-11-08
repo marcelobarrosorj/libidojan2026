@@ -64,6 +64,21 @@ export const sendMessage = async (message: Omit<Message, 'id'>) => {
 
 let lastUserId = '';
 
+let _ocultasCache: { uid: string; at: number; ids: Set<string> } = { uid: "", at: 0, ids: new Set<string>() };
+export const invalidarOcultas = () => { _ocultasCache = { uid: "", at: 0, ids: new Set<string>() }; };
+
+const ocultasDoUsuario = async (uid: string): Promise<Set<string>> => {
+  const agora = Date.now();
+  if (_ocultasCache.uid === uid && agora - _ocultasCache.at < 15000) return _ocultasCache.ids;
+  try {
+    const ids = await mensagensOcultasIds(uid);
+    _ocultasCache = { uid, at: agora, ids: new Set<string>(ids.map(String)) };
+  } catch {
+    _ocultasCache = { uid, at: agora, ids: _ocultasCache.ids };
+  }
+  return _ocultasCache.ids;
+};
+
 const fetchAndNotifyAll = async () => {
   if (!lastUserId) return;
 
