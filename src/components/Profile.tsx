@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import { supabase } from '../services/supabase';
 import { getUsersByIds } from '../services/users';
-import { Eye, Lock, Camera, Sparkles, Edit3, Plus, Trash2, Check, Users } from 'lucide-react';
+import { Eye, Lock, Camera, Sparkles, Edit3, Plus, Trash2, Check, Users, Copy } from 'lucide-react';
 import { uploadPhoto } from '../services/uploadPhoto';
 import { ImageEditor } from './ImageEditor';
 import { User } from '../types';
@@ -12,7 +12,8 @@ import { calcularIdade } from '../services/idade'; // IDADE-EDIT: idade calculad
 import { createPost, excluirPostPorFoto } from '../services/posts';
 import { deleteUserProfile } from '../services/users'; // GALLERY-AUTOPOST
 import { contarVisitas, listarVisitantes } from '../services/visits'; // VISITAS-REAIS
-import ExcluirConta from './ExcluirConta'
+import ExcluirConta from './ExcluirConta';
+
 // NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
 function extrairTextoBio(b: any): string {
   if (!b || typeof b !== 'string') return '';
@@ -41,6 +42,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [visitas, setVisitas] = useState<number | null>(null); // VISITAS-REAIS
   const [visitantes, setVisitantes] = useState<any[]>([]); // VISITAS-REAIS
+  const [copiedId, setCopiedId] = useState(false);
 
   useEffect(() => {
     const carregarVisitas = async () => {
@@ -54,6 +56,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
     };
     void carregarVisitas();
   }, []);
+
   const [followersList, setFollowersList] = useState<any[] | null>(null);
   const [saving, setSaving] = useState(false);
   const [editingImageUrl, setEditingImageUrl] = useState<string | null>(null);
@@ -64,14 +67,14 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [maleNickname, setMaleNickname] = useState('');
   const [maleAge, setMaleAge] = useState('');
   const [maleOrientation, setMaleOrientation] = useState('Heterossexual');
-  const [maleBiotype, setMaleBiotype] = useState('PadrÃ£o');
+  const [maleBiotype, setMaleBiotype] = useState('Padrão');
   const [maleHeight, setMaleHeight] = useState('');
   const [maleWeight, setMaleWeight] = useState('');
 
   const [femaleNickname, setFemaleNickname] = useState('');
   const [femaleAge, setFemaleAge] = useState('');
   const [femaleOrientation, setFemaleOrientation] = useState('Bissexual');
-  const [femaleBiotype, setFemaleBiotype] = useState('PadrÃ£o');
+  const [femaleBiotype, setFemaleBiotype] = useState('Padrão');
   const [femaleHeight, setFemaleHeight] = useState('');
   const [femaleWeight, setFemaleWeight] = useState('');
 
@@ -79,7 +82,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   const [singleAge, setSingleAge] = useState('');
   const [singleGender, setSingleGender] = useState('Masculino');
   const [singleOrientation, setSingleOrientation] = useState('Bissexual');
-  const [singleBiotype, setSingleBiotype] = useState('PadrÃ£o');
+  const [singleBiotype, setSingleBiotype] = useState('Padrão');
   const [singleHeight, setSingleHeight] = useState('');
   // IDADE-EDIT: datas de nascimento na edicao (perfis existentes incluidos)
   const [singleBirth, setSingleBirth] = useState('');
@@ -99,14 +102,14 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setMaleAge(cp.maleAge != null ? String(cp.maleAge) : (calcularIdade(cp.maleBirthDate) != null ? String(calcularIdade(cp.maleBirthDate)) : ''));
         setMaleBirth(cp.maleBirthDate || '');
         setMaleOrientation(cp.maleOrientation || 'Heterossexual');
-        setMaleBiotype(cp.maleBiotype || 'PadrÃ£o');
+        setMaleBiotype(cp.maleBiotype || 'Padrão');
         setMaleHeight(cp.maleHeight != null ? String(cp.maleHeight) : '');
         setMaleWeight(cp.maleWeight != null ? String(cp.maleWeight) : '');
         setFemaleNickname(cp.femaleNickname || '');
         setFemaleAge(cp.femaleAge != null ? String(cp.femaleAge) : (calcularIdade(cp.femaleBirthDate) != null ? String(calcularIdade(cp.femaleBirthDate)) : ''));
         setFemaleBirth(cp.femaleBirthDate || '');
         setFemaleOrientation(cp.femaleOrientation || 'Bissexual');
-        setFemaleBiotype(cp.femaleBiotype || 'PadrÃ£o');
+        setFemaleBiotype(cp.femaleBiotype || 'Padrão');
         setFemaleHeight(cp.femaleHeight != null ? String(cp.femaleHeight) : '');
         setFemaleWeight(cp.femaleWeight != null ? String(cp.femaleWeight) : '');
         setEditBio(extrairTextoBio(rawBio) || (cp && typeof cp.text === 'string' ? cp.text : ''));
@@ -121,7 +124,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           setMaleAge(parsed.maleAge?.toString() || (calcularIdade(parsed.maleBirthDate) != null ? String(calcularIdade(parsed.maleBirthDate)) : ''));
           setMaleBirth(parsed.maleBirthDate || '');
           setMaleOrientation(parsed.maleOrientation || 'Heterossexual');
-          setMaleBiotype(parsed.maleBiotype || 'PadrÃ£o');
+          setMaleBiotype(parsed.maleBiotype || 'Padrão');
           setMaleHeight(parsed.maleHeight || '');
           setMaleWeight(parsed.maleWeight || '');
 
@@ -129,7 +132,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           setFemaleAge(parsed.femaleAge?.toString() || (calcularIdade(parsed.femaleBirthDate) != null ? String(calcularIdade(parsed.femaleBirthDate)) : ''));
           setFemaleBirth(parsed.femaleBirthDate || '');
           setFemaleOrientation(parsed.femaleOrientation || 'Bissexual');
-          setFemaleBiotype(parsed.femaleBiotype || 'PadrÃ£o');
+          setFemaleBiotype(parsed.femaleBiotype || 'Padrão');
           setFemaleHeight(parsed.femaleHeight || '');
           setFemaleWeight(parsed.femaleWeight || '');
           setEditBio(parsed.text || '');
@@ -147,7 +150,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         setSingleBirth(currentUser.birth_date || '');
         setSingleGender(currentUser.gender || 'Masculino');
         setSingleOrientation(currentUser.sexual_orientation || 'Bissexual');
-        setSingleBiotype(currentUser.biotype || 'PadrÃ£o');
+        setSingleBiotype(currentUser.biotype || 'Padrão');
         setSingleHeight(currentUser.height?.toString() || '');
       }
     }
@@ -244,7 +247,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         const updatedPhotos = [...currentPhotos, url];
         await updateUserProfile(userId, { photos: updatedPhotos });
         try { await createPost({ id: '', userId: userId, image: url, text: '', likes: 0, createdAt: Date.now() }); } catch (eAP) { console.error('GALLERY-AUTOPOST falhou', eAP); } // GALLERY-AUTOPOST: foto da galeria vira post no feed
-        alert("Foto adicionada Ã  galeria e publicada no feed!");
+        alert("Foto adicionada à galeria e publicada no feed!");
       }
       
       setEditingImageUrl(null);
@@ -273,7 +276,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       const currentPhotos = currentUser?.photos || [];
       const updatedPhotos = currentPhotos.filter((url: string) => url !== urlToDelete);
       await updateUserProfile(userId, { photos: updatedPhotos });
-      alert("Foto excluÃ­da!");
+      try { await excluirPostPorFoto(urlToDelete); } catch (eDelPost) { console.error(eDelPost); }
+      alert("Foto excluída!");
       setActivePhotoIndex(null);
       window.dispatchEvent(new Event('profileUpdated'));
     } catch (err: any) {
@@ -281,14 +285,42 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
     }
   };
 
+  const handleDeleteOwnProfile = async () => {
+    if (!userId) return;
+    if (!confirm("Tem certeza que deseja excluir seu perfil permanentemente? Esta ação não pode ser desfeita.")) return;
+    setSaving(true);
+    try {
+      await deleteUserProfile(userId);
+      alert("Perfil excluído com sucesso.");
+      if (onLogout) onLogout();
+    } catch (err: any) {
+      alert("Erro ao excluir perfil: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCopyUserNumber = () => {
+    if (!currentUser?.userNumber) return;
+    const formatted = `#${formatUserNumber(currentUser.userNumber)}`;
+    navigator.clipboard.writeText(formatted).then(() => {
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    }).catch(() => {
+      // Fallback simples
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    });
+  };
+
   const handleSaveProfile = async () => {
     if (!editNickname.trim()) {
-      alert("O apelido nÃ£o pode ficar vazio.");
+      alert("O apelido não pode ficar vazio.");
       return;
     }
     const idadeSingle = calcularIdade(singleBirth);
     if (idadeSingle != null && idadeSingle < 18) {
-      alert("VocÃª deve ter 18 anos ou mais.");
+      alert("Você deve ter 18 anos ou mais.");
       return;
     }
     const mIdadeChk = calcularIdade(maleBirth);
@@ -368,32 +400,58 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         <button onClick={onLogout} className="absolute top-0 right-0 text-[var(--libido-muted)] opacity-50 hover:text-[var(--libido-text)] text-xs font-black uppercase tracking-wider">Sair</button>
         
         <div className="relative w-24 h-24 rounded-[2.2rem] p-0.5 border-2 border-[var(--libido-accent)] shadow-[0_0_25px_rgba(255,179,0,0.15)] mb-4">
-          <ProtectedImage currentUser={currentUser} src={photoUrl} alt="avatar" className="w-full h-full rounded-[2rem] border border-black" />
+          <ProtectedImage 
+            currentUser={currentUser} 
+            src={photoUrl} 
+            alt="avatar" 
+            className="w-full h-full object-cover rounded-[2rem] border border-black transition-all duration-300" 
+          />
           <button 
             disabled={uploading}
             onClick={() => document.getElementById('avatar-input')?.click()}
             className="absolute bottom-0 right-0 w-7 h-7 bg-[var(--libido-accent)] rounded-xl flex items-center justify-center border border-black hover:opacity-90 active:scale-95 shadow-md disabled:opacity-55"
+            title="Alterar foto de perfil"
           >
             <Camera size={12} className="text-black" />
           </button>
           <ExcluirConta />
         </div>
 
-        <h2 className="text-lg font-black uppercase tracking-widest text-[var(--libido-text)] italic font-fraunces font-medium flex items-center gap-1.5 justify-center">
-          {nickname}
-          <Sparkles size={14} className="text-[var(--libido-accent)] fill-[var(--libido-accent)]" />
-          {currentUser?.userNumber ? <span className="text-[12px] text-[var(--libido-muted)] opacity-50 ml-1">#{formatUserNumber(currentUser.userNumber)}</span> : null}
-        </h2>
+        <div className="flex items-center gap-1.5 justify-center flex-wrap">
+          <h2 className="text-lg font-black uppercase tracking-widest text-[var(--libido-text)] italic font-fraunces font-medium flex items-center gap-1.5 justify-center">
+            {nickname}
+            <Sparkles size={14} className="text-[var(--libido-accent)] fill-[var(--libido-accent)]" />
+          </h2>
+
+          {currentUser?.userNumber ? (
+            <button
+              type="button"
+              onClick={handleCopyUserNumber}
+              title="Clique para copiar seu ID"
+              className="inline-flex items-center gap-1 px-2 py-0.5 ml-1 rounded-full bg-white/5 border border-[var(--libido-border)] hover:border-[var(--libido-accent)] hover:bg-white/10 active:scale-95 transition-all cursor-pointer text-[11px] font-bold tracking-wider"
+            >
+              <span className="text-[var(--libido-muted)] opacity-80">#{formatUserNumber(currentUser.userNumber)}</span>
+              {copiedId ? (
+                <span className="text-[var(--libido-accent)] flex items-center gap-0.5 font-bold animate-in fade-in">
+                  <Check size={11} />
+                  <span className="text-[9px] uppercase tracking-wider">Copiado!</span>
+                </span>
+              ) : (
+                <Copy size={11} className="text-[var(--libido-muted)] opacity-60 hover:opacity-100 transition-opacity" />
+              )}
+            </button>
+          ) : null}
+        </div>
         
         <button 
           onClick={() => setShowEditModal(true)}
-          className="flex items-center gap-1.5 mt-2.5 px-4 py-1.5 bg-white/5 border border-[var(--libido-border)] hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--libido-muted)] opacity-80 hover:text-[var(--libido-text)] transition-all shadow-[0_4px_15px_rgba(0,0,0,0.4)] animate-pulse"
+          className="flex items-center gap-1.5 mt-2.5 px-4 py-1.5 bg-white/5 border border-[var(--libido-border)] hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--libido-muted)] opacity-80 hover:text-[var(--libido-text)] transition-all shadow-[0_4px_15px_rgba(0,0,0,0.4)]"
         >
           <Edit3 size={10} className="text-[var(--libido-accent)]" />
           Configurar Perfil
         </button>
 
-        <span className="text-[11px] font-black tracking-widest text-[var(--libido-muted)] opacity-50 uppercase mt-3">Status: {isPremium ? 'Membro Premium' : 'Membro GrÃ¡tis'}</span>
+        <span className="text-[11px] font-black tracking-widest text-[var(--libido-muted)] opacity-50 uppercase mt-3">Status: {isPremium ? 'Membro Premium' : 'Membro Grátis'}</span>
       </div>
 
       <div className="h-[1px] bg-white/5 my-6"></div>
@@ -406,7 +464,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-accent)]/20 p-4 rounded-2xl text-left relative overflow-hidden shadow-[0_0_15px_rgba(255,179,0,0.03)]">
-              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ele ðŸ‘¨</p>
+              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ele 👨</p>
               <h4 className="text-sm font-black truncate">{maleNickname || 'Parceiro'}</h4>
               <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-semibold mt-1">{maleAge ? `${maleAge} anos` : 'Idade n/d'}</p>
               <span className="text-[11px] bg-white/5 text-[var(--libido-muted)] opacity-80 px-2 py-0.5 rounded-md mt-2 inline-block font-bold">{maleOrientation}</span>
@@ -418,7 +476,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
             </div>
 
             <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-accent)]/20 p-4 rounded-2xl text-left relative overflow-hidden shadow-[0_0_15px_rgba(255,179,0,0.03)]">
-              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ela ðŸ‘©</p>
+              <p className="text-[10px] font-black text-[var(--libido-accent)] tracking-widest uppercase mb-1.5">Ela 👩</p>
               <h4 className="text-sm font-black truncate">{femaleNickname || 'Parceira'}</h4>
               <p className="text-[10px] text-[var(--libido-muted)] opacity-70 font-semibold mt-1">{femaleAge ? `${femaleAge} anos` : 'Idade n/d'}</p>
               <span className="text-[11px] bg-white/5 text-[var(--libido-muted)] opacity-80 px-2 py-0.5 rounded-md mt-2 inline-block font-bold">{femaleOrientation}</span>
@@ -432,13 +490,13 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         </section>
       ) : (
         <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl text-left mb-6 relative overflow-hidden">
-          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 tracking-widest uppercase mb-1">InformaÃ§Ãµes Pessoais</p>
+          <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 tracking-widest uppercase mb-1">Informações Pessoais</p>
           <div className="grid grid-cols-2 gap-4 text-xs font-bold mt-2">
-            <p>GÃŠNERO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.gender || 'n/d'}</span></p>
+            <p>GÊNERO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.gender || 'n/d'}</span></p>
             <p>IDADE: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.age ? `${currentUser.age} anos` : 'n/d'}</span></p>
             <p>BIOTIPO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.biotype || 'n/d'}</span></p>
             <p>ALTURA: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.height ? `${currentUser.height} cm` : 'n/d'}</span></p>
-            <p>ORIENTAÃ‡ÃƒO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.sexualOrientation || 'n/d'}</span></p>
+            <p>ORIENTAÇÃO: <span className="text-[var(--libido-muted)] opacity-90">{currentUser?.sexualOrientation || 'n/d'}</span></p>
           </div>
         </div>
       )}
@@ -467,9 +525,13 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           <div className="space-y-2.5">
             {visitantes.slice(0, 10).map((v: any) => (
               <div key={v.id || v.user_id} className="flex items-center gap-3">
-                <ProtectedImage currentUser={currentUser} src={v.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} className="w-9 h-9 rounded-full" />
+                <ProtectedImage 
+                  currentUser={currentUser} 
+                  src={v.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} 
+                  className="w-9 h-9 rounded-full object-cover border border-[var(--libido-border)]" 
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{v.nickname || 'Usuario'}</p>
+                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{v.nickname || 'Usuário'}</p>
                   {((v as any).isOnline ?? (v as any).is_online) ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
                 </div>
               </div>
@@ -484,9 +546,13 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           <div className="space-y-2.5">
             {followersList.map((f: any) => (
               <div key={f.id || f.user_id} className="flex items-center gap-3">
-                <ProtectedImage currentUser={currentUser} src={f.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} className="w-9 h-9 rounded-full" />
+                <ProtectedImage 
+                  currentUser={currentUser} 
+                  src={f.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'} 
+                  className="w-9 h-9 rounded-full object-cover border border-[var(--libido-border)]" 
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{f.nickname || 'UsuÃ¡rio'}</p>
+                  <p className="text-xs font-black text-[var(--libido-text)] truncate">{f.nickname || 'Usuário'}</p>
                   {f.isOnline ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
                 </div>
               </div>
@@ -494,8 +560,9 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           </div>
         </div>
       )}
+      
       <div className="bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl mb-6 text-left">
-        <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-1.5">Sobre NÃ³s / Bio</p>
+        <p className="text-[10px] font-black text-[var(--libido-muted)] opacity-50 uppercase tracking-wider mb-1.5">Sobre Nós / Bio</p>
         <p className="text-xs text-[var(--libido-muted)] opacity-90 font-medium leading-relaxed">{editBio || 'Sem biografia cadastrada...'}</p>
       </div>
 
@@ -522,10 +589,16 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
         ) : (
           <div className="grid grid-cols-3 gap-2 relative">
             {userPhotos.map((imgUrl, idx) => (
-              <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-[var(--libido-border)] relative shadow-md">
-                <ProtectedImage currentUser={currentUser} src={imgUrl} alt="gallery" onClick={() => setActivePhotoIndex(idx)} className={`w-full h-full transition-all cursor-pointer hover:scale-105 ${!isPremium && idx > 0 ? "blur-md pointer-events-none" : ""}`} />
+              <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-[var(--libido-border)] bg-black/40 relative shadow-md">
+                <ProtectedImage 
+                  currentUser={currentUser} 
+                  src={imgUrl} 
+                  alt="gallery" 
+                  onClick={() => setActivePhotoIndex(idx)} 
+                  className={`w-full h-full object-cover transition-transform duration-300 cursor-pointer hover:scale-105 ${!isPremium && idx > 0 ? "blur-md pointer-events-none" : ""}`} 
+                />
                 {!isPremium && idx > 0 && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center">
                     <Lock size={12} className="text-[var(--libido-accent)]" />
                   </div>
                 )}
@@ -536,18 +609,18 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       </div>
 
       {activePhotoIndex !== null && userPhotos[activePhotoIndex] && (
-        <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4">
-            <button
-              type="button"
-              onClick={() => setActivePhotoIndex(null)}
+        <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-md">
+          <button
+            type="button"
+            onClick={() => setActivePhotoIndex(null)}
             className="absolute top-4 right-4 z-[70] w-12 h-12 rounded-full bg-white text-black flex items-center justify-center text-2xl font-bold shadow-lg hover:scale-105 transition-transform"
-              aria-label="Fechar"
-            >
-            X
-            </button>
+            aria-label="Fechar"
+          >
+            ✕
+          </button>
           
           <div
-            className="relative touch-none select-none"
+            className="relative touch-none select-none max-w-full flex items-center justify-center"
             onPointerDown={(e) => { e.currentTarget.dataset.sx = String(e.clientX); e.currentTarget.dataset.sy = String(e.clientY); }}
             onPointerUp={(e) => {
               const sx = Number(e.currentTarget.dataset.sx ?? e.clientX);
@@ -572,23 +645,25 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
             <img
               src={userPhotos[activePhotoIndex]}
               alt="Foto ampliada"
-              className="block mx-auto max-w-full max-h-[65vh] w-auto h-auto object-contain rounded-2xl border border-[var(--libido-border)] shadow-2xl mb-8"
+              className="block mx-auto max-w-full max-h-[65vh] w-auto h-auto object-contain rounded-2xl border border-[var(--libido-border)] shadow-2xl mb-8 transition-opacity duration-200"
               style={{ objectFit: "contain" }}
             />
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-black/70 text-white text-[10px] font-black px-3 py-1 rounded-full pointer-events-none">{(activePhotoIndex ?? 0) + 1} / {userPhotos.length}</div>
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-black/70 border border-white/10 text-white text-[10px] font-black px-3 py-1 rounded-full pointer-events-none shadow-md">
+              {(activePhotoIndex ?? 0) + 1} / {userPhotos.length}
+            </div>
           </div>
           
           <div className="flex gap-4 w-full max-w-xs">
             <button 
               onClick={() => handleSetAsAvatar(userPhotos[activePhotoIndex])}
-              className="flex-1 py-3 bg-[var(--libido-accent)] hover:bg-[#e6a200] text-black text-[11px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1 shadow-lg"
+              className="flex-1 py-3 bg-[var(--libido-accent)] hover:bg-[#e6a200] text-black text-[11px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1 shadow-lg active:scale-95"
             >
               <Check size={12} />
               Usar como Perfil
             </button>
             <button 
               onClick={() => handleDeletePhoto(userPhotos[activePhotoIndex])}
-              className="flex-1 py-3 bg-red-600/25 border border-red-500/20 hover:bg-red-600/40 text-red-400 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1"
+              className="flex-1 py-3 bg-red-600/25 border border-red-500/20 hover:bg-red-600/40 text-red-400 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-1 active:scale-95"
             >
               <Trash2 size={12} />
               Excluir Foto
@@ -600,8 +675,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       {showEditModal && (
         <div className="fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
           <div className="bg-[var(--libido-surface-2)] border border-[var(--libido-border)] rounded-[2rem] p-6 max-w-sm w-full relative animate-in fade-in duration-200 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
-            <button onClick={() => setShowEditModal(false)} className="absolute top-4 right-4 text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] transition-colors">âœ•</button>
-            <h3 className="text-base font-black text-[var(--libido-accent)] mb-4 uppercase tracking-widest italic font-fraunces font-medium">ConfiguraÃ§Ãµes do Perfil</h3>
+            <button onClick={() => setShowEditModal(false)} className="absolute top-4 right-4 text-[var(--libido-muted)] opacity-60 hover:text-[var(--libido-text)] transition-colors">✕</button>
+            <h3 className="text-base font-black text-[var(--libido-accent)] mb-4 uppercase tracking-widest italic font-fraunces font-medium">Configurações do Perfil</h3>
             
             <div className="space-y-3.5 text-left">
               <div>
@@ -641,8 +716,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                         <option value="Homossexual">Homossexual</option>
                       </select>
                       <select value={maleBiotype} onChange={e => setMaleBiotype(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none">
-                        <option value="PadrÃ£o">Biotipo: PadrÃ£o</option>
-                        <option value="AtlÃ©tico">AtlÃ©tico</option>
+                        <option value="Padrão">Biotipo: Padrão</option>
+                        <option value="Atlético">Atlético</option>
                         <option value="Fortinho">Fortinho</option>
                         <option value="Magro">Magro</option>
                       </select>
@@ -666,10 +741,10 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                         <option value="Homossexual">Homossexual</option>
                       </select>
                       <select value={femaleBiotype} onChange={e => setFemaleBiotype(e.target.value)} className="bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none">
-                        <option value="PadrÃ£o">Biotipo: PadrÃ£o</option>
+                        <option value="Padrão">Biotipo: Padrão</option>
                         <option value="Magro">Magro</option>
-                        <option value="AtlÃ©tico">AtlÃ©tico</option>
-                        <option value="CurvilÃ­nea">CurvilÃ­nea</option>
+                        <option value="Atlético">Atlético</option>
+                        <option value="Curvilínea">Curvilínea</option>
                       </select>
                     </div>
                   </div>
@@ -683,7 +758,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                       <input type="date" value={singleBirth} onChange={e => setSingleBirth(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
                     </div>
                     <div>
-                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">GÃªnero</label>
+                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Gênero</label>
                       <select value={singleGender} onChange={e => setSingleGender(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
                         <option value="Masculino">Homem</option>
                         <option value="Feminino">Mulher</option>
@@ -697,12 +772,11 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                       <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Altura (cm)</label>
                       <input type="number" placeholder="Altura" value={singleHeight} onChange={e => setSingleHeight(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-text)] focus:outline-none mt-1"/>
                     </div>
-
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">OrientaÃ§Ã£o</label>
+                      <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Orientação</label>
                       <select value={singleOrientation} onChange={e => setSingleOrientation(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
                         <option value="Bissexual">Bissexual</option>
                         <option value="Heterossexual">Heterossexual</option>
@@ -712,8 +786,8 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                     <div>
                       <label className="text-[10px] text-[var(--libido-muted)] opacity-60 font-bold uppercase">Biotipo</label>
                       <select value={singleBiotype} onChange={e => setSingleBiotype(e.target.value)} className="w-full bg-[var(--libido-surface)] border border-[var(--libido-border)] rounded-lg px-3 py-2 text-xs text-[var(--libido-muted)] opacity-80 focus:outline-none mt-1">
-                        <option value="PadrÃ£o">PadrÃ£o</option>
-                        <option value="AtlÃ©tico">AtlÃ©tico</option>
+                        <option value="Padrão">Padrão</option>
+                        <option value="Atlético">Atlético</option>
                         <option value="Fortinho">Fortinho</option>
                         <option value="Magro">Magro</option>
                       </select>
@@ -723,7 +797,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
               )}
 
               <div>
-                <label className="text-[10px] font-black uppercase text-[var(--libido-muted)] opacity-50 tracking-widest">Sobre NÃ³s / Bio</label>
+                <label className="text-[10px] font-black uppercase text-[var(--libido-muted)] opacity-50 tracking-widest">Sobre Nós / Bio</label>
                 <textarea 
                   value={editBio}
                   onChange={e => setEditBio(e.target.value)}
@@ -737,9 +811,16 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
               disabled={saving}
               className="w-full bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] font-black py-3.5 rounded-2xl mt-6 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity active:scale-95 shadow-lg shadow-[var(--libido-accent)]/10"
             >
-              {saving ? 'SALVANDO...' : 'SALVAR CONFIGURAÃ‡Ã•ES'}
+              {saving ? 'SALVANDO...' : 'SALVAR CONFIGURAÇÕES'}
             </button>
-            <button type="button" onClick={handleDeleteOwnProfile} disabled={saving} className="w-full bg-red-600/15 border border-red-500/30 text-red-400 font-black py-3 rounded-2xl mt-3 text-[11px] uppercase tracking-widest hover:bg-red-600/25 transition-all">Excluir Meu Perfil Permanentemente</button>
+            <button 
+              type="button" 
+              onClick={handleDeleteOwnProfile} 
+              disabled={saving} 
+              className="w-full bg-red-600/15 border border-red-500/30 text-red-400 font-black py-3 rounded-2xl mt-3 text-[11px] uppercase tracking-widest hover:bg-red-600/25 transition-all"
+            >
+              Excluir Meu Perfil Permanentemente
+            </button>
           </div>
         </div>
       )}

@@ -66,3 +66,8 @@ tools/.supabase-token
 reports/
 sql/backups
 _deploy.ps1
+FILA_DE_TAREFAS.txt
+RELATORIO_DO_AGENTE.log
+tools/.gemini-key
+tools/agente-libido.mjs
+tools/REGRAS_CTO_AGENTE.md

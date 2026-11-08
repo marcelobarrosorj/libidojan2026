@@ -34,8 +34,16 @@ export const login = async (email: string, password: string) => {
   if (error) throw error;
   if (!data.user) throw new Error("No user data returned");
 
-  const pendenteNovo = localStorage.getItem('libido_novo_nao_confirmado_' + data.user.id) === '1';
   const confirmadoNoBanco = data.user.email_confirmed_at != null;
+  if (confirmadoNoBanco) {
+    try {
+      localStorage.removeItem('libido_novo_nao_confirmado_' + data.user.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const pendenteNovo = localStorage.getItem('libido_novo_nao_confirmado_' + data.user.id) === '1';
 
   return {
     user: {
@@ -64,20 +72,28 @@ export const register = async (email: string, password: string) => {
   if (error) throw error;
   if (!data.user) throw new Error("No user data returned");
 
-  // Se o Supabase estiver com autoconfirm desligado, data.session sera null (correto).
-  // Mesmo se o servidor retornar sessao sem o clique no link, exigimos a confirmacao para novos cadastros:
-  const confirmado = !!(data.user.email_confirmed_at && !data.session);
-  if (!data.user.email_confirmed_at) {
-    try { localStorage.setItem('libido_novo_nao_confirmado_' + data.user.id, '1'); } catch (e) { console.error(e); }
+  const confirmado = data.user.email_confirmed_at != null;
+  if (!confirmado) {
+    try {
+      localStorage.setItem('libido_novo_nao_confirmado_' + data.user.id, '1');
+    } catch (e) {
+      console.error(e);
+    }
+  } else {
+    try {
+      localStorage.removeItem('libido_novo_nao_confirmado_' + data.user.id);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return {
     user: {
       id: data.user.id,
       email: data.user.email,
-      emailVerified: data.user.email_confirmed_at != null && !localStorage.getItem('libido_novo_nao_confirmado_' + data.user.id),
+      emailVerified: confirmado && !localStorage.getItem('libido_novo_nao_confirmado_' + data.user.id),
     },
-    session: data.user.email_confirmed_at ? data.session : null
+    session: confirmado ? data.session : null
   };
 };
 
@@ -87,21 +103,33 @@ export const logout = async () => {
 };
 
 export const getCurrentUser = (callback: (user: any) => void) => {
+  const processSessionUser = (user: any) => {
+    if (!user) return null;
+    const isUrlConfirmed = window.location.hash.includes('access_token') || window.location.hash.includes('type=signup');
+    const isDbConfirmed = user.email_confirmed_at != null;
+
+    if (isUrlConfirmed || isDbConfirmed) {
+      try {
+        localStorage.removeItem('libido_novo_nao_confirmado_' + user.id);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const bloqueadoNovo = localStorage.getItem('libido_novo_nao_confirmado_' + user.id) === '1';
+
+    return {
+      id: user.id,
+      email: user.email,
+      emailVerified: isDbConfirmed && !bloqueadoNovo,
+    };
+  };
+
   const {
     data: { subscription },
-  } = supabase.auth.onAuthStateChange((event, session) => {
+  } = supabase.auth.onAuthStateChange((_event, session) => {
     if (session?.user) {
-      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-        if (window.location.hash.includes('access_token') || window.location.hash.includes('type=signup')) {
-          try { localStorage.removeItem('libido_novo_nao_confirmado_' + session.user.id); } catch (e) { console.error(e); }
-        }
-      }
-      const bloqueadoNovo = localStorage.getItem('libido_novo_nao_confirmado_' + session.user.id) === '1';
-      callback({
-        id: session.user.id,
-        email: session.user.email,
-        emailVerified: session.user.email_confirmed_at != null && !bloqueadoNovo,
-      });
+      callback(processSessionUser(session.user));
     } else {
       callback(null);
     }
@@ -109,15 +137,7 @@ export const getCurrentUser = (callback: (user: any) => void) => {
 
   supabase.auth.getSession().then(({ data: { session } }) => {
     if (session?.user) {
-      if (window.location.hash.includes('access_token') || window.location.hash.includes('type=signup')) {
-        try { localStorage.removeItem('libido_novo_nao_confirmado_' + session.user.id); } catch (e) { console.error(e); }
-      }
-      const bloqueadoNovo = localStorage.getItem('libido_novo_nao_confirmado_' + session.user.id) === '1';
-      callback({
-        id: session.user.id,
-        email: session.user.email,
-        emailVerified: session.user.email_confirmed_at != null && !bloqueadoNovo,
-      });
+      callback(processSessionUser(session.user));
     } else {
       callback(null);
     }

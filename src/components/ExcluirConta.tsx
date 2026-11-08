@@ -34,7 +34,7 @@ export default function ExcluirConta() {
 
   return (
     <div style={st.box}>
-      <button type="button" style={st.btn} onClick={() => setAberto(true)}>Excluir minha conta</button>
+      
       {aberto && (
         <div style={st.overlay} onClick={() => { if (!carregando) setAberto(false) }}>
           <div style={st.card} onClick={e => e.stopPropagation()}>
@@ -62,6 +62,9 @@ export default function ExcluirConta() {
           </div>
         </div>
       )}
-    </div>
+    <footer className="mt-auto pt-10 pb-28 w-full flex justify-center relative z-0">
+        <button data-footer-excluir="1" type="button" style={st.btn} onClick={() => setAberto(true)}>Excluir minha conta</button>
+      </footer>
+      </div>
   )
 }
