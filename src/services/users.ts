@@ -158,12 +158,8 @@ export const updateUserProfile = async (userId: string, data: Partial<User>) => 
     console.error('Error updating user profile:', error);
     throw error;
   }
-  try {
-    await (supabase as any)
-      .from('user_profiles')
-      .update(updateData)
-      .eq('user_id', userId);
-  } catch (e) { console.error(e); }
+  // USER-PROFILES: escrita removida. A tabela tem apenas GRANT SELECT;
+  // o erro era descartado sem verificacao e nunca gravava nada.
 };
 
 export const getAllUsers = async (): Promise<User[]> => {
