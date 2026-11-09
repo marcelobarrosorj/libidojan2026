@@ -6,34 +6,10 @@ let usuarioAtual: string | null = null;
 async function gravar(userId: string, online: boolean): Promise<void> {
   try {
     const { supabase } = await import('./supabase');
-    const { error: errRpc } = await (supabase as any).rpc('marcar_presenca', { p_online: !!online });
-    if (errRpc) console.warn('[presence] marcar_presenca:', errRpc.message);
-    const agora = new Date().toISOString();
-    const payload = online
-      ? { is_online: true, updated_at: agora }
-      : { is_online: false, updated_at: agora };
-
-    await supabase
-      .from('users')
-      .update(payload)
-      .eq('user_id', userId);
-
-    try {
-      await (supabase as any)
-        .from('user_profiles')
-        .update(payload)
-        .eq('user_id', userId);
-    } catch {
-      try {
-        await (supabase as any)
-          .from('user_profiles')
-          .update({ is_online: online })
-          .eq('user_id', userId);
-      } catch (e) { console.error(e); }
-    }
+    const { error } = await (supabase as any).rpc('marcar_presenca', { p_online: !!online });
+    if (error) console.warn('[presence] marcar_presenca falhou para ' + userId + ':', error.message);
   } catch (e) { console.error(e); }
 }
-
 export async function startPresence(userId: string): Promise<void> {
   if (!userId) return;
   if (usuarioAtual === userId && timer) return;
