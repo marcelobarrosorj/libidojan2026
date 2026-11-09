@@ -345,8 +345,10 @@ export const apagarMensagem = async (
       .upsert(
         { user_id: userId, message_id: String(id), ocultada_em: new Date().toISOString() },
         { onConflict: 'user_id,message_id' }
-      );
+        );
     if (error) throw error;
+    invalidarOcultas();
+    fetchAndNotifyAll();
   } catch (err: any) {
     console.error('apagarMensagem falhou:', err?.message || err);
     throw err;

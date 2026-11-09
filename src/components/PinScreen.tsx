@@ -117,6 +117,12 @@ export function PinScreen({ userId, mode, onSuccess }: PinScreenProps) {
 
       if (data && (data as any)?.ok === true) {
         onSuccess();
+      } else if ((data as any)?.erro === 'bloqueado') {
+        const ate = (data as any)?.ate ? new Date((data as any).ate) : null;
+        const min = ate ? Math.max(1, Math.ceil((ate.getTime() - Date.now()) / 60000)) : 15;
+        setError(`Muitas tentativas. Tente novamente em ${min} min.`);
+        setPin(['', '', '', '']);
+        setTimeout(() => inputRefs[0].current?.focus(), 300);
       } else {
         setError('PIN incorreto. Tente novamente.');
         setPin(['', '', '', '']);
