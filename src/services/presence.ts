@@ -6,6 +6,8 @@ let usuarioAtual: string | null = null;
 async function gravar(userId: string, online: boolean): Promise<void> {
   try {
     const { supabase } = await import('./supabase');
+    const { error: errRpc } = await (supabase as any).rpc('marcar_presenca', { p_online: !!online });
+    if (errRpc) console.warn('[presence] marcar_presenca:', errRpc.message);
     const agora = new Date().toISOString();
     const payload = online
       ? { is_online: true, updated_at: agora }
