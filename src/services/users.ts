@@ -214,32 +214,11 @@ export const deleteUserProfile = async (userId: string) => {
     }
   } catch (e) { console.error(e); }
 
-  try { await (supabase as any).from('posts').delete().eq('user_id', userId); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('post_comments').delete().eq('user_id', userId); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('post_likes').delete().eq('user_id', userId); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('follows').delete().or(`follower_id.eq.${userId},following_id.eq.${userId}`); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('profile_visits').delete().or(`visitor_id.eq.${userId},visited_id.eq.${userId}`); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('push_subscriptions').delete().eq('user_id', userId); } catch (e) { console.error(e); }
-  // EXCLUIR-CONTA: user_profiles e VIEW com apenas GRANT SELECT.
-  // O delete anterior falhava em silencio e a conta nunca era apagada.
+  // EXCLUIR-CONTA: a limpeza inteira acontece na RPC security definer.
+  // Os deletes anteriores eram bloqueados por RLS e falhavam em silencio.
   const { data: rDel, error: eDel } = await (supabase as any).rpc('excluir_minha_conta');
   if (eDel) throw eDel;
-  if (rDel && rDel.ok === false) throw new Error('exclusao falhou: ' + (rDel.motivo || 'desconhecido'));
-
-  const { error } = await supabase
-    .from('users')
-    .delete()
-    .eq('user_id', userId);
-
-  try {
-    await supabase.rpc('excluir_minha_conta');
-  } catch (e) { console.error(e); }
-
-  if (error) {
-    console.error('Error deleting user profile:', error);
-    throw error;
-  }
+  if (rDel && (rDel as any).ok === false) throw new Error('exclusao falhou: ' + ((rDel as any).motivo || 'desconhecido'));
 };
 
 export const getUsersByIds = async (userIds: string[]): Promise<User[]> => {

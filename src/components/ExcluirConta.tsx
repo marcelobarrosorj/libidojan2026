@@ -21,8 +21,9 @@ export default function ExcluirConta() {
     setCarregando(true)
     setErro(null)
     try {
-      const { error } = await supabase.rpc('excluir_minha_conta')
+      const { data: rDel, error } = await supabase.rpc('excluir_minha_conta')
       if (error) throw error
+      if (rDel && (rDel as any).ok === false) throw new Error('exclusao falhou: ' + ((rDel as any).motivo || 'desconhecido'))
       try { await supabase.auth.signOut() } catch {}
       try { localStorage.clear(); sessionStorage.clear() } catch {}
       window.location.replace('/')
