@@ -221,7 +221,11 @@ export const deleteUserProfile = async (userId: string) => {
   try { await (supabase as any).from('profile_visits').delete().or(`visitor_id.eq.${userId},visited_id.eq.${userId}`); } catch (e) { console.error(e); }
   try { await (supabase as any).from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`); } catch (e) { console.error(e); }
   try { await (supabase as any).from('push_subscriptions').delete().eq('user_id', userId); } catch (e) { console.error(e); }
-  try { await (supabase as any).from('user_profiles').delete().eq('user_id', userId); } catch (e) { console.error(e); }
+  // EXCLUIR-CONTA: user_profiles e VIEW com apenas GRANT SELECT.
+  // O delete anterior falhava em silencio e a conta nunca era apagada.
+  const { data: rDel, error: eDel } = await (supabase as any).rpc('excluir_minha_conta');
+  if (eDel) throw eDel;
+  if (rDel && rDel.ok === false) throw new Error('exclusao falhou: ' + (rDel.motivo || 'desconhecido'));
 
   const { error } = await supabase
     .from('users')
