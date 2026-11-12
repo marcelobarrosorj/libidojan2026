@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield, Bell, Zap } from 'lucide-react';
+import { Rss, Radio, MessageCircle, Menu, X, Users, Trophy, Calendar, UserPlus, Settings, User, Shield, Search, Zap } from 'lucide-react';
 
 interface BottomNavProps {
   unreadChat?: number; // NOTIF-BADGE
