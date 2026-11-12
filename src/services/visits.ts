@@ -26,7 +26,7 @@ export async function contarVisitas(meuId: string): Promise<number> {
       .select('*', { count: 'exact', head: true })
       .eq('visited_id', meuId);
     return count ?? 0;
-  } catch {
+  } catch (errAuto) { console.warn("[LIBIDO-AUTO-LOG]", errAuto);
     return 0;
   }
 }
@@ -40,7 +40,7 @@ export async function listarVisitantes(meuId: string, limite = 20): Promise<any[
       .order('created_at', { ascending: false })
       .limit(limite);
     return data || [];
-  } catch {
+  } catch (errAuto) { console.warn("[LIBIDO-AUTO-LOG]", errAuto);
     return [];
   }
 }

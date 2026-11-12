@@ -159,3 +159,18 @@ body.is-hidden #root { filter: blur(18px) brightness(0.12); transition: filter 1
 #libido-marca { position: fixed; inset: 0; pointer-events: none; z-index: 2147483646; display: flex; align-items: center; justify-content: center; font: 600 13px system-ui, sans-serif; color: rgba(255,255,255,0.06); letter-spacing: 3px; transform: rotate(-24deg); white-space: nowrap; }
 img { -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
 @media print { body { display: none !important; } }
+
+/* Efeito Blur-to-Reveal para fotos no Chat (Misterio e Privacidade) */
+.libido-blur-reveal {
+  filter: blur(20px);
+  opacity: 0.9;
+  transition: all 0.4s ease-in-out;
+  touch-action: none; /* Evita que a tela role ao segurar a foto */
+  user-select: none;
+  cursor: pointer;
+}
+.libido-blur-reveal:active {
+  filter: blur(0px);
+  opacity: 1;
+  transition: all 0.1s ease-in-out;
+}

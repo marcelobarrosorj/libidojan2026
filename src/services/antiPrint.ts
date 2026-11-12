@@ -72,7 +72,7 @@ function abaAtual(): string {
       const aba = (estado as Record<string, unknown>).libidoTab;
       if (typeof aba === 'string') return aba.toLowerCase();
     }
-  } catch {
+  } catch (errAuto) { console.warn("[LIBIDO-AUTO-LOG]", errAuto);
     return '';
   }
   return '';

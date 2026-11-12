@@ -73,7 +73,8 @@ const ocultasDoUsuario = async (uid: string): Promise<Set<string>> => {
   try {
     const ids = await mensagensOcultasIds(uid);
     _ocultasCache = { uid, at: agora, ids: new Set<string>(ids.map(String)) };
-  } catch {
+  } catch (errOcultas) {
+    console.warn("[CHAT] Fallback cache ocultas:", errOcultas);
     _ocultasCache = { uid, at: agora, ids: _ocultasCache.ids };
   }
   return _ocultasCache.ids;

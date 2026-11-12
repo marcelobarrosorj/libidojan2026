@@ -51,7 +51,7 @@ export async function sanitizarImagem(
     const extensao = tipo === "image/png" ? ".png" : ".jpg";
 
     return new File([blob], base + extensao, { type: tipo });
-  } catch {
+  } catch (errAuto) { console.warn("[LIBIDO-AUTO-LOG]", errAuto);
     return file;
   } finally {
     URL.revokeObjectURL(url);
