@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, Camera, X } from 'lucide-react';
+import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, Camera, X, RotateCcw } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
@@ -11,9 +11,9 @@ export function SearchScreen(props: any) {
   const [loading, setLoading] = useState(false);
   const [todosPerfis, setTodosPerfis] = useState<any[]>([]);
   const [termo, setTermo] = useState('');
-  const [perfilFiltro, setPerfilFiltro] = useState('todos');
-  const [orientacaoFiltro, setOrientacaoFiltro] = useState('todos');
-  const [objetivoFiltro, setObjetivoFiltro] = useState('todos');
+  const [perfilFiltro, setPerfilFiltro] = useState('');
+  const [orientacaoFiltro, setOrientacaoFiltro] = useState('');
+  const [objetivoFiltro, setObjetivoFiltro] = useState('');
   const [apenasComFoto, setApenasComFoto] = useState(false);
   const [perfilSelecionado, setPerfilSelecionado] = useState<any | null>(null);
 
@@ -40,71 +40,102 @@ export function SearchScreen(props: any) {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
 
-  const resultados = todosPerfis.filter(u => {
-    const rel = normalizar(u.relationship_status || u.gender || u.type || u.profile_type || u.couple_profile);
-    const ori = normalizar(u.sexual_orientation || u.orientation || u.preferences);
-    const bio = normalizar(u.bio || u.description || u.interests || u.looking_for);
-    const nick = normalizar(u.nickname || u.name || u.username);
-    const cid = normalizar(u.city || u.location || u.state);
-    const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
+  // Verifica se o usuario ja selecionou pelo menos um criterio de busca
+  const temFiltroSelecionado = Boolean(
+    perfilFiltro !== '' ||
+    orientacaoFiltro !== '' ||
+    objetivoFiltro !== '' ||
+    apenasComFoto ||
+    termo.trim() !== ''
+  );
 
-    if (apenasComFoto && !foto) return false;
+  const limparFiltros = () => {
+    setPerfilFiltro('');
+    setOrientacaoFiltro('');
+    setObjetivoFiltro('');
+    setApenasComFoto(false);
+    setTermo('');
+  };
 
-    if (termo.trim() !== '') {
-      const t = normalizar(termo);
-      if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t)) return false;
-    }
+  const resultados = !temFiltroSelecionado
+    ? []
+    : todosPerfis.filter(u => {
+        const rel = normalizar(u.relationship_status || u.gender || u.type || u.profile_type || u.couple_profile);
+        const ori = normalizar(u.sexual_orientation || u.orientation || u.preferences);
+        const bio = normalizar(u.bio || u.description || u.interests || u.looking_for);
+        const nick = normalizar(u.nickname || u.name || u.username);
+        const cid = normalizar(u.city || u.location || u.state);
+        const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
 
-    if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('couple') && !u.couple_profile) return false;
-    if (perfilFiltro === 'solteiros' && !rel.includes('solteiro') && !rel.includes('homem') && !rel.includes('male')) return false;
-    if (perfilFiltro === 'solteiras' && !rel.includes('solteira') && !rel.includes('mulher') && !rel.includes('female')) return false;
+        if (apenasComFoto && !foto) return false;
 
-    if (orientacaoFiltro === 'hetero' && !ori.includes('hetero')) return false;
-    if (orientacaoFiltro === 'bissexual' && !ori.includes('bi')) return false;
-    if (orientacaoFiltro === 'liberal' && !ori.includes('liberal') && !ori.includes('swing') && !bio.includes('swing') && !bio.includes('liberal')) return false;
+        if (termo.trim() !== '') {
+          const t = normalizar(termo);
+          if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t)) return false;
+        }
 
-    if (objetivoFiltro === 'troca' && !bio.includes('troca') && !bio.includes('swing') && !rel.includes('casal')) return false;
-    if (objetivoFiltro === 'menage' && !bio.includes('menage') && !bio.includes('tres') && !ori.includes('bi')) return false;
-    if (objetivoFiltro === 'festas' && !bio.includes('festa') && !bio.includes('club')) return false;
+        if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('couple') && !u.couple_profile) return false;
+        if (perfilFiltro === 'solteiros' && !rel.includes('solteiro') && !rel.includes('homem') && !rel.includes('male')) return false;
+        if (perfilFiltro === 'solteiras' && !rel.includes('solteira') && !rel.includes('mulher') && !rel.includes('female')) return false;
 
-    return true;
-  });
+        if (orientacaoFiltro === 'hetero' && !ori.includes('hetero')) return false;
+        if (orientacaoFiltro === 'bissexual' && !ori.includes('bi')) return false;
+        if (orientacaoFiltro === 'liberal' && !ori.includes('liberal') && !ori.includes('swing') && !bio.includes('swing') && !bio.includes('liberal')) return false;
+
+        if (objetivoFiltro === 'troca' && !bio.includes('troca') && !bio.includes('swing') && !rel.includes('casal')) return false;
+        if (objetivoFiltro === 'menage' && !bio.includes('menage') && !bio.includes('tres') && !ori.includes('bi')) return false;
+        if (objetivoFiltro === 'festas' && !bio.includes('festa') && !bio.includes('club')) return false;
+
+        return true;
+      });
 
   const OPCOES_PERFIL = [
-    { id: 'todos', label: 'Todos' },
     { id: 'casais', label: 'Casais' },
     { id: 'solteiros', label: 'Solteiros (Ele)' },
-    { id: 'solteiras', label: 'Solteiras (Ela)' }
+    { id: 'solteiras', label: 'Solteiras (Ela)' },
+    { id: 'todos', label: 'Todos' }
   ];
 
   const OPCOES_ORIENTACAO = [
-    { id: 'todos', label: 'Todas' },
     { id: 'hetero', label: 'Hétero' },
     { id: 'bissexual', label: 'Bissexuais' },
-    { id: 'liberal', label: 'Liberal / Swing' }
+    { id: 'liberal', label: 'Liberal / Swing' },
+    { id: 'todos', label: 'Todas' }
   ];
 
   const OPCOES_OBJETIVO = [
-    { id: 'todos', label: 'Todos os Interesses' },
     { id: 'troca', label: 'Troca de Casais' },
     { id: 'menage', label: 'Ménage / A Três' },
-    { id: 'festas', label: 'Festas & Clubes' }
+    { id: 'festas', label: 'Festas & Clubes' },
+    { id: 'todos', label: 'Todos os Interesses' }
   ];
 
   return (
-    <div id="libido-search-screen-root" className="flex flex-col w-full h-full bg-[var(--libido-bg,#0b0b0e)] text-[var(--libido-text,#f5f5f7)] pt-4 px-4 pb-28 overflow-y-auto">
+    <div id="libido-search-screen-root" className="flex flex-col w-full min-h-screen bg-[var(--libido-bg,#0b0b0e)] text-[var(--libido-text,#f5f5f7)] pt-4 px-4 pb-32 overflow-y-auto">
       <div className="flex items-center justify-between mb-4 border-b border-[var(--libido-border,rgba(255,255,255,0.1))] pb-3">
         <div className="flex items-center gap-2.5">
           <Search className="text-[var(--libido-accent,#d86b3f)]" size={22} />
           <div>
             <h2 className="text-base font-bold uppercase tracking-widest text-[var(--libido-accent,#d86b3f)]">Busca Liberal</h2>
-            <p className="text-[10px] text-[var(--libido-muted,#9ca3af)]">Casais, solteiros, solteiras, orientação e interesses</p>
+            <p className="text-[10px] text-[var(--libido-muted,#9ca3af)]">Selecione os filtros abaixo para encontrar perfis</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-accent,#d86b3f)]">
-            {resultados.length} perfis
-          </span>
+          {temFiltroSelecionado && (
+            <>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-accent,#d86b3f)]">
+                {resultados.length} perfis
+              </span>
+              <button
+                type="button"
+                onClick={limparFiltros}
+                title="Limpar busca"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[10px] font-bold uppercase text-[var(--libido-muted,#9ca3af)] hover:text-white"
+              >
+                <RotateCcw size={11} /> Limpar
+              </button>
+            </>
+          )}
           {props?.onClose && (
             <button
               type="button"
@@ -139,7 +170,7 @@ export function SearchScreen(props: any) {
             <button
               key={op.id}
               type="button"
-              onClick={() => setPerfilFiltro(op.id)}
+              onClick={() => setPerfilFiltro(prev => (prev === op.id ? '' : op.id))}
               className={`py-2 px-3 text-[11px] uppercase font-bold rounded-xl transition-all ${
                 perfilFiltro === op.id
                   ? 'bg-[var(--libido-accent,#d86b3f)] text-black shadow-[0_0_12px_rgba(216,107,63,0.35)]'
@@ -162,7 +193,7 @@ export function SearchScreen(props: any) {
             <button
               key={op.id}
               type="button"
-              onClick={() => setOrientacaoFiltro(op.id)}
+              onClick={() => setOrientacaoFiltro(prev => (prev === op.id ? '' : op.id))}
               className={`py-2 px-3 text-[11px] uppercase font-bold rounded-xl transition-all ${
                 orientacaoFiltro === op.id
                   ? 'bg-[var(--libido-accent,#d86b3f)] text-black shadow-[0_0_12px_rgba(216,107,63,0.35)]'
@@ -198,7 +229,7 @@ export function SearchScreen(props: any) {
             <button
               key={op.id}
               type="button"
-              onClick={() => setObjetivoFiltro(op.id)}
+              onClick={() => setObjetivoFiltro(prev => (prev === op.id ? '' : op.id))}
               className={`py-2 px-3 text-[10px] uppercase font-bold rounded-xl transition-all ${
                 objetivoFiltro === op.id
                   ? 'bg-[var(--libido-accent,#d86b3f)] text-black'
@@ -211,72 +242,84 @@ export function SearchScreen(props: any) {
         </div>
       </div>
 
-      {/* Resultados */}
-      <div className="space-y-2.5">
-        {loading ? (
-          <div className="py-8 text-center text-xs text-[var(--libido-muted,#9ca3af)] animate-pulse">Carregando perfis...</div>
-        ) : resultados.length > 0 ? (
-          resultados.map((u, idx) => {
-            const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
-            const nome = u.nickname || u.name || u.username || 'Perfil Liberal';
-            const status = u.relationship_status || u.gender || 'Membro Liberal';
-            const orient = u.sexual_orientation || 'Liberal';
-            const cidade = u.city || u.location || '';
+      {/* Area de Resultados: So aparece quando o usuario escolhe um filtro */}
+      {!temFiltroSelecionado ? (
+        <div className="text-center py-12 px-4 bg-[var(--libido-surface-2,#16161d)]/60 rounded-2xl border border-dashed border-[var(--libido-border,rgba(255,255,255,0.12))]">
+          <Search size={28} className="mx-auto mb-2.5 text-[var(--libido-accent,#d86b3f)] opacity-70" />
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--libido-text,#f5f5f7)] mb-1">
+            Selecione o que você procura acima
+          </p>
+          <p className="text-[11px] text-[var(--libido-muted,#9ca3af)]">
+            Escolha entre Casais, Solteiros, Solteiras, Orientação ou digite um termo para listar os perfis.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2.5">
+          {loading ? (
+            <div className="py-8 text-center text-xs text-[var(--libido-muted,#9ca3af)] animate-pulse">Buscando perfis...</div>
+          ) : resultados.length > 0 ? (
+            resultados.map((u, idx) => {
+              const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
+              const nome = u.nickname || u.name || u.username || 'Perfil Liberal';
+              const status = u.relationship_status || u.gender || 'Membro Liberal';
+              const orient = u.sexual_orientation || 'Liberal';
+              const cidade = u.city || u.location || '';
 
-            return (
-              <div
-                key={u.user_id || u.id || idx}
-                onClick={() => setPerfilSelecionado(u)}
-                className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-3 rounded-2xl cursor-pointer transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
-                    {foto ? (
-                      <img src={foto} alt={nome} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-sm font-bold text-[var(--libido-accent,#d86b3f)]">{String(nome).charAt(0).toUpperCase()}</span>
-                    )}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-bold text-[var(--libido-text,#f5f5f7)]">{nome}</span>
-                      {u.age && <span className="text-xs text-[var(--libido-muted,#9ca3af)]">{u.age} anos</span>}
-                      <ShieldCheck size={13} className="text-amber-500" />
-                    </div>
-                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                      <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-[var(--libido-accent,#d86b3f)]/15 text-[var(--libido-accent,#d86b3f)]">
-                        {status}
-                      </span>
-                      <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-white/5 text-[var(--libido-muted,#9ca3af)]">
-                        {orient}
-                      </span>
-                      {cidade && (
-                        <span className="text-[10px] text-[var(--libido-muted,#9ca3af)] flex items-center gap-0.5">
-                          <MapPin size={10} /> {cidade}
-                        </span>
+              return (
+                <div
+                  key={u.user_id || u.id || idx}
+                  onClick={() => setPerfilSelecionado(u)}
+                  className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-3 rounded-2xl cursor-pointer transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
+                      {foto ? (
+                        <img src={foto} alt={nome} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-sm font-bold text-[var(--libido-accent,#d86b3f)]">{String(nome).charAt(0).toUpperCase()}</span>
                       )}
                     </div>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-bold text-[var(--libido-text,#f5f5f7)]">{nome}</span>
+                        {u.age && <span className="text-xs text-[var(--libido-muted,#9ca3af)]">{u.age} anos</span>}
+                        <ShieldCheck size={13} className="text-amber-500" />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-[var(--libido-accent,#d86b3f)]/15 text-[var(--libido-accent,#d86b3f)]">
+                          {status}
+                        </span>
+                        <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-white/5 text-[var(--libido-muted,#9ca3af)]">
+                          {orient}
+                        </span>
+                        {cidade && (
+                          <span className="text-[10px] text-[var(--libido-muted,#9ca3af)] flex items-center gap-0.5">
+                            <MapPin size={10} /> {cidade}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                  <span className="text-[10px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] px-2.5 py-1 rounded-lg bg-black/30 border border-[var(--libido-border,rgba(255,255,255,0.1))]">
+                    Ver
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] px-2.5 py-1 rounded-lg bg-black/30 border border-[var(--libido-border,rgba(255,255,255,0.1))]">
-                  Ver
-                </span>
-              </div>
-            );
-          })
-        ) : (
-          <div className="text-center py-8 bg-[var(--libido-surface-2,#16161d)] rounded-2xl border border-[var(--libido-border,rgba(255,255,255,0.1))]">
-            <p className="text-xs text-[var(--libido-muted,#9ca3af)] mb-2">Nenhum perfil encontrado para este filtro.</p>
-            <button
-              type="button"
-              onClick={() => { setPerfilFiltro('todos'); setOrientacaoFiltro('todos'); setObjetivoFiltro('todos'); setApenasComFoto(false); setTermo(''); }}
-              className="text-[10px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] underline"
-            >
-              Limpar filtros e mostrar todos
-            </button>
-          </div>
-        )}
-      </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-8 bg-[var(--libido-surface-2,#16161d)] rounded-2xl border border-[var(--libido-border,rgba(255,255,255,0.1))]">
+              <p className="text-xs text-[var(--libido-muted,#9ca3af)] mb-2">Nenhum perfil encontrado para este filtro.</p>
+              <button
+                type="button"
+                onClick={limparFiltros}
+                className="text-[10px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] underline"
+              >
+                Limpar filtros
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {perfilSelecionado && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPerfilSelecionado(null)}>
@@ -300,7 +343,7 @@ export function SearchScreen(props: any) {
   );
 }
 
-// Interceptador Global: Abre a Busca Avancada ao clicar na Lupa (ou aba Busca/Alertas)
+// Interceptador Global: Garante abertura limpa da Busca sem mostrar Convites no fundo
 if (typeof window !== 'undefined' && !(window as any).__LIBIDO_BUSCA_INTERCEPTOR__) {
   (window as any).__LIBIDO_BUSCA_INTERCEPTOR__ = true;
 
@@ -315,12 +358,12 @@ if (typeof window !== 'undefined' && !(window as any).__LIBIDO_BUSCA_INTERCEPTOR
 
   const abrirBusca = () => {
     if (document.getElementById('libido-search-screen-root') && (!portalDiv || portalDiv.style.display === 'none')) {
-      return; // Ja renderizado nativamente pelo roteador
+      return;
     }
     if (!portalDiv) {
       portalDiv = document.createElement('div');
       portalDiv.id = 'libido-search-portal-overlay';
-      portalDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:64px;z-index:45;background:var(--libido-bg,#0b0b0e);overflow-y:auto;';
+      portalDiv.style.cssText = 'position:fixed;top:56px;left:0;right:0;bottom:64px;z-index:48;background:var(--libido-bg,#0b0b0e);overflow-y:auto;';
       document.body.appendChild(portalDiv);
       portalRoot = createRoot(portalDiv);
       portalRoot.render(<SearchScreen onClose={fecharBusca} />);
@@ -342,12 +385,11 @@ if (typeof window !== 'undefined' && !(window as any).__LIBIDO_BUSCA_INTERCEPTOR
     const dentroDeNav = !!btn.closest('nav, header, footer, [class*="bottom"], [class*="nav"]');
 
     if (txt === 'busca' || txt === 'alertas' || txt === 'notificações' || txt === 'notificacoes' || (dentroDeNav && temIconeLupa)) {
-      setTimeout(abrirBusca, 20);
+      setTimeout(abrirBusca, 15);
       return;
     }
 
-    // Se clicou em qualquer outro botao da barra de navegacao inferior, fecha a busca
-    if (dentroDeNav && (txt === 'radar' || txt === 'feed' || txt === 'chat' || txt === 'perfil' || txt === 'eventos' || txt === 'top' || txt === 'parceiros' || txt === 'início' || txt === 'inicio' || txt === 'grupos' || txt === 'fórum' || txt === 'live')) {
+    if (dentroDeNav && (txt === 'radar' || txt === 'feed' || txt === 'chat' || txt === 'perfil' || txt === 'menu' || txt === 'eventos' || txt === 'top' || txt === 'parceiros' || txt === 'início' || txt === 'inicio' || txt === 'grupos' || txt === 'fórum' || txt === 'live')) {
       fecharBusca();
     }
   }, true);
