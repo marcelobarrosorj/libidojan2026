@@ -1,0 +1,11 @@
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS partner_link_code text;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS linked_partner_id uuid;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS secret_fetishes text[] DEFAULT '{}';
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS tonight_until timestamptz;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS travel_city text;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS travel_dates text;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS voice_bio_url text;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS invisible_mode boolean DEFAULT false;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS exclusion_zone_label text;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS exclusion_radius_km numeric DEFAULT 0;
+NOTIFY pgrst, 'reload schema';
