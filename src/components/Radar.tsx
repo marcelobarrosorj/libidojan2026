@@ -1,3 +1,4 @@
+import { IntencaoRadarBar } from './elite/IntencaoRadarBar';
 import { carregarRadarMapa } from '../services/radarMapa';
 import { useState, useEffect, useMemo } from 'react';
 import { Users, Map as MapIcon, List as ListIcon } from 'lucide-react';

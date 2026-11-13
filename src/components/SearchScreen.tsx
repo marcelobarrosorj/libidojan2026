@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, Camera, X, RotateCcw } from 'lucide-react';
+import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, Camera, RotateCcw } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { IntencaoRadarBar } from './elite/IntencaoRadarBar';
+import { CofrePrivadoModal } from './elite/CofrePrivadoModal';
+import { SeloPresencaBadge } from './elite/SeloPresencaBadge';
+
+// Blindagem global contra ReferenceError em runtime
+if (typeof window !== 'undefined') {
+  (window as any).IntencaoRadarBar = IntencaoRadarBar;
+  (window as any).CofrePrivadoModal = CofrePrivadoModal;
+  (window as any).SeloPresencaBadge = SeloPresencaBadge;
+  (window as any).Bell = Search;
+}
 
 const SUPABASE_URL = 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jnteoNon4vEhWscOanGZDw_i6NGG6fI';
@@ -40,8 +51,8 @@ export function SearchScreen(props: any) {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
 
-  // Verifica se o usuario ja selecionou pelo menos um criterio de busca
-  const temFiltroSelecionado = Boolean(
+  // So exibe resultados quando o usuario seleciona pelo menos um filtro
+  const temFiltroAtivo = Boolean(
     perfilFiltro !== '' ||
     orientacaoFiltro !== '' ||
     objetivoFiltro !== '' ||
@@ -57,7 +68,7 @@ export function SearchScreen(props: any) {
     setTermo('');
   };
 
-  const resultados = !temFiltroSelecionado
+  const resultados = !temFiltroAtivo
     ? []
     : todosPerfis.filter(u => {
         const rel = normalizar(u.relationship_status || u.gender || u.type || u.profile_type || u.couple_profile);
@@ -93,7 +104,7 @@ export function SearchScreen(props: any) {
     { id: 'casais', label: 'Casais' },
     { id: 'solteiros', label: 'Solteiros (Ele)' },
     { id: 'solteiras', label: 'Solteiras (Ela)' },
-    { id: 'todos', label: 'Todos' }
+    { id: 'todos', label: 'Ver Todos' }
   ];
 
   const OPCOES_ORIENTACAO = [
@@ -107,243 +118,237 @@ export function SearchScreen(props: any) {
     { id: 'troca', label: 'Troca de Casais' },
     { id: 'menage', label: 'Ménage / A Três' },
     { id: 'festas', label: 'Festas & Clubes' },
-    { id: 'todos', label: 'Todos os Interesses' }
+    { id: 'todos', label: 'Todos Interesses' }
   ];
 
   return (
-    <div id="libido-search-screen-root" className="flex flex-col w-full min-h-screen bg-[var(--libido-bg,#0b0b0e)] text-[var(--libido-text,#f5f5f7)] pt-4 px-4 pb-32 overflow-y-auto">
-      <div className="flex items-center justify-between mb-4 border-b border-[var(--libido-border,rgba(255,255,255,0.1))] pb-3">
-        <div className="flex items-center gap-2.5">
-          <Search className="text-[var(--libido-accent,#d86b3f)]" size={22} />
-          <div>
-            <h2 className="text-base font-bold uppercase tracking-widest text-[var(--libido-accent,#d86b3f)]">Busca Liberal</h2>
-            <p className="text-[10px] text-[var(--libido-muted,#9ca3af)]">Selecione os filtros abaixo para encontrar perfis</p>
+    <div id="libido-search-screen-root" className="w-full min-h-full bg-[var(--libido-bg,#0b0b0e)] text-[var(--libido-text,#f5f5f7)]">
+      {/* Container centralizado na mesma largura das outras paginas (430px) */}
+      <div className="w-full max-w-[430px] mx-auto min-h-[calc(100vh-64px)] border-x border-[var(--libido-border,rgba(255,255,255,0.08))] px-3.5 pt-3.5 pb-20">
+        
+        {/* Cabecalho Compacto */}
+        <div className="flex items-center justify-between mb-3 border-b border-[var(--libido-border,rgba(255,255,255,0.08))] pb-2.5">
+          <div className="flex items-center gap-2">
+            <Search className="text-[var(--libido-accent,#d86b3f)]" size={18} />
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--libido-accent,#d86b3f)]">Busca Liberal</h2>
+              <p className="text-[9px] text-[var(--libido-muted,#9ca3af)]">Escolha os filtros para listar perfis</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {temFiltroSelecionado && (
-            <>
-              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-accent,#d86b3f)]">
+          {temFiltroAtivo && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-accent,#d86b3f)]">
                 {resultados.length} perfis
               </span>
               <button
                 type="button"
                 onClick={limparFiltros}
-                title="Limpar busca"
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[10px] font-bold uppercase text-[var(--libido-muted,#9ca3af)] hover:text-white"
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[9px] font-bold uppercase text-[var(--libido-muted,#9ca3af)] hover:text-white"
               >
-                <RotateCcw size={11} /> Limpar
-              </button>
-            </>
-          )}
-          {props?.onClose && (
-            <button
-              type="button"
-              onClick={props.onClose}
-              className="p-1.5 rounded-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-muted,#9ca3af)]"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Busca por texto */}
-      <div className="relative mb-3.5">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--libido-muted,#9ca3af)]" />
-        <input
-          type="text"
-          value={termo}
-          onChange={e => setTermo(e.target.value)}
-          placeholder="Buscar por apelido, cidade ou fetiche..."
-          className="w-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[var(--libido-text,#f5f5f7)] focus:border-[var(--libido-accent,#d86b3f)] outline-none"
-        />
-      </div>
-
-      {/* Seletor 1: Casais, Solteiros, Solteiras */}
-      <div className="bg-[var(--libido-surface-2,#16161d)] p-3.5 rounded-2xl border border-[var(--libido-border,rgba(255,255,255,0.1))] mb-3">
-        <label className="text-[10px] font-black uppercase tracking-wider text-[var(--libido-muted,#9ca3af)] flex items-center gap-1.5 mb-2.5">
-          <Users size={13} className="text-[var(--libido-accent,#d86b3f)]" /> Busco por:
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {OPCOES_PERFIL.map(op => (
-            <button
-              key={op.id}
-              type="button"
-              onClick={() => setPerfilFiltro(prev => (prev === op.id ? '' : op.id))}
-              className={`py-2 px-3 text-[11px] uppercase font-bold rounded-xl transition-all ${
-                perfilFiltro === op.id
-                  ? 'bg-[var(--libido-accent,#d86b3f)] text-black shadow-[0_0_12px_rgba(216,107,63,0.35)]'
-                  : 'bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-muted,#9ca3af)]'
-              }`}
-            >
-              {op.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Seletor 2: Hetero, Bissexuais, Liberal/Swing */}
-      <div className="bg-[var(--libido-surface-2,#16161d)] p-3.5 rounded-2xl border border-[var(--libido-border,rgba(255,255,255,0.1))] mb-3">
-        <label className="text-[10px] font-black uppercase tracking-wider text-[var(--libido-muted,#9ca3af)] flex items-center gap-1.5 mb-2.5">
-          <Filter size={13} className="text-[var(--libido-accent,#d86b3f)]" /> Orientação:
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {OPCOES_ORIENTACAO.map(op => (
-            <button
-              key={op.id}
-              type="button"
-              onClick={() => setOrientacaoFiltro(prev => (prev === op.id ? '' : op.id))}
-              className={`py-2 px-3 text-[11px] uppercase font-bold rounded-xl transition-all ${
-                orientacaoFiltro === op.id
-                  ? 'bg-[var(--libido-accent,#d86b3f)] text-black shadow-[0_0_12px_rgba(216,107,63,0.35)]'
-                  : 'bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-muted,#9ca3af)]'
-              }`}
-            >
-              {op.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Seletor 3: Interesses + Com Foto */}
-      <div className="bg-[var(--libido-surface-2,#16161d)] p-3.5 rounded-2xl border border-[var(--libido-border,rgba(255,255,255,0.1))] mb-4">
-        <div className="flex items-center justify-between mb-2.5">
-          <label className="text-[10px] font-black uppercase tracking-wider text-[var(--libido-muted,#9ca3af)] flex items-center gap-1.5">
-            <Sparkles size={13} className="text-[var(--libido-accent,#d86b3f)]" /> Interesses:
-          </label>
-          <button
-            type="button"
-            onClick={() => setApenasComFoto(!apenasComFoto)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border transition-all ${
-              apenasComFoto
-                ? 'bg-[var(--libido-accent,#d86b3f)]/20 border-[var(--libido-accent,#d86b3f)] text-[var(--libido-accent,#d86b3f)]'
-                : 'border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-muted,#9ca3af)]'
-            }`}
-          >
-            <Camera size={11} /> Só com foto
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {OPCOES_OBJETIVO.map(op => (
-            <button
-              key={op.id}
-              type="button"
-              onClick={() => setObjetivoFiltro(prev => (prev === op.id ? '' : op.id))}
-              className={`py-2 px-3 text-[10px] uppercase font-bold rounded-xl transition-all ${
-                objetivoFiltro === op.id
-                  ? 'bg-[var(--libido-accent,#d86b3f)] text-black'
-                  : 'bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-muted,#9ca3af)]'
-              }`}
-            >
-              {op.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Area de Resultados: So aparece quando o usuario escolhe um filtro */}
-      {!temFiltroSelecionado ? (
-        <div className="text-center py-12 px-4 bg-[var(--libido-surface-2,#16161d)]/60 rounded-2xl border border-dashed border-[var(--libido-border,rgba(255,255,255,0.12))]">
-          <Search size={28} className="mx-auto mb-2.5 text-[var(--libido-accent,#d86b3f)] opacity-70" />
-          <p className="text-xs font-bold uppercase tracking-wider text-[var(--libido-text,#f5f5f7)] mb-1">
-            Selecione o que você procura acima
-          </p>
-          <p className="text-[11px] text-[var(--libido-muted,#9ca3af)]">
-            Escolha entre Casais, Solteiros, Solteiras, Orientação ou digite um termo para listar os perfis.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-2.5">
-          {loading ? (
-            <div className="py-8 text-center text-xs text-[var(--libido-muted,#9ca3af)] animate-pulse">Buscando perfis...</div>
-          ) : resultados.length > 0 ? (
-            resultados.map((u, idx) => {
-              const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
-              const nome = u.nickname || u.name || u.username || 'Perfil Liberal';
-              const status = u.relationship_status || u.gender || 'Membro Liberal';
-              const orient = u.sexual_orientation || 'Liberal';
-              const cidade = u.city || u.location || '';
-
-              return (
-                <div
-                  key={u.user_id || u.id || idx}
-                  onClick={() => setPerfilSelecionado(u)}
-                  className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-3 rounded-2xl cursor-pointer transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
-                      {foto ? (
-                        <img src={foto} alt={nome} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-sm font-bold text-[var(--libido-accent,#d86b3f)]">{String(nome).charAt(0).toUpperCase()}</span>
-                      )}
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-bold text-[var(--libido-text,#f5f5f7)]">{nome}</span>
-                        {u.age && <span className="text-xs text-[var(--libido-muted,#9ca3af)]">{u.age} anos</span>}
-                        <ShieldCheck size={13} className="text-amber-500" />
-                      </div>
-                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                        <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-[var(--libido-accent,#d86b3f)]/15 text-[var(--libido-accent,#d86b3f)]">
-                          {status}
-                        </span>
-                        <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-white/5 text-[var(--libido-muted,#9ca3af)]">
-                          {orient}
-                        </span>
-                        {cidade && (
-                          <span className="text-[10px] text-[var(--libido-muted,#9ca3af)] flex items-center gap-0.5">
-                            <MapPin size={10} /> {cidade}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] px-2.5 py-1 rounded-lg bg-black/30 border border-[var(--libido-border,rgba(255,255,255,0.1))]">
-                    Ver
-                  </span>
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center py-8 bg-[var(--libido-surface-2,#16161d)] rounded-2xl border border-[var(--libido-border,rgba(255,255,255,0.1))]">
-              <p className="text-xs text-[var(--libido-muted,#9ca3af)] mb-2">Nenhum perfil encontrado para este filtro.</p>
-              <button
-                type="button"
-                onClick={limparFiltros}
-                className="text-[10px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] underline"
-              >
-                Limpar filtros
+                <RotateCcw size={10} /> Limpar
               </button>
             </div>
           )}
         </div>
-      )}
 
-      {perfilSelecionado && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPerfilSelecionado(null)}>
-          <div className="bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-accent,#d86b3f)]/40 rounded-2xl p-5 max-w-sm w-full" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-[var(--libido-accent,#d86b3f)] mb-1">{perfilSelecionado.nickname || perfilSelecionado.name || 'Perfil'}</h3>
-            <p className="text-xs text-[var(--libido-muted,#9ca3af)] uppercase mb-3">
-              {perfilSelecionado.relationship_status || 'Membro'} • {perfilSelecionado.sexual_orientation || 'Liberal'}
-            </p>
-            <p className="text-xs text-[var(--libido-text,#f5f5f7)] mb-4">{perfilSelecionado.bio || 'Sem descrição informada.'}</p>
-            <button
-              type="button"
-              onClick={() => setPerfilSelecionado(null)}
-              className="w-full py-2.5 bg-[var(--libido-accent,#d86b3f)] text-black font-bold text-xs uppercase rounded-xl"
-            >
-              Fechar
-            </button>
+        {/* Input de Pesquisa */}
+        <div className="relative mb-2.5">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--libido-muted,#9ca3af)]" />
+          <input
+            type="text"
+            value={termo}
+            onChange={e => setTermo(e.target.value)}
+            placeholder="Buscar apelido, cidade ou fetiche..."
+            className="w-full bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.1))] rounded-xl pl-8 pr-3 py-2 text-[11px] text-[var(--libido-text,#f5f5f7)] focus:border-[var(--libido-accent,#d86b3f)] outline-none"
+          />
+        </div>
+
+        {/* Bloco 1: Busco por */}
+        <div className="bg-[var(--libido-surface-2,#16161d)] p-2.5 rounded-xl border border-[var(--libido-border,rgba(255,255,255,0.08))] mb-2">
+          <label className="text-[9px] font-black uppercase tracking-wider text-[var(--libido-muted,#9ca3af)] flex items-center gap-1 mb-2">
+            <Users size={11} className="text-[var(--libido-accent,#d86b3f)]" /> Busco por:
+          </label>
+          <div className="grid grid-cols-2 gap-1.5">
+            {OPCOES_PERFIL.map(op => (
+              <button
+                key={op.id}
+                type="button"
+                onClick={() => setPerfilFiltro(prev => (prev === op.id ? '' : op.id))}
+                className={`py-1.5 px-2 text-[10px] uppercase font-bold rounded-lg transition-all ${
+                  perfilFiltro === op.id
+                    ? 'bg-[var(--libido-accent,#d86b3f)] text-black shadow-[0_0_10px_rgba(216,107,63,0.3)]'
+                    : 'bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.08))] text-[var(--libido-muted,#9ca3af)]'
+                }`}
+              >
+                {op.label}
+              </button>
+            ))}
           </div>
         </div>
-      )}
+
+        {/* Bloco 2: Orientacao */}
+        <div className="bg-[var(--libido-surface-2,#16161d)] p-2.5 rounded-xl border border-[var(--libido-border,rgba(255,255,255,0.08))] mb-2">
+          <label className="text-[9px] font-black uppercase tracking-wider text-[var(--libido-muted,#9ca3af)] flex items-center gap-1 mb-2">
+            <Filter size={11} className="text-[var(--libido-accent,#d86b3f)]" /> Orientação:
+          </label>
+          <div className="grid grid-cols-2 gap-1.5">
+            {OPCOES_ORIENTACAO.map(op => (
+              <button
+                key={op.id}
+                type="button"
+                onClick={() => setOrientacaoFiltro(prev => (prev === op.id ? '' : op.id))}
+                className={`py-1.5 px-2 text-[10px] uppercase font-bold rounded-lg transition-all ${
+                  orientacaoFiltro === op.id
+                    ? 'bg-[var(--libido-accent,#d86b3f)] text-black shadow-[0_0_10px_rgba(216,107,63,0.3)]'
+                    : 'bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.08))] text-[var(--libido-muted,#9ca3af)]'
+                }`}
+              >
+                {op.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Bloco 3: Interesses */}
+        <div className="bg-[var(--libido-surface-2,#16161d)] p-2.5 rounded-xl border border-[var(--libido-border,rgba(255,255,255,0.08))] mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[9px] font-black uppercase tracking-wider text-[var(--libido-muted,#9ca3af)] flex items-center gap-1">
+              <Sparkles size={11} className="text-[var(--libido-accent,#d86b3f)]" /> Interesses:
+            </label>
+            <button
+              type="button"
+              onClick={() => setApenasComFoto(!apenasComFoto)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border transition-all ${
+                apenasComFoto
+                  ? 'bg-[var(--libido-accent,#d86b3f)]/20 border-[var(--libido-accent,#d86b3f)] text-[var(--libido-accent,#d86b3f)]'
+                  : 'border-[var(--libido-border,rgba(255,255,255,0.1))] text-[var(--libido-muted,#9ca3af)]'
+              }`}
+            >
+              <Camera size={10} /> Só com foto
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {OPCOES_OBJETIVO.map(op => (
+              <button
+                key={op.id}
+                type="button"
+                onClick={() => setObjetivoFiltro(prev => (prev === op.id ? '' : op.id))}
+                className={`py-1.5 px-2 text-[9px] uppercase font-bold rounded-lg transition-all ${
+                  objetivoFiltro === op.id
+                    ? 'bg-[var(--libido-accent,#d86b3f)] text-black'
+                    : 'bg-black/40 border border-[var(--libido-border,rgba(255,255,255,0.08))] text-[var(--libido-muted,#9ca3af)]'
+                }`}
+              >
+                {op.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Resultados: Ocultos ate o usuario selecionar uma opcao */}
+        {!temFiltroAtivo ? (
+          <div className="text-center py-8 px-3 bg-[var(--libido-surface-2,#16161d)]/50 rounded-xl border border-dashed border-[var(--libido-border,rgba(255,255,255,0.1))]">
+            <Search size={22} className="mx-auto mb-2 text-[var(--libido-accent,#d86b3f)] opacity-60" />
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--libido-text,#f5f5f7)] mb-1">
+              Selecione o que você procura
+            </p>
+            <p className="text-[10px] text-[var(--libido-muted,#9ca3af)]">
+              Toque em Casais, Solteiros, Solteiras ou Orientação acima para exibir os perfis compatíveis.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {loading ? (
+              <div className="py-6 text-center text-[11px] text-[var(--libido-muted,#9ca3af)] animate-pulse">Buscando perfis...</div>
+            ) : resultados.length > 0 ? (
+              resultados.map((u, idx) => {
+                const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
+                const nome = u.nickname || u.name || u.username || 'Perfil Liberal';
+                const status = u.relationship_status || u.gender || 'Membro Liberal';
+                const orient = u.sexual_orientation || 'Liberal';
+                const cidade = u.city || u.location || '';
+
+                return (
+                  <div
+                    key={u.user_id || u.id || idx}
+                    onClick={() => setPerfilSelecionado(u)}
+                    className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
+                        {foto ? (
+                          <img src={foto} alt={nome} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-bold text-[var(--libido-accent,#d86b3f)]">{String(nome).charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-bold text-[var(--libido-text,#f5f5f7)]">{nome}</span>
+                          {u.age && <span className="text-[10px] text-[var(--libido-muted,#9ca3af)]">{u.age} anos</span>}
+                          <ShieldCheck size={12} className="text-amber-500" />
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1 mt-0.5">
+                          <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-[var(--libido-accent,#d86b3f)]/15 text-[var(--libido-accent,#d86b3f)]">
+                            {status}
+                          </span>
+                          <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-white/5 text-[var(--libido-muted,#9ca3af)]">
+                            {orient}
+                          </span>
+                          {cidade && (
+                            <span className="text-[9px] text-[var(--libido-muted,#9ca3af)] flex items-center gap-0.5">
+                              <MapPin size={9} /> {cidade}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[9px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] px-2 py-1 rounded-lg bg-black/30 border border-[var(--libido-border,rgba(255,255,255,0.1))]">
+                      Ver
+                    </span>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-6 bg-[var(--libido-surface-2,#16161d)] rounded-xl border border-[var(--libido-border,rgba(255,255,255,0.08))]">
+                <p className="text-[11px] text-[var(--libido-muted,#9ca3af)] mb-1.5">Nenhum perfil encontrado para este filtro.</p>
+                <button
+                  type="button"
+                  onClick={limparFiltros}
+                  className="text-[9px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] underline"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {perfilSelecionado && (
+          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPerfilSelecionado(null)}>
+            <div className="bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-accent,#d86b3f)]/40 rounded-2xl p-4 max-w-xs w-full" onClick={e => e.stopPropagation()}>
+              <h3 className="text-sm font-bold text-[var(--libido-accent,#d86b3f)] mb-0.5">{perfilSelecionado.nickname || perfilSelecionado.name || 'Perfil'}</h3>
+              <p className="text-[10px] text-[var(--libido-muted,#9ca3af)] uppercase mb-2.5">
+                {perfilSelecionado.relationship_status || 'Membro'} • {perfilSelecionado.sexual_orientation || 'Liberal'}
+              </p>
+              <p className="text-xs text-[var(--libido-text,#f5f5f7)] mb-3.5">{perfilSelecionado.bio || 'Sem descrição informada.'}</p>
+              <button
+                type="button"
+                onClick={() => setPerfilSelecionado(null)}
+                className="w-full py-2 bg-[var(--libido-accent,#d86b3f)] text-black font-bold text-[10px] uppercase rounded-xl"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
 
-// Interceptador Global: Garante abertura limpa da Busca sem mostrar Convites no fundo
+// Interceptador Global ajustado para respeitar a barra do topo (top: 64px) e cobrir até o fim da tela (bottom: 0)
 if (typeof window !== 'undefined' && !(window as any).__LIBIDO_BUSCA_INTERCEPTOR__) {
   (window as any).__LIBIDO_BUSCA_INTERCEPTOR__ = true;
 
@@ -363,7 +368,7 @@ if (typeof window !== 'undefined' && !(window as any).__LIBIDO_BUSCA_INTERCEPTOR
     if (!portalDiv) {
       portalDiv = document.createElement('div');
       portalDiv.id = 'libido-search-portal-overlay';
-      portalDiv.style.cssText = 'position:fixed;top:56px;left:0;right:0;bottom:64px;z-index:48;background:var(--libido-bg,#0b0b0e);overflow-y:auto;';
+      portalDiv.style.cssText = 'position:fixed;top:64px;left:0;right:0;bottom:0;z-index:40;background:var(--libido-bg,#0b0b0e);overflow-y:auto;';
       document.body.appendChild(portalDiv);
       portalRoot = createRoot(portalDiv);
       portalRoot.render(<SearchScreen onClose={fecharBusca} />);
