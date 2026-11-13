@@ -1,4 +1,4 @@
-import { Search, Zap, Settings, Bell } from "lucide-react";
+import { Search, Zap, Settings } from "lucide-react";
 import { Logo } from "./Logo";
 
 interface HeaderGlobalProps {
@@ -37,7 +37,7 @@ export function HeaderGlobal({ onSearchClick, onEnergyClick, onSettingsClick, on
             onClick={() => onNotificationsClick?.()}
             className="w-10 h-10 rounded-full bg-[var(--libido-surface-2)] hover:bg-[var(--libido-surface)] border border-[var(--libido-border)] flex items-center justify-center hover:text-[var(--libido-accent)] hover:border-[var(--libido-accent)]/50 transition-all relative"
           >
-             <Bell size={18} strokeWidth={2.5}/>
+             <Search size={18} strokeWidth={2.5}/>
              <span className="absolute top-0 right-0 w-3 h-3 bg-[var(--libido-accent)] rounded-full border-[3px] border-[var(--libido-bg)]"></span>
           </button>
         </div>

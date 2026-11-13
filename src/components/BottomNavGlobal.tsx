@@ -20,7 +20,7 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 
     { id: 'profile', label: 'Perfil', icon: User },
   ];
   const extraTabs = [ // BARRA-UNICA: ALERTAS na barra
-    { id: 'invites', label: 'Alertas', icon: Bell, dot: true },
+    { id: 'invites', label: 'Busca', icon: Search, dot: true },
   ];
 
   const menuItems = [

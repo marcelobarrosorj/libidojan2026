@@ -1,4 +1,4 @@
-import { Bell, Shield, LogOut, Moon, ChevronRight, Sun } from 'lucide-react';
+import { Search, Shield, LogOut, Moon, ChevronRight, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { OwnerInvites } from './OwnerInvites'; // OWNER-INVITES
 interface SettingsPageProps {
@@ -30,7 +30,7 @@ export function SettingsPage({ onLogout, currentUser, isPremium }: SettingsPageP
         <OwnerInvites />
         <div className="flex items-center justify-between bg-[var(--libido-surface-2)]/60 border border-[var(--libido-border)] p-4 rounded-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center"><Bell size={14} className="text-blue-400" /></div>
+            <div className="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center"><Search size={14} className="text-blue-400" /></div>
             <div>
               <p className="text-xs font-black text-[var(--libido-text)]">Notificações</p>
               <p className="text-[9px] text-[var(--libido-muted)] opacity-50 font-semibold">Alertas sonoros e de vibração</p>
