@@ -1,3 +1,4 @@
+import { SearchScreen } from './SearchScreen';
 import React from "react";
 import { Feed } from "./Feed";
 import { Radar } from "./Radar";

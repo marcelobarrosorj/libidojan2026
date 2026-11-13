@@ -1,3 +1,4 @@
+import { SearchScreen } from './components/SearchScreen';
 import { LandingPage } from './components/LandingPage';
 import { Partners } from './components/Partners';
 import React, { useState, useEffect, useRef } from 'react';

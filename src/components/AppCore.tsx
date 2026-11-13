@@ -1,3 +1,4 @@
+import { SearchScreen } from './SearchScreen';
 import { updateUserProfile } from '../services/users';
 import { initNavHistory, registrarTela } from '../services/navHistory'; // NAV-HISTORY
 import { useEffect, useState, useRef, ReactNode } from "react";
