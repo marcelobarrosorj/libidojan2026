@@ -229,7 +229,7 @@ export function SearchScreen(props: any) {
         if (ativo && data) setTodosPerfis(data);
         if (ativo) setLoading(false);
       })
-      .catch(() => {
+      .then(undefined, () => {
         if (ativo) setLoading(false);
       });
     return () => { ativo = false; };
@@ -473,7 +473,7 @@ export function SearchScreen(props: any) {
               </button>
             </div>
             <div className="space-y-1.5">
-              {Object.entries(modulos).map(([chave, item]) => (
+              {Object.entries(modulos as Record<string, { nome: string; ativo: boolean }>).map(([chave, item]) => (
                 <div
                   key={chave}
                   onClick={() => alternarModulo(chave)}

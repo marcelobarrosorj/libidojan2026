@@ -99,7 +99,7 @@ export interface Message {
   to: string;
   text: string;
   createdAt: number;
-  status?: 'sending' | 'sent' | 'delivered' | 'read';
+  status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
 }
 
 export interface Report {

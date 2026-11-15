@@ -276,7 +276,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       const currentPhotos = currentUser?.photos || [];
       const updatedPhotos = currentPhotos.filter((url: string) => url !== urlToDelete);
       await updateUserProfile(userId, { photos: updatedPhotos });
-      try { await excluirPostPorFoto(urlToDelete); } catch (eDelPost) { console.error(eDelPost); }
+      try { await excluirPostPorFoto(userId, urlToDelete); } catch (eDelPost) { console.error(eDelPost); }
       alert("Foto excluída!");
       setActivePhotoIndex(null);
       window.dispatchEvent(new Event('profileUpdated'));

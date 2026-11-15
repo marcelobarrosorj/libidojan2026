@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from './supabase';
 
 export async function apagarParaMim(userId: string, outroId: string): Promise<void> {
   const { error } = await supabase.from('conversas_ocultas').upsert(

@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { supabase } from '../services/supabase'
 
-const st: Record<string, React.CSSProperties> = {
+const st: Record<string, CSSProperties> = {
   box: { marginTop: 24, paddingTop: 16, borderTop: '1px solid #2a2a2f' },
   btn: { width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #b3261e', background: 'transparent', color: '#e5484d', fontSize: 15, fontWeight: 600, cursor: 'pointer' },
   overlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, zIndex: 9999 },

@@ -41,6 +41,7 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
   const [loading, setLoading] = useState(true);
   const [modo, setModo] = useState<'mapa' | 'lista'>('mapa');
   const [meuPonto, setMeuPonto] = useState<{ lat: number; lon: number } | null>(null);
+  const [modoVitrine, setModoVitrine] = useState(false);
 
   useEffect(() => {
     let ativo = true;
@@ -196,8 +197,6 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-      <div className="px-4 pt-4"><IntencaoRadarBar userId={userId} userObj={currentUser} />
-        <button onClick={() => setModoVitrine(!modoVitrine)} className="w-full mt-3 py-2 bg-black/40 border border-[var(--libido-accent)]/50 rounded-xl text-[10px] text-[var(--libido-accent)] font-bold uppercase tracking-widest">{modoVitrine ? 'Desativar Vitrine de Afinidade' : 'Ver Vitrine de Casais por Afinidade'}</button></div>
                   <p className="text-sm font-bold text-[var(--libido-text)] truncate flex items-center gap-1.5">
                     {p.user.name}
                     {p.user.isOnline && (
