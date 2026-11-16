@@ -1,0 +1,12 @@
+{
+  "appId": "br.com.libidoapp",
+  "appName": "Libido App",
+  "webDir": "dist",
+  "server": {
+    "url": "https://www.libidoapp.com.br",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
