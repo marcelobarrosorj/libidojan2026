@@ -27,6 +27,9 @@ export const routes: Record<string, React.FC<any>> = {
   invites: Invites,
   settings: SettingsPage,
   viewprofile: ViewProfile,
+  search: SearchScreen,
+  busca: SearchScreen,
+  alertas: SearchScreen,
 };
 
 interface ContentRouterProps {
