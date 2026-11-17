@@ -21,8 +21,7 @@ export function SearchScreen(props: any) {
   useEffect(() => {
     let ativo = true;
     setLoading(true);
-    // LIMITE AUMENTADO PARA 4000 PERFIS
-    sbClient.from('users').select('*').limit(4000)
+    sbClient.from('users').select('*').limit(3000)
       .then(({ data }) => {
         if (ativo && data) setTodosPerfis(data);
         if (ativo) setLoading(false);
@@ -35,51 +34,75 @@ export function SearchScreen(props: any) {
 
   const normalizar = (v: any) => String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
+  // FUNÇÃO SALVA-VIDAS: Decodifica JSON sujo do banco e resgata casais ocultos
+  const parseProfileData = (u: any) => {
+    let bioText = u.bio || u.description || '';
+    let isCasal = u.couple_profile === true || normalizar(u.relationship_status).includes('casal');
+    let orientacao = normalizar(u.sexual_orientation || u.orientation || '');
+    let genero = normalizar(u.gender || '');
+
+    // Se a bio for um JSON cru (como na imagem do erro), extrai isCouple e limpa o texto
+    if (typeof u.bio === 'string' && u.bio.trim().startsWith('{')) {
+      try {
+        const pb = JSON.parse(u.bio);
+        if (pb.isCouple === true) isCasal = true;
+        if (pb.gender) genero = normalizar(pb.gender);
+        if (pb.orientation) orientacao = normalizar(pb.orientation);
+        bioText = pb.description || pb.bio || pb.about || pb.text || '';
+      } catch (e) {}
+    } else if (typeof u.bio === 'object' && u.bio !== null) {
+        if (u.bio.isCouple === true) isCasal = true;
+        if (u.bio.gender) genero = normalizar(u.bio.gender);
+        if (u.bio.orientation) orientacao = normalizar(u.bio.orientation);
+        bioText = u.bio.description || u.bio.bio || u.bio.about || u.bio.text || '';
+    }
+
+    const statusReal = normalizar(`${u.relationship_status} ${genero} ${u.type} ${u.profile_type}`);
+    if (statusReal.includes('casal') || statusReal.includes('casais') || statusReal.includes('couple') || statusReal.includes('casad')) isCasal = true;
+
+    const isHomemSolteiro = !isCasal && (statusReal.includes('solteiro') || statusReal.includes('homem') || statusReal.includes('male') || statusReal.includes('masculino') || genero === 'male' || genero === 'homem');
+    const isMulherSolteira = !isCasal && (statusReal.includes('solteira') || statusReal.includes('mulher') || statusReal.includes('female') || statusReal.includes('feminina') || genero === 'female' || genero === 'mulher');
+
+    return { ...u, bioText, isCasal, isHomemSolteiro, isMulherSolteira, orientacao, statusReal };
+  };
+
   const temFiltroAtivo = Boolean(perfilFiltro !== '' || orientacaoFiltro !== '' || objetivoFiltro !== '' || apenasComFoto || termo.trim() !== '');
 
   const limparFiltros = () => {
     setPerfilFiltro(''); setOrientacaoFiltro(''); setObjetivoFiltro(''); setApenasComFoto(false); setTermo('');
   };
 
-  const resultados = !temFiltroAtivo ? [] : todosPerfis.filter((u) => {
-    // 1. ISOLAMENTO REFORÇADO DE STATUS (Evita que o texto da bio contamine o filtro)
-    const statusReal = normalizar(`${u.relationship_status} ${u.gender} ${u.type} ${u.profile_type}`);
-    
-    // Regras de Identidade (Nuca mistura casal com solteiro)
-    const isCasal = u.couple_profile === true || statusReal.includes('casal') || statusReal.includes('casais') || statusReal.includes('couple') || statusReal.includes('casad');
-    const isHomemSolteiro = !isCasal && (statusReal.includes('solteiro') || statusReal.includes('homem') || statusReal.includes('male') || statusReal.includes('masculino'));
-    const isMulherSolteira = !isCasal && (statusReal.includes('solteira') || statusReal.includes('mulher') || statusReal.includes('female') || statusReal.includes('feminina'));
-
-    const ori = normalizar(`${u.sexual_orientation} ${u.orientation} ${u.preferences}`);
-    const bio = normalizar(`${u.bio} ${u.description} ${u.interests} ${u.looking_for}`);
-    const nick = normalizar(`${u.nickname} ${u.name} ${u.username}`);
-    const cid = normalizar(`${u.city} ${u.location} ${u.state}`);
-    const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
+  const resultados = !temFiltroAtivo ? [] : todosPerfis.filter((uOriginal) => {
+    const u = parseProfileData(uOriginal);
+    const ori = normalizar(`${u.orientacao} ${uOriginal.preferences}`);
+    const bio = normalizar(`${u.bioText} ${uOriginal.interests} ${uOriginal.looking_for}`);
+    const nick = normalizar(`${uOriginal.nickname} ${uOriginal.name} ${uOriginal.username}`);
+    const cid = normalizar(`${uOriginal.city} ${uOriginal.location} ${uOriginal.state}`);
+    const foto = uOriginal.photo_url || uOriginal.avatar_url || uOriginal.avatar || (Array.isArray(uOriginal.photos) && uOriginal.photos[0]);
 
     if (apenasComFoto && !foto) return false;
 
     if (termo.trim() !== '') {
       const t = normalizar(termo);
-      if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t) && !statusReal.includes(t)) return false;
+      if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t) && !u.statusReal.includes(t)) return false;
     }
 
-    // 2. FILTRO ESTRITO DE PERFIL
-    if (perfilFiltro === 'casais' && !isCasal) return false;
-    if (perfilFiltro === 'solteiros' && !isHomemSolteiro) return false;
-    if (perfilFiltro === 'solteiras' && !isMulherSolteira) return false;
+    if (perfilFiltro === 'casais' && !u.isCasal) return false;
+    if (perfilFiltro === 'solteiros' && !u.isHomemSolteiro) return false;
+    if (perfilFiltro === 'solteiras' && !u.isMulherSolteira) return false;
 
-    // 3. FILTRO DE ORIENTAÇÃO
     if (orientacaoFiltro === 'hetero' && !ori.includes('hetero')) return false;
     if (orientacaoFiltro === 'bissexual' && !ori.includes('bi')) return false;
     if (orientacaoFiltro === 'liberal' && !ori.includes('liberal') && !ori.includes('swing') && !bio.includes('swing') && !bio.includes('liberal')) return false;
 
-    // 4. FILTRO DE INTERESSE
-    if (objetivoFiltro === 'troca' && !bio.includes('troca') && !bio.includes('swing') && !isCasal) return false;
+    if (objetivoFiltro === 'troca' && !bio.includes('troca') && !bio.includes('swing') && !u.isCasal) return false;
     if (objetivoFiltro === 'menage' && !bio.includes('menage') && !bio.includes('tres') && !ori.includes('bi')) return false;
     if (objetivoFiltro === 'festas' && !bio.includes('festa') && !bio.includes('club')) return false;
 
     return true;
   });
+
+  const perfilParsed = perfilSelecionado ? parseProfileData(perfilSelecionado) : null;
 
   return (
     <div id="libido-search-screen-root" className="w-full min-h-full bg-[var(--libido-bg,#0b0b0e)] text-[var(--libido-text,#f5f5f7)]">
@@ -179,15 +202,16 @@ export function SearchScreen(props: any) {
             {loading ? (
               <div className="py-6 text-center text-[11px] text-[var(--libido-muted,#9ca3af)] animate-pulse">Buscando perfis...</div>
             ) : resultados.length > 0 ? (
-              resultados.map((u, idx) => {
+              resultados.map((uOriginal, idx) => {
+                const u = parseProfileData(uOriginal);
                 const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
                 const nome = u.nickname || u.name || u.username || 'Perfil Liberal';
-                const status = u.relationship_status || u.gender || 'Membro Liberal';
-                const orient = u.sexual_orientation || 'Liberal';
+                const status = u.isCasal ? 'Casal' : (u.relationship_status || u.gender || 'Membro Liberal');
+                const orient = u.orientacao || 'Liberal';
                 const cidade = u.city || u.location || '';
 
                 return (
-                  <div key={u.user_id || u.id || idx} onClick={() => setPerfilSelecionado(u)} className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all">
+                  <div key={u.user_id || u.id || idx} onClick={() => setPerfilSelecionado(uOriginal)} className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all">
                     <div className="flex items-center gap-2.5">
                       <div className="w-10 h-10 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
                         {foto ? (
@@ -221,13 +245,20 @@ export function SearchScreen(props: any) {
           </div>
         )}
 
-        {perfilSelecionado && (
+        {/* MODAL CORRIGIDO: Agora usa perfilParsed.bioText em vez de perfilSelecionado.bio que tinha o JSON quebrado */}
+        {perfilParsed && (
           <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPerfilSelecionado(null)}>
             <div className="bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-accent,#d86b3f)]/40 rounded-2xl p-4 max-w-[340px] w-full" onClick={e => e.stopPropagation()}>
-              <h3 className="text-sm font-bold text-[var(--libido-accent,#d86b3f)] mb-0.5">{perfilSelecionado.nickname || perfilSelecionado.name || 'Perfil'}</h3>
-              <p className="text-[10px] text-[var(--libido-muted,#9ca3af)] uppercase mb-2.5">{perfilSelecionado.relationship_status || 'Membro'} • {perfilSelecionado.sexual_orientation || 'Liberal'}</p>
-              <p className="text-xs text-[var(--libido-text,#f5f5f7)] mb-4">{perfilSelecionado.bio || 'Sem descrição informada.'}</p>
-              <button type="button" onClick={() => setPerfilSelecionado(null)} className="w-full py-2 bg-[var(--libido-accent,#d86b3f)] text-black font-bold text-[10px] uppercase rounded-xl">Fechar</button>
+              <h3 className="text-sm font-bold text-[var(--libido-accent,#d86b3f)] mb-0.5">{perfilParsed.nickname || perfilParsed.name || 'Perfil'}</h3>
+              <p className="text-[10px] text-[var(--libido-muted,#9ca3af)] uppercase mb-2.5">{perfilParsed.isCasal ? 'Casal' : (perfilParsed.relationship_status || 'Membro')} • {perfilParsed.orientacao || 'Liberal'}</p>
+              
+              <div className="bg-black/30 p-3 rounded-xl mb-4 border border-[var(--libido-border,rgba(255,255,255,0.05))]">
+                <p className="text-xs text-[var(--libido-text,#f5f5f7)] leading-relaxed">
+                  {perfilParsed.bioText || 'Este membro ainda não adicionou uma descrição.'}
+                </p>
+              </div>
+
+              <button type="button" onClick={() => setPerfilSelecionado(null)} className="w-full py-2.5 bg-[var(--libido-accent,#d86b3f)] text-black font-bold text-[10px] uppercase rounded-xl tracking-wider">Fechar</button>
             </div>
           </div>
         )}
