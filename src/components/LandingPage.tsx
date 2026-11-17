@@ -62,7 +62,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         </h1>
         {/* LANDING-21 */}
         <p className="text-base md:text-2xl font-black uppercase tracking-wide text-[var(--libido-accent)] mb-2" style={{ textShadow: '0 0 8px var(--libido-accent), 0 0 28px var(--libido-accent)' }}>
-          <span className="bg-[#d86b3f] text-black px-6 py-3 rounded-xl font-black shadow-[0_0_15px_rgba(216,107,63,0.4)] inline-block uppercase tracking-wider mt-2 mb-1">CRIAR CONTA GRATUITA</span>
+          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); const btns = Array.from(document.querySelectorAll("button, a")); const target = btns.find(b => b.textContent && b.textContent.match(/entrar|login|cadastre-se/i) && !b.textContent.includes("GRATUITA")); if(target) { (target as HTMLElement).click(); } else { window.dispatchEvent(new CustomEvent("libido-auth-open")); } }} className="bg-[#d86b3f] hover:bg-[#e87b4f] text-black px-6 py-3 rounded-xl font-black shadow-[0_0_15px_rgba(216,107,63,0.4)] inline-block uppercase tracking-wider mt-2 mb-1 relative z-50 cursor-pointer transition-all active:scale-95">CRIAR CONTA GRATUITA</button>
         </p>
         <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[var(--libido-muted)] mb-8">
           <span className="text-[#9ca3af] font-medium text-[11px]">Navegação gratuita. Ganhe acesso VIP ao verificar sua identidade.</span>
