@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, RotateCcw, ChevronDown } from 'lucide-react';
+import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, Camera, RotateCcw, ChevronDown, X } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { sanitizarPerfil } from '../utils/profileParser';
 
 const SUPABASE_URL = 'https://hkuwlazwtxwfffnpgfdd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jnteoNon4vEhWscOanGZDw_i6NGG6fI';
@@ -23,7 +24,10 @@ export function SearchScreen(props: any) {
     setLoading(true);
     sbClient.from('users').select('*').limit(5000)
       .then(({ data }) => {
-        if (ativo && data) setTodosPerfis(data);
+        if (ativo && data) {
+          const limpos = data.map(sanitizarPerfil);
+          setTodosPerfis(limpos);
+        }
         if (ativo) setLoading(false);
       })
       .catch(() => {
@@ -34,89 +38,38 @@ export function SearchScreen(props: any) {
 
   const normalizar = (v: any) => String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // PARSER BLINDADO: Extrai dados de JSONs salvos na bio do Supabase
-  const parseUser = (u: any) => {
-    let rawBio = u.bio || u.description || '';
-    let isCouple = u.couple_profile === true;
-    let cleanBio = '';
-    let genderStr = String(u.gender || '').toLowerCase();
-    let orientStr = String(u.sexual_orientation || u.orientation || '').toLowerCase();
-    let statusStr = String(u.relationship_status || '').toLowerCase();
-
-    if (typeof rawBio === 'string' && rawBio.trim().startsWith('{')) {
-      try {
-        const parsed = JSON.parse(rawBio);
-        if (parsed.isCouple === true || parsed.couple === true) isCouple = true;
-        if (parsed.gender) genderStr = String(parsed.gender).toLowerCase();
-        if (parsed.orientation) orientStr = String(parsed.orientation).toLowerCase();
-        if (parsed.relationship_status) statusStr = String(parsed.relationship_status).toLowerCase();
-        cleanBio = parsed.description || parsed.bio || parsed.about || parsed.text || '';
-      } catch (e) {
-        cleanBio = rawBio;
-      }
-    } else if (typeof rawBio === 'object' && rawBio !== null) {
-      if (rawBio.isCouple === true || rawBio.couple === true) isCouple = true;
-      if (rawBio.gender) genderStr = String(rawBio.gender).toLowerCase();
-      if (rawBio.orientation) orientStr = String(rawBio.orientation).toLowerCase();
-      cleanBio = rawBio.description || rawBio.bio || rawBio.about || rawBio.text || '';
-    } else {
-      cleanBio = rawBio;
-    }
-
-    const combinedCheck = normalizar(`${statusStr} ${genderStr} ${u.type} ${u.profile_type} ${cleanBio}`);
-    if (combinedCheck.includes('casal') || combinedCheck.includes('casais') || combinedCheck.includes('couple') || combinedCheck.includes('casad')) {
-      isCouple = true;
-    }
-
-    const isHomem = !isCouple && (genderStr.includes('homem') || genderStr.includes('male') || genderStr.includes('solteiro') || statusStr.includes('solteiro'));
-    const isMulher = !isCouple && (genderStr.includes('mulher') || genderStr.includes('female') || genderStr.includes('solteira') || statusStr.includes('solteira') || genderStr.includes('feminina'));
-
-    return {
-      ...u,
-      cleanBio,
-      isCouple,
-      isHomem,
-      isMulher,
-      orientStr,
-      combinedCheck
-    };
-  };
-
   const temFiltroAtivo = Boolean(perfilFiltro !== '' || orientacaoFiltro !== '' || objetivoFiltro !== '' || apenasComFoto || termo.trim() !== '');
 
   const limparFiltros = () => {
     setPerfilFiltro(''); setOrientacaoFiltro(''); setObjetivoFiltro(''); setApenasComFoto(false); setTermo('');
   };
 
-  const resultados = !temFiltroAtivo ? [] : todosPerfis.filter((rawU) => {
-    const u = parseUser(rawU);
-    const foto = rawU.photo_url || rawU.avatar_url || rawU.avatar || (Array.isArray(rawU.photos) && rawU.photos[0]);
-    const nick = normalizar(`${rawU.nickname} ${rawU.name} ${rawU.username}`);
-    const cid = normalizar(`${rawU.city} ${rawU.location} ${rawU.state}`);
-
-    if (apenasComFoto && !foto) return false;
+  const resultados = !temFiltroAtivo ? [] : todosPerfis.filter((u) => {
+    if (apenasComFoto && !u.foto) return false;
 
     if (termo.trim() !== '') {
       const t = normalizar(termo);
-      if (!nick.includes(t) && !cid.includes(t) && !u.cleanBio.toLowerCase().includes(t) && !u.combinedCheck.includes(t)) return false;
+      const nick = normalizar(u.nome);
+      const cid = normalizar(u.city || u.location || '');
+      const bio = normalizar(u.bioLimpa);
+      if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t)) return false;
     }
 
-    if (perfilFiltro === 'casais' && !u.isCouple) return false;
+    if (perfilFiltro === 'casais' && !u.isCasal) return false;
     if (perfilFiltro === 'solteiros' && !u.isHomem) return false;
     if (perfilFiltro === 'solteiras' && !u.isMulher) return false;
 
-    if (orientacaoFiltro === 'hetero' && !u.orientStr.includes('hetero')) return false;
-    if (orientacaoFiltro === 'bissexual' && !u.orientStr.includes('bi')) return false;
-    if (orientacaoFiltro === 'liberal' && !u.orientStr.includes('liberal') && !u.orientStr.includes('swing') && !u.cleanBio.toLowerCase().includes('liberal')) return false;
+    const ori = normalizar(u.orientacao);
+    if (orientacaoFiltro === 'hetero' && !ori.includes('hetero')) return false;
+    if (orientacaoFiltro === 'bissexual' && !ori.includes('bi')) return false;
+    if (orientacaoFiltro === 'liberal' && !ori.includes('liberal') && !ori.includes('swing')) return false;
 
-    if (objetivoFiltro === 'troca' && !u.cleanBio.toLowerCase().includes('troca') && !u.cleanBio.toLowerCase().includes('swing') && !u.isCouple) return false;
-    if (objetivoFiltro === 'menage' && !u.cleanBio.toLowerCase().includes('menage') && !u.cleanBio.toLowerCase().includes('tres') && !u.orientStr.includes('bi')) return false;
-    if (objetivoFiltro === 'festas' && !u.cleanBio.toLowerCase().includes('festa') && !u.cleanBio.toLowerCase().includes('club')) return false;
+    if (objetivoFiltro === 'troca' && !normalizar(u.bioLimpa).includes('troca') && !normalizar(u.bioLimpa).includes('swing') && !u.isCasal) return false;
+    if (objetivoFiltro === 'menage' && !normalizar(u.bioLimpa).includes('menage') && !normalizar(u.bioLimpa).includes('tres') && !ori.includes('bi')) return false;
+    if (objetivoFiltro === 'festas' && !normalizar(u.bioLimpa).includes('festa') && !normalizar(u.bioLimpa).includes('club')) return false;
 
     return true;
   });
-
-  const parsedModal = perfilSelecionado ? parseUser(perfilSelecionado) : null;
 
   return (
     <div id="libido-search-screen-root" className="w-full min-h-full bg-[var(--libido-bg,#0b0b0e)] text-[var(--libido-text,#f5f5f7)]">
@@ -216,41 +169,32 @@ export function SearchScreen(props: any) {
             {loading ? (
               <div className="py-6 text-center text-[11px] text-[var(--libido-muted,#9ca3af)] animate-pulse">Buscando perfis...</div>
             ) : resultados.length > 0 ? (
-              resultados.map((rawU, idx) => {
-                const u = parseUser(rawU);
-                const foto = rawU.photo_url || rawU.avatar_url || rawU.avatar || (Array.isArray(rawU.photos) && rawU.photos[0]);
-                const nome = rawU.nickname || rawU.name || rawU.username || 'Perfil Liberal';
-                const statusLabel = u.isCouple ? 'Casal' : (u.isHomem ? 'Solteiro' : (u.isMulher ? 'Solteira' : 'Membro'));
-                const orient = u.orientStr || 'Liberal';
-                const cidade = rawU.city || rawU.location || '';
-
-                return (
-                  <div key={rawU.user_id || rawU.id || idx} onClick={() => setPerfilSelecionado(rawU)} className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
-                        {foto ? (
-                          <img src={foto} alt={nome} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-xs font-bold text-[var(--libido-accent,#d86b3f)]">{String(nome).charAt(0).toUpperCase()}</span>
-                        )}
+              resultados.map((u, idx) => (
+                <div key={u.user_id || u.id || idx} onClick={() => setPerfilSelecionado(u)} className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
+                      {u.foto ? (
+                        <img src={u.foto} alt={u.nome} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xs font-bold text-[var(--libido-accent,#d86b3f)]">{String(u.nome).charAt(0).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-bold text-[var(--libido-text,#f5f5f7)]">{u.nome}</span>
+                        {u.age && <span className="text-[10px] text-[var(--libido-muted,#9ca3af)]">{u.age} anos</span>}
+                        <ShieldCheck size={12} className="text-amber-500" />
                       </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs font-bold text-[var(--libido-text,#f5f5f7)]">{nome}</span>
-                          {rawU.age && <span className="text-[10px] text-[var(--libido-muted,#9ca3af)]">{rawU.age} anos</span>}
-                          <ShieldCheck size={12} className="text-amber-500" />
-                        </div>
-                        <div className="flex flex-wrap items-center gap-1 mt-0.5">
-                          <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-[var(--libido-accent,#d86b3f)]/15 text-[var(--libido-accent,#d86b3f)]">{statusLabel}</span>
-                          <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-white/5 text-[var(--libido-muted,#9ca3af)]">{orient}</span>
-                          {cidade && <span className="text-[9px] text-[var(--libido-muted,#9ca3af)] flex items-center gap-0.5"><MapPin size={9} /> {cidade}</span>}
-                        </div>
+                      <div className="flex flex-wrap items-center gap-1 mt-0.5">
+                        <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-[var(--libido-accent,#d86b3f)]/15 text-[var(--libido-accent,#d86b3f)]">{u.statusLabel}</span>
+                        <span className="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-white/5 text-[var(--libido-muted,#9ca3af)]">{u.orientacao}</span>
+                        {u.city && <span className="text-[9px] text-[var(--libido-muted,#9ca3af)] flex items-center gap-0.5"><MapPin size={9} /> {u.city}</span>}
                       </div>
                     </div>
-                    <span className="text-[9px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] px-2 py-1 rounded-lg bg-black/30 border border-[var(--libido-border,rgba(255,255,255,0.1))]">Ver</span>
                   </div>
-                );
-              })
+                  <span className="text-[9px] font-bold uppercase text-[var(--libido-accent,#d86b3f)] px-2 py-1 rounded-lg bg-black/30 border border-[var(--libido-border,rgba(255,255,255,0.1))]">Ver</span>
+                </div>
+              ))
             ) : (
               <div className="text-center py-6 bg-[var(--libido-surface-2,#16161d)] rounded-xl border border-[var(--libido-border,rgba(255,255,255,0.08))]">
                 <p className="text-[11px] text-[var(--libido-muted,#9ca3af)] mb-1.5">Nenhum perfil encontrado para este filtro.</p>
@@ -259,17 +203,17 @@ export function SearchScreen(props: any) {
           </div>
         )}
 
-        {parsedModal && (
+        {perfilSelecionado && (
           <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPerfilSelecionado(null)}>
             <div className="bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-accent,#d86b3f)]/40 rounded-2xl p-4 max-w-[340px] w-full" onClick={e => e.stopPropagation()}>
-              <h3 className="text-sm font-bold text-[var(--libido-accent,#d86b3f)] mb-0.5">{parsedModal.nickname || parsedModal.name || 'Perfil'}</h3>
+              <h3 className="text-sm font-bold text-[var(--libido-accent,#d86b3f)] mb-0.5">{perfilSelecionado.nome}</h3>
               <p className="text-[10px] text-[var(--libido-muted,#9ca3af)] uppercase mb-2.5">
-                {parsedModal.isCouple ? 'Casal' : 'Membro'} • {parsedModal.orientStr || 'Liberal'}
+                {perfilSelecionado.statusLabel} • {perfilSelecionado.orientacao}
               </p>
-              
+
               <div className="bg-black/30 p-3 rounded-xl mb-4 border border-[var(--libido-border,rgba(255,255,255,0.05))]">
                 <p className="text-xs text-[var(--libido-text,#f5f5f7)] leading-relaxed">
-                  {parsedModal.cleanBio || 'Este membro ainda não adicionou uma descrição.'}
+                  {perfilSelecionado.bioLimpa}
                 </p>
               </div>
 
