@@ -35,7 +35,7 @@ export function SearchScreen(props: any) {
     sbClient
       .from('users')
       .select('*')
-      .limit(150)
+      .limit(1500)
       .then(({ data }) => {
         if (ativo && data) setTodosPerfis(data);
         if (ativo) setLoading(false);
@@ -85,7 +85,7 @@ export function SearchScreen(props: any) {
           if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t)) return false;
         }
 
-        if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('couple') && !u.couple_profile) return false;
+        if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('casais') && !rel.includes('couple') && !u.couple_profile) return false;
         if (perfilFiltro === 'solteiros' && !rel.includes('solteiro') && !rel.includes('homem') && !rel.includes('male')) return false;
         if (perfilFiltro === 'solteiras' && !rel.includes('solteira') && !rel.includes('mulher') && !rel.includes('female')) return false;
 
