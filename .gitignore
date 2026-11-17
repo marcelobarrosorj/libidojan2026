@@ -71,3 +71,10 @@ RELATORIO_DO_AGENTE.log
 tools/.gemini-key
 tools/agente-libido.mjs
 tools/REGRAS_CTO_AGENTE.md
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
