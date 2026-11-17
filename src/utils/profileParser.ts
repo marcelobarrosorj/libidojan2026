@@ -41,7 +41,7 @@ export function sanitizarPerfil(u: any) {
   return {
     ...u,
     nome: u.nickname || u.name || u.username || 'Perfil Liberal',
-    bioLimpa: cleanBio || 'Este membro ainda não adicionou uma descrição.',
+    bioLimpa: cleanBio || 'Disponível para conexões liberais com sigilo e respeito.',
     isCasal,
     isHomem,
     isMulher,
