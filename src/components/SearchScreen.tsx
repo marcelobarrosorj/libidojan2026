@@ -35,7 +35,7 @@ export function SearchScreen(props: any) {
     sbClient
       .from('users')
       .select('*')
-      .limit(1500)
+      .limit(4000)
       .then(({ data }) => {
         if (ativo && data) setTodosPerfis(data);
         if (ativo) setLoading(false);
@@ -71,7 +71,7 @@ export function SearchScreen(props: any) {
   const resultados = !temFiltroAtivo
     ? []
     : todosPerfis.filter((u) => {
-        const rel = normalizar(u.relationship_status || u.gender || u.type || u.profile_type || u.couple_profile);
+        const rel = normalizar(`${u.relationship_status} ${u.gender} ${u.type} ${u.profile_type} ${u.couple_profile} ${u.bio} ${u.description}`);
         const ori = normalizar(u.sexual_orientation || u.orientation || u.preferences);
         const bio = normalizar(u.bio || u.description || u.interests || u.looking_for);
         const nick = normalizar(u.nickname || u.name || u.username);
@@ -85,7 +85,7 @@ export function SearchScreen(props: any) {
           if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t)) return false;
         }
 
-        if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('casais') && !rel.includes('couple') && !u.couple_profile) return false;
+        if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('casais') && !rel.includes('couple') && !rel.includes('casad') && !u.couple_profile) return false;
         if (perfilFiltro === 'solteiros' && !rel.includes('solteiro') && !rel.includes('homem') && !rel.includes('male')) return false;
         if (perfilFiltro === 'solteiras' && !rel.includes('solteira') && !rel.includes('mulher') && !rel.includes('female')) return false;
 
