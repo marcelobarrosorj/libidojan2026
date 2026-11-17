@@ -44,7 +44,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
           🔞 Uso exclusivo para maiores de 18 anos.
         </p>
         <p className="text-[10px] md:text-xs text-[var(--libido-muted)] opacity-70 mt-1 max-w-2xl mx-auto">
-          Ao continuar, você confirma que tem 18 anos ou mais e concorda com nossos Termos de Uso, Política de Privacidade e Regras da Comunidade.
+          <span className="text-[#d1d5db]">Ao continuar, você confirma que tem 18 anos ou mais e concorda com nossos Termos de Uso, Política de Privacidade e Regras da Comunidade.</span>
         </p>
       </div>
 
@@ -56,16 +56,16 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="mb-8"><Logo size="lg" /></div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-fraunces font-medium leading-[1.1] mb-6 max-w-4xl mx-auto">
-          <span className="font-semibold">Segurança acima do prazer.</span><br/>
-          Conexões adultas.<br/>
-          <span className="text-[var(--libido-muted)]">Privacidade levada a sério.</span>
+          <span className="font-semibold">Explore seus desejos.</span><br/>
+          O clube mais exclusivo e seguro para casais, solteiros e solteiras.<br/>
+          <span className="text-[var(--libido-muted)]">Privacidade e segurança levados a sério.</span>
         </h1>
         {/* LANDING-21 */}
         <p className="text-base md:text-2xl font-black uppercase tracking-wide text-[var(--libido-accent)] mb-2" style={{ textShadow: '0 0 8px var(--libido-accent), 0 0 28px var(--libido-accent)' }}>
-          Cadastre-se e use 36 horas grátis
+          <span className="bg-[#d86b3f] text-black px-6 py-3 rounded-xl font-black shadow-[0_0_15px_rgba(216,107,63,0.4)] inline-block uppercase tracking-wider mt-2 mb-1">CRIAR CONTA GRATUITA</span>
         </p>
         <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[var(--libido-muted)] mb-8">
-          Acesso completo no primeiro cadastro - sem mensalidade
+          <span className="text-[#9ca3af] font-medium text-[11px]">Navegação gratuita. Ganhe acesso VIP ao verificar sua identidade.</span>
         </p>
       <p className="text-xs md:text-sm text-[var(--libido-muted)] mb-8">
         Dados protegidos · Denúncia em 1 toque
@@ -216,7 +216,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
             Seu desejo.<br/>Seu espaço.<br/>Suas escolhas.
           </h2>
           <p className="text-sm md:text-lg text-[var(--libido-muted)] mb-10 leading-relaxed">
-            Descubra conexões adultas em um ambiente criado para valorizar privacidade, liberdade e respeito.
+            Descubra O clube mais exclusivo e seguro para casais, solteiros e solteiras. em um ambiente criado para valorizar privacidade, liberdade e respeito.
           </p>
           <button 
             onClick={onRegisterClick}
@@ -241,7 +241,7 @@ export function LandingPage({ onLoginClick, onRegisterClick, onPartnersClick }: 
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
           <div>
             <div className="mb-4"><Logo size="md" /></div>
-            <p className="mb-2">Conexões adultas com privacidade, liberdade e respeito.</p>
+            <p className="mb-2">O clube mais exclusivo e seguro para casais, solteiros e solteiras. com privacidade, liberdade e respeito.</p>
             <p className="mb-2 font-bold text-[var(--libido-text)]">Uso exclusivo para maiores de 18 anos.</p>
             <p className="mb-6 opacity-70">O Libido não oferece, vende ou intermedeia serviços sexuais.</p>
             <p className="opacity-70 max-w-sm">Compromisso com a proteção de dados pessoais e com os princípios da LGPD.</p>
