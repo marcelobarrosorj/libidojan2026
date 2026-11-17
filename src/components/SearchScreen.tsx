@@ -68,32 +68,40 @@ export function SearchScreen(props: any) {
     setTermo('');
   };
 
-  const resultados = !temFiltroAtivo
+    const resultados = !temFiltroAtivo
     ? []
     : todosPerfis.filter((u) => {
-        const rel = normalizar(`${u.relationship_status} ${u.gender} ${u.type} ${u.profile_type} ${u.couple_profile} ${u.bio} ${u.description}`);
-        const ori = normalizar(u.sexual_orientation || u.orientation || u.preferences);
-        const bio = normalizar(u.bio || u.description || u.interests || u.looking_for);
-        const nick = normalizar(u.nickname || u.name || u.username);
-        const cid = normalizar(u.city || u.location || u.state);
+        // 1. ISOLAMENTO DE STATUS (Evita que o texto da bio contamine o filtro)
+        const statusReal = normalizar(`${u.relationship_status} ${u.gender} ${u.type} ${u.profile_type}`);
+        const isCasal = statusReal.includes('casal') || statusReal.includes('casais') || statusReal.includes('couple') || statusReal.includes('casad') || u.couple_profile === true;
+        const isHomemSolteiro = statusReal.includes('solteiro') || statusReal.includes('homem') || statusReal.includes('male') || statusReal.includes('masculino');
+        const isMulherSolteira = statusReal.includes('solteira') || statusReal.includes('mulher') || statusReal.includes('female') || statusReal.includes('feminino');
+
+        // 2. CAMPOS GERAIS PARA PESQUISA DE TEXTO E OUTROS FILTROS
+        const ori = normalizar(`${u.sexual_orientation} ${u.orientation} ${u.preferences}`);
+        const bio = normalizar(`${u.bio} ${u.description} ${u.interests} ${u.looking_for}`);
+        const nick = normalizar(`${u.nickname} ${u.name} ${u.username}`);
+        const cid = normalizar(`${u.city} ${u.location} ${u.state}`);
         const foto = u.photo_url || u.avatar_url || u.avatar || (Array.isArray(u.photos) && u.photos[0]);
 
         if (apenasComFoto && !foto) return false;
 
         if (termo.trim() !== '') {
           const t = normalizar(termo);
-          if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t)) return false;
+          if (!nick.includes(t) && !cid.includes(t) && !bio.includes(t) && !statusReal.includes(t)) return false;
         }
 
-        if (perfilFiltro === 'casais' && !rel.includes('casal') && !rel.includes('casais') && !rel.includes('couple') && !rel.includes('casad') && !u.couple_profile) return false;
-        if (perfilFiltro === 'solteiros' && !rel.includes('solteiro') && !rel.includes('homem') && !rel.includes('male')) return false;
-        if (perfilFiltro === 'solteiras' && !rel.includes('solteira') && !rel.includes('mulher') && !rel.includes('female')) return false;
+        // 3. FILTRO ESTRITO DE IDENTIDADE (Mata o bug do solteiro na busca de casal)
+        if (perfilFiltro === 'casais' && !isCasal) return false;
+        if (perfilFiltro === 'solteiros' && (isCasal || !isHomemSolteiro)) return false;
+        if (perfilFiltro === 'solteiras' && (isCasal || !isMulherSolteira)) return false;
 
+        // 4. ORIENTAÇÃO E INTERESSES
         if (orientacaoFiltro === 'hetero' && !ori.includes('hetero')) return false;
         if (orientacaoFiltro === 'bissexual' && !ori.includes('bi')) return false;
         if (orientacaoFiltro === 'liberal' && !ori.includes('liberal') && !ori.includes('swing') && !bio.includes('swing') && !bio.includes('liberal')) return false;
 
-        if (objetivoFiltro === 'troca' && !bio.includes('troca') && !bio.includes('swing') && !rel.includes('casal')) return false;
+        if (objetivoFiltro === 'troca' && !bio.includes('troca') && !bio.includes('swing') && !isCasal) return false;
         if (objetivoFiltro === 'menage' && !bio.includes('menage') && !bio.includes('tres') && !ori.includes('bi')) return false;
         if (objetivoFiltro === 'festas' && !bio.includes('festa') && !bio.includes('club')) return false;
 
