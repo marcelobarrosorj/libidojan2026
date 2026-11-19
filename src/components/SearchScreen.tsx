@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
 import { Search, Filter, Users, Sparkles, MapPin, ShieldCheck, Camera, RotateCcw, ChevronDown, X } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { sanitizarPerfil } from '../utils/profileParser';
@@ -226,44 +225,5 @@ export function SearchScreen(props: any) {
   );
 }
 
-if (typeof window !== 'undefined' && !(window as any).__LIBIDO_BUSCA_INTERCEPTOR__) {
-  (window as any).__LIBIDO_BUSCA_INTERCEPTOR__ = true;
-  let portalDiv: HTMLElement | null = null;
-  let portalRoot: any = null;
 
-  const fecharBusca = () => { if (portalDiv) portalDiv.style.display = 'none'; };
-
-  const abrirBusca = () => {
-    if (document.getElementById('libido-search-screen-root') && (!portalDiv || portalDiv.style.display === 'none')) return;
-    if (!portalDiv) {
-      portalDiv = document.createElement('div');
-      portalDiv.id = 'libido-search-portal-overlay';
-      portalDiv.style.cssText = 'position:fixed;top:64px;left:0;right:0;bottom:0;z-index:40;background:var(--libido-bg,#0b0b0e);overflow-y:auto;';
-      document.body.appendChild(portalDiv);
-      portalRoot = createRoot(portalDiv);
-      portalRoot.render(<SearchScreen onClose={fecharBusca} />);
-    } else {
-      portalDiv.style.display = 'block';
-    }
-  };
-
-  document.addEventListener('click', (e) => {
-    const alvo = e.target as HTMLElement;
-    if (!alvo) return;
-    if (portalDiv && portalDiv.contains(alvo)) return;
-    const btn = alvo.closest('button, a, [role="button"]');
-    if (!btn) return;
-    const txt = (btn.textContent || '').trim().toLowerCase();
-    const temIconeLupa = !!btn.querySelector('.lucide-search, .lucide-bell');
-    const dentroDeNav = !!btn.closest('nav, header, footer, [class*="bottom"], [class*="nav"]');
-
-    if (txt === 'busca' || txt === 'alertas' || txt === 'notificações' || (dentroDeNav && temIconeLupa)) {
-      setTimeout(abrirBusca, 15);
-      return;
-    }
-    if (dentroDeNav && (txt === 'radar' || txt === 'feed' || txt === 'chat' || txt === 'perfil' || txt === 'menu' || txt === 'eventos')) {
-      fecharBusca();
-    }
-  }, true);
-}
 export default SearchScreen;

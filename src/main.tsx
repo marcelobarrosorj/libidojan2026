@@ -1,4 +1,3 @@
-import './components/SearchScreen';
 import './services/antiPrint';
 import './services/semPausa';
 import { StrictMode } from 'react';
