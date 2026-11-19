@@ -29,7 +29,7 @@ export function SearchScreen(props: any) {
         }
         if (ativo) setLoading(false);
       })
-      .catch(() => {
+      .then(undefined, () => {
         if (ativo) setLoading(false);
       });
     return () => { ativo = false; };
