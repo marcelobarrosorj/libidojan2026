@@ -3,7 +3,8 @@ import { calcularIdade } from '../services/idade'; // IDADE-AUTOMATICA
 import { Sparkles } from 'lucide-react';
 import { supabase } from '../services/supabase';
 import { uploadPhoto } from '../services/uploadPhoto';
-import { createPost } from '../services/posts'; // FOTO-CADASTRO
+import { createPost, garantirPostDaFoto } from '../services/posts'; // FOTO-CADASTRO
+import { updateUserProfile } from '../services/users';
 import { salvarPerfil, mensagemPerfil } from '../services/onboarding';
 
 // FOTO-FIX: comprime a foto antes do envio (menos memoria e menos falha)
@@ -178,7 +179,22 @@ export function Onboarding({ userId, onComplete }: OnboardingProps) {
         return;
       }
 
-      if (finalPhotoUrl) { try { await createPost({ id: '', userId: userId, image: finalPhotoUrl, text: '', likes: 0, createdAt: Date.now() }); } catch (eP) { console.error('ONBOARDING-POST falhou', eP); } }
+      if (finalPhotoUrl) {
+        // FOTO-CADASTRO-SYNC: garante gravacao de photo_url e photos mesmo se a RPC ignorar photos
+        try {
+          await updateUserProfile(userId, { photo_url: finalPhotoUrl, photos: [finalPhotoUrl] });
+        } catch (eU) {
+          console.error('ONBOARDING-PROFILE-PHOTO-SYNC falhou', eU);
+        }
+        try {
+          const okPost = await garantirPostDaFoto(userId, finalPhotoUrl, '');
+          if (!okPost) {
+            await garantirPostDaFoto(userId, finalPhotoUrl, '');
+          }
+        } catch (eP) {
+          console.error('ONBOARDING-POST falhou', eP);
+        }
+      }
       try { localStorage.removeItem('libido_rascunho_' + userId); } catch (eLimpa) { console.error(eLimpa); }
       onComplete();
     } catch (err: any) {

@@ -157,6 +157,7 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
           const atuais: string[] = uFresh?.photos || (currentUser as any)?.photos || [];
           if (!atuais.includes(imagem)) {
             await updateUserProfile(userId, { photos: [...atuais, imagem] });
+            window.dispatchEvent(new Event('profileUpdated')); // FEED-AUTOGALERIA-EVENT
           }
         } catch (eG) { console.error('FEED-AUTOGALERIA falhou', eG); }
       }

@@ -19,6 +19,10 @@ export const createPost = async (post: Post) => {
     created_at: new Date(post.createdAt).toISOString()
   });
   if (error) throw error;
+  // CREATE-POST-FEED-EVENT: atualiza o feed imediatamente apos criar post
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('feedUpdated'));
+  }
 };
 
 export const getFeedPosts = (callback: (posts: Post[]) => void) => {
@@ -234,3 +238,100 @@ export const excluirComentario = async (id: string): Promise<boolean> => {
     return !error;
   } catch { return false; }
 };
+// GALERIA->FEED SYNC: garante que uma foto exista na tabela posts sem duplicar
+export async function garantirPostDaFoto(
+  userId: string,
+  imageUrl: string,
+  text = ''
+): Promise<boolean> {
+  const uid = String(userId || '').trim();
+  const img = String(imageUrl || '').trim();
+  if (!uid || !img) return false;
+  if (img.includes('dicebear.com') || img.includes('photo-1534528741775')) return false;
+
+  try {
+    const { data: existentes, error: errCheck } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('user_id', uid)
+      .eq('image', img)
+      .limit(1);
+
+    if (!errCheck && Array.isArray(existentes) && existentes.length > 0) {
+      return true;
+    }
+
+    const { error: errInsert } = await supabase.from('posts').insert({
+      user_id: uid,
+      image: img,
+      text: text || '',
+      created_at: new Date().toISOString()
+    });
+
+    if (errInsert) {
+      console.error('GALERIA-FEED-SYNC insert falhou:', errInsert);
+      return false;
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('feedUpdated'));
+    }
+    return true;
+  } catch (e) {
+    console.error('GALERIA-FEED-SYNC erro:', e);
+    return false;
+  }
+}
+
+// GALERIA->FEED SYNC: reconcilia todas as fotos da galeria com a tabela posts
+export async function sincronizarGaleriaComFeed(
+  userId: string,
+  photos?: string[] | null,
+  photoUrl?: string | null
+): Promise<number> {
+  const uid = String(userId || '').trim();
+  if (!uid) return 0;
+
+  const candidatas = Array.from(
+    new Set(
+      [...(Array.isArray(photos) ? photos : []), photoUrl || '']
+        .map((u) => String(u || '').trim())
+        .filter((u) => u.length > 0 && !u.includes('dicebear.com') && !u.includes('photo-1534528741775'))
+    )
+  );
+
+  if (candidatas.length === 0) return 0;
+
+  try {
+    const { data: postsExistentes, error } = await supabase
+      .from('posts')
+      .select('image')
+      .eq('user_id', uid);
+
+    if (error) {
+      console.error('SYNC-GALERIA leitura posts falhou:', error);
+      return 0;
+    }
+
+    const imagensNoFeed = new Set(
+      (postsExistentes || []).map((p: any) => String(p.image || '').trim()).filter(Boolean)
+    );
+
+    const faltantes = candidatas.filter((img) => !imagensNoFeed.has(img));
+    if (faltantes.length === 0) return 0;
+
+    let criadas = 0;
+    for (const img of faltantes) {
+      const ok = await garantirPostDaFoto(uid, img, '');
+      if (ok) criadas++;
+    }
+
+    if (criadas > 0 && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('feedUpdated'));
+    }
+    return criadas;
+  } catch (e) {
+    console.error('SYNC-GALERIA erro:', e);
+    return 0;
+  }
+}

@@ -1,4 +1,6 @@
 import { updateUserProfile } from '../services/users';
+import { sincronizarGaleriaComFeed } from '../services/posts';
+import { extrairFotosValidas } from './GalleryFeedSync';
 import { initNavHistory, registrarTela } from '../services/navHistory'; // NAV-HISTORY
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { AppShell } from "./AppShell";
@@ -128,6 +130,39 @@ export function AppCore({
     return iniciarNotificacoesGlobais(userId, () => activeTabRef.current, setUnreadChat);
   }, [userId]);
 
+  // GALERIA-FEED-RECONCILE: garante que fotos da galeria aparecam no feed e photo_url/photos fiquem alinhados
+  const galeriaSyncFeitoRef = useRef<string>('');
+  useEffect(() => {
+    if (!userId || !currentUser) return;
+    const fotosValidas = extrairFotosValidas(currentUser);
+    const assinatura = userId + '|' + fotosValidas.join(',');
+    if (galeriaSyncFeitoRef.current === assinatura) return;
+    galeriaSyncFeitoRef.current = assinatura;
+
+    (async () => {
+      try {
+        const photosAtuais = Array.isArray((currentUser as any).photos)
+          ? (currentUser as any).photos.filter((p: any) => typeof p === 'string' && p.trim() !== '')
+          : [];
+        const avatarAtual = String((currentUser as any).photo_url || '').trim();
+        const precisaAtualizarPerfil =
+          (fotosValidas.length > 0 && photosAtuais.length === 0) ||
+          (fotosValidas.length > 0 && !avatarAtual);
+
+        if (precisaAtualizarPerfil) {
+          await updateUserProfile(userId, {
+            photo_url: avatarAtual || fotosValidas[0],
+            photos: fotosValidas
+          });
+          window.dispatchEvent(new Event('profileUpdated'));
+        }
+
+        await sincronizarGaleriaComFeed(userId, fotosValidas, avatarAtual || fotosValidas[0]);
+      } catch (eSync) {
+        console.error('GALERIA-FEED-RECONCILE erro:', eSync);
+      }
+    })();
+  }, [userId, currentUser]);
   const openPremiumCheckout = () => {
     // Owner, admin e usuários Premium não podem abrir cobrança.
     if (isOwner || isPremium || !premiumChecked) {

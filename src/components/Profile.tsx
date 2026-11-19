@@ -9,7 +9,7 @@ import { ProtectedImage } from './ProtectedImage';
 import { formatUserNumber } from '../utils/formatUserNumber';
 import { updateUserProfile } from '../services/users';
 import { calcularIdade } from '../services/idade'; // IDADE-EDIT: idade calculada pela data de nascimento
-import { createPost, excluirPostPorFoto } from '../services/posts';
+import { createPost, excluirPostPorFoto, garantirPostDaFoto } from '../services/posts';
 import { deleteUserProfile } from '../services/users'; // GALLERY-AUTOPOST
 import { contarVisitas, listarVisitantes } from '../services/visits'; // VISITAS-REAIS
 import ExcluirConta from './ExcluirConta';
@@ -239,14 +239,26 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
       
       const url = await uploadPhoto(editedFile, userId);
 
+      const currentPhotos = Array.isArray(currentUser?.photos) ? currentUser.photos.filter(Boolean) : [];
+      const updatedPhotos = currentPhotos.includes(url) ? currentPhotos : [...currentPhotos, url];
+
       if (isEditingAvatar) {
-        await updateUserProfile(userId, { photo_url: url });
-        alert("Foto do perfil atualizada!");
+        await updateUserProfile(userId, { photo_url: url, photos: updatedPhotos });
+        const okFeed = await garantirPostDaFoto(userId, url, '');
+        if (!okFeed) await garantirPostDaFoto(userId, url, '');
+        alert("Foto do perfil atualizada, salva na galeria e publicada no feed!");
       } else {
-        const currentPhotos = currentUser?.photos || [];
-        const updatedPhotos = [...currentPhotos, url];
-        await updateUserProfile(userId, { photos: updatedPhotos });
-        try { await createPost({ id: '', userId: userId, image: url, text: '', likes: 0, createdAt: Date.now() }); } catch (eAP) { console.error('GALLERY-AUTOPOST falhou', eAP); } // GALLERY-AUTOPOST: foto da galeria vira post no feed
+        const avatarAtual = String(currentUser?.photo_url || '').trim();
+        const precisaAvatar = !avatarAtual || avatarAtual.includes('photo-1534528741775');
+        await updateUserProfile(
+          userId,
+          precisaAvatar ? { photos: updatedPhotos, photo_url: url } : { photos: updatedPhotos }
+        );
+        const okFeed = await garantirPostDaFoto(userId, url, '');
+        if (!okFeed) {
+          console.error('GALLERY-AUTOPOST falhou na primeira tentativa, tentando novamente...');
+          await garantirPostDaFoto(userId, url, '');
+        }
         alert("Foto adicionada à galeria e publicada no feed!");
       }
       
@@ -271,11 +283,19 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
   };
 
   const handleDeletePhoto = async (urlToDelete: string) => {
+    const currentPhotos = Array.isArray(currentUser?.photos) ? currentUser.photos.filter(Boolean) : [];
+    if (currentPhotos.length <= 1) {
+      alert("É obrigatório manter pelo menos 1 foto na sua galeria. Para trocar, poste outra foto antes de excluir esta.");
+      return;
+    }
     if (!userId || !confirm("Deseja realmente excluir esta foto da sua galeria secreta?")) return;
     try {
-      const currentPhotos = currentUser?.photos || [];
       const updatedPhotos = currentPhotos.filter((url: string) => url !== urlToDelete);
-      await updateUserProfile(userId, { photos: updatedPhotos });
+      const eraAvatar = currentUser?.photo_url === urlToDelete;
+      await updateUserProfile(
+        userId,
+        eraAvatar ? { photos: updatedPhotos, photo_url: updatedPhotos[0] } : { photos: updatedPhotos }
+      );
       try { await excluirPostPorFoto(userId, urlToDelete); } catch (eDelPost) { console.error(eDelPost); }
       alert("Foto excluída!");
       setActivePhotoIndex(null);

@@ -40,11 +40,7 @@ export async function uploadPhoto(file: File, requestedUserId: string) {
         upsert: false
     });
 
-  const { error, data: uploadData } = await withTimeout(
-    uploadPromise, 
-    6000, 
-    "Supabase Storage Upload"
-  );
+  const { error, data: uploadData } = await withTimeout(uploadPromise, 25000, "Supabase Storage Upload");
 
   if (error) {
     console.error("❌ UPLOAD ERROR NO SUPABASE STORAGE:", error.message, error.name);

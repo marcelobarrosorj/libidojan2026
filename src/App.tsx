@@ -18,6 +18,7 @@ import { Logo } from './components/Logo';
 import { PinScreen } from './components/PinScreen';
 import { AppCore } from './components/AppCore';
 import { Onboarding } from './components/Onboarding';
+import { MandatoryPhotoGate, temFotoObrigatoria } from './components/GalleryFeedSync';
 import { startPresence, stopPresence } from './services/presence';
 
 export default function App() {
@@ -520,12 +521,23 @@ export default function App() {
     const perfilIncompleto =
       !su ||
       !su.nickname ||
-      !(su.relationship_status || su.relationshipStatus) || (!su.photo_url && (!Array.isArray(su.photos) || su.photos.length === 0));
+      !(su.relationship_status || su.relationshipStatus);
     if (perfilIncompleto || !supabaseUser) {
       return (
         <Onboarding
           userId={user.id}
           onComplete={handleOnboardingComplete}
+        />
+      );
+    }
+
+    if (!temFotoObrigatoria(su)) {
+      return (
+        <MandatoryPhotoGate
+          userId={user.id}
+          currentUser={supabaseUser}
+          onPhotoUploaded={handleOnboardingComplete}
+          onLogout={logout}
         />
       );
     }
