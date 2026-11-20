@@ -4,7 +4,7 @@ import DeleteMessageModal from './DeleteMessageModal';
 export function Chat() {
   const [mensagens, setMensagens] = useState<any[]>([]);
   const [novaMensagem, setNovaMensagem] = useState('');
-  const [selecionadas, setSelecionadas] = useState<number[]>([]);
+  const [selecionadas, setSelecionadas] = useState<(string | number)[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function Chat() {
   };
 
   const toggleSelecao = (id: number) => {
-    if (selecionadas.includes(id)) {
+    if (selecionadas.some(x => String(x) === String(id))) {
       setSelecionadas(selecionadas.filter(item => item !== id));
     } else {
       setSelecionadas([...selecionadas, id]);
@@ -131,12 +131,14 @@ export function Chat() {
         </button>
       </form>
 
-      <DeleteMessageModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onDeleteForMe={apagarParaMim}
-        onDeleteForEveryone={apagarParaTodos}
-      />
+      {isModalOpen && (
+        <DeleteMessageModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onDeleteForMe={apagarParaMim}
+          onDeleteForEveryone={apagarParaTodos}
+        />
+      )}
     </div>
   );
 }
