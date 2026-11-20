@@ -68,7 +68,7 @@ export function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral-950 text-white p-4 max-w-md mx-auto relative justify-between">
+    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-neutral-950 text-white p-4 max-w-md mx-auto relative justify-between">
       <div className="flex justify-between items-center mb-4 pb-2 border-b border-neutral-800">
         <div>
           <h2 className="font-bold text-base text-neutral-100">Chat Libido App</h2>
@@ -84,7 +84,7 @@ export function Chat() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-3 pr-1 pb-4">
+      <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 pb-4">
         {mensagens.length === 0 ? (
           <div className="text-center text-neutral-500 mt-20 text-sm">
             Nenhuma mensagem no momento. Comece a conversar abaixo!
