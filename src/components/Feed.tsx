@@ -8,6 +8,7 @@ import { ProtectedImage } from './ProtectedImage';
 import { formatUserNumber } from '../utils/formatUserNumber';
 import { isDemoEnabled, isDemoId } from '../demo';
 import { excluirPost } from '../services/posts'; // FEED-DELETE
+import { isUserOnline } from '../utils/presenceText';
 
 interface FeedProps {
   currentUser?: User | null;
@@ -228,7 +229,8 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
             <div key={f.id} className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer" onClick={() => author && navigate?.('viewprofile', { user: author })} style={{ position: 'relative' }}>
               {f.userId === currentUser?.user_id && (
                 <button
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.stopPropagation();
                     if (confirm('Excluir este post?')) {
                       const okDel = await excluirPost(f.id);
                       if (okDel) setPosts((prev: any[]) => prev.filter((p: any) => p.id !== f.id));
@@ -242,7 +244,7 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
               )}{/* FEED-DELETE */}
               <div className="relative w-16 h-16 rounded-full p-0.5 border-2 border-[var(--libido-accent)] shadow-[0_0_15px_rgba(255,179,0,0.2)]">
                 <ProtectedImage currentUser={currentUser} src={(f as any).avatar || author?.photo_url || DEFAULT_AVATAR} alt="avatar" className="w-full h-full rounded-full border border-black" />
-                {author && <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[var(--libido-bg)] ${author.isOnline ? 'bg-green-500' : 'bg-gray-500'}`} />}
+                {author && <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[var(--libido-bg)] ${isUserOnline(author) ? 'bg-green-500' : 'bg-gray-500'}`} />}
               </div>
               <span className="text-[10px] font-black text-[var(--libido-muted)] opacity-70 truncate max-w-[80px] tracking-wider uppercase">{(f as any).nickname || author?.nickname || author?.name || "User"} {author?.userNumber ? `#${formatUserNumber(author.userNumber)}` : ""}</span>
             </div>
@@ -272,7 +274,7 @@ export function Feed({ isPremium, onShowPremiumModal, navigate, currentUser }: F
                 <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => author && navigate?.('viewprofile', { user: author })}>
                   <div className="relative shrink-0">
                     <ProtectedImage currentUser={currentUser} src={(post as any).avatar || author?.photo_url || DEFAULT_AVATAR} alt="avatar" className="w-9 h-9 rounded-full border border-[var(--libido-border)]" />
-                    {author && <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[var(--libido-bg)] ${author.isOnline ? 'bg-green-500' : 'bg-gray-500'}`} />}
+                    {author && <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[var(--libido-bg)] ${isUserOnline(author) ? 'bg-green-500' : 'bg-gray-500'}`} />}
                   </div>
                   <div>
                     <h3 className="text-xs font-black uppercase text-[var(--libido-text)] tracking-widest flex items-center">{(post as any).nickname || author?.nickname || author?.name || "User"} {author?.userNumber ? <span className="text-[9px] opacity-50 ml-1">#{formatUserNumber(author.userNumber)}</span> : null}{author && (((author as any).createdAt) || 0) >= Date.now() - 604800000 && <span className="text-[8px] font-black uppercase tracking-wider bg-[var(--libido-accent)]/20 text-[var(--libido-accent)] px-1.5 py-0.5 rounded-full ml-1">NOVO</span>}</h3>

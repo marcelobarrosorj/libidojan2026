@@ -157,7 +157,7 @@ export function AppCore({
           window.dispatchEvent(new Event('profileUpdated'));
         }
 
-        await sincronizarGaleriaComFeed(userId, fotosValidas, avatarAtual || fotosValidas[0]);
+        // DESATIVADO (Item 4): nao republicar fotos antigas automaticamente no feed
       } catch (eSync) {
         console.error('GALERIA-FEED-RECONCILE erro:', eSync);
       }

@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase'
 
 const st: Record<string, CSSProperties> = {
   box: { marginTop: 24, paddingTop: 16, borderTop: '1px solid #2a2a2f' },
-  btn: { width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid #b3261e', background: 'transparent', color: '#e5484d', fontSize: 15, fontWeight: 600, cursor: 'pointer' },
+  btn: { padding: '6px 14px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.03)', color: '#a1a1aa', fontSize: 11, fontWeight: 600, cursor: 'pointer' },
   overlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, zIndex: 9999 },
   card: { width: '100%', maxWidth: 380, background: '#1b1b1f', borderRadius: 14, padding: 22, color: '#f2f2f3' },
   input: { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #3a3a40', background: '#16161a', color: '#fff', marginTop: 10, boxSizing: 'border-box' }

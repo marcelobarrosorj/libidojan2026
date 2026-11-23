@@ -34,9 +34,12 @@ export const getFeedPosts = (callback: (posts: Post[]) => void) => {
 
   const fetchPosts = async () => {
     try {
+      // FEED-24H-EXPIRATION: exibe apenas publicacoes das ultimas 24 horas
+      const limite24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { data, error } = await supabase
         .from('posts')
         .select('*')
+        .gte('created_at', limite24h)
         .order('created_at', { ascending: false });
       if (error) throw error;
       if (!isSubscribed || !data) return;

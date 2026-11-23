@@ -1,61 +1,73 @@
 import React from 'react';
+import { Trash2, Ban, X } from 'lucide-react';
 
-export default function DeleteMessageModal({ isOpen, onClose, onDeleteForMe, onDeleteForEveryone }) {
+export default function DeleteMessageModal({ isOpen, onClose, onDeleteForMe, onDeleteForEveryone, count = 1 }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="w-full max-w-sm bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden p-6 text-white space-y-4">
-        
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in duration-150"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm bg-neutral-950/95 border border-white/10 rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,0.85)] overflow-hidden p-6 text-white space-y-5"
+      >
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold tracking-wide text-neutral-100">
-            Gerenciar Mensagem
-          </h3>
-          <button 
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
+              <Trash2 size={16} />
+            </div>
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-wider text-neutral-100">
+                Apagar {count > 1 ? `${count} mensagens` : 'mensagem'}
+              </h3>
+              <p className="text-[11px] text-neutral-400">Escolha como deseja remover</p>
+            </div>
+          </div>
+          <button
             onClick={onClose}
-            className="text-neutral-400 hover:text-white transition-colors text-lg"
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+            aria-label="Fechar"
           >
-            ✕
+            <X size={15} />
           </button>
         </div>
 
-        <p className="text-sm text-neutral-400">
-          O que deseja fazer com esta mensagem?
-        </p>
-
-        <div className="space-y-2 pt-2">
+        <div className="space-y-2.5">
           <button
             onClick={() => { onDeleteForMe(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-neutral-800/60 hover:bg-neutral-800 text-neutral-200 rounded-xl font-medium transition-all border border-neutral-700/50 hover:border-neutral-600 text-left"
+            className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-white/[0.04] hover:bg-white/[0.08] text-neutral-100 rounded-2xl font-medium transition-all border border-white/10 hover:border-white/20 text-left active:scale-[0.98]"
           >
-            <span className="text-lg">🗑️</span>
+            <div className="w-9 h-9 rounded-xl bg-neutral-800 flex items-center justify-center text-neutral-300 shrink-0">
+              <Trash2 size={16} />
+            </div>
             <div>
-              <div className="text-sm font-semibold">Apagar para mim</div>
-              <div className="text-xs text-neutral-400">A mensagem some apenas da sua visualização</div>
+              <div className="text-xs font-bold uppercase tracking-wide">Apagar para mim</div>
+              <div className="text-[11px] text-neutral-400">Remove apenas da sua conversa</div>
             </div>
           </button>
 
           <button
             onClick={() => { onDeleteForEveryone(); onClose(); }}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-medium transition-all border border-red-500/20 text-left"
+            className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-gradient-to-r from-red-600/20 to-rose-600/15 hover:from-red-600/30 hover:to-rose-600/25 text-red-300 rounded-2xl font-medium transition-all border border-red-500/30 text-left active:scale-[0.98]"
           >
-            <span className="text-lg">🚫</span>
+            <div className="w-9 h-9 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 shrink-0">
+              <Ban size={16} />
+            </div>
             <div>
-              <div className="text-sm font-semibold">Apagar para todos</div>
-              <div className="text-xs text-red-400/70">Remove a mensagem para ambos os participantes</div>
+              <div className="text-xs font-bold uppercase tracking-wide text-red-300">Apagar para todos</div>
+              <div className="text-[11px] text-red-300/70">Remove para ambos os participantes</div>
             </div>
           </button>
         </div>
 
-        <div className="pt-2">
-          <button
-            onClick={onClose}
-            className="w-full py-3 bg-transparent hover:bg-neutral-800/40 text-neutral-400 hover:text-white font-medium rounded-xl transition-all text-sm"
-          >
-            Cancelar
-          </button>
-        </div>
-
+        <button
+          onClick={onClose}
+          className="w-full py-3 bg-transparent hover:bg-white/5 text-neutral-400 hover:text-white font-semibold rounded-2xl transition-all text-xs uppercase tracking-widest"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
   );

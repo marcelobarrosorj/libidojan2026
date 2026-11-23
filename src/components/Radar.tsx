@@ -1,3 +1,4 @@
+import { isUserOnline, formatarTempoOffline } from '../utils/presenceText';
 import { IntencaoRadarBar } from './elite/IntencaoRadarBar';
 import { carregarRadarMapa } from '../services/radarMapa';
 import { useState, useEffect, useMemo } from 'react';
@@ -121,6 +122,8 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
           photo_url: p.foto,
           isOnline: p.online,
           is_online: p.online,
+          last_seen: p.lastSeen || null,
+          updated_at: p.lastSeen || null,
           faixa: p.faixa,
           ordem: p.ordem,
           anelM: p.anelM,
@@ -199,11 +202,11 @@ export function Radar({ userId, navigate, currentUser }: RadarProps) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[var(--libido-text)] truncate flex items-center gap-1.5">
                     {p.user.name}
-                    {p.user.isOnline && (
+                    {isUserOnline(p.user) && (
                       <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
                     )}
                   </p>
-                  <p className="text-[10px] font-black text-[var(--libido-muted)]">{p.user.isOnline ? p.faixa : 'offline - ' + p.faixa}</p>
+                  <p className="text-[10px] font-black text-[var(--libido-muted)]">{isUserOnline(p.user) ? p.faixa : formatarTempoOffline(p.user) + (p.faixa ? ' · ' + p.faixa : '')}</p>
                 </div>
                 <span className="px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--libido-accent)] to-[var(--libido-accent-hover)] text-[var(--libido-text)] text-xs font-black uppercase tracking-wide shrink-0">Ver perfil</span>
               </div>

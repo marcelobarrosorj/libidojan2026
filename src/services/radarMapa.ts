@@ -5,6 +5,7 @@ export type PerfilRadar = {
   nickname: string;
   foto: string | null;
   online: boolean;
+  lastSeen?: string | null;
   faixa: string;
   ordem: number;
   anelM: number;
@@ -40,6 +41,7 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
           nickname: r.nickname || 'Usuário',
           foto,
           online: r.online === true,
+          lastSeen: r.last_seen || r.updated_at || null,
           faixa: r.faixa || 'Perto de você',
           ordem: r.ordem === null || r.ordem === undefined ? (r.online ? 1 : 50) : r.ordem,
           anelM: r.anel_m === null || r.anel_m === undefined ? 1500 : r.anel_m,
@@ -70,8 +72,10 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
       const recente = ts ? (Date.now() - new Date(ts).getTime()) < janelaMs : true;
       const estaOnline = (u.is_online === true || u.isOnline === true) && recente;
 
+      const lastSeenReal = u.last_seen || u.updated_at || u.online_at || null;
       const existente = mapa.get(uid);
       if (existente) {
+        if (!existente.lastSeen && lastSeenReal) existente.lastSeen = lastSeenReal;
         if (estaOnline && !existente.online) {
           existente.online = true;
           existente.ordem = Math.min(existente.ordem, 1);
@@ -87,7 +91,8 @@ export async function carregarRadarMapa(raioKm: number = 50): Promise<PerfilRada
           nickname: u.nickname || u.name || 'Usuário',
           foto,
           online: estaOnline,
-          faixa: estaOnline ? 'Online agora' : 'Na sua região',
+          lastSeen: lastSeenReal,
+          faixa: estaOnline ? 'Online agora' : '',
           ordem: estaOnline ? 1 : 20,
           anelM: estaOnline ? 1000 : 2000,
           angulo: anguloDeterministico(String(uid)),

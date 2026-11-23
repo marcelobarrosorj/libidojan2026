@@ -13,6 +13,7 @@ import { createPost, excluirPostPorFoto, garantirPostDaFoto } from '../services/
 import { deleteUserProfile } from '../services/users'; // GALLERY-AUTOPOST
 import { contarVisitas, listarVisitantes } from '../services/visits'; // VISITAS-REAIS
 import ExcluirConta from './ExcluirConta';
+import { isUserOnline, formatarTempoOffline } from '../utils/presenceText';
 
 // NOCOPIA-HELPER: se a bio veio como JSON do casal, extrai apenas o texto
 function extrairTextoBio(b: any): string {
@@ -434,8 +435,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           >
             <Camera size={12} className="text-black" />
           </button>
-          <ExcluirConta />
-        </div>
+</div>
 
         <div className="flex items-center gap-1.5 justify-center flex-wrap">
           <h2 className="text-lg font-black uppercase tracking-widest text-[var(--libido-text)] italic font-fraunces font-medium flex items-center gap-1.5 justify-center">
@@ -552,7 +552,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-black text-[var(--libido-text)] truncate">{v.nickname || 'Usuário'}</p>
-                  {((v as any).isOnline ?? (v as any).is_online) ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
+                  {isUserOnline(v) ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-60 font-bold">{formatarTempoOffline(v)}</p>}
                 </div>
               </div>
             ))}
@@ -573,7 +573,7 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-black text-[var(--libido-text)] truncate">{f.nickname || 'Usuário'}</p>
-                  {f.isOnline ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-50 font-bold">Offline</p>}
+                  {isUserOnline(f) ? <p className="text-[11px] text-green-400 font-bold">Online agora</p> : <p className="text-[11px] text-[var(--libido-muted)] opacity-60 font-bold">{formatarTempoOffline(f)}</p>}
                 </div>
               </div>
             ))}
@@ -844,6 +844,18 @@ export function Profile({ userId, isPremium, onShowPremiumModal, onLogout, navig
           </div>
         </div>
       )}
+
+      {/* EXCLUIR-CONTA-DISCRETO: botao menor e discreto no rodape do perfil */}
+      <div className="mt-10 pt-4 border-t border-white/5 flex items-center justify-center pb-6">
+        <button
+          type="button"
+          onClick={handleDeleteOwnProfile}
+          disabled={saving}
+          className="px-3.5 py-1.5 rounded-full bg-white/[0.03] hover:bg-red-500/15 border border-white/10 hover:border-red-500/30 text-[10px] font-semibold uppercase tracking-wider text-[var(--libido-muted)] hover:text-red-400 transition-all"
+        >
+          {saving ? 'Excluindo...' : 'Excluir minha conta'}
+        </button>
+      </div>
 
       {editingImageUrl && (
         <ImageEditor

@@ -1,3 +1,4 @@
+import { isUserOnline, formatarTempoOffline } from '../utils/presenceText'; // MAP-ONLINE-DOT
 import { useState, useEffect, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -243,13 +244,27 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           className="absolute z-20 flex flex-col items-center gap-0.5 -translate-x-1/2 -translate-y-1/2 hover:scale-110 active:scale-95 transition-transform"
           style={{ left: x, top: y }}
         >
-          <div className="w-9 h-9 rounded-full border-2 border-[var(--libido-accent)]/60 overflow-hidden shadow-lg">
-            <ProtectedImage
-              currentUser={currentUser}
-              src={user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=32'}
-              style={{ border: (user as any).is_online ? '2.5px solid #22c55e' : 'none', boxShadow: (user as any).is_online ? '0 0 8px rgba(34,197,94,0.8)' : 'none' }}
-              alt=""
-              className="w-full h-full"
+          <div className="relative w-9 h-9 rounded-full border-2 border-[var(--libido-accent)]/60 shadow-lg">
+            <div className="w-full h-full rounded-full overflow-hidden">
+              <ProtectedImage
+                currentUser={currentUser}
+                src={user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=32'}
+                alt=""
+                className="w-full h-full"
+              />
+            </div>
+            <span
+              title={isUserOnline(user) ? 'Online' : 'Offline'}
+              style={{
+                position: 'absolute',
+                bottom: '-1px',
+                right: '-1px',
+                width: '10px',
+                height: '10px',
+                borderRadius: '9999px',
+                border: '2px solid #0b0b0b',
+                backgroundColor: isUserOnline(user) ? '#22c55e' : '#737373'
+              }}
             />
           </div>
           <span className="px-1.5 py-0.5 rounded-full bg-[var(--libido-bg)]/90 border border-[var(--libido-border)] text-[8px] font-black text-[var(--libido-text)] whitespace-nowrap">
@@ -284,12 +299,10 @@ export function RadarMap({ users, currentUser, userId, navigate }: RadarMapProps
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-[var(--libido-text)] truncate flex items-center gap-1.5">
               {selecionado.user.name}
-              {selecionado.user.isOnline && (
-                <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
-              )}
+              <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${isUserOnline(selecionado.user) ? 'bg-green-500' : 'bg-neutral-500'}`} />
             </p>
             <p className="text-[10px] font-black text-[var(--libido-muted)]">
-              {formatarDistancia(selecionado.dist)}
+              {formatarDistancia(selecionado.dist)} · {formatarTempoOffline(selecionado.user)}
             </p>
           </div>
           <button
