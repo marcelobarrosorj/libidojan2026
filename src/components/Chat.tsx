@@ -29,7 +29,6 @@ import { markMessagesAsDelivered, markMessagesAsRead } from '../services/chat';
 import { playMessageSound } from '../services/sounds';
 import { supabase } from "../services/supabase";
 import { dedupeMensagens } from '../utils/dedupe';
-import { Trash2, Ban, X } from 'lucide-react'; // CHAT-MODAL-MODERNO-7
 
 interface ChatProps {
   user?: User;
@@ -149,8 +148,6 @@ export function Chat({
 
   const [conversas, setConversas] = useState<ConversaResumo[]>([]);
   const [midiaAberta, setMidiaAberta] = useState<string | null>(null);
-  const [msgParaApagar, setMsgParaApagar] = useState<any>(null);
-  const [fotoZoomChat, setFotoZoomChat] = useState<string | null>(null);
 
   const recarregarConversas = useCallback(async () => {
     if (!userId) return;
@@ -164,27 +161,24 @@ export function Chat({
     return () => clearInterval(t);
   }, [recarregarConversas]);
 
-  function acoesMensagem(msg: any) {
-    setMsgParaApagar(msg);
-  }
-
-  async function confirmarApagarMensagem(modo: 'mim' | 'todos') {
-    const msg = msgParaApagar;
-    setMsgParaApagar(null);
-    if (!msg) return;
+  async function acoesMensagem(msg: any) {
+    const ops = ["Apagar para mim"];
+    if (podeApagarParaTodos(msg, userId)) ops.push("Apagar para todos");
+    let e: string | null = null;
     try {
-      if (modo === 'mim') {
-        await apagarParaMim(msg.id);
-      } else if (modo === 'todos' && podeApagarParaTodos(msg, userId)) {
-        await apagarParaTodos(msg.id);
-      } else {
-        return;
-      }
+      e = window.prompt("1 - " + ops[0] + (ops[1] ? "\n2 - " + ops[1] : ""), "1");
+    } catch (perr) {
+      console.error("[chat] prompt bloqueado neste ambiente:", perr);
+      return;
+    }
+    if (!e) return;
+    try {
+      if (e.trim() === "1") await apagarParaMim(msg.id);
+      else if (e.trim() === "2" && ops[1]) await apagarParaTodos(msg.id);
+      else return;
       setAllMessages((p: any[]) => p.filter((m) => String(m.id) !== String(msg.id)));
       recarregarConversas();
-    } catch (err) {
-      console.error("[chat] apagar", err);
-    }
+    } catch (err) { console.error("[chat] apagar", err); }
   }
 
   async function acoesConversa(peerId: string) {
@@ -625,11 +619,11 @@ status: (m.status as any) || "sent",
           >
             <ArrowLeft size={20} />
           </button>
-          <div className="relative flex-shrink-0 cursor-pointer" onClick={() => setFotoZoomChat(activeChatContact.avatar)} title="Ver foto">
+          <div className="relative flex-shrink-0">
             <ProtectedImage
               currentUser={currentUser}
               src={activeChatContact.avatar}
-              className="w-10 h-10 rounded-full border border-[var(--libido-border)] hover:opacity-90 transition-opacity"
+              className="w-10 h-10 rounded-full border border-[var(--libido-border)]"
               alt=""
               semMarca
             />
@@ -785,7 +779,7 @@ status: (m.status as any) || "sent",
                 >
                   <span className="text-[11px] text-[var(--libido-muted)] opacity-50">
                     {msg.time}
-                  </span><button type="button" onClick={(e) => { e.stopPropagation(); acoesMensagem(msg); }} title="Apagar mensagem" className="ml-1 p-1 rounded-full text-white/40 hover:text-red-400 hover:bg-black/25 transition-colors" data-btn="BTN-APAGAR-MSG-MODERNO"><Trash2 size={12} /></button>
+                  </span>
                   {msg.fromMe && (
                     <MessageStatus status={msg.status} />
                   )}
@@ -852,95 +846,6 @@ status: (m.status as any) || "sent",
               <Send size={16} />
             </button>
         </div>
-        {fotoZoomChat && (
-          <div
-            onClick={() => setFotoZoomChat(null)}
-            className="fixed inset-0 z-[960] bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
-          >
-            <button
-              type="button"
-              onClick={() => setFotoZoomChat(null)}
-              aria-label="Fechar foto"
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center"
-            >
-              <X size={20} />
-            </button>
-            <img
-              src={fotoZoomChat}
-              alt="Foto ampliada"
-              onClick={(e) => e.stopPropagation()}
-              className="max-w-[92vw] max-h-[82vh] rounded-2xl object-contain shadow-2xl border border-white/10"
-            />
-          </div>
-        )}
-
-        {msgParaApagar && (
-          <div
-            onClick={() => setMsgParaApagar(null)}
-            className="fixed inset-0 z-[950] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-neutral-950 border border-white/10 rounded-3xl p-5 text-white shadow-2xl space-y-4"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400">
-                    <Trash2 size={16} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider">Apagar mensagem</h3>
-                    <p className="text-[11px] text-neutral-400">Escolha uma opção</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMsgParaApagar(null)}
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-neutral-400 hover:text-white"
-                >
-                  <X size={15} />
-                </button>
-              </div>
-
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => confirmarApagarMensagem('mim')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-left transition-all"
-                >
-                  <Trash2 size={16} className="text-neutral-300 shrink-0" />
-                  <div>
-                    <div className="text-xs font-bold">Apagar para mim</div>
-                    <div className="text-[11px] text-neutral-400">Remove apenas na sua tela</div>
-                  </div>
-                </button>
-
-                {podeApagarParaTodos(msgParaApagar, userId) && (
-                  <button
-                    type="button"
-                    onClick={() => confirmarApagarMensagem('todos')}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-red-600/20 to-rose-600/15 hover:from-red-600/30 hover:to-rose-600/25 border border-red-500/30 text-left transition-all"
-                  >
-                    <Ban size={16} className="text-red-400 shrink-0" />
-                    <div>
-                      <div className="text-xs font-bold text-red-300">Apagar para todos</div>
-                      <div className="text-[11px] text-red-300/70">Remove para ambos os usuários</div>
-                    </div>
-                  </button>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setMsgParaApagar(null)}
-                className="w-full py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-widest text-neutral-400 hover:text-white hover:bg-white/5"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* CHAT8: overlay da foto de visualizacao unica (abre 1x e some) */}
         {viewOnceUrl && (
           <div
@@ -963,21 +868,8 @@ status: (m.status as any) || "sent",
     );
   }
   // TELA DE LISTA DE CONTATOS
-  const chatRootRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const raiz = chatRootRef.current;
-    if (!raiz) return;
-    const rolar = () => {
-      const alvos = raiz.querySelectorAll<HTMLElement>('[class*="overflow-y-auto"], [class*="overflow-auto"]');
-      alvos.forEach((el) => { el.scrollTop = el.scrollHeight; });
-    };
-    rolar();
-    const t1 = window.setTimeout(rolar, 120);
-    const t2 = window.setTimeout(rolar, 450);
-    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
-  }, []);
   return (
-    <div ref={chatRootRef} className="flex-1 flex flex-col w-full h-full min-h-0 bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+    <div className="flex-1 flex flex-col w-full h-full min-h-0 bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
       {/* HEADER LISTA */}
       <div className="flex-none px-5 pt-5 pb-3 w-full">
         <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">
