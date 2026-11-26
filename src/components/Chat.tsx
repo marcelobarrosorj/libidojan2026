@@ -236,6 +236,15 @@ export function Chat({
     }
   };
 
+  // CHAT-ABRE-NO-FIM: posiciona na ultima mensagem ao abrir a conversa, sem animacao
+  useEffect(() => {
+    if (!activeChat) return;
+    const irParaOFim = () => scrollToBottom("auto");
+    irParaOFim();
+    const marcas = [120, 400, 900].map((ms) => window.setTimeout(irParaOFim, ms));
+    return () => marcas.forEach((id) => window.clearTimeout(id));
+  }, [activeChat]);
+
   // SCROLL-TRAVA: o poll de 5s recria o array. A chave abaixo so muda com
   // mensagem nova (id ou quantidade), nunca com mudanca de status.
   const chaveScroll = useRef<string>("");
@@ -662,7 +671,7 @@ status: (m.status as any) || "sent",
         {/* AREA DE MENSAGENS */}
         <div
           ref={messagesEndRef}
-          className="flex-1 overflow-y-auto no-scrollbar px-3 py-4 space-y-1.5"
+          className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-3 py-4 space-y-1.5"
           style={{
             backgroundImage:
               "radial-gradient(circle at 50% 50%, rgba(255,179,0,0.02) 0%, transparent 70%)",
@@ -895,7 +904,7 @@ status: (m.status as any) || "sent",
         </div>
       </div>
       {/* AREA DE LISTA CONTATOS */}
-      <div className="flex-1 overflow-y-auto no-scrollbar w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar w-full">
         {filteredContacts.map((contact) => (
           <button
             key={contact.id}
