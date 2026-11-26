@@ -157,11 +157,17 @@ export function Chat({
 
   useEffect(() => {
     recarregarConversas();
-    const t = setInterval(recarregarConversas, 15000);
+    const t = setInterval(recarregarConversas, 60000);
     return () => clearInterval(t);
   }, [recarregarConversas]);
 
-  async function acoesMensagem(msg: any) {
+  async function acoesMensagem(msg: any) {
+
+    // CHAT-EXCLUIR-MODAL: usa o modal proprio em vez do prompt nativo
+
+    setMsgParaApagar(msg);
+
+    return;
     const ops = ["Apagar para mim"];
     if (podeApagarParaTodos(msg, userId)) ops.push("Apagar para todos");
     let e: string | null = null;
@@ -197,7 +203,13 @@ export function Chat({
     Number(localStorage.getItem("libido_chat_font") || 15)
   );
   // CHAT6-FOTO: estado de envio de foto
-  const [sendingPhoto, setSendingPhoto] = useState(false);
+  const [sendingPhoto, setSendingPhoto] = useState(false);
+  // CHAT-FOTO-WATCHDOG: libera o estado de envio se o upload nao concluir
+  useEffect(() => {
+    if (!sendingPhoto) return;
+    const t = window.setTimeout(() => setSendingPhoto(false), 30000);
+    return () => window.clearTimeout(t);
+  }, [sendingPhoto]);
   // CHAT8: modo da proxima foto (normal ou visualizacao unica) + overlay
   const pickOnceRef = useRef(false);
   const [viewOnceUrl, setViewOnceUrl] = useState<string | null>(null);
@@ -357,7 +369,7 @@ export function Chat({
   useEffect(() => {
     if (!userId) return;
     markMessagesAsDelivered(userId);
-    const t = setInterval(() => markMessagesAsDelivered(userId), 4000);
+    const t = setInterval(() => markMessagesAsDelivered(userId), 30000);
     return () => clearInterval(t);
   }, [userId]);
 
