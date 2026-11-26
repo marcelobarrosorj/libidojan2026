@@ -963,8 +963,21 @@ status: (m.status as any) || "sent",
     );
   }
   // TELA DE LISTA DE CONTATOS
+  const chatRootRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const raiz = chatRootRef.current;
+    if (!raiz) return;
+    const rolar = () => {
+      const alvos = raiz.querySelectorAll<HTMLElement>('[class*="overflow-y-auto"], [class*="overflow-auto"]');
+      alvos.forEach((el) => { el.scrollTop = el.scrollHeight; });
+    };
+    rolar();
+    const t1 = window.setTimeout(rolar, 120);
+    const t2 = window.setTimeout(rolar, 450);
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
+  }, []);
   return (
-    <div className="flex-1 flex flex-col w-full h-full min-h-0 bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
+    <div ref={chatRootRef} className="flex-1 flex flex-col w-full h-full min-h-0 bg-[var(--libido-bg)] text-[var(--libido-text)] overflow-hidden">
       {/* HEADER LISTA */}
       <div className="flex-none px-5 pt-5 pb-3 w-full">
         <h1 className="text-xl font-black uppercase tracking-wider italic font-fraunces font-medium">
