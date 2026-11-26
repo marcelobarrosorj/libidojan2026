@@ -148,6 +148,8 @@ export function Chat({
 
   const [conversas, setConversas] = useState<ConversaResumo[]>([]);
   const [midiaAberta, setMidiaAberta] = useState<string | null>(null);
+  // CHAT-MENU-EXCLUIR: mensagem alvo do menu de exclusao
+  const [menuMsg, setMenuMsg] = useState<any>(null);
 
   const recarregarConversas = useCallback(async () => {
     if (!userId) return;
@@ -161,30 +163,9 @@ export function Chat({
     return () => clearInterval(t);
   }, [recarregarConversas]);
 
-  async function acoesMensagem(msg: any) {
-
-    // CHAT-EXCLUIR-MODAL: usa o modal proprio em vez do prompt nativo
-
-    setMsgParaApagar(msg);
-
-    return;
-    const ops = ["Apagar para mim"];
-    if (podeApagarParaTodos(msg, userId)) ops.push("Apagar para todos");
-    let e: string | null = null;
-    try {
-      e = window.prompt("1 - " + ops[0] + (ops[1] ? "\n2 - " + ops[1] : ""), "1");
-    } catch (perr) {
-      console.error("[chat] prompt bloqueado neste ambiente:", perr);
-      return;
-    }
-    if (!e) return;
-    try {
-      if (e.trim() === "1") await apagarParaMim(msg.id);
-      else if (e.trim() === "2" && ops[1]) await apagarParaTodos(msg.id);
-      else return;
-      setAllMessages((p: any[]) => p.filter((m) => String(m.id) !== String(msg.id)));
-      recarregarConversas();
-    } catch (err) { console.error("[chat] apagar", err); }
+  async function acoesMensagem(msg: any) {
+    // CHAT-MENU-EXCLUIR: abre o menu proprio em vez do prompt nativo
+    setMenuMsg(msg);
   }
 
   async function acoesConversa(peerId: string) {
@@ -203,13 +184,7 @@ export function Chat({
     Number(localStorage.getItem("libido_chat_font") || 15)
   );
   // CHAT6-FOTO: estado de envio de foto
-  const [sendingPhoto, setSendingPhoto] = useState(false);
-  // CHAT-FOTO-WATCHDOG: libera o estado de envio se o upload nao concluir
-  useEffect(() => {
-    if (!sendingPhoto) return;
-    const t = window.setTimeout(() => setSendingPhoto(false), 30000);
-    return () => window.clearTimeout(t);
-  }, [sendingPhoto]);
+  const [sendingPhoto, setSendingPhoto] = useState(false);
   // CHAT8: modo da proxima foto (normal ou visualizacao unica) + overlay
   const pickOnceRef = useRef(false);
   const [viewOnceUrl, setViewOnceUrl] = useState<string | null>(null);
@@ -811,6 +786,67 @@ status: (m.status as any) || "sent",
           ))}
         {midiaAberta && (
           <MidiaUnica messageId={midiaAberta} onFechar={() => setMidiaAberta(null)} />
+        )}
+        {menuMsg && (
+          <div
+            className="fixed inset-0 z-[950] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            onClick={() => setMenuMsg(null)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-neutral-950 border border-white/10 rounded-3xl p-5 text-white shadow-2xl space-y-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="w-1 h-8 rounded-full bg-red-500 shrink-0" />
+                  <div>
+                    <p className="text-[15px] font-bold leading-tight">Apagar mensagem</p>
+                    <p className="text-[11px] text-neutral-400">{"Escolha o alcance da exclus\u00e3o"}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMenuMsg(null)}
+                  className="text-neutral-400 hover:text-white text-[18px] leading-none px-1"
+                >
+                  {"\u00d7"}
+                </button>
+              </div>
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => { const alvo = menuMsg; setMenuMsg(null); apagarParaMim(alvo.id); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-left transition-all"
+                >
+                  <span className="w-1 h-6 rounded-full bg-neutral-400 shrink-0" />
+                  <span>
+                    <span className="block text-[13px] font-semibold">Apagar para mim</span>
+                    <span className="block text-[11px] text-neutral-400">{"Some apenas da sua visualiza\u00e7\u00e3o"}</span>
+                  </span>
+                </button>
+                {podeApagarParaTodos(menuMsg, userId) && (
+                  <button
+                    type="button"
+                    onClick={() => { const alvo = menuMsg; setMenuMsg(null); apagarParaTodos(alvo.id); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-left transition-all"
+                  >
+                    <span className="w-1 h-6 rounded-full bg-red-500 shrink-0" />
+                    <span>
+                      <span className="block text-[13px] font-semibold text-red-300">Apagar para todos</span>
+                      <span className="block text-[11px] text-red-400/70">Remove para os dois participantes</span>
+                    </span>
+                  </button>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setMenuMsg(null)}
+                className="w-full py-2.5 text-[12px] font-semibold text-neutral-400 hover:text-white rounded-2xl hover:bg-white/5 transition-all"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
         )}
           {sendingPhoto && (
             <div className="text-center text-[12px] text-[var(--libido-muted)] opacity-70 font-bold">
