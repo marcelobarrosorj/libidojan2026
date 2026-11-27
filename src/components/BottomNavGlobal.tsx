@@ -28,7 +28,7 @@ export function BottomNavGlobal({ activeTab, onTabChange, isAdmin, unreadChat = 
     { id: 'top', label: 'Ranking', icon: Trophy, premium: false },
     { id: 'events', label: 'Eventos', icon: Calendar, premium: false },
     { id: 'groups', label: 'Grupos', icon: Users, premium: true },
-    { id: 'invites', label: 'Convites', icon: UserPlus, premium: false },
+    // CONVITES-REMOVIDO: opcao retirada do menu a pedido
     { id: 'settings', label: 'Configurações', icon: Settings, premium: false },
   ];
 
