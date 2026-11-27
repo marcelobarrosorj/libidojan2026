@@ -169,7 +169,7 @@ export function SearchScreen(props: any) {
               <div className="py-6 text-center text-[11px] text-[var(--libido-muted,#9ca3af)] animate-pulse">Buscando perfis...</div>
             ) : resultados.length > 0 ? (
               resultados.map((u, idx) => (
-                <div key={u.user_id || u.id || idx} onClick={() => setPerfilSelecionado(u)} className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all">
+                <div key={u.user_id || u.id || idx} onClick={() => { /* BUSCA-IR-PERFIL */ const alvo: any = { ...u, user_id: u.user_id || u.id, nickname: u.nickname || u.nome, photo_url: u.photo_url || u.foto }; if (typeof props?.navigate === "function") props.navigate("viewprofile", { user: alvo }); else setPerfilSelecionado(u); }} className="flex items-center justify-between bg-[var(--libido-surface-2,#16161d)] border border-[var(--libido-border,rgba(255,255,255,0.08))] hover:border-[var(--libido-accent,#d86b3f)]/50 p-2.5 rounded-xl cursor-pointer transition-all">
                   <div className="flex items-center gap-2.5">
                     <div className="w-10 h-10 rounded-full bg-black/60 border border-[var(--libido-accent,#d86b3f)]/60 overflow-hidden flex items-center justify-center shrink-0">
                       {u.foto ? (

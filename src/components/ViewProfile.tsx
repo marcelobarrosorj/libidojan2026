@@ -189,7 +189,7 @@ export function ViewProfile({ user, navigate, isPremium, currentUser }: ViewProf
 
   const nickname = user.nickname || 'Usuário';
   const photoUrl = user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
-  const userPhotos: string[] = user.photos || [];
+  const userPhotos: string[] = (user.photos && user.photos.length ? user.photos : (user.photo_url ? [user.photo_url] : [])); // GALERIA-FALLBACK
   const displayBio = extrairTextoBio(user.bio) || '';
   const isOnline = user.isOnline || user.is_online || false;
 
