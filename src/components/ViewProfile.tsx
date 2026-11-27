@@ -19,6 +19,8 @@ function extrairTextoBio(b: any): string {
   return b;
 }
 
+import { getUserById } from '../services/users';
+
 interface ViewProfileProps {
   currentUser?: User | null;
   user: User;
@@ -33,6 +35,22 @@ export function ViewProfile({ user, navigate, isPremium, currentUser }: ViewProf
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [galleryViewerIndex, setGalleryViewerIndex] = useState<number | null>(null);
+  // GALERIA-HIDRATAR: busca o perfil completo quando o objeto recebido vem parcial (mapa, busca, ranking)
+  const [fotosHidratadas, setFotosHidratadas] = useState<string[] | null>(null);
+  const idPerfil = (user as any)?.user_id || (user as any)?.id || null;
+  useEffect(() => {
+    setFotosHidratadas(null);
+    if (!idPerfil) return;
+    let vivo = true;
+    getUserById(String(idPerfil))
+      .then((completo: any) => {
+        if (!vivo || !completo) return;
+        const fotos: string[] = Array.isArray(completo.photos) ? completo.photos.filter(Boolean).map(String) : [];
+        if (fotos.length > 0) setFotosHidratadas(fotos);
+      })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, [idPerfil]);
   const [reportReason, setReportReason] = useState('');
   const [isReporting, setIsReporting] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -189,7 +207,7 @@ export function ViewProfile({ user, navigate, isPremium, currentUser }: ViewProf
 
   const nickname = user.nickname || 'Usuário';
   const photoUrl = user.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
-  const userPhotos: string[] = (user.photos && user.photos.length ? user.photos : (user.photo_url ? [user.photo_url] : [])); // GALERIA-FALLBACK
+  const userPhotos: string[] = (fotosHidratadas && fotosHidratadas.length > 0 ? fotosHidratadas : (user.photos && user.photos.length ? user.photos : (user.photo_url ? [user.photo_url] : []))); // GALERIA-HIDRATADA
   const displayBio = extrairTextoBio(user.bio) || '';
   const isOnline = user.isOnline || user.is_online || false;
 
