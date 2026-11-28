@@ -205,6 +205,20 @@ export const getActiveUsersOriginal = async (currentUserId: string): Promise<Use
 };
 
 export const deleteUserProfile = async (userId: string) => {
+  /* 
+TRAVA-EXCLUSAO
+: recusa alvo vazio ou igual a conta logada */
+  if (!
+userId
+) { throw new Error("Exclusao recusada: alvo nao informado."); }
+  try {
+    const _eu = (await supabase.auth.getUser()).data?.user?.id || "";
+    if (_eu && String(
+userId
+) === String(_eu)) { throw new Error("Exclusao recusada: o alvo e a propria conta logada."); }
+  } catch (_e: any) {
+    if (String(_e?.message || "").indexOf("propria conta") >= 0) throw _e;
+  }
   if (isDemoId(userId)) return;
   try {
     const { data: listaArquivos } = await supabase.storage.from('photos').list(userId);
